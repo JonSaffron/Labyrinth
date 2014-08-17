@@ -1,0 +1,103 @@
+﻿green kiler cube not shooting, and seems to change frame too quickly
+can't shoot eggs
+shots go through walls
+can't shoot fruit or mushrooms
+mushrooms are planted not square on tiles, or on top of other mushrooms
+
+
+
+
+crushing monsters and player
+new level sound
+restart position and energy
+map monsters/crystal/forcefields position
+monsters movement & behaviour
+count of fruit per level
+die if in forcefield
+monsters shooting
+record position of static monsters, fruit, etc
+mushrooms
+gravestone
+forcefield not present impedes shots
+how to finish level?
+
+if moving towards a blank space then tend to keep moving in the same direction
+	if not going to continue, then change direction by 90 degrees in a free direction. If no free direction then keep going.
+If space ahead is not free, then tend to go back in opposite direction. Or a free 90 degree direction.
+If aggressive, and on same or adjacent line to player and moving perpendicular than may change direction.
+
+
+-- Stop shot after a certain amount of movementC:\Users\Jon\Documents\Visual Studio 2010\Projects\Labyrinth\WindowsGame1\_ToDo.txt
+
+-- Monsters in front of eggs
+
+-- Flittering
+
+cautious movement
+
+-- shot bouncing off stuff
+
+-- laying mushrooms
+
+firing in monster class bang when monster fires
+
+-- turn shot into bang
+
+prevent fruit on crystals
+
+flitterbug brown
+crazy crawler
+moth
+joker
+
+two monsters on same square e.g. 44, 47 : 2nd appears to be no longer on potentially occupied tile
+
+***************
+
+# forcefield
+t thresher
+p thresher cyan (poisonous)
+r rotafloater
+s rotafloater cyan (speedy)
+K green killer cube (still)
+f red flitterbug
+y cyan flitterbug
+k red killer cube (moving)
+d diamond demon
+x flitterbug brown
+c crazy crawler
+m moth
+j joker
+b butterfly
+X deathcube
+
+C crystal
+
+----------------------------------------------------------------
+
+map
+contains walls and floors and potentially occupied squares
+
+items
+block, crystals, forcefields, monsters
+
+load map array. mark down tile useage - floor, wall, potentially occupied
+
+load items lists, create 2nd map array useage - free, static monster, moving monster
+
+run through map arrays:
+	map			lists		results
+	-------------------------------
+	floor		free		ok
+	floor		static		bad
+	floor		moving		bad
+
+	wall		free		ok
+	wall		static		bad
+	wall		moving		bad
+
+	potential	free		bad
+	potential	static		ok
+	potential	moving		ok
+
+	

@@ -1,0 +1,17 @@
+﻿- The routines for animating the monsters are very different.
+
+Firstly, their "AI" is completely different, and their position is maintained
+off the screen.
+
+- The way fruit is distributed.
+
+Originally, a set amount of fruit is expected when a new level is started.
+If fruit is not collected from an earlier level then a new piece of fruit
+will not become available. The split between what type of fruit is created
+is random.
+
+- Some floor/wall tiles and other sprites
+
+There are new floor and wall tiles where appropriate. Some sprites
+have had some very minor tweaks where they looked odd under a greater
+resolution.

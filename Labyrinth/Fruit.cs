@@ -1,0 +1,75 @@
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Labyrinth
+    {
+    class Fruit : StaticItem
+        {
+        private readonly FruitType _fruitType;
+        private bool _isTaken;
+
+        public Fruit(World world, Vector2 position, FruitType fruitType) : base(world, position)
+            {
+            this._fruitType = fruitType;
+            switch (fruitType)
+                {
+                case FruitType.Apple:
+                    this.Energy = 6;
+                    break;
+                case FruitType.Watermelon:
+                    this.Energy = 8;
+                    break;
+                case FruitType.Pineapple:
+                    this.Energy = 10;
+                    break;
+                case FruitType.Strawberry:
+                    this.Energy = 12;
+                    break;
+                case FruitType.Cherries:
+                    this.Energy = 14;
+                    break;
+                case FruitType.Acorn:
+                    this.Energy = 16;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+                }
+            
+            string file = string.Format("Sprites/Fruit/{0:G}", _fruitType);
+            
+            var texture = World.Content.Load<Texture2D>(file);
+            var a = Animation.StaticAnimation(texture);
+            this.Ap.PlayAnimation(a);
+            }
+
+        public FruitType FruitType
+            {
+            get
+                {
+                return this._fruitType;
+                }
+            }
+
+        public override bool IsExtant
+        {
+            get
+            {
+                var result = base.IsExtant && !this._isTaken;
+                return result;
+            }
+        }
+
+        public void SetTaken()
+        {
+            this._isTaken = true;
+        }
+
+        public override TouchResult OnTouched(Player p)
+            {
+            this.World.Game.SoundLibrary.Play(GameSound.PlayerEatsFruit);
+            p.AddEnergy(Energy);
+            return TouchResult.RemoveObject;
+            }
+        }
+    }
