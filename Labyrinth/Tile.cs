@@ -9,7 +9,7 @@ namespace Labyrinth
     struct Tile
         {
         public readonly Texture2D Floor;
-        public readonly Texture2D Wall;
+
         private TileTypeByMap _tileTypeByMap;
         private TileTypeByData _tileTypeByData;
         private readonly char _symbol;
@@ -18,16 +18,15 @@ namespace Labyrinth
         public const int Height = 32;
         public static readonly Vector2 Size = new Vector2(Width, Height);
 
-        public Tile(Texture2D floor, Texture2D wall, TileTypeByMap tileTypeByMap)
+        public Tile(Texture2D floor, TileTypeByMap tileTypeByMap)
             {
             this.Floor = floor;
-            this.Wall = wall;
             this._tileTypeByMap = tileTypeByMap;
             this._tileTypeByData = TileTypeByData.Free;
             this._symbol = ' ';
             }
         
-        public Tile(Texture2D floor, char symbol) : this(floor, null, TileTypeByMap.PotentiallyOccupied)
+        public Tile(Texture2D floor, char symbol) : this(floor, TileTypeByMap.PotentiallyOccupied)
             {
             this._symbol = symbol;
             }
@@ -95,13 +94,13 @@ namespace Labyrinth
                 }
             }
 
-        public TileCollision Collision
-            {
-            get
-                {
-                TileCollision result = this._tileTypeByMap == TileTypeByMap.Wall ? TileCollision.Impassable : TileCollision.Passable;
-                return result;
-                }
-            }
+        //public TileCollision Collision
+        //    {
+        //    get
+        //        {
+        //        TileCollision result = this._tileTypeByMap == TileTypeByMap.Wall ? TileCollision.Impassable : TileCollision.Passable;
+        //        return result;
+        //        }
+        //    }
         }
     }

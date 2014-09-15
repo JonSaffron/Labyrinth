@@ -52,24 +52,17 @@ namespace Labyrinth
             }
 
         public override bool IsExtant
-        {
-            get
             {
+            get
+                {
                 var result = base.IsExtant && !this._isTaken;
                 return result;
+                }
             }
-        }
 
         public void SetTaken()
-        {
-            this._isTaken = true;
-        }
-
-        public override TouchResult OnTouched(Player p)
             {
-            this.World.Game.SoundLibrary.Play(GameSound.PlayerEatsFruit);
-            p.AddEnergy(Energy);
-            return TouchResult.RemoveObject;
+            this._isTaken = true;
             }
         }
     }

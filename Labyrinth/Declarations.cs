@@ -1,22 +1,5 @@
 ﻿namespace Labyrinth
     {
-    /// <summary>
-    /// Controls the collision detection and response behavior of a tile.
-    /// </summary>
-    enum TileCollision
-        {
-        /// <summary>
-        /// A passable, empty tile is one which does not hinder player motion at all.
-        /// </summary>
-        Passable = 0,
-
-        /// <summary>
-        /// An impassable tile is one which does not allow the player to move through
-        /// it at all. It is completely solid.
-        /// </summary>
-        Impassable = 1
-        }
-    
     public enum TileTypeByMap
         {
         Floor,
@@ -57,7 +40,28 @@
         Up,
         Down
         }
-        
+    
+    /// <summary>
+    /// Describes how solid an object is
+    /// </summary>
+    enum ObjectSolidity
+        {
+        /// <summary>
+        /// An object can move into a space occupied by a passable object
+        /// </summary>
+        Passable,
+
+        /// <summary>
+        /// An object can push a moveable object away and take its place
+        /// </summary>
+        Moveable,
+
+        /// <summary>
+        /// An object cannot move into a space occupied by an impassable object
+        /// </summary>
+        Impassable
+        }
+
     enum PushStatus
         {
         Yes,
@@ -73,20 +77,6 @@
         Strawberry = 4,
         Cherries = 5,
         Acorn = 6
-        }
-    
-    enum ShotStatus
-        {
-        HitHome,        // hit and hurt monster, or impassable tile
-        BounceOff,      // bounce off monster or object
-        CarryOn         // nothing in the way
-        }
-    
-    enum ShotOutcome
-        {
-        Remove,
-        Continue,
-        ConvertToBang
         }
     
     enum LevelReturnType
@@ -124,13 +114,6 @@
         Cautious
         }
     
-    enum TouchResult
-        {
-        NoEffect,
-        RemoveObject,
-        BounceBack
-        }
-    
     enum ChangeRooms
         {
         StaysWithinRoom,
@@ -150,11 +133,6 @@
         Normal,
         Egg,
         Hatching
-        }
-
-    public enum InjuryType
-        {
-            
         }
 
     public enum GameSound

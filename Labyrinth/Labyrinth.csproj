@@ -146,6 +146,8 @@
     <Compile Include="Monster\KillerCube.cs" />
     <Compile Include="Monster\KillerCubeGreen.cs" />
     <Compile Include="Monster\KillerCubeRed.cs" />
+    <Compile Include="StaticItemAndStaticItemInteraction.cs" />
+    <Compile Include="Wall.cs" />
     <Compile Include="World.cs" />
     <Compile Include="Monster\Monster.cs" />
     <Compile Include="Monster\MonsterMovement.cs" />

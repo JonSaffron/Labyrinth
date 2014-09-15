@@ -36,6 +36,12 @@ namespace Labyrinth
                 return;
                 }
 
+            if (this._staticItem is Wall)
+                {
+                this._shot.InstantDeath();
+                return;
+                }
+
             if (!(this._staticItem is Fruit) && !(this._staticItem is Grave) && !(this._staticItem is Mushroom)) 
                 return;
 

@@ -9,9 +9,6 @@ namespace Labyrinth.Monster
         {
         protected static readonly Random MonsterRandom = new Random();
         
-        // Movement
-        //private Vector2 MovingTowards { get; set; }
-
         private MonsterMobility _mobility;
         protected abstract Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility);
         private Func<Monster, Direction> _determineDirection;
@@ -89,8 +86,14 @@ namespace Labyrinth.Monster
             {
             get
                 {
-                var result = this.MonsterState == MonsterState.Egg || this.MonsterState == MonsterState.Hatching;
-                return result;
+                var monsterState = this.MonsterState;
+                switch (monsterState)
+                    {
+                    case MonsterState.Egg:
+                    case MonsterState.Hatching:
+                        return true;
+                    }
+                return false;
                 }
             }
 
@@ -177,9 +180,9 @@ namespace Labyrinth.Monster
                 }
             }
         
-        public override void ReduceEnergy(int energy)
+        public override void ReduceEnergy(int energyToRemove)
             {
-            base.ReduceEnergy(energy);
+            base.ReduceEnergy(energyToRemove);
             if (this.IsAlive())
             {
                 var gs = this.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
@@ -197,40 +200,6 @@ namespace Labyrinth.Monster
                 }
             }
         
-        public override ShotStatus OnShot(Shot s)
-            {
-            if (!this.IsExtant)
-                return ShotStatus.CarryOn;
-            
-            if (!this.IsActive)
-                this.IsActive = true;
-            
-            if (this.Mobility == MonsterMobility.Patrolling)
-                this.Mobility = MonsterMobility.Placid;
-            
-            if (this.ShotsBounceOff)
-                {
-                ShotStatus result = s.HasRebounded ? ShotStatus.CarryOn : ShotStatus.BounceOff;
-                return result;
-                }
-            
-            this.World.IncreaseScore(Math.Min(s.Energy, this.Energy) * 10);
-            ReduceEnergy(s.Energy);
-            var sound = !this.IsExtant 
-                ? GameSound.MonsterDies 
-                : (this.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster);
-            this.World.Game.SoundLibrary.Play(sound);
-            return ShotStatus.HitHome;
-            }
-
-        public override TouchResult OnTouched(Player p)
-            {
-            p.ReduceEnergy(this.Energy);
-            this.InstantDeath();
-            this.World.Game.SoundLibrary.Play(GameSound.PlayerCollidesWithMonster);
-            return TouchResult.RemoveObject;
-            }
-
         public virtual int InstantDeath()
             {
             if (!this.IsExtant)
@@ -274,7 +243,7 @@ namespace Labyrinth.Monster
         /// <summary>
         /// Handles input, performs physics, and animates the sprite.
         /// </summary>
-        public override void Update(GameTime gameTime)
+        public override bool Update(GameTime gameTime)
             {
             bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this);
             
@@ -286,8 +255,9 @@ namespace Labyrinth.Monster
                 this.IsActive = true;
 
             if (!this.IsActive)
-                return;
+                return false;
 
+            bool result = false;
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _stepTime += elapsed;
             float remainingMovement = (CurrentVelocity * (_flitterFlag ? 2 : 1)) * elapsed;
@@ -316,6 +286,7 @@ namespace Labyrinth.Monster
                 else
                     {
                     this.ContinueMove(ref remainingMovement, out needToChooseDirection);
+                    result = true;
                     }                
                 }
 
@@ -324,6 +295,7 @@ namespace Labyrinth.Monster
                 _stepTime -= AnimationPlayer.GameClockResolution;
                 DoMonsterAction(inSameRoom);
                 }
+            return result;
             }
 
         private void DoMonsterAction(bool inSameRoom)
@@ -331,20 +303,21 @@ namespace Labyrinth.Monster
             if (this.LaysMushrooms && !this.IsEgg && this.World.ShotExists() && inSameRoom && (MonsterRandom.Next(256) & 1) == 0 && IsDirectionCompatible(this.World.Player.Direction, this.Direction))
                 {
                 TilePos tp = TilePos.TilePosFromPosition(this.Position);
-                if (this.World.IsTileUnoccupied(tp, false))
+                if (!this.World.IsStaticItemOnTile(tp))
                     {
                     this.World.Game.SoundLibrary.Play(GameSound.MonsterLaysMushroom);
-                    this.World.AddMushroom(this.Position);
+                    this.World.AddMushroom(tp.ToPosition());
                     }
                 }
 
             if (this.LaysEggs && inSameRoom && this.World.Player.IsExtant && !this.IsEgg && (MonsterRandom.Next(256) & 0x1f)  == 0)
                 {
                 TilePos tp = TilePos.TilePosFromPosition(this.Position);
-                if (this.World.IsTileUnoccupied(tp, false))
+                if (this.World.IsStaticItemOnTile(tp))
                     {
                     this.World.Game.SoundLibrary.Play(GameSound.MonsterLaysEgg);
                     Monster m = this.Clone();
+                    m.ResetAnimationPlayerAfterClone();
                     m.Energy = this._originalEnergy;
                     m.DelayBeforeHatching = (MonsterRandom.Next(256) & 0x1f) + 8;
                     m.LaysEggs = false;
@@ -387,85 +360,11 @@ namespace Labyrinth.Monster
             return result;
             }
 
-        private void ContinueMove(ref float maxMovementRemaining, out bool hasArrivedAtDestination)
+        protected override void ContinueMove(ref float maxMovementRemaining, out bool hasArrivedAtDestination)
             {
             Rectangle currentRoom = World.GetContainingRoom(this.Position);
-
-            switch (this.Direction)
-                {
-                //case Direction.None:
-                //    this.MovingTowards += new Vector2(-maxMovementRemaining, -maxMovementRemaining);
-                //    if (MovingTowards.X < Vector2.Zero.X)
-                //        {
-                //        maxMovementRemaining = -MovingTowards.X;
-                //        this.MovingTowards = Vector2.Zero;
-                //        moveFinished = false;
-                //        }
-                //    else
-                //        {
-                //        maxMovementRemaining = 0;
-                //        moveFinished = true;
-                //        }
-                //    break;
-                case Direction.Left:
-                    Position += new Vector2(-maxMovementRemaining, 0);
-                    if (Position.X < MovingTowards.X)
-                        {
-                        maxMovementRemaining = MovingTowards.X - Position.X;
-                        Position = new Vector2(MovingTowards.X, Position.Y);
-                        hasArrivedAtDestination = true;
-                        }
-                    else
-                        {
-                        maxMovementRemaining = 0;
-                        hasArrivedAtDestination = false;
-                        }
-                    break;
-                case Direction.Right:
-                    Position += new Vector2(maxMovementRemaining, 0);
-                    if (Position.X > MovingTowards.X)
-                        {
-                        maxMovementRemaining = Position.X - MovingTowards.X;
-                        Position = new Vector2(MovingTowards.X, Position.Y);
-                        hasArrivedAtDestination = true;
-                        }
-                    else
-                        {
-                        maxMovementRemaining = 0;
-                        hasArrivedAtDestination = false;
-                        }
-                    break;
-                case Direction.Up:
-                    Position += new Vector2(0, -maxMovementRemaining);
-                    if (Position.Y < MovingTowards.Y)
-                        {
-                        maxMovementRemaining = MovingTowards.Y - Position.Y;
-                        Position = new Vector2(Position.X, MovingTowards.Y);
-                        hasArrivedAtDestination = true;
-                        }
-                    else
-                        {
-                        maxMovementRemaining = 0;
-                        hasArrivedAtDestination = false;
-                        }
-                    break;
-                case Direction.Down:
-                    Position += new Vector2(0, maxMovementRemaining);
-                    if (Position.Y > MovingTowards.Y)
-                        {
-                        maxMovementRemaining = Position.Y - MovingTowards.Y;
-                        Position = new Vector2(Position.X, MovingTowards.Y);
-                        hasArrivedAtDestination = true;
-                        }
-                    else
-                        {
-                        maxMovementRemaining = 0;
-                        hasArrivedAtDestination = false;
-                        }
-                    break;
-                default:
-                    throw new InvalidOperationException();
-                }
+            
+            base.ContinueMove(ref maxMovementRemaining, out hasArrivedAtDestination);
 
             Rectangle newRoom = World.GetContainingRoom(this.Position);
             if (currentRoom != newRoom)
@@ -511,7 +410,7 @@ namespace Labyrinth.Monster
             TilePos testPos = startPos;
             while (true)
                 {
-                bool isClear = this.World.IsTileUnoccupied(testPos, false);
+                bool isClear = this.World.CanTileBeOccupied(testPos, true);
                 if (!isClear)
                     return;
                 testPos = TilePos.GetPositionAfterOneMove(testPos, firingDirection);

@@ -15,15 +15,6 @@ namespace Labyrinth
             this.Energy = 40;
             }
         
-        public override TouchResult OnTouched(Player p)
-            {
-            this.World.Game.SoundLibrary.Play(GameSound.PlayerInjured);
-            int r = CalculateEnergyToRemove(p);
-            if (r > 0)
-                p.ReduceEnergy(r);
-            return TouchResult.RemoveObject;
-            }
-
         public override bool IsExtant
         {
             get

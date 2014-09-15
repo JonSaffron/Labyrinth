@@ -21,32 +21,17 @@ namespace Labyrinth
             }
 
         public override bool IsExtant
-        {
-            get
             {
+            get
+                {
                 var result = base.IsExtant && !this._isTaken;
                 return result;
+                }
             }
-        }
 
         public void SetTaken()
-        {
+            {
             this._isTaken = true;
-        }
-
-        public override TouchResult OnTouched(Player p)
-            {
-            if (this.World.HowManyCrystalsRemain() > 1)
-                this.World.Game.SoundLibrary.Play(GameSound.PlayerCollectsCrystal);
-            p.AddEnergy(Energy);
-            base.World.IncreaseScore(Score);
-            p.CrystalCollected(this);
-            return TouchResult.RemoveObject;
-            }
-
-        public override ShotStatus OnShot(Shot s)
-            {
-            return ShotStatus.CarryOn;
             }
         }
     }

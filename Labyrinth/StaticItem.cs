@@ -5,7 +5,7 @@ namespace Labyrinth
     {
     abstract class StaticItem
         {
-        protected readonly AnimationPlayer Ap = new AnimationPlayer();
+        private AnimationPlayer _animationPlayer = new AnimationPlayer();
         
         public int Energy { get; protected set; }
         
@@ -19,6 +19,20 @@ namespace Labyrinth
             this.Position = position;
             }
         
+        protected AnimationPlayer Ap
+            {
+            get
+                {
+                var result = this._animationPlayer;
+                return result;
+                }
+            }
+
+        protected void ResetAnimationPlayerAfterClone()
+            {
+            this._animationPlayer = new AnimationPlayer();
+            }
+
         public virtual Rectangle BoundingRectangle
             {
             get
@@ -36,40 +50,12 @@ namespace Labyrinth
                 Ap.Draw(gt, spriteBatch, Position);
             }
         
-        /// <summary>
-        /// Determines what happens when the player touches this object
-        /// </summary>
-        /// <param name="p">An instance of the player object</param>
-        /// <returns>Whether to remove this object or not</returns>
-        public virtual TouchResult OnTouched(Player p)
+        public virtual void ReduceEnergy(int energyToRemove)
             {
-            return TouchResult.NoEffect;
-            }
-        
-        /// <summary>
-        /// Determines what happens when a shot touches this object
-        /// </summary>
-        /// <param name="s">An instance of a shot object</param>
-        /// <returns>Whether the shot hit this object, bounced off it, or has no effect on it</returns>
-        public virtual ShotStatus OnShot(Shot s)
-            {
-            if (!IsExtant)
-                return ShotStatus.CarryOn;
-            
-            this.World.Game.SoundLibrary.Play(GameSound.StaticObjectShotAndInjured);
-            this.ReduceEnergy(s.Energy);
-            return ShotStatus.HitHome;
-            }
+            if (energyToRemove <= 0)
+                throw new ArgumentOutOfRangeException("energyToRemove", energyToRemove, "Must be above 0.");
 
-        public virtual void ReduceEnergy(int energy)
-            {
-            if (energy <= 0)
-                throw new ArgumentOutOfRangeException("energy", energy, "Must be above 0.");
-            this.Energy -= energy;
-            if (this.Energy < 0)
-                {
-                this.Energy = 0;
-                }
+            this.Energy = (this.Energy > energyToRemove) ? this.Energy - energyToRemove : 0;
             }
 
         public virtual bool IsExtant
@@ -77,6 +63,14 @@ namespace Labyrinth
             get
                 {
                 return this.Energy > 0;
+                }
+            }
+
+        public virtual ObjectSolidity Solidity
+            {
+            get
+                {
+                return ObjectSolidity.Passable;
                 }
             }
         }

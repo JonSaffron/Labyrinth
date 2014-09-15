@@ -47,6 +47,7 @@ namespace Labyrinth
                 int monsterEnergy = this._monster1.Energy;
                 this._player.ReduceEnergy(monsterEnergy);
                 this._monster1.InstantDeath();
+                this._world.AddLongBang(this._monster1.Position);
                 this._world.Game.SoundLibrary.Play(GameSound.PlayerCollidesWithMonster);
                 return;
                 }
@@ -61,31 +62,12 @@ namespace Labyrinth
                 if (this._boulder.Direction == Direction.None && this._player.Direction != Direction.None && !this._player.IsBouncingBack)
                     {
                     // cannot crush if not moving - can it be pushed?
-
-                    PushStatus ps = this._boulder.CanBePushed(this._player.Direction);
-                    switch (ps)
-                        {
-                        case PushStatus.No:
-                            return;
-
-                        case PushStatus.Yes:
-                            this._boulder.Push(this._player.Direction, false);
-                            return;
-
-                        case PushStatus.Bounce:
-                            this._boulder.Push(this._player.Direction.Reversed(), true);
-                            // todo this._player.BounceBack(this._player.Direction.Reversed(), gameTime);
-                            this._player.BounceBack(this._player.Direction.Reversed());
-                            this._world.Game.SoundLibrary.Play(GameSound.BoulderBounces);
-                            return;
-
-                        default:
-                            throw new InvalidOperationException();
-                        }
+                    this._boulder.PushOrBounce(this._player, this._player.Direction);
+                    return;
                     }
                 
                 // is the player in danger of being crushed?
-                if (true || this._boulder.Direction == this._player.Direction)
+                if (this._boulder.Direction == this._player.Direction)
                     return;
 
                 var playerPosition = this._player.Direction == Direction.None ? this._player.Position : this._player.MovingTowards;
@@ -111,7 +93,8 @@ namespace Labyrinth
                     this._world.AddLongBang(this._monster1.Position);
                     this._world.IncreaseScore(score);
                     }
-                return;
+                
+                //return;
                 }
             }
         }

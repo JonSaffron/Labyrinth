@@ -113,7 +113,7 @@ namespace Labyrinth
         /// <summary>
         /// Handles input, performs physics, and animates the player sprite.
         /// </summary>
-        public override void Update(GameTime gameTime)
+        public override bool Update(GameTime gameTime)
             {
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             var distance = this.CurrentVelocity * elapsed;
@@ -121,6 +121,7 @@ namespace Labyrinth
             this._distanceToTravel -= distance;
             if (this._distanceToTravel <= 0)
                 this.Energy = 0;
+            return true;
             }
 
         public void Reverse()
@@ -132,24 +133,6 @@ namespace Labyrinth
             this.World.Game.SoundLibrary.Play(GameSound.ShotBounces);
             this.HasRebounded = true;
             ResetDistanceToTravel();
-            }
-
-        public override TouchResult OnTouched(Player p)
-            {
-            throw new InvalidOperationException();
-            }
-
-        public override ShotStatus OnShot(Shot s)
-            {
-            if (!this.IsExtant || !s.IsExtant || s.ShotType == this.ShotType || s.Direction != this.Direction.Reversed())
-                return ShotStatus.CarryOn;
-
-            int minEnergy = Math.Min(this.Energy, s.Energy);
-            this.World.Game.SoundLibrary.Play(GameSound.StaticObjectShotAndInjured);
-            this.ReduceEnergy(minEnergy);
-            s.ReduceEnergy(minEnergy);
-            var result = this.IsExtant ? ShotStatus.CarryOn : ShotStatus.HitHome;
-            return result;
             }
 
         public virtual void InstantDeath()

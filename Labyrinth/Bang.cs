@@ -31,11 +31,6 @@ namespace Labyrinth
             this._isExtant = true;
             }
 
-        public override ShotStatus OnShot(Shot s)
-            {
-            return ShotStatus.CarryOn;
-            }
-
         private void AnimationFinished(object sender, EventArgs e)
             {
             this._isExtant = false;

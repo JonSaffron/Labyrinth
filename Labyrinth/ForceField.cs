@@ -24,18 +24,5 @@ namespace Labyrinth
                 return result;
                 }
             }
-
-        public override TouchResult OnTouched(Player p)
-            {
-            if (IsExtant)
-                p.InstantDeath();
-            return TouchResult.NoEffect;
-            }
-
-        public override ShotStatus OnShot(Shot s)
-            {
-            ShotStatus result = IsExtant ? ShotStatus.BounceOff : ShotStatus.CarryOn;
-            return result;
-            }
         }
     }

@@ -6,9 +6,6 @@ namespace Labyrinth
     {
     class Boulder : MovingItem
         {
-        // Movement
-        //public Vector2 MovingTowards { get; private set; }
-        
         // Animations
         private Animation _staticImage;
         
@@ -43,103 +40,113 @@ namespace Labyrinth
                 }
             }
 
-        public override TouchResult OnTouched(Player p)
+        public override PushStatus CanBePushed(Direction direction)
             {
-            //PushStatus ps = this.CanBePushed(p.Direction);
-            //if (ps == PushStatus.No)
-            //    return TouchResult.NoEffect;
-            
-            //Vector2 difference = p.Position - this.Position;
-            //float distanceApart = Math.Abs(difference.Length());
-            //if (distanceApart >= 40)
-            //    return TouchResult.NoEffect;
-
-            //switch (ps)
-            //    {
-            //    case PushStatus.Yes:
-            //        this.Push(p.Direction, false);
-            //        return TouchResult.NoEffect;
-
-            //    case PushStatus.Bounce:
-            //        this.BounceBack(p.Direction);
-            //        return TouchResult.BounceBack;
-
-            //    default:
-            //        throw new InvalidOperationException();
-            //    }
-            return TouchResult.NoEffect;
-            }
-
-        public PushStatus CanBePushed(Direction d)
-            {
-            TilePos tp = TilePos.TilePosFromPosition(Position);
-            bool canMoveForwards = World.IsTileUnoccupied(TilePos.GetPositionAfterOneMove(tp, d), false);
-            if (canMoveForwards)
-                return PushStatus.Yes;
-
-            Direction oppositeDirection = d.Reversed();
-            TilePos playersPositionAfterBouncing = TilePos.GetPositionAfterOneMove(TilePos.GetPositionAfterOneMove(tp, oppositeDirection), oppositeDirection);
-            bool canMoveBackwards = World.IsTileUnoccupied(playersPositionAfterBouncing, false);
-            var result = canMoveBackwards ? PushStatus.Bounce : PushStatus.No;
+            var result = this.CanMoveTo(direction, false) ? PushStatus.Yes : PushStatus.No;
             return result;
             }
-        
-        public void Push(Direction d, bool isBounceBack)
+
+        public override PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction)
             {
-            TilePos tp = TilePos.TilePosFromPosition(this.Position);
-            TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, d);
-            if (World.IsTileUnoccupied(potentiallyMovingTowardsTile, false))
+            var result = CanBePushed(direction);
+            if (result == PushStatus.No)
+                result = byWhom.CanBePushed(direction.Reversed());
+            return result;
+            }
+
+        //[Obsolete]
+        //public PushStatus CanBePushed(Direction d)
+        //    {
+        //    TilePos tp = TilePos.TilePosFromPosition(Position);
+        //    bool canMoveForwards = World.IsTileUnoccupied(TilePos.GetPositionAfterOneMove(tp, d), false);
+        //    if (canMoveForwards)
+        //        return PushStatus.Yes;
+
+        //    Direction oppositeDirection = d.Reversed();
+        //    TilePos playersPositionAfterBouncing = TilePos.GetPositionAfterOneMove(TilePos.GetPositionAfterOneMove(tp, oppositeDirection), oppositeDirection);
+        //    bool canMoveBackwards = World.IsTileUnoccupied(playersPositionAfterBouncing, false);
+        //    var result = canMoveBackwards ? PushStatus.Bounce : PushStatus.No;
+        //    return result;
+        //    }
+        
+        public void Push(Direction direction)
+            {
+            var ps = CanBePushed(direction);
+            switch (ps)
                 {
-                this.Direction = d;
-                this.MovingTowards = potentiallyMovingTowardsTile.ToPosition();
-                this.CurrentVelocity = isBounceBack ? BounceBackSpeed : StandardSpeed;
+                case PushStatus.No:
+                    return;
+
+                case PushStatus.Yes:
+                    {
+                    this.Direction = direction;
+                    this.MovingTowards = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(direction).ToPosition();
+                    this.CurrentVelocity = StandardSpeed;
+                    return;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+                }
+            }
+
+        public void PushOrBounce(MovingItem byWhom, Direction direction)
+            {
+            var ps = CanBePushedOrBounced(byWhom, direction);
+            switch (ps)
+                {
+                case PushStatus.No:
+                    return;
+
+                case PushStatus.Yes:
+                    {
+                    this.Direction = direction;
+                    this.MovingTowards = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(direction).ToPosition();
+                    this.CurrentVelocity = StandardSpeed;
+                    return;
+                    }
+
+                case PushStatus.Bounce:
+                    {
+                    this.Direction = direction.Reversed();
+                    this.MovingTowards = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(this.Direction).ToPosition();
+                    this.CurrentVelocity = BounceBackSpeed;
+
+                    // todo this._player.BounceBack(this._player.Direction.Reversed(), gameTime);
+                    byWhom.BounceBack(this.Direction);
+                    this.World.Game.SoundLibrary.Play(GameSound.BoulderBounces);
+                    return;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
                 }
             }
 
         /// <summary>
         /// Handles input, performs physics, and animates the player sprite.
         /// </summary>
-        public override void Update(GameTime gameTime)
+        public override bool Update(GameTime gameTime)
             {
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (this.Direction != Direction.None)
-                {   // currently in motion
-                switch (this.Direction)
-                    {
-                    case Direction.Left:
-                        Position += new Vector2(-CurrentVelocity, 0) * elapsed;
-                        if (Position.X < MovingTowards.X)
-                            {
-                            Position = new Vector2(MovingTowards.X, Position.Y);
-                            this.Direction = Direction.None;
-                            }
-                        break;
-                    case Direction.Right:
-                        Position += new Vector2(CurrentVelocity, 0) * elapsed;
-                        if (Position.X > MovingTowards.X)
-                            {
-                            Position = new Vector2(MovingTowards.X, Position.Y);
-                            this.Direction = Direction.None;
-                            }
-                        break;
-                    case Direction.Up:
-                        Position += new Vector2(0, -CurrentVelocity) * elapsed;
-                        if (Position.Y < MovingTowards.Y)
-                            {
-                            Position = new Vector2(Position.X, MovingTowards.Y);
-                            this.Direction = Direction.None;
-                            }
-                        break;
-                    case Direction.Down:
-                        Position += new Vector2(0, CurrentVelocity) * elapsed;
-                        if (Position.Y > MovingTowards.Y)
-                            {
-                            Position = new Vector2(Position.X, MovingTowards.Y);
-                            this.Direction = Direction.None;
-                            }
-                        break;
-                    }
+            bool isMoving = this.Position != this.MovingTowards;
+            if (isMoving)
+                {
+                float remainingMovement = (CurrentVelocity * elapsed);
+                bool hasArrivedAtDestination;
+                ContinueMove(ref remainingMovement, out hasArrivedAtDestination);
+                if (hasArrivedAtDestination)
+                    this.Direction = Direction.None;
+                }
+            return isMoving;
+            }
+
+        public override ObjectSolidity Solidity
+            {
+            get
+                {
+                return ObjectSolidity.Moveable;
                 }
             }
         }

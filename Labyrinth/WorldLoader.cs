@@ -125,7 +125,7 @@ namespace Labyrinth
                 string type = mdef.GetAttribute("Type");
                 var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
                 Vector2 position = tilePos.ToPosition();
-                if (!world.IsTileUnoccupied(position, false))
+                if (!world.CanTileBeOccupied(tilePos, false))
                     throw new InvalidOperationException(string.Format("Position ({0}, {1}) for monster {2} is an impassable tile.", tilePos.X, tilePos.Y, type));
                 int e = int.Parse(mdef.GetAttribute("Energy"));
                 Monster.Monster m = Monster.Monster.Create(type, world, position, e);
@@ -229,13 +229,13 @@ namespace Labyrinth
             return result;
             }
 
-        public Tile[,] LoadLayout()
+        public Tile[,] LoadLayout(List<StaticItem> walls, World world)
             {
-            var world = (XmlElement)this._xmlDoc.SelectSingleNode("World");
-            if (world == null)
+            var worldDef = (XmlElement)this._xmlDoc.SelectSingleNode("World");
+            if (worldDef == null)
                 throw new InvalidOperationException("No World element found.");
-            int width = int.Parse(world.GetAttribute("Width"));
-            int height = int.Parse(world.GetAttribute("Height"));
+            int width = int.Parse(worldDef.GetAttribute("Width"));
+            int height = int.Parse(worldDef.GetAttribute("Height"));
             var layout = (XmlElement) this._xmlDoc.SelectSingleNode("World/Layout");
             if (layout == null)
                 throw new InvalidOperationException("No Layout element found.");
@@ -281,12 +281,14 @@ namespace Labyrinth
                         {
                         case TileTypeByMap.Wall:
                             floor = GetTexture(defaultFloor.TextureName);
-                            Texture2D wall = GetTexture(td.TextureName);
-                            tiles[p.X, p.Y] = new Tile(floor, wall, td.TileTypeByMap);
+                            tiles[p.X, p.Y] = new Tile(floor, td.TileTypeByMap);
+                            var position = new Vector2(p.X * Tile.Width + (Tile.Width / 2), p.Y * Tile.Height + (Tile.Height / 2));
+                            var wall = new Wall(world, position, GetTexture(td.TextureName));
+                            walls.Add(wall);
                             break;
                         case TileTypeByMap.Floor:
                             floor = GetTexture(td.TextureName);
-                            tiles[p.X, p.Y] = new Tile(floor, null, td.TileTypeByMap);
+                            tiles[p.X, p.Y] = new Tile(floor, td.TileTypeByMap);
                             break;
                         case TileTypeByMap.PotentiallyOccupied:
                             floor = GetTexture(defaultFloor.TextureName);

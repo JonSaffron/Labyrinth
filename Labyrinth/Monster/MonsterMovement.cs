@@ -14,7 +14,7 @@ namespace Labyrinth.Monster
 
             TilePos tp = TilePos.TilePosFromPosition(m.Position);
             TilePos pp = TilePos.GetPositionAfterOneMove(tp, m.Direction);
-            bool isCurrentlyMovingTowardsFreeSpace = m.World.IsTileUnoccupied(pp, true);
+            bool isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, false);
             Vector2 potentiallyMovingTowards = pp.ToPosition();
             bool isInSameRoom = IsInSameRoom(m.Position, potentiallyMovingTowards);
             bool canContinueMovingInTheSameDirection = isCurrentlyMovingTowardsFreeSpace && isInSameRoom;
@@ -112,7 +112,7 @@ namespace Labyrinth.Monster
             Direction result;
             if (IsCautious(m))
                 {
-                bool alterDirection = (MonsterRandom.Next(256) & 3) == 0;
+                bool alterDirection = m.Direction != Direction.None && (MonsterRandom.Next(256) & 3) == 0;
                 if (alterDirection)
                     result = AlterDirection(m.Direction);
                 else
@@ -242,7 +242,7 @@ namespace Labyrinth.Monster
                     continue;
                     }
                 
-                if (m.World.IsTileUnoccupied(potentiallyMovingTowards, true))
+                if (m.World.CanTileBeOccupied(potentiallyMovingTowards, false))
                     {
                     return d;
                     }                
@@ -256,8 +256,7 @@ namespace Labyrinth.Monster
         public static bool IsInSameRoom(Vector2 p1, Vector2 p2)
             {
             Rectangle room1 = World.GetContainingRoom(p1);
-            Rectangle room2 = World.GetContainingRoom(p2);
-            bool result = room1.Intersects(room2);
+            bool result = room1.IncludesPoint(p2);
             return result;
             }    
 

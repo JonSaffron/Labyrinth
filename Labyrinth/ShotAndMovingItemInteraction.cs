@@ -31,7 +31,7 @@ namespace Labyrinth
             var block = this._movingItem as Boulder;
             if (block != null)
                 {
-                block.Push(this._shot.Direction, false);
+                block.Push(this._shot.Direction);
                 this._world.ConvertShotToBang(this._shot);
                 return;
                 }

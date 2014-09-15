@@ -46,7 +46,7 @@ namespace Labyrinth.Monster
             else
                 {
                 TilePos pp = TilePos.GetPositionAfterOneMove(tp, m.Direction);
-                isCurrentlyMovingTowardsFreeSpace = m.World.IsTileUnoccupied(pp, true);
+                isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, false);
                 
                 if (isCurrentlyMovingTowardsFreeSpace)
                     {
@@ -96,7 +96,7 @@ namespace Labyrinth.Monster
                 if (newDirection != Direction.None)
                     {
                     TilePos pp = TilePos.GetPositionAfterOneMove(tp, newDirection);
-                    if (!m.World.IsTileUnoccupied(pp, true))
+                    if (!m.World.CanTileBeOccupied(pp, false))
                         newDirection = Direction.None;
                     }
                 }

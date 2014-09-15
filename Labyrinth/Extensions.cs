@@ -28,5 +28,11 @@ namespace Labyrinth
             foreach (var item in items)
                 list.AddLast(item);
             } 
+
+        public static TilePos GetPositionAfterOneMove(this TilePos tp, Direction d) 
+            {
+            var result = TilePos.GetPositionAfterOneMove(tp, d);
+            return result;
+            }
         }
     }

@@ -3,7 +3,12 @@ can't shoot eggs
 shots go through walls
 can't shoot fruit or mushrooms
 mushrooms are planted not square on tiles, or on top of other mushrooms
+when egg is laid, the monster that laid the egg animates as an egg
 
+
+Solid objects.... walls, 
+
+Player can
 
 
 
@@ -99,5 +104,3 @@ run through map arrays:
 	potential	free		bad
 	potential	static		ok
 	potential	moving		ok
-
-	
