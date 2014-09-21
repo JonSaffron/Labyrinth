@@ -12,11 +12,11 @@ namespace Labyrinth.Monster
             if (m.Direction == Direction.None)
                 throw new InvalidOperationException("Direction must be set for patrolling.");
 
-            TilePos tp = TilePos.TilePosFromPosition(m.Position);
+            TilePos tp = m.TilePosition;
             TilePos pp = TilePos.GetPositionAfterOneMove(tp, m.Direction);
-            bool isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, false);
+            bool isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, true);
             Vector2 potentiallyMovingTowards = pp.ToPosition();
-            bool isInSameRoom = IsInSameRoom(m.Position, potentiallyMovingTowards);
+            bool isInSameRoom = IsInSameRoom(m.TilePosition, potentiallyMovingTowards);
             bool canContinueMovingInTheSameDirection = isCurrentlyMovingTowardsFreeSpace && isInSameRoom;
             var result = canContinueMovingInTheSameDirection ? m.Direction : m.Direction.Reversed();
             System.Diagnostics.Trace.WriteLine(string.Format("{0} {1} {2} {3} {4}", tp, pp, isCurrentlyMovingTowardsFreeSpace, isInSameRoom, result));
@@ -147,7 +147,7 @@ namespace Labyrinth.Monster
             
             if (m.World.Player != null)
                 {
-                TilePos tp = TilePos.TilePosFromPosition(m.Position);
+                TilePos tp = m.TilePosition;
                 TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, result);
                 Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
                 Vector2 diff = (potentiallyMovingTowards - m.World.Player.Position) / new Vector2(Tile.Width, Tile.Height);
@@ -213,7 +213,7 @@ namespace Labyrinth.Monster
             if (p == null || !p.IsExtant)
                 return false;
             
-            var result = IsInSameRoom(p.Position, m.Position);
+            var result = IsInSameRoom(p.TilePosition, m.Position);
             return result;
             }
             
@@ -230,19 +230,19 @@ namespace Labyrinth.Monster
             {
             Direction intendedDirection = d;
             
-            TilePos tp = TilePos.TilePosFromPosition(m.Position);
+            TilePos tp = m.TilePosition;
             do
                 {
                 TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, d);
                 Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
                 
-                if (m.ChangeRooms == ChangeRooms.StaysWithinRoom && !IsInSameRoom(m.Position, potentiallyMovingTowards))
+                if (m.ChangeRooms == ChangeRooms.StaysWithinRoom && !IsInSameRoom(m.TilePosition, potentiallyMovingTowards))
                     {
                     d = GetNextDirection(d);
                     continue;
                     }
                 
-                if (m.World.CanTileBeOccupied(potentiallyMovingTowards, false))
+                if (m.World.CanTileBeOccupied(potentiallyMovingTowardsTile, true))
                     {
                     return d;
                     }                
@@ -253,7 +253,7 @@ namespace Labyrinth.Monster
             return Direction.None;
             }
         
-        public static bool IsInSameRoom(Vector2 p1, Vector2 p2)
+        public static bool IsInSameRoom(TilePos p1, Vector2 p2)
             {
             Rectangle room1 = World.GetContainingRoom(p1);
             bool result = room1.IncludesPoint(p2);

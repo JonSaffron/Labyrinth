@@ -8,12 +8,14 @@ namespace Labyrinth
         public Direction Direction { get; set;}
         protected float CurrentVelocity { get; set; }
         public Vector2 MovingTowards { get; protected set; }
+        protected ObjectCapability ObjectCapability { get; set; }
 
         public abstract bool Update(GameTime gameTime);
 
         protected MovingItem(World world, Vector2 position) : base(world, position)
             {
             this.MovingTowards = position;
+            this.ObjectCapability = ObjectCapability.CannotMoveOthers;
             }
 
         /// <summary>
@@ -45,16 +47,22 @@ namespace Labyrinth
                 }
             }
 
-        public virtual PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction)
+        protected PushStatus CanBePushed(Direction direction)
             {
-            // only the boulder can be pushed or cause a bounceback
-            return PushStatus.No;
+            var result = this.CanMoveTo(direction) ? PushStatus.Yes : PushStatus.No;
+            return result;
             }
 
-        public virtual PushStatus CanBePushed(Direction direction)
+        protected PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction)
             {
-            // only the player can be bounced backward
-            return PushStatus.No;
+            var result = CanBePushed(direction);
+            if (result == PushStatus.No)
+                {
+                result = byWhom.CanBePushed(direction.Reversed());
+                if (result == PushStatus.Yes)
+                    result = PushStatus.Bounce;
+                }
+            return result;
             }
 
         public virtual void BounceBack(Direction direction)
@@ -62,29 +70,52 @@ namespace Labyrinth
             throw new InvalidOperationException();
             }
 
+        public bool IsBouncingBack
+            {
+            get
+                {
+                var result = this.Direction != Direction.None && Math.Abs(this.CurrentVelocity - AnimationPlayer.BounceBackSpeed) < 1.0;
+                return result;
+                }
+            }
+
+
+
         // can a moving object move onto a particular square?
         // the square must not be occupied by an impassable object,
         // and any moveable objects must be able to move off in the same direction
 
-        public bool CanMoveTo(Direction direction, bool canBePushedOrBounced)
+        protected bool CanMoveTo(Direction direction)
             {
-            TilePos proposedDestination = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(direction);
+            TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
             var objectsOnTile = this.World.GetItemsOnTile(proposedDestination);
             foreach (var item in objectsOnTile)
                 {
-                if (item.Solidity == ObjectSolidity.Impassable)
-                    return false;
-                if (item.Solidity == ObjectSolidity.Moveable)
+                switch (item.Solidity)
                     {
-                    var mi = (MovingItem) item;
-                    var canMove = canBePushedOrBounced 
-                        ? mi.CanBePushedOrBounced(this, direction)
-                        : mi.CanBePushed(direction);
-                    if (canMove != PushStatus.Yes && canMove != PushStatus.No)
+                    case ObjectSolidity.Passable:
+                        continue;
+
+                    case ObjectSolidity.Impassable:
                         return false;
+
+                    case ObjectSolidity.Moveable:
+                        {
+                        var mi = item as MovingItem;
+                        if (mi == null || this.ObjectCapability == ObjectCapability.CannotMoveOthers)
+                            return false;
+                        bool canCauseBounceBack = this.ObjectCapability == ObjectCapability.CanPushOrCauseBounceBack && !this.IsBouncingBack;
+                        var canMove = canCauseBounceBack 
+                            ? mi.CanBePushedOrBounced(this, direction)
+                            : mi.CanBePushed(direction);
+                        if (canMove == PushStatus.No)
+                            return false;
+                        continue;
+                        }
+
+                    default:
+                        throw new InvalidOperationException();
                     }
-                else
-                    throw new InvalidOperationException();
                 }
 
             return true;

@@ -9,7 +9,8 @@ namespace Labyrinth
         
         public int Energy { get; protected set; }
         
-        public Vector2 Position { get; protected set; }
+        private Vector2 _position;
+        private TilePos _tilePosition;
 
         public World World { get; private set; }
         
@@ -19,6 +20,28 @@ namespace Labyrinth
             this.Position = position;
             }
         
+        public Vector2 Position
+            {
+            get
+                {
+                return this._position;
+                }
+
+            protected set
+                {
+                this._position = value;
+                this._tilePosition = TilePos.TilePosFromPosition(value);
+                }
+            }
+
+        public TilePos TilePosition
+            {
+            get
+                {
+                return this._tilePosition;
+                }
+            }
+
         protected AnimationPlayer Ap
             {
             get

@@ -11,7 +11,6 @@ namespace Labyrinth
         
         // Constants for controlling movement
         private const float StandardSpeed = AnimationPlayer.BaseSpeed * 2.5f;
-        private const float BounceBackSpeed = AnimationPlayer.BaseSpeed * 3;
         
         /// <summary>
         /// Constructs a new block.
@@ -40,20 +39,6 @@ namespace Labyrinth
                 }
             }
 
-        public override PushStatus CanBePushed(Direction direction)
-            {
-            var result = this.CanMoveTo(direction, false) ? PushStatus.Yes : PushStatus.No;
-            return result;
-            }
-
-        public override PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction)
-            {
-            var result = CanBePushed(direction);
-            if (result == PushStatus.No)
-                result = byWhom.CanBePushed(direction.Reversed());
-            return result;
-            }
-
         //[Obsolete]
         //public PushStatus CanBePushed(Direction d)
         //    {
@@ -80,7 +65,7 @@ namespace Labyrinth
                 case PushStatus.Yes:
                     {
                     this.Direction = direction;
-                    this.MovingTowards = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(direction).ToPosition();
+                    this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();
                     this.CurrentVelocity = StandardSpeed;
                     return;
                     }
@@ -101,7 +86,7 @@ namespace Labyrinth
                 case PushStatus.Yes:
                     {
                     this.Direction = direction;
-                    this.MovingTowards = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(direction).ToPosition();
+                    this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();
                     this.CurrentVelocity = StandardSpeed;
                     return;
                     }
@@ -109,8 +94,8 @@ namespace Labyrinth
                 case PushStatus.Bounce:
                     {
                     this.Direction = direction.Reversed();
-                    this.MovingTowards = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(this.Direction).ToPosition();
-                    this.CurrentVelocity = BounceBackSpeed;
+                    this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(this.Direction).ToPosition();
+                    this.CurrentVelocity = AnimationPlayer.BounceBackSpeed;
 
                     // todo this._player.BounceBack(this._player.Direction.Reversed(), gameTime);
                     byWhom.BounceBack(this.Direction);

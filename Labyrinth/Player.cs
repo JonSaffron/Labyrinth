@@ -36,7 +36,6 @@ namespace Labyrinth
         
         // Constants for controling horizontal movement
         private const float StandardSpeed = AnimationPlayer.BaseSpeed * 2;
-        private const float BounceBackSpeed = AnimationPlayer.BaseSpeed * 3;
 
         private int _countOfShotsBeforeCostingEnergy;
         private double _time;
@@ -64,6 +63,8 @@ namespace Labyrinth
             this._playerMovesFootOne = world.Game.SoundLibrary[GameSound.PlayerMoves].CreateInstance();
             this._playerMovesFootTwo = world.Game.SoundLibrary[GameSound.PlayerMoves].CreateInstance();
             this._playerMovesFootTwo.Pitch = -0.15f;
+
+            this.ObjectCapability = ObjectCapability.CanPushOrCauseBounceBack;
             }
 
         private void PlayerSpriteNewFrame(object sender, EventArgs e)
@@ -210,8 +211,8 @@ namespace Labyrinth
 
             if (isFiring)
                 {
-                TilePos startPos = TilePos.GetPositionAfterOneMove(TilePos.TilePosFromPosition(this.Position), this._currentDirectionFaced);
-                if (this.World.CanTileBeOccupied(startPos, true) && this.Energy >= 4)
+                TilePos startPos = TilePos.GetPositionAfterOneMove(this.TilePosition, this._currentDirectionFaced);
+                if (this.World.CanTileBeOccupied(startPos, false) && this.Energy >= 4)
                     {
                     this.World.AddShot(ShotType.Player, startPos.ToPosition(), this.Energy >> 2, this._currentDirectionFaced);
                     this.World.Game.SoundLibrary.Play(GameSound.PlayerShoots);
@@ -241,11 +242,11 @@ namespace Labyrinth
             
             // start new movement
             
-            TilePos tp = TilePos.TilePosFromPosition(Position);
+            TilePos tp = this.TilePosition;
             TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, requestedDirection);
             Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
 
-            if (World.CanPlayerMove(requestedDirection, potentiallyMovingTowards))
+            if (this.CanMoveTo(requestedDirection))
                 {
                 Direction = requestedDirection;
                 this.MovingTowards = potentiallyMovingTowards;
@@ -255,30 +256,15 @@ namespace Labyrinth
             return isMoving;
             }
 
-        public override PushStatus CanBePushed(Direction direction)
-            {
-            var result = this.CanMoveTo(direction, false) ? PushStatus.Yes : PushStatus.No;
-            return result;
-            }
-
         // todo public void BounceBack(Direction bounceBackDirection, GameTime gameTime)
         public override void BounceBack(Direction direction)
             {
-            if (this.CanMoveTo(direction, false))
+            if (this.CanMoveTo(direction))
                 {
                 this.Direction = direction;
-                this.MovingTowards = TilePos.TilePosFromPosition(this.Position).GetPositionAfterOneMove(direction).ToPosition();
-                this.CurrentVelocity = BounceBackSpeed;
+                this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();
+                this.CurrentVelocity = AnimationPlayer.BounceBackSpeed;
                 // todo _lastChangeOfDirection = gameTime.TotalGameTime;
-                }
-            }
-
-        public bool IsBouncingBack
-            {
-            get
-                {
-                var result = this.Direction != Direction.None && Math.Abs(this.CurrentVelocity - BounceBackSpeed) < 1.0;
-                return result;
                 }
             }
 
@@ -318,7 +304,7 @@ namespace Labyrinth
 
             this.World.Game.SoundLibrary.Play(GameSound.PlayerDies, SoundEffectFinished);
             this.World.AddLongBang(this.Position);
-            this.World.AddGrave(this.Position);
+            this.World.AddGrave(this.TilePosition);
             }
 
         private void SoundEffectFinished(object sender, SoundEffectFinishedEventArgs args)

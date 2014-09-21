@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -7,6 +8,8 @@ namespace Labyrinth
         {
         public readonly int X;
         public readonly int Y;
+        private const int HalfTileWidth = Tile.Width / 2;
+        private const int HalfTileHeight = Tile.Height / 2;
         
         public TilePos(int x, int y)
             {
@@ -16,9 +19,15 @@ namespace Labyrinth
         
         public static TilePos TilePosFromPosition(Vector2 position)
             {
-            var x = (int)Math.Floor(position.X / Tile.Width);
-            var y = (int)Math.Floor(position.Y / Tile.Height);
-            return new TilePos(x, y);
+            //var x = (int)Math.Floor(position.X / Tile.Width);
+            //var y = (int)Math.Floor(position.Y / Tile.Height);
+
+            var intx = (int)position.X / Tile.Width;
+            var inty= (int)position.Y / Tile.Height;
+
+            //Debug.Assert(intx ==x && inty == y);
+
+            return new TilePos(intx, inty);
             }
         
         public static bool operator ==(TilePos first, TilePos second)
@@ -65,8 +74,9 @@ namespace Labyrinth
 
         public Vector2 ToPosition()
             {
-            var r = new Rectangle(this.X * Tile.Width, this.Y * Tile.Height, Tile.Width, Tile.Height);
-            var result = r.GetCentre();
+            int x = this.X * Tile.Width + HalfTileWidth;
+            int y = this.Y * Tile.Height + HalfTileHeight;
+            var result = new Vector2(x, y);
             return result;
             }
             

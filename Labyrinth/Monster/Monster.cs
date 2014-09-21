@@ -233,7 +233,7 @@ namespace Labyrinth.Monster
                 }
             else
                 {
-                TilePos tp = TilePos.TilePosFromPosition(Position);
+                TilePos tp = this.TilePosition;
                 TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, this.Direction);
                 Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
                 this.MovingTowards = potentiallyMovingTowards;
@@ -302,17 +302,17 @@ namespace Labyrinth.Monster
             {
             if (this.LaysMushrooms && !this.IsEgg && this.World.ShotExists() && inSameRoom && (MonsterRandom.Next(256) & 1) == 0 && IsDirectionCompatible(this.World.Player.Direction, this.Direction))
                 {
-                TilePos tp = TilePos.TilePosFromPosition(this.Position);
+                TilePos tp = this.TilePosition;
                 if (!this.World.IsStaticItemOnTile(tp))
                     {
                     this.World.Game.SoundLibrary.Play(GameSound.MonsterLaysMushroom);
-                    this.World.AddMushroom(tp.ToPosition());
+                    this.World.AddMushroom(tp);
                     }
                 }
 
             if (this.LaysEggs && inSameRoom && this.World.Player.IsExtant && !this.IsEgg && (MonsterRandom.Next(256) & 0x1f)  == 0)
                 {
-                TilePos tp = TilePos.TilePosFromPosition(this.Position);
+                TilePos tp = this.TilePosition;
                 if (this.World.IsStaticItemOnTile(tp))
                     {
                     this.World.Game.SoundLibrary.Play(GameSound.MonsterLaysEgg);
@@ -362,14 +362,14 @@ namespace Labyrinth.Monster
 
         protected override void ContinueMove(ref float maxMovementRemaining, out bool hasArrivedAtDestination)
             {
-            Rectangle currentRoom = World.GetContainingRoom(this.Position);
+            Rectangle currentRoom = World.GetContainingRoom(this.TilePosition);
             
             base.ContinueMove(ref maxMovementRemaining, out hasArrivedAtDestination);
 
-            Rectangle newRoom = World.GetContainingRoom(this.Position);
+            Rectangle newRoom = World.GetContainingRoom(this.TilePosition);
             if (currentRoom != newRoom)
                 {
-                Rectangle playerRoom = World.GetContainingRoom(World.Player.Position);
+                Rectangle playerRoom = World.GetContainingRoom(World.Player.TilePosition);
                 if (currentRoom == playerRoom)
                     this.World.Game.SoundLibrary.Play(GameSound.MonsterLeavesRoom);
                 else if (newRoom == playerRoom)
@@ -379,8 +379,8 @@ namespace Labyrinth.Monster
 
         private void CheckToFire()
             {
-            TilePos tp = TilePos.TilePosFromPosition(this.Position);
-            TilePos playerPosition = TilePos.TilePosFromPosition(this.World.Player.Position);
+            TilePos tp = this.TilePosition;
+            TilePos playerPosition = this.World.Player.TilePosition;
             
             Direction firingDirection = Direction.None;
             int xDiff = Math.Sign(tp.X - playerPosition.X);
@@ -406,11 +406,11 @@ namespace Labyrinth.Monster
                 return;
 
             // Do any walls intervene?
-            TilePos startPos = TilePos.GetPositionAfterOneMove(TilePos.TilePosFromPosition(this.Position), firingDirection);
+            TilePos startPos = TilePos.GetPositionAfterOneMove(this.TilePosition, firingDirection);
             TilePos testPos = startPos;
             while (true)
                 {
-                bool isClear = this.World.CanTileBeOccupied(testPos, true);
+                bool isClear = this.World.CanTileBeOccupied(testPos, false);
                 if (!isClear)
                     return;
                 testPos = TilePos.GetPositionAfterOneMove(testPos, firingDirection);

@@ -62,6 +62,27 @@
         Impassable
         }
 
+    /// <summary>
+    /// Describes what an object is capable of doing to another object
+    /// </summary>
+    enum ObjectCapability
+        {
+        /// <summary>
+        /// An object that cannot move another object
+        /// </summary>
+        CannotMoveOthers,
+
+        /// <summary>
+        /// An object that can push another object in the same direction
+        /// </summary>
+        CanPushOthers,
+
+        /// <summary>
+        /// An object that can push another objecct in the same direction or cause it to bounce backwards
+        /// </summary>
+        CanPushOrCauseBounceBack
+        }
+
     enum PushStatus
         {
         Yes,

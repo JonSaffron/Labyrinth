@@ -41,7 +41,7 @@ namespace Labyrinth.Monster
                 return MonsterMovement.DetermineDirectionRolling(m);
                 }
             
-            TilePos tp = TilePos.TilePosFromPosition(m.Position);
+            TilePos tp = m.TilePosition;
 /*            bool isCurrentlyMovingTowardsFreeSpace;
             if (this.Direction == Direction.None) 
                 isCurrentlyMovingTowardsFreeSpace = false;
@@ -59,7 +59,7 @@ namespace Labyrinth.Monster
                 }
 */            
             Direction newDirection = Direction.None;
-            TilePos playerPosition = TilePos.TilePosFromPosition(p.Position);
+            TilePos playerPosition = p.TilePosition;
             int yDiff = tp.Y - playerPosition.Y;
             int xDiff = tp.X - playerPosition.X;
             if (m.Direction == Direction.Left || m.Direction == Direction.Right)
@@ -87,7 +87,7 @@ namespace Labyrinth.Monster
             if (newDirection != Direction.None)
                 {
                 TilePos pp = TilePos.GetPositionAfterOneMove(tp, newDirection);
-                if (m.World.CanTileBeOccupied(pp, false))
+                if (m.World.CanTileBeOccupied(pp, true))
                     {
                     return newDirection;
                     }

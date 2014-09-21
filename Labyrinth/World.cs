@@ -29,11 +29,8 @@ namespace Labyrinth
 
         private Boulder Boulder { get; set; }
 
-        private readonly LinkedList<StaticItem> _gameItems; 
-        //private readonly LinkedList<StaticItem> _staticItems;
-        //private readonly LinkedList<Shot> _shots;
-        //private readonly LinkedList<Monster.Monster> _monsters;
-        private LinkedListNode<StaticItem> _firstInteractiveNode; 
+        private readonly LinkedList<StaticItem> _allGameItems; 
+        private readonly LinkedList<StaticItem> _interactiveGameItems; 
         
         private readonly Stack<WorldArea> _areasVisited;
 
@@ -81,38 +78,37 @@ namespace Labyrinth
                 exceptions.Add(nte);
                 }
 
-            this._gameItems = new LinkedList<StaticItem>();
-            this._gameItems.AddRange(walls);
+            this._allGameItems = new LinkedList<StaticItem>();
+            this._allGameItems.AddRange(walls);
 
             this.Player = new Player(this, ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
-            this._firstInteractiveNode = this._gameItems.AddLast(this.Player);
+            this._allGameItems.AddLast(this.Player);
             Reset(spw);
 
             this.Boulder = new Boulder(this, ss.BlockPosition.ToPosition());
-            this._gameItems.AddLast(this.Boulder);
+            this._allGameItems.AddLast(this.Boulder);
 
             var monsters = x.GetListOfMonsters(this);
             //var toRemove = monsters.Where(m => !(m is RotaFloaterBrown) || m.Energy != 40 || m.Mobility != MonsterMobility.Patrolling).ToList();
             //foreach (var m in toRemove)
             //    monsters.Remove(m);
-            this._gameItems.AddRange(monsters);
+            this._allGameItems.AddRange(monsters);
 
             CheckOccupationByStaticMonsters(exceptions);
             
             var crystals = x.GetListOfCrystals(this).ToList();
-            this._gameItems.AddRange(crystals);
+            this._allGameItems.AddRange(crystals);
             AddCrystalsToOccupiedList(crystals, exceptions);
 
             var forceFields = x.GetListOfForceFields(this).ToList();
-            this._gameItems.AddRange(forceFields);
+            this._allGameItems.AddRange(forceFields);
             AddForceFieldsToOccupiedList(forceFields, exceptions);
             
             var fruit = x.GetListOfFruit(this, this._tiles);
-            this._gameItems.AddRange(fruit);
+            this._allGameItems.AddRange(fruit);
 
             CheckOccupationByMovingMonsters(exceptions);
             
-            //this._shots = new LinkedList<Shot>();
             ReviewPotentiallyOccupiedTiles(exceptions);
             
             if (exceptions.Count != 0)
@@ -145,15 +141,16 @@ namespace Labyrinth
                     throw new InvalidOperationException(message);
                 }
 
+            this._interactiveGameItems = new LinkedList<StaticItem>(this._allGameItems.Where(item => !(item is Wall)));
             this._areasVisited = new Stack<WorldArea>();
             this._areasVisited.Push(x.GetWorldAreaForTilePos(ss.PlayerPosition));
             }
         
         private void CheckOccupationByStaticMonsters(List<TileException> exceptions)
             {
-            foreach (Monster.Monster m in this._gameItems.OfType<Monster.Monster>().Where(m => m.IsStill))
+            foreach (Monster.Monster m in this._allGameItems.OfType<Monster.Monster>().Where(m => m.IsStill))
                 {
-                TilePos tp = TilePos.TilePosFromPosition(m.Position);
+                TilePos tp = m.TilePosition;
 
                 try
                     {
@@ -169,9 +166,9 @@ namespace Labyrinth
         
         private void CheckOccupationByMovingMonsters(List<TileException> exceptions)
             {
-            foreach (Monster.Monster m in this._gameItems.OfType<Monster.Monster>().Where(m => !m.IsStill))
+            foreach (Monster.Monster m in this._allGameItems.OfType<Monster.Monster>().Where(m => !m.IsStill))
                 {
-                TilePos tp = TilePos.TilePosFromPosition(m.Position);
+                TilePos tp = m.TilePosition;
 
                 try
                     {
@@ -189,7 +186,7 @@ namespace Labyrinth
             {
             foreach (Crystal c in crystals)
                 {
-                TilePos tp = TilePos.TilePosFromPosition(c.Position);
+                TilePos tp = c.TilePosition;
                 try
                     {
                     this._tiles[tp.X, tp.Y].SetOccupationByStaticItem();
@@ -206,7 +203,7 @@ namespace Labyrinth
             {
             foreach (ForceField ff in forceFields)
                 {
-                TilePos tp = TilePos.TilePosFromPosition(ff.Position);
+                TilePos tp = ff.TilePosition;
                 try
                     {
                     this._tiles[tp.X, tp.Y].SetOccupationByStaticItem();
@@ -242,25 +239,28 @@ namespace Labyrinth
 
         public void ResetLevel(SpriteBatchWindowed spw)
             {
-            var item = this._gameItems.First;
+            var item = this._interactiveGameItems.First;
             while (item != null)
                 {
                 var currentNode = item;
                 item = item.Next;
 
                 if (currentNode.Value is Bang || currentNode.Value is Shot)
-                    this._gameItems.Remove(currentNode);
+                    {
+                    this._allGameItems.Remove(currentNode.Value);
+                    this._interactiveGameItems.Remove(currentNode);
+                    }
                 }
             //this._shots.Clear();
 
-            StartState ss = _wl.StartStateAfterDeath(TilePos.TilePosFromPosition(this.Player.Position));
+            StartState ss = _wl.StartStateAfterDeath(this.Player.TilePosition);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             Reset(spw);
             }
         
         private void Reset(SpriteBatchWindowed spw)
             {
-            Point roomStart = GetContainingRoom(Player.Position).Location;
+            Point roomStart = GetContainingRoom(Player.TilePosition).Location;
             spw.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
             this.Game.SoundLibrary.Play(GameSound.PlayerStartsNewLife);
             this._levelReturnType = LevelReturnType.Normal;
@@ -334,38 +334,33 @@ namespace Labyrinth
             this.Game.AddScore(score);
             }
         
-        public bool CanPlayerMove(Direction d, Vector2 potentiallyMovingTowards)
-            {
-            if (d == Direction.None)
-                throw new ArgumentOutOfRangeException("d", "Invalid direction");
+        //public bool CanPlayerMove(Direction d, Vector2 potentiallyMovingTowards)
+        //    {
+        //    if (d == Direction.None)
+        //        throw new ArgumentOutOfRangeException("d", "Invalid direction");
             
-            bool result;
-            if (potentiallyMovingTowards == Boulder.Position && Boulder.Direction == Direction.None)
-                {
-                PushStatus ps = this.Boulder.CanBePushed(d);
-                result = (ps != PushStatus.No);
-                }
-            else
-                {
-                result = CanTileBeOccupied(potentiallyMovingTowards, false);
-                }
-            return result;
-            }
+        //    bool result;
+        //    if (potentiallyMovingTowards == Boulder.Position && Boulder.Direction == Direction.None)
+        //        {
+        //        PushStatus ps = this.Boulder.CanBePushed(d);
+        //        result = (ps != PushStatus.No);
+        //        }
+        //    else
+        //        {
+        //        result = CanTileBeOccupied(potentiallyMovingTowards, false);
+        //        }
+        //    return result;
+        //    }
         
-        public bool CanTileBeOccupied(Vector2 position, bool canMoveObjects)
-            {
-            TilePos tp = TilePos.TilePosFromPosition(position);
-            var result = CanTileBeOccupied(tp, canMoveObjects);
-            return result;
-            }
-
-        public bool CanTileBeOccupied(TilePos tp, bool canMoveObjects)
+        public bool CanTileBeOccupied(TilePos tp, bool treatMoveableItemsAsImpassable)
             {
             if (!IsTileWithinWorld(tp))
                 return false;
 
             var objectsAtPosition = GetItemsOnTile(tp);
-            var isTileAlreadyOccupied = objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable || (gi.Solidity == ObjectSolidity.Moveable && !canMoveObjects));
+            var isTileAlreadyOccupied = treatMoveableItemsAsImpassable
+                ? objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable || gi.Solidity == ObjectSolidity.Moveable)
+                : objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable);
             var result = !isTileAlreadyOccupied;
             return result;
             }
@@ -379,7 +374,7 @@ namespace Labyrinth
 
         public IEnumerable<StaticItem> GetItemsOnTile(TilePos tp)
             {
-            var result = this._gameItems.Where(gi => gi.IsExtant && TilePos.TilePosFromPosition(gi.Position) == tp);
+            var result = this._allGameItems.Where(gi => gi.IsExtant && gi.TilePosition == tp);
             return result;
             } 
 
@@ -405,15 +400,7 @@ namespace Labyrinth
             
             UpdateGameClock(gameTime);
             
-            //if (Player.IsExtant)
-            //    {
-            //    UpdatePlayer(gameTime);
-            //    }
-            
-            //UpdateBlock(gameTime);
             UpdateGameItems(gameTime);
-            //UpdateShots(gameTime);
-            //UpdateMonsters(gameTime);
             
             return this._levelReturnType;
             }
@@ -437,7 +424,7 @@ namespace Labyrinth
 
             if (Player.Direction != Direction.None)
                 {
-                TilePos tp = TilePos.TilePosFromPosition(this.Player.Position);
+                TilePos tp = this.Player.TilePosition;
                 WorldArea wa = this._wl.GetWorldAreaForTilePos(tp);
                 if (!this._areasVisited.Contains(wa))
                     {
@@ -449,12 +436,12 @@ namespace Labyrinth
 
         private void UnlockLevel(int levelThatPlayerShouldHaveReached)
             {
-            foreach (Monster.Monster m in this._gameItems.OfType<Monster.Monster>())
+            foreach (Monster.Monster m in this._interactiveGameItems.OfType<Monster.Monster>())
                 {
                 if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
                 
-                WorldArea wa = this._wl.GetWorldAreaForTilePos(TilePos.TilePosFromPosition(m.Position));
+                WorldArea wa = this._wl.GetWorldAreaForTilePos(m.TilePosition);
                 if (wa.HasId && wa.Id < levelThatPlayerShouldHaveReached)
                     m.IsActive = true;
                 }
@@ -464,16 +451,20 @@ namespace Labyrinth
             {
             const float minimumDistance = Tile.Height * Tile.Height;
 
-            var item = this._gameItems.First;
+            var item = this._interactiveGameItems.First;
 
+            int i = 0;
+            int j = 0;
             while (item != null)
                 {
                 var currentItem = item.Value;
                 item = item.Next;
-                
+                j++;
+
                 if (!currentItem.IsExtant && !(currentItem is Player))
                     {
-                    this._gameItems.Remove(currentItem);
+                    this._interactiveGameItems.Remove(currentItem);
+                    this._allGameItems.Remove(currentItem);
                     continue;
                     }
 
@@ -484,26 +475,29 @@ namespace Labyrinth
 
                 Rectangle? bounds = null;
                 var currentItemPosition = currentItem.Position;
-                for (var si = this._gameItems.First; si != null; si = si.Next)
+                for (var si = this._interactiveGameItems.First; si != null; si = si.Next)
                     {
                     if (currentItem == si.Value)
                         continue;   
+
+                    i++;
 
                     if (Math.Abs(Vector2.DistanceSquared(currentItemPosition, si.Value.Position)) <= minimumDistance)
                         {
                         if (bounds == null)
                             {
-                            //System.Diagnostics.Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si.Value));
+                            System.Diagnostics.Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si.Value));
                             bounds = currentItem.BoundingRectangle;
                             }
                         if (bounds.Value.Intersects(si.Value.BoundingRectangle))
                             {
-                            //System.Diagnostics.Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si.Value));
+                            System.Diagnostics.Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si.Value));
                             BuildInteraction(currentItem, si.Value).Collide();
                             }
                         }
                     }
                 }
+                System.Diagnostics.Trace.WriteLine(string.Format("Checks run: {0}, from {1} items", i, j));
             }
 
         private IInteraction BuildInteraction(StaticItem thisGameItem, StaticItem thatGameItem)
@@ -545,7 +539,8 @@ namespace Labyrinth
                              ChangeRooms = ChangeRooms.FollowsPlayer,
                              MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately
                          };
-            this._gameItems.AddLast(dd);
+            this._interactiveGameItems.AddLast(dd);
+            this._allGameItems.AddLast(dd);
             }
 
         /// <summary>
@@ -555,14 +550,16 @@ namespace Labyrinth
         public void ConvertShotToBang(Shot s)
             {
             var b = new Bang(this, s.Position, BangType.Short);
-            this._gameItems.AddLast(b);  
+            this._interactiveGameItems.AddLast(b);  
+            this._allGameItems.AddLast(b);  
             s.InstantDeath();
             }
         
         public void AddShortBang(Vector2 p)
             {
             var b = new Bang(this, p, BangType.Short);
-            this._gameItems.AddLast(b);
+            this._interactiveGameItems.AddLast(b);
+            this._allGameItems.AddLast(b);
             }
             
         /// <summary>
@@ -572,36 +569,39 @@ namespace Labyrinth
         public void AddLongBang(Vector2 p)
             {
             var b = new Bang(this, p, BangType.Long);
-            this._gameItems.AddLast(b);  
+            this._interactiveGameItems.AddLast(b);  
+            this._allGameItems.AddLast(b);  
             }
 
-        public void AddGrave(Vector2 position)
+        public void AddGrave(TilePos tp)
             {
-            TilePos tp = TilePos.TilePosFromPosition(position);
             var g = new Grave(this, tp.ToPosition());
-            this._gameItems.AddLast(g);
+            this._interactiveGameItems.AddLast(g);
+            this._allGameItems.AddLast(g);
             }
         
-        public void AddMushroom(Vector2 position)
+        public void AddMushroom(TilePos tp)
             {
-            var m = new Mushroom(this, position);
-            this._gameItems.AddLast(m);
+            var m = new Mushroom(this, tp.ToPosition());
+            this._interactiveGameItems.AddLast(m);
+            this._allGameItems.AddLast(m);
             }
         
         public void AddMonster(Monster.Monster m)
             {
-            this._gameItems.AddLast(m);
+            this._interactiveGameItems.AddLast(m);
+            this._allGameItems.AddLast(m);
             }
         
         public void AddShot(ShotType st, Vector2 position, int energy, Direction d)
             {
             var s = new Shot(this, position, d, energy, st);
-            this._gameItems.AddLast(s);
+            this._interactiveGameItems.AddLast(s);
+            this._allGameItems.AddLast(s);
             }
         
-        public static Rectangle GetContainingRoom(Vector2 position)
+        public static Rectangle GetContainingRoom(TilePos tp)
             {
-            TilePos tp = TilePos.TilePosFromPosition(position);
             int roomx = tp.X / WindowSizeX;
             int roomy = tp.Y / WindowSizeY;
             var r = new Rectangle(roomx * WindowSizeX * Tile.Width, roomy * WindowSizeY * Tile.Height, WindowSizeX * Tile.Width, WindowSizeY * Tile.Height);
@@ -613,7 +613,7 @@ namespace Labyrinth
             if (this.Player == null)
                 return;
             
-            Point movingTowards = GetContainingRoom(Player.Position).Location;
+            Point movingTowards = GetContainingRoom(Player.TilePosition).Location;
             Vector2 position = spriteBatchWindowed.WindowOffset;
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             const float currentVelocity = 750;
@@ -663,11 +663,16 @@ namespace Labyrinth
             {
             RecalculateWindow(gameTime, spriteBatch);
             
-            DrawTiles(spriteBatch);
+            var viewPort = GetViewPort(spriteBatch.WindowOffset);
 
-            foreach (var item in this._gameItems)
-                item.Draw(gameTime, spriteBatch);
-                return;
+            DrawTiles(spriteBatch, viewPort);
+
+            var r = new Rectangle((viewPort.Left - 1) * Tile.Width, (viewPort.Top -1) * Tile.Height, (viewPort.Right + 2) * Tile.Width, (viewPort.Bottom + 1) * Tile.Height);
+
+            foreach (var item in this._allGameItems)
+                if (r.Contains((int) item.Position.X, (int) item.Position.Y))
+                    item.Draw(gameTime, spriteBatch);
+/*                return;
 
             foreach (Wall w in this._gameItems.OfType<Wall>())
                 w.Draw(gameTime, spriteBatch);
@@ -690,7 +695,7 @@ namespace Labyrinth
 
             foreach (Bang b in this._gameItems.OfType<Bang>())
                 b.Draw(gameTime, spriteBatch);
-            }
+*/            }
 
         public int GetZOrder(StaticItem si)
             {
@@ -716,23 +721,29 @@ namespace Labyrinth
             throw new InvalidOperationException();
             }
 
-        /// <summary>
-        /// Draws each tile in the World.
-        /// </summary>
-        private void DrawTiles(SpriteBatchWindowed spriteBatch)
+        private Rectangle GetViewPort(Vector2 windowOffset)
             {
             const int windowWidth = (WindowSizeX - 1) * Tile.Width;
             const int windowHeight = (WindowSizeY - 1) * Tile.Height;
             
-            var roomStartX = (int)Math.Floor(spriteBatch.WindowOffset.X / Tile.Width);
-            var roomStartY = (int)Math.Floor(spriteBatch.WindowOffset.Y / Tile.Height);
-            var roomEndX = (int)Math.Ceiling((spriteBatch.WindowOffset.X + windowWidth)  / Tile.Width);
-            var roomEndY = (int)Math.Ceiling((spriteBatch.WindowOffset.Y + windowHeight) / Tile.Height);
-            
+            var roomStartX = (int)Math.Floor(windowOffset.X / Tile.Width);
+            var roomStartY = (int)Math.Floor(windowOffset.Y / Tile.Height);
+            var roomEndX = (int)Math.Ceiling((windowOffset.X + windowWidth)  / Tile.Width);
+            var roomEndY = (int)Math.Ceiling((windowOffset.Y + windowHeight) / Tile.Height);
+
+            var result = new Rectangle(roomStartX, roomStartY, roomEndX - roomStartX, roomEndY - roomStartY);
+            return result;
+            }
+
+        /// <summary>
+        /// Draws each tile in the World.
+        /// </summary>
+        private void DrawTiles(SpriteBatchWindowed spriteBatch, Rectangle r)
+            {
             // draw the floor
-            for (int y = roomStartY; y <= roomEndY; y++)
+            for (int y = r.Top; y <= r.Bottom; y++)
                 {
-                for (int x = roomStartX; x <= roomEndX; x++)
+                for (int x = r.Left; x <= r.Right; x++)
                     {
                     Texture2D texture = _tiles[x, y].Floor;
                     if (texture != null)
@@ -742,33 +753,17 @@ namespace Labyrinth
                         }
                     }
                 }
-
-            // For each tile position
-            //for (int y = roomStartY; y <= roomEndY; y++)
-            //    {
-            //    for (int x = roomStartX; x <= roomEndX; x++)
-            //        {
-            //        // If there is a visible tile in that position
-            //        Texture2D texture = _tiles[x, y].Wall;
-            //        if (texture != null)
-            //            {
-            //            // Draw it in screen space.
-            //            Vector2 position = new Vector2(x, y) * Tile.Size;
-            //            spriteBatch.DrawInWindow(texture, position);
-            //            }
-            //        }
-            //    }
             }
 
         public bool ShotExists()
             {
-            bool result = this._gameItems.OfType<Shot>().Any(item => item.IsExtant);
+            bool result = this._interactiveGameItems.OfType<Shot>().Any(item => item.IsExtant);
             return result;
             }
 
         public int HowManyCrystalsRemain()
             {
-            int result = this._gameItems.OfType<Crystal>().Count(c => c.IsExtant);
+            int result = this._interactiveGameItems.OfType<Crystal>().Count(c => c.IsExtant);
             return result;
             }
 
@@ -777,7 +772,7 @@ namespace Labyrinth
             if (!this.Player.IsAlive())
                 return;
 
-            var currentWorld = this._wl.GetWorldAreaForTilePos(TilePos.TilePosFromPosition(this.Player.Position)).Id;
+            var currentWorld = this._wl.GetWorldAreaForTilePos(this.Player.TilePosition).Id;
             var maxId = this._wl.GetMaximumId();
             StartState newState = null;
             for (int i = currentWorld + 1; i <= maxId; i++)
@@ -786,11 +781,11 @@ namespace Labyrinth
                 if (newState != null)
                     break;
             }
-            var itemToReplace = this._gameItems.Find(this.Boulder);
+            var itemToReplace = this._interactiveGameItems.Find(this.Boulder);
             if (newState == null || itemToReplace == null)
                 return;
 
-            var crystals = this._gameItems.OfType<Crystal>().Where(c => this._wl.GetWorldAreaForTilePos(TilePos.TilePosFromPosition(c.Position)).Id == currentWorld);
+            var crystals = this._interactiveGameItems.OfType<Crystal>().Where(c => this._wl.GetWorldAreaForTilePos(c.TilePosition).Id == currentWorld);
             foreach (var c in crystals)
                 {
                 var i = new MovingItemAndStaticItemInteraction(this, this.Player, c);
@@ -799,7 +794,7 @@ namespace Labyrinth
             this.Player.Reset(newState.PlayerPosition.ToPosition(), newState.PlayerEnergy);
             this.Boulder = new Boulder(this, newState.BlockPosition.ToPosition());
             itemToReplace.Value = this.Boulder;
-            Point roomStart = GetContainingRoom(Player.Position).Location;
+            Point roomStart = GetContainingRoom(Player.TilePosition).Location;
             this.Game.SpriteBatchWindowed.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
             }
         }

@@ -58,7 +58,7 @@ namespace Labyrinth
                 {
                 var instancesToDispose = new List<SoundEffectInstance>();
                 foreach (var instance in this._trackingInstances.Where(i => i.Key.State == SoundState.Stopped))
-                {
+                    {
                     var gameSound = instance.Value.Item1;
                     var callback = instance.Value.Item2;
                     var args = new SoundEffectFinishedEventArgs(gameSound);

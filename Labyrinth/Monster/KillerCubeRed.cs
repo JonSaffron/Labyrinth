@@ -39,19 +39,19 @@ namespace Labyrinth.Monster
 
         private static Direction DetermineDirectionAggressive(Monster m)
             {
-            TilePos tp = TilePos.TilePosFromPosition(m.Position);
+            TilePos tp = m.TilePosition;
             bool isCurrentlyMovingTowardsFreeSpace;
             if (m.Direction == Direction.None) 
                 isCurrentlyMovingTowardsFreeSpace = false;
             else
                 {
                 TilePos pp = TilePos.GetPositionAfterOneMove(tp, m.Direction);
-                isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, false);
+                isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, true);
                 
                 if (isCurrentlyMovingTowardsFreeSpace)
                     {
                     Vector2 newPos = pp.ToPosition();
-                    if (!MonsterMovement.IsInSameRoom(m.Position, newPos) && MonsterRandom.Next(4) != 0)
+                    if (!MonsterMovement.IsInSameRoom(m.TilePosition, newPos) && MonsterRandom.Next(4) != 0)
                         isCurrentlyMovingTowardsFreeSpace = false;
                     }
                 }
@@ -59,7 +59,7 @@ namespace Labyrinth.Monster
             Direction newDirection = Direction.None;
             if (m.World.Player != null)
                 {
-                TilePos playerPosition = TilePos.TilePosFromPosition(m.World.Player.Position);
+                TilePos playerPosition = m.World.Player.TilePosition;
                 int yDiff = tp.Y - playerPosition.Y;
                 int xDiff = tp.X - playerPosition.X;
                 
@@ -96,7 +96,7 @@ namespace Labyrinth.Monster
                 if (newDirection != Direction.None)
                     {
                     TilePos pp = TilePos.GetPositionAfterOneMove(tp, newDirection);
-                    if (!m.World.CanTileBeOccupied(pp, false))
+                    if (!m.World.CanTileBeOccupied(pp, true))
                         newDirection = Direction.None;
                     }
                 }

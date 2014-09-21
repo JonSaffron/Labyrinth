@@ -19,6 +19,9 @@ namespace Labyrinth
         // Unit of measurement is therefore pixels per second.
         public const int BaseSpeed = BaseDistance * MovementsPerSecond;
 
+        // Speed when bouncing back
+        public const int BounceBackSpeed = BaseSpeed * 3;
+
         // The internal game clock ticks once every movement by a sprite
         // Unit of measurement is seconds.
         public const float GameClockResolution = 1.0f / MovementsPerSecond;

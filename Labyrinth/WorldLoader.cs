@@ -125,7 +125,7 @@ namespace Labyrinth
                 string type = mdef.GetAttribute("Type");
                 var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
                 Vector2 position = tilePos.ToPosition();
-                if (!world.CanTileBeOccupied(tilePos, false))
+                if (!world.CanTileBeOccupied(tilePos, true))
                     throw new InvalidOperationException(string.Format("Position ({0}, {1}) for monster {2} is an impassable tile.", tilePos.X, tilePos.Y, type));
                 int e = int.Parse(mdef.GetAttribute("Energy"));
                 Monster.Monster m = Monster.Monster.Create(type, world, position, e);
