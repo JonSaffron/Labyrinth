@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -36,10 +35,8 @@ namespace Labyrinth
                     throw new InvalidOperationException();
                 }
             
-            string file = string.Format("Sprites/Fruit/{0:G}", _fruitType);
-            
-            var texture = World.Content.Load<Texture2D>(file);
-            var a = Animation.StaticAnimation(texture);
+            string textureName = string.Format("Sprites/Fruit/{0:G}", _fruitType);
+            var a = Animation.StaticAnimation(World, textureName);
             this.Ap.PlayAnimation(a);
             }
 

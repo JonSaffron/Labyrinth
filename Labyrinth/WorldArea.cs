@@ -74,6 +74,9 @@ namespace Labyrinth
             
             this.Area = GetRectangleFromDefinition(area);
             
+            if (area.GetAttribute("WorldStart") == "true")
+                this.IsInitialArea = true;
+
             var tileDefinitions = (XmlElement) area.SelectSingleNode("TileDefinitions");
             if (tileDefinitions != null)
                 LoadTileDefs(tileDefinitions);
@@ -126,15 +129,7 @@ namespace Labyrinth
 
             int startEnergy = int.Parse(startPos.GetAttribute("StartEnergy"));
 
-            int bx = int.Parse(startPos.GetAttribute("BlockLeft"));
-            int by = int.Parse(startPos.GetAttribute("BlockTop"));
-            var b = new TilePos(bx, by);
-            if (!this.Area.Contains(b))
-                throw new InvalidOperationException();
-
-            this.StartState = new StartState(p, startEnergy, b);
-            if (startPos.GetAttribute("WorldStart") == "true")
-                this.IsInitialArea = true;
+            this.StartState = new StartState(p, startEnergy);
             }
 
         public bool Equals(WorldArea other)

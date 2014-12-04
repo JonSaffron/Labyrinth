@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -10,7 +9,6 @@ namespace Labyrinth
         public ShotType ShotType { get; private set; }
         public bool HasRebounded {get; private set; }
 
-        private readonly Animation _staticImage;
         private float _distanceToTravel;
 
         // Constants for controlling movement
@@ -23,22 +21,20 @@ namespace Labyrinth
             this.ShotType = shotType;
             this.CurrentVelocity = StandardSpeed;
 
-            string file;
+            string textureName;
             switch (this.ShotType)
                 {
                 case ShotType.Player:
-                    file = "Sprites/Shot/RedShot";
+                    textureName = "Sprites/Shot/RedShot";
                     break;
                 case ShotType.Monster: 
-                    file = "Sprites/Shot/GreenShot";
+                    textureName = "Sprites/Shot/GreenShot";
                     break;
                 default:
                     throw new InvalidOperationException();
                 }
-            
-            var texture = this.World.Content.Load<Texture2D>(file);
-            this._staticImage = Animation.StaticAnimation(texture);
-            Ap.PlayAnimation(_staticImage);
+            var staticImage = Animation.StaticAnimation(World, textureName);
+            Ap.PlayAnimation(staticImage);
             ResetDistanceToTravel();
             }
 
@@ -73,39 +69,39 @@ namespace Labyrinth
                 switch (this.Direction)
                     {
                     case Direction.Up:
-                        w = this._staticImage.FrameWidth / 8;
-                        x = (this._staticImage.FrameWidth / 2) - (w / 2);
-                        h = this._staticImage.FrameHeight / 2;
+                        w = Tile.Width / 8;
+                        x = (Tile.Width / 2) - (w / 2);
+                        h = Tile.Height / 2;
                         y = 0;
                         break;
                     
                     case Direction.Down:
-                        w = this._staticImage.FrameWidth / 8;
-                        x = (this._staticImage.FrameWidth / 2) - (w / 2);
-                        h = this._staticImage.FrameHeight / 2;
-                        y = this._staticImage.FrameHeight / 2;
+                        w = Tile.Width / 8;
+                        x = (Tile.Width / 2) - (w / 2);
+                        h = Tile.Height / 2;
+                        y = Tile.Height / 2;
                         break;
                     
                     case Direction.Left:
-                        w = this._staticImage.FrameWidth / 2;
+                        w = Tile.Width / 2;
                         x = 0;
-                        h = this._staticImage.FrameHeight / 8;
-                        y = (this._staticImage.FrameHeight / 2) - (h / 2);
+                        h = Tile.Height / 8;
+                        y = (Tile.Height / 2) - (h / 2);
                         break;
                     
                     case Direction.Right:
-                        w = this._staticImage.FrameWidth / 2;
-                        x = this._staticImage.FrameWidth / 2;
-                        h = this._staticImage.FrameHeight / 8;
-                        y = (this._staticImage.FrameHeight / 2) - (h / 2);
+                        w = Tile.Width / 2;
+                        x = Tile.Width / 2;
+                        h = Tile.Height / 8;
+                        y = (Tile.Height / 2) - (h / 2);
                         break;
                     
                     default:
                         throw new InvalidOperationException();
                     }
                         
-                int left = (int)Math.Round(Position.X - Ap.Origin.X) + x;
-                int top = (int)Math.Round(Position.Y - Ap.Origin.Y) + y;
+                int left = (int)Math.Round(Position.X - AnimationPlayer.Origin.X) + x;
+                int top = (int)Math.Round(Position.Y - AnimationPlayer.Origin.Y) + y;
                 return new Rectangle(left, top, w, h);
                 }
             }
@@ -117,7 +113,7 @@ namespace Labyrinth
             {
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             var distance = this.CurrentVelocity * elapsed;
-            Position += Animation.GetBaseVectorForDirection(this.Direction) * distance;
+            Position += GetBaseVectorForDirection(this.Direction) * distance;
             this._distanceToTravel -= distance;
             if (this._distanceToTravel <= 0)
                 this.Energy = 0;
@@ -141,6 +137,25 @@ namespace Labyrinth
                 return;
             
             this.Energy = 0;
+            }
+
+        private static Vector2 GetBaseVectorForDirection(Direction d)
+            {
+            switch (d)
+                {
+                case Direction.Left: 
+                    return new Vector2(-1, 0);
+                case Direction.Right:
+                    return new Vector2(1, 0);
+                case Direction.Up:
+                    return new Vector2(0, -1);
+                case Direction.Down:
+                    return new Vector2(0, 1);
+                case Direction.None:
+                    return new Vector2(0, 0);
+                default:
+                    throw new InvalidOperationException();
+                }
             }
         }
     }

@@ -11,9 +11,12 @@ namespace Labyrinth
             {
             try
                 {
-                using (var game = new Game1())
+                using (var soundLibrary = new SoundLibrary())
                     {
-                    game.Run();
+                    using (var game = new Game1(soundLibrary))
+                        {
+                        game.Run();
+                        }
                     }
                 }
             catch (ApplicationException e)

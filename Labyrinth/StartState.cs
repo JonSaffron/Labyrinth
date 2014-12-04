@@ -4,13 +4,11 @@
         {
         public TilePos PlayerPosition { get; private set; }
         public int PlayerEnergy { get; private set; }
-        public TilePos BlockPosition { get; private set; }
         
-        public StartState(TilePos playerPosition, int playerEnergy, TilePos blockPosition)
+        public StartState(TilePos playerPosition, int playerEnergy)
             {
             this.PlayerPosition = playerPosition;
             this.PlayerEnergy = playerEnergy;
-            this.BlockPosition = blockPosition;
             }
         }
     }

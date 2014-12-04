@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabyrinthContent", "Labyrin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Labyrinth", "Labyrinth\Labyrinth.csproj", "{F462AC55-20C5-4202-A82A-E389428BFD02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Labyrinth.Test", "Labyrinth.Test\Labyrinth.Test.csproj", "{4C9851A7-C758-48D5-A015-00ECB6D5F9DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -12,12 +14,15 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{69FCCD2B-FCCB-412A-848A-7115013C42A9}.Debug|x86.ActiveCfg = Debug|x86
-		{69FCCD2B-FCCB-412A-848A-7115013C42A9}.Debug|x86.Build.0 = Debug|x86
 		{69FCCD2B-FCCB-412A-848A-7115013C42A9}.Release|x86.ActiveCfg = Release|x86
 		{F462AC55-20C5-4202-A82A-E389428BFD02}.Debug|x86.ActiveCfg = Debug|x86
 		{F462AC55-20C5-4202-A82A-E389428BFD02}.Debug|x86.Build.0 = Debug|x86
 		{F462AC55-20C5-4202-A82A-E389428BFD02}.Release|x86.ActiveCfg = Release|x86
 		{F462AC55-20C5-4202-A82A-E389428BFD02}.Release|x86.Build.0 = Release|x86
+		{4C9851A7-C758-48D5-A015-00ECB6D5F9DC}.Debug|x86.ActiveCfg = Debug|x86
+		{4C9851A7-C758-48D5-A015-00ECB6D5F9DC}.Debug|x86.Build.0 = Debug|x86
+		{4C9851A7-C758-48D5-A015-00ECB6D5F9DC}.Release|x86.ActiveCfg = Release|x86
+		{4C9851A7-C758-48D5-A015-00ECB6D5F9DC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

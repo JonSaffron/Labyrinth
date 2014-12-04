@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -9,8 +8,7 @@ namespace Labyrinth
 
         public Mushroom(World world, Vector2 position) : base(world, position)
             {
-            var texture = World.Content.Load<Texture2D>("Sprites/Props/Mushroom");
-            var a = Animation.StaticAnimation(texture);
+            var a = Animation.StaticAnimation(World, "Sprites/Props/Mushroom");
             this.Ap.PlayAnimation(a);
             this.Energy = 40;
             }

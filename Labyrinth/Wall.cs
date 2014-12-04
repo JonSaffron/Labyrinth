@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
     class Wall : StaticItem
         {
-        public Wall(World world, Vector2 position, Texture2D texture) : base(world, position)
+        public Wall(World world, Vector2 position, string textureName) : base(world, position)
             {
-            var a = Animation.StaticAnimation(texture);
+            var a = Animation.StaticAnimation(World, textureName);
             this.Ap.PlayAnimation(a);
             }
 

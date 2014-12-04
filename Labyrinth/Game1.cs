@@ -11,10 +11,10 @@ namespace Labyrinth
     /// </summary>
     public class Game1 : Game
         {
-        SpriteBatchWindowed _spriteBatch;
+        private SpriteBatchWindowed _spriteBatch;
         private World _world;
 
-        public SoundLibrary SoundLibrary {get; private set;}
+        public ISoundLibrary SoundLibrary {get; private set;}
 
         private const int BackBufferWidth = 1024;
         private const int BackBufferHeight = 640;
@@ -28,27 +28,30 @@ namespace Labyrinth
         
         private readonly GraphicsDeviceManager _gdm;
 
-        public Game1()
+        public Game1(ISoundLibrary soundLibrary)
             {
+            if (soundLibrary == null)
+                throw new ArgumentNullException("soundLibrary");
+
             this._gdm = new GraphicsDeviceManager(this)
                             {
                                 PreferredBackBufferWidth = BackBufferWidth,
                                 PreferredBackBufferHeight = BackBufferHeight
                             };
-            Content.RootDirectory = "Content";
+            this.Content.RootDirectory = "Content";
             //this.TargetElapsedTime = new TimeSpan(this.TargetElapsedTime.Ticks * 4);
-            _lives = 2;
-            _score = 0;
+            this._lives = 2;
+            this._score = 0;
+            this.SoundLibrary = soundLibrary;
             }
 
         /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
+        /// LoadContent will be called once per game and is the place to load all of your content.
         /// </summary>
         protected override void LoadContent()
             {
             // Create a new SpriteBatch, which can be used to draw textures.
-            _spriteBatch = new SpriteBatchWindowed(GraphicsDevice) {Zoom = 2};
+            this._spriteBatch = new SpriteBatchWindowed(this.GraphicsDevice) {Zoom = 2};
 
             this._digits = Content.Load<Texture2D>("Display/Digits");
             this._life = Content.Load<Texture2D>("Display/Life");
@@ -56,12 +59,11 @@ namespace Labyrinth
             _rectangleTexture = new Texture2D(this.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             _rectangleTexture.SetData(new [] { Color.White });
 
-            this.SoundLibrary = new SoundLibrary(this.Content);
+            this.SoundLibrary.LoadContent(this.Content);
             }
 
         /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
+        /// UnloadContent will be called once per game and is the place to unload all content.
         /// </summary>
         protected override void UnloadContent()
             {
@@ -108,6 +110,7 @@ namespace Labyrinth
             if (newLevel)
                 {
                 _world = LoadLevel("World1.xml");
+                _world.Reset(this._spriteBatch);
                 
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -170,8 +173,8 @@ namespace Labyrinth
                 throw new Exception("No levels found.");
 
             // Load the World.
-            var x = new WorldLoader(levelPath, this.Content);
-            var result = new World(Services, x, this._spriteBatch, this);
+            var x = new WorldLoader(levelPath);
+            var result = new World(this, x);
             return result;
             }
         
@@ -260,12 +263,16 @@ namespace Labyrinth
                 Vector2 destination = new Vector2(480 - ((i + 1) * 16), 8) + spriteBatch.WindowOffset;
                 spriteBatch.DrawInWindow(this._life, destination);
                 }
-            
             }
 
         private void DrawRectangle(SpriteBatchWindowed spriteBatch, Rectangle r, Color colour)
             {
             spriteBatch.DrawInWindow(_rectangleTexture, r, colour);
+            }
+
+        public void ToggleFullScreen()
+            {
+            this._gdm.ToggleFullScreen();
             }
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
@@ -19,7 +18,7 @@ namespace Labyrinth
         /// </summary>
         public Texture2D Texture { get; private set; }
 
-        public int BaseMovementsPerFrame { get; private set;}
+        public int BaseMovementsPerFrame { get; private set; }
 
         /// <summary>
         /// When the end of the animation is reached, should it
@@ -30,41 +29,48 @@ namespace Labyrinth
         /// <summary>
         /// Constructs a new animation using a static image
         /// </summary>
-        /// <param name="texture"></param>
-        public static Animation StaticAnimation(Texture2D texture)
+        /// <param name="world">The world that will provide the graphic content</param>
+        /// <param name="textureName">The name of a single framed graphic to show</param>
+        public static Animation StaticAnimation(World world, string textureName)
             {
-            var result = new Animation(texture, 0, false);
+            var result = new Animation(world, textureName, 0, false);
             return result;
             }
         
         /// <summary>
         /// Constructs a new animation which loops
         /// </summary>
-        /// <param name="texture"></param>
-        /// <param name="baseMovementsPerFrame"></param>
-        public static Animation LoopingAnimation(Texture2D texture, int baseMovementsPerFrame)
+        /// <param name="world">The world that will provide the graphic content</param>
+        /// <param name="textureName">The name of a multi-framed graphic image to show</param>
+        /// <param name="baseMovementsPerFrame">The rate to switch between frames</param>
+        public static Animation LoopingAnimation(World world, string textureName, int baseMovementsPerFrame)
             {
-            var result = new Animation(texture, baseMovementsPerFrame, true);
+            if (baseMovementsPerFrame <= 0)
+                throw new ArgumentOutOfRangeException("baseMovementsPerFrame");
+            var result = new Animation(world, textureName, baseMovementsPerFrame, true);
             return result;
             }
         
         /// <summary>
         /// Constructs a new animation which doesn't loop
         /// </summary>
-        /// <param name="texture"></param>
-        /// <param name="baseMovementsPerFrame"></param>
-        public static Animation SingleAnimation(Texture2D texture, int baseMovementsPerFrame)
+        /// <param name="world">The world that will provide the graphic content</param>
+        /// <param name="textureName">The name of a multi-framed graphic image to show</param>
+        /// <param name="baseMovementsPerFrame">The rate to switch between frames</param>
+        public static Animation SingleAnimation(World world, string textureName, int baseMovementsPerFrame)
             {
-            var result = new Animation(texture, baseMovementsPerFrame, false);
+            if (baseMovementsPerFrame <= 0)
+                throw new ArgumentOutOfRangeException("baseMovementsPerFrame");
+            var result = new Animation(world, textureName, baseMovementsPerFrame, false);
             return result;
             }
 
         /// <summary>
         /// Constructs a new animation specifying whether it loops
         /// </summary>        
-        private Animation(Texture2D texture, int baseMovementsPerFrame, bool loopAnimation)
+        private Animation(World world, string textureName, int baseMovementsPerFrame, bool loopAnimation)
             {
-            this.Texture = texture;
+            this.Texture = world.LoadTexture(textureName);
             this.BaseMovementsPerFrame = baseMovementsPerFrame;
             this.LoopAnimation = loopAnimation;
             }
@@ -74,51 +80,15 @@ namespace Labyrinth
         /// </summary>
         public int FrameCount
             {
-            get { return Texture.Width / FrameWidth; }
+            get { return Texture.Width / Tile.Width; }
             }
 
-        /// <summary>
-        /// Gets the width of a frame in the animation.
-        /// </summary>
-        public int FrameWidth
-            {
-            // Assume square frames.
-            get { return Texture.Height; }
-            }
-
-        /// <summary>
-        /// Gets the height of a frame in the animation.
-        /// </summary>
-        public int FrameHeight
-            {
-            get { return Texture.Height; }
-            }
-        
         public bool IsStaticAnimation
             {
             get
                 {
                 var result = this.BaseMovementsPerFrame == 0;
                 return result;
-                }
-            }
-
-        public static Vector2 GetBaseVectorForDirection(Direction d)
-            {
-            switch (d)
-                {
-                case Direction.Left: 
-                    return new Vector2(-1, 0);
-                case Direction.Right:
-                    return new Vector2(1, 0);
-                case Direction.Up:
-                    return new Vector2(0, -1);
-                case Direction.Down:
-                    return new Vector2(0, 1);
-                case Direction.None:
-                    return new Vector2(0, 0);
-                default:
-                    throw new InvalidOperationException();
                 }
             }
         }

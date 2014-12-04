@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Monster
     {
@@ -7,8 +6,7 @@ namespace Labyrinth.Monster
         {
         public RotaFloaterBrown(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            var t = this.World.Content.Load<Texture2D>("sprites/Monsters/RotaFloaterBrown");
-            this.NormalAnimation = Animation.LoopingAnimation(t, 2);
+            this.NormalAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/RotaFloaterBrown", 2);
             
             this.CurrentVelocity = AnimationPlayer.BaseSpeed;
             this.ChanceOfAggressiveMove = 6;

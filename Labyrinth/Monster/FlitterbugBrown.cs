@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Monster
     {
@@ -7,8 +6,7 @@ namespace Labyrinth.Monster
         {
         public FlitterbugBrown(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            var t = this.World.Content.Load<Texture2D>("sprites/Monsters/FlitterbugBrown");
-            this.NormalAnimation = Animation.LoopingAnimation(t, 4);
+            this.NormalAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/FlitterbugBrown", 4);
             
             this.CurrentVelocity = AnimationPlayer.BaseSpeed;
             this.Mobility = MonsterMobility.Aggressive;

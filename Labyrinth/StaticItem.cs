@@ -12,6 +12,7 @@ namespace Labyrinth
         private Vector2 _position;
         private TilePos _tilePosition;
 
+        #warning This property should not be public
         public World World { get; private set; }
         
         protected StaticItem(World world, Vector2 position)
@@ -51,6 +52,7 @@ namespace Labyrinth
                 }
             }
 
+        #warning perhaps this should be a virtual reset method
         protected void ResetAnimationPlayerAfterClone()
             {
             this._animationPlayer = new AnimationPlayer();
@@ -60,10 +62,10 @@ namespace Labyrinth
             {
             get
                 {
-                var left = (int)Math.Round(Position.X - Ap.Origin.X);
-                var top = (int)Math.Round(Position.Y - Ap.Origin.Y);
+                var left = (int)Math.Round(Position.X - AnimationPlayer.Origin.X);
+                var top = (int)Math.Round(Position.Y - AnimationPlayer.Origin.Y);
 
-                return new Rectangle(left, top, Ap.Animation.FrameWidth, Ap.Animation.FrameHeight);
+                return new Rectangle(left, top, Tile.Width, Tile.Height);
                 }
             }
 

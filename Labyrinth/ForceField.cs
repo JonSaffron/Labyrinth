@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -11,8 +10,7 @@ namespace Labyrinth
             {
             this._crystalRequired = crystalRequired;
 
-            var texture = base.World.Content.Load<Texture2D>("Sprites/Props/ForceField");
-            var a = Animation.LoopingAnimation(texture, 3);
+            var a = Animation.LoopingAnimation(World, "Sprites/Props/ForceField", 3);
             this.Ap.PlayAnimation(a);
             }
 

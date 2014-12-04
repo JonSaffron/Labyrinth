@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -14,12 +13,10 @@ namespace Labyrinth
             switch (bangType)
                 {
                 case BangType.Short:
-                    var shortBang = base.World.Content.Load<Texture2D>("Sprites/Props/ShortBang");
-                    a = Animation.SingleAnimation(shortBang, 3);
+                    a = Animation.SingleAnimation(World, "Sprites/Props/ShortBang", 3);
                     break;
                 case BangType.Long:
-                    var longBang = base.World.Content.Load<Texture2D>("Sprites/Props/LongBang");
-                    a = Animation.SingleAnimation(longBang, 3);
+                    a = Animation.SingleAnimation(World, "Sprites/Props/LongBang", 3);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("bangType");

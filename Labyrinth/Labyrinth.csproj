@@ -120,9 +120,13 @@
     <Compile Include="Bang.cs" />
     <Compile Include="Boulder.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="GameSoundInstance.cs" />
     <Compile Include="GameTimer.cs" />
     <Compile Include="GameTimerCollection.cs" />
     <Compile Include="IInteraction.cs" />
+    <Compile Include="IGameSoundInstance.cs" />
+    <Compile Include="ISoundLibrary.cs" />
+    <Compile Include="IWorldLoader.cs" />
     <Compile Include="MovingItemAndMovingItemInteraction.cs" />
     <Compile Include="MovingItemAndStaticItemInteraction.cs" />
     <Compile Include="Properties\Annotations.cs" />

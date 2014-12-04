@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -8,31 +10,48 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
-    class WorldLoader
+    class WorldLoader : IWorldLoader
         {
         private readonly XmlDocument _xmlDoc = new XmlDocument();
-        private readonly ContentManager _content;
         private readonly List<WorldArea> _worldAreas;
-        private readonly Dictionary<string, Texture2D> _textures;
+        private Tile[,] _tiles;
         
         private static readonly Random Rnd = new Random();
         
-        public WorldLoader(string file, ContentManager content)
+        public WorldLoader(string file)
             {
             this._xmlDoc.Load(file);
-            this._content = content;
-            this._textures = new Dictionary<string, Texture2D>();
             
             this._worldAreas = LoadAreas();
             }
         
-        private Texture2D GetTexture(string name)
+        /// <summary>
+        /// Width of World measured in tiles.
+        /// </summary>
+        public int Width
             {
-            Texture2D result;
-            if (this._textures.TryGetValue(name, out result))
-                return result;
-            result = this._content.Load<Texture2D>("Tiles/" + name);
-            this._textures.Add(name, result);
+            get { return _tiles.GetLength(0); }
+            }
+
+        /// <summary>
+        /// Height of the World measured in tiles.
+        /// </summary>
+        public int Height
+            {
+            get { return _tiles.GetLength(1); }
+            }
+        
+        public Tile this[TilePos tp]
+            {
+            get
+                {
+                return this._tiles[tp.X, tp.Y];
+                }
+            }
+
+        public Texture2D LoadTexture(ContentManager contentManager, string textureName)
+            {
+            var result = contentManager.Load<Texture2D>(textureName);
             return result;
             }
         
@@ -55,43 +74,39 @@ namespace Labyrinth
                         where r.Area.Intersects(wa.Area) && r.TileDefinitions.Count != 0
                         select r).FirstOrDefault();
                     if (intersectingArea != null)
-                        throw new InvalidOperationException(string.Format("The area {0} intersects with another area {1} (this is a problem because their are multiple tile definitions).", wa.Area, intersectingArea.Area));
+                        throw new InvalidOperationException(string.Format("The area {0} intersects with another area {1} (this is a problem because there are multiple tile definitions).", wa.Area, intersectingArea.Area));
                     }
                 
                 result.Add(wa);
                 }
             return result;
             }
-        
-        public StartState StartStateForWorld
+
+        private int GetStartingWorldAreaId()
             {
-            get
+            WorldArea startingWorldArea;
+            try
                 {
-                StartState[] result =
-                    (from WorldArea wa in this._worldAreas
-                    where wa.IsInitialArea
-                    select wa.StartState).ToArray();
-                switch (result.GetLength(0))
-                    {
-                    case 0:
-                        throw new InvalidOperationException("No world area is marked as the starting point.");
-                    case 1:
-                        return result[0];
-                    }
-                throw new InvalidOperationException("Multiple world areas are marked as the starting point.");
+                startingWorldArea = this._worldAreas.Single(wa => wa.IsInitialArea);
                 }
+            catch (InvalidOperationException)
+                {
+                throw new InvalidOperationException("There is not a single worldarea marked as the initial area.");
+                }
+            var result = startingWorldArea.Id;
+            return result;
             }
-        
-        public int? GetMaximumId()
+
+        public int GetMaximumWorldAreaId()
             {
             var worldAreasWithIds = this._worldAreas.Where(wa => wa.HasId).ToList();
             if (!worldAreasWithIds.Any())
-                return null;
+                throw new InvalidOperationException();
             var result = worldAreasWithIds.Max(wa => wa.Id);
             return result;
             }
 
-        public StartState GetStartStateForWorld(int id)
+        public StartState GetStartStateForWorldAreaId(int id)
             {
             var worldArea = this._worldAreas.SingleOrDefault(wa => wa.HasId && wa.Id == id);
             if (worldArea == null)
@@ -100,23 +115,93 @@ namespace Labyrinth
             return result;
             }
 
-        public StartState StartStateAfterDeath(TilePos tp)
-            {
-            return GetWorldAreaForTilePos(tp).StartState;
-            }
-        
-        public WorldArea GetWorldAreaForTilePos(TilePos tp)
+        public int GetWorldAreaIdForTilePos(TilePos tp)
             {
             var areaContainingPoint =
                 (from WorldArea wa in this._worldAreas
-                where wa.StartState != null && wa.Area.Contains(tp.X, tp.Y)
+                where wa.HasId && wa.StartState != null && wa.Area.Contains(tp.X, tp.Y)
                 select wa).Single();
-            return areaContainingPoint;
+            var result = areaContainingPoint.Id;
+            return result;
             }
         
-        public LinkedList<Monster.Monster> GetListOfMonsters(World world)
+        public IEnumerable<StaticItem> GetGameObjects(World world)
             {
-            var result = new LinkedList<Monster.Monster>();
+            var exceptions = new List<TileException>();
+            Tile[,] tiles;
+
+            var result = new List<StaticItem>();
+            var walls = GetLayout(world, out tiles);
+            result.AddRange(walls);
+
+            int initialWorldId = GetStartingWorldAreaId();
+            StartState ss = GetStartStateForWorldAreaId(initialWorldId);
+
+            var player = new Player(world, ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
+            result.Add(player);
+            var playerStartPositions = this._worldAreas.Where(wa => wa.StartState != null).Select(wa => new Grave(world, wa.StartState.PlayerPosition.ToPosition()));
+            exceptions.AddRange(SetTileOccupation(ref tiles, playerStartPositions, false));
+
+            var boulders = GetListOfBoulders(world).ToList();
+            result.AddRange(boulders);
+            exceptions.AddRange(SetTileOccupation(ref tiles, boulders, false));
+
+            var monsters = GetListOfMonsters(world).ToList();
+            result.AddRange(monsters);
+            exceptions.AddRange(SetTileOccupation(ref tiles, monsters.Where(m => m.IsStill), false));
+            
+            var crystals = GetListOfCrystals(world).ToList();
+            result.AddRange(crystals);
+            exceptions.AddRange(SetTileOccupation(ref tiles, crystals, false));
+
+            var forceFields = GetListOfForceFields(world).ToList();
+            result.AddRange(forceFields);
+            exceptions.AddRange(SetTileOccupation(ref tiles, forceFields, false));
+            
+            var fruit = GetListOfFruit(world, ref tiles);
+            result.AddRange(fruit);
+
+            exceptions.AddRange(SetTileOccupation(ref tiles, monsters.Where(m => !m.IsStill), true));
+            
+            ReviewPotentiallyOccupiedTiles(ref tiles, exceptions);
+            
+            if (exceptions.Count != 0)
+                {
+                string message = string.Empty;
+                var errors = exceptions.Where(te=>te.Type == TileExceptionType.Error).ToList();
+                var warnings = exceptions.Where(te=>te.Type == TileExceptionType.Warning).ToList();
+                foreach (TileException te in errors)
+                    {
+                    if (message.Length != 0)
+                        message += "\r\n";
+                    message += string.Format("{0} - {1}", te.Type, te.Message);
+                    }
+                if (warnings.Any())
+                    {
+                    if (message.Length != 0)
+                        message += "\r\n";
+                    foreach (TileException te in warnings)
+                        {
+                        if (message.Length != 0)
+                            message += "\r\n";
+                        message += string.Format("{0} - {1}", te.Type, te.Message);
+                        }
+                    }
+                if (errors.Any())
+                    throw new InvalidOperationException(message);
+                Trace.WriteLine(message);
+                var dr = MessageBox.Show(message, "Warnings", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (dr == DialogResult.Cancel)
+                    throw new InvalidOperationException(message);
+                }
+
+            this._tiles = tiles;
+            return result;
+            }
+
+        private IEnumerable<Monster.Monster> GetListOfMonsters(World world)
+            {
+            var result = new List<Monster.Monster>();
             var monsters = this._xmlDoc.SelectNodes("World/Monsters/Monster");
             if (monsters == null)
                 throw new InvalidOperationException();
@@ -125,8 +210,8 @@ namespace Labyrinth
                 string type = mdef.GetAttribute("Type");
                 var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
                 Vector2 position = tilePos.ToPosition();
-                if (!world.CanTileBeOccupied(tilePos, true))
-                    throw new InvalidOperationException(string.Format("Position ({0}, {1}) for monster {2} is an impassable tile.", tilePos.X, tilePos.Y, type));
+                //if (!world.CanTileBeOccupied(tilePos, true))
+                //    throw new InvalidOperationException(string.Format("Position ({0}, {1}) for monster {2} is an impassable tile.", tilePos.X, tilePos.Y, type));
                 int e = int.Parse(mdef.GetAttribute("Energy"));
                 Monster.Monster m = Monster.Monster.Create(type, world, position, e);
                 string direction = mdef.GetAttribute("Direction");
@@ -164,13 +249,13 @@ namespace Labyrinth
                     {
                     m.SplitsOnHit = Boolean.Parse(splitsOnHit);
                     }
-                result.AddLast(m);
+                result.Add(m);
                 }
             
             return result;
             }
-        
-        public IEnumerable<Crystal> GetListOfCrystals(World world)
+
+        private IEnumerable<Crystal> GetListOfCrystals(World world)
             {
             var crystals = this._xmlDoc.SelectNodes("World/Crystals/Item");
             if (crystals == null)
@@ -184,8 +269,20 @@ namespace Labyrinth
                           select new Crystal(world, position, id, score, energy)).ToList();
             return result;
             }
-        
-        public IEnumerable<ForceField> GetListOfForceFields(World world)
+
+        private IEnumerable<Boulder> GetListOfBoulders(World world)
+            {
+            var boulders = this._xmlDoc.SelectNodes("World/Boulders/Item");
+            if (boulders == null)
+                throw new InvalidOperationException();
+            var result = (from XmlElement bdef in boulders
+                          let tilePos = new TilePos(int.Parse(bdef.GetAttribute("Left")), int.Parse(bdef.GetAttribute("Top")))
+                          let position = tilePos.ToPosition()
+                          select new Boulder(world, position)).ToList();
+            return result;
+            }
+
+        private IEnumerable<ForceField> GetListOfForceFields(World world)
             {
             var result = new List<ForceField>();
             var forceFields = this._xmlDoc.SelectNodes("World/ForceFields/Item");
@@ -205,7 +302,7 @@ namespace Labyrinth
             return result;
             }
 
-        public IEnumerable<Fruit> GetListOfFruit(World world, Tile[,] tiles)
+        private IEnumerable<Fruit> GetListOfFruit(World world, ref Tile[,] tiles)
             {
             var result = new List<Fruit>();
             foreach (WorldArea wa in this._worldAreas)
@@ -229,7 +326,7 @@ namespace Labyrinth
             return result;
             }
 
-        public Tile[,] LoadLayout(List<StaticItem> walls, World world)
+        private IEnumerable<Wall> GetLayout(World world, out Tile[,] tiles)
             {
             var worldDef = (XmlElement)this._xmlDoc.SelectSingleNode("World");
             if (worldDef == null)
@@ -239,7 +336,7 @@ namespace Labyrinth
             var layout = (XmlElement) this._xmlDoc.SelectSingleNode("World/Layout");
             if (layout == null)
                 throw new InvalidOperationException("No Layout element found.");
-            var tiles = new Tile[width, height];            
+            tiles = new Tile[width, height];            
             
             var lines = layout.InnerText.Trim().Replace("\r\n", "\t").Split('\t');
             if (lines.GetLength(0) != height)
@@ -251,22 +348,14 @@ namespace Labyrinth
                 if (lines[y].Length != width)
                     throw new InvalidOperationException();
                 }
-                
+               
+            var result = new List<Wall>();
             foreach (WorldArea wa in this._worldAreas)
                 {
                 if (wa.TileDefinitions.Count == 0)
                     continue;
                 
-                TileDefinition defaultFloor;
-                var floorTiles = 
-                    (from TileDefinition td in wa.TileDefinitions.Values
-                    where td.TileTypeByMap == TileTypeByMap.Floor
-                    select td).ToList();
-                if (floorTiles.Count == 1)
-                    defaultFloor = floorTiles[0];
-                else
-                    throw new InvalidOperationException();
-                    
+                string defaultFloorName = wa.TileDefinitions.Values.Single(td => td.TileTypeByMap == TileTypeByMap.Floor).TextureName;
                 foreach (TilePos p in wa.Area.PointsInside())
                     {
                     char symbol = lines[p.Y][p.X];
@@ -280,18 +369,18 @@ namespace Labyrinth
                     switch (td.TileTypeByMap)
                         {
                         case TileTypeByMap.Wall:
-                            floor = GetTexture(defaultFloor.TextureName);
+                            floor = world.LoadTexture("Tiles/" + defaultFloorName);
                             tiles[p.X, p.Y] = new Tile(floor, td.TileTypeByMap);
                             var position = new Vector2(p.X * Tile.Width + (Tile.Width / 2), p.Y * Tile.Height + (Tile.Height / 2));
-                            var wall = new Wall(world, position, GetTexture(td.TextureName));
-                            walls.Add(wall);
+                            var wall = new Wall(world, position, "Tiles/" + td.TextureName);
+                            result.Add(wall);
                             break;
                         case TileTypeByMap.Floor:
-                            floor = GetTexture(td.TextureName);
+                            floor = world.LoadTexture("Tiles/" + td.TextureName);
                             tiles[p.X, p.Y] = new Tile(floor, td.TileTypeByMap);
                             break;
                         case TileTypeByMap.PotentiallyOccupied:
-                            floor = GetTexture(defaultFloor.TextureName);
+                            floor = world.LoadTexture("Tiles/" + defaultFloorName);
                             tiles[p.X, p.Y] = new Tile(floor, symbol);  
                             break;
                         default:
@@ -300,7 +389,53 @@ namespace Labyrinth
                     }
                 }
             
-            return tiles;
+            return result;
+            }
+
+        private static IEnumerable<TileException> SetTileOccupation(ref Tile[,] tiles, IEnumerable<StaticItem> gameObjects, bool isMoving)
+            {
+            Action<Tile> action;
+            if (isMoving)
+                action = t => t.SetOccupationByMovingMonster();
+            else
+                action = t => t.SetOccupationByStaticItem();
+
+            var result = new List<TileException>();
+            foreach (var item in gameObjects)
+                {
+                TilePos tp = item.TilePosition;
+
+                try
+                    {
+                    action(tiles[tp.X, tp.Y]);
+                    }
+                catch (TileException te)
+                    {
+                    var nte = new TileException(te, string.Format("{0} at tile {1},{2} for {3} occupation", item.GetType().Name, tp.X, tp.Y, isMoving ? "moving" : "static"));
+                    result.Add(nte);
+                    }
+                }
+            return result;
+            }
+
+        private static void ReviewPotentiallyOccupiedTiles(ref Tile[,] tiles, List<TileException> exceptions)
+            {
+            for (int y = 0; y < tiles.GetLength(1); y++)
+                {
+                for (int x = 0; x < tiles.GetLength(0); x++)
+                    {
+                    Tile t = tiles[x, y];
+                    try
+                        {
+                        t.CheckIfIncorrectlyPotentiallyOccupied();
+                        }
+                    catch (TileException te)
+                        {
+                        var nte = new TileException(te, string.Format("Tile at {0},{1}", x, y));
+                        exceptions.Add(nte);
+                        }
+                    }
+                }
             }
         }
     }

@@ -79,13 +79,11 @@ namespace Labyrinth
                 }
             }
 
-
-
         // can a moving object move onto a particular square?
         // the square must not be occupied by an impassable object,
         // and any moveable objects must be able to move off in the same direction
 
-        protected bool CanMoveTo(Direction direction)
+        protected internal bool CanMoveTo(Direction direction)
             {
             TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
             var objectsOnTile = this.World.GetItemsOnTile(proposedDestination);

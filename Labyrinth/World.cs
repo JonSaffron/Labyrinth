@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using Labyrinth.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -10,231 +9,54 @@ using Labyrinth.Monster;
 
 namespace Labyrinth
     {
-    /// <summary>
-    /// A uniform grid of tiles with collections of gems and enemies.
-    /// The World owns the player and controls the game's win and lose
-    /// conditions as well as scoring.
-    /// </summary>
     class World : IDisposable
         {
         private int _gameClock;
         private double _time;
         private int _levelUnlocked;
         
-        // Physical structure of the World.
-        private readonly Tile[,] _tiles;
-        
         // Entities in the World.
-        public Player Player { get; private set; }
-
-        private Boulder Boulder { get; set; }
-
+        private readonly Player _player;
         private readonly LinkedList<StaticItem> _allGameItems; 
         private readonly LinkedList<StaticItem> _interactiveGameItems; 
         
-        private readonly Stack<WorldArea> _areasVisited;
-
         bool _doNotUpdate;
-        private readonly WorldLoader _wl;
+        private readonly IWorldLoader _wl;
         
         // World content.   
         public readonly Game1 Game;
-        public ContentManager Content { get; private set; }
+        private ContentManager _contentManager;
 
         public const int WindowSizeX = 16;
         public const int WindowSizeY = 10;
             
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
 
-        public World(IServiceProvider serviceProvider, WorldLoader x, SpriteBatchWindowed spw, Game1 game)
+        public World(Game1 game, IWorldLoader worldLoader)
             {
-            this._wl = x;
-            // Create a new content manager to load content used just by this World.
-            Content = new ContentManager(serviceProvider, "Content");
             this.Game = game;
+            this._wl = worldLoader;
+            // Create a new content manager to load content used just by this World.
+            this._contentManager = new ContentManager(game.Services, "Content");
 
-            var exceptions = new List<TileException>();
-
-            var walls = new List<StaticItem>();
-            this._tiles = x.LoadLayout(walls, this);
-
-            StartState ss = x.StartStateForWorld;
-            try
-                {
-                this._tiles[ss.PlayerPosition.X, ss.PlayerPosition.Y].SetOccupationByStaticItem();
-                }
-            catch (TileException te)
-                {
-                var nte = new TileException(te, string.Format("Player's start position at tile {0},{1}", ss.PlayerPosition.X, ss.PlayerPosition.Y));
-                exceptions.Add(nte);
-                }
-            try
-                {
-                this._tiles[ss.BlockPosition.X, ss.BlockPosition.Y].SetOccupationByStaticItem();
-                }
-            catch (TileException te)
-                {
-                var nte = new TileException(te, string.Format("Boulder's start position at tile {0},{1}", ss.BlockPosition.X, ss.BlockPosition.Y));
-                exceptions.Add(nte);
-                }
-
-            this._allGameItems = new LinkedList<StaticItem>();
-            this._allGameItems.AddRange(walls);
-
-            this.Player = new Player(this, ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
-            this._allGameItems.AddLast(this.Player);
-            Reset(spw);
-
-            this.Boulder = new Boulder(this, ss.BlockPosition.ToPosition());
-            this._allGameItems.AddLast(this.Boulder);
-
-            var monsters = x.GetListOfMonsters(this);
-            //var toRemove = monsters.Where(m => !(m is RotaFloaterBrown) || m.Energy != 40 || m.Mobility != MonsterMobility.Patrolling).ToList();
-            //foreach (var m in toRemove)
-            //    monsters.Remove(m);
-            this._allGameItems.AddRange(monsters);
-
-            CheckOccupationByStaticMonsters(exceptions);
-            
-            var crystals = x.GetListOfCrystals(this).ToList();
-            this._allGameItems.AddRange(crystals);
-            AddCrystalsToOccupiedList(crystals, exceptions);
-
-            var forceFields = x.GetListOfForceFields(this).ToList();
-            this._allGameItems.AddRange(forceFields);
-            AddForceFieldsToOccupiedList(forceFields, exceptions);
-            
-            var fruit = x.GetListOfFruit(this, this._tiles);
-            this._allGameItems.AddRange(fruit);
-
-            CheckOccupationByMovingMonsters(exceptions);
-            
-            ReviewPotentiallyOccupiedTiles(exceptions);
-            
-            if (exceptions.Count != 0)
-                {
-                string message = string.Empty;
-                var errors = exceptions.Where(te=>te.Type == TileExceptionType.Error).ToList();
-                var warnings = exceptions.Where(te=>te.Type == TileExceptionType.Warning).ToList();
-                foreach (TileException te in errors)
-                    {
-                    if (message.Length != 0)
-                        message += "\r\n";
-                    message += string.Format("{0} - {1}", te.Type, te.Message);
-                    }
-                if (warnings.Any())
-                    {
-                    if (message.Length != 0)
-                        message += "\r\n";
-                    foreach (TileException te in warnings)
-                        {
-                        if (message.Length != 0)
-                            message += "\r\n";
-                        message += string.Format("{0} - {1}", te.Type, te.Message);
-                        }
-                    }
-                if (errors.Any())
-                    throw new InvalidOperationException(message);
-                System.Diagnostics.Trace.WriteLine(message);
-                var dr = MessageBox.Show(message, "Warnings", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                if (dr == DialogResult.Cancel)
-                    throw new InvalidOperationException(message);
-                }
-
-            this._interactiveGameItems = new LinkedList<StaticItem>(this._allGameItems.Where(item => !(item is Wall)));
-            this._areasVisited = new Stack<WorldArea>();
-            this._areasVisited.Push(x.GetWorldAreaForTilePos(ss.PlayerPosition));
+            var gameItems = worldLoader.GetGameObjects(this).ToList();
+            this._allGameItems = new LinkedList<StaticItem>(gameItems);
+            this._interactiveGameItems = new LinkedList<StaticItem>(gameItems.Where(item => !(item is Wall)));
+            this._player = gameItems.OfType<Player>().Single();
             }
-        
-        private void CheckOccupationByStaticMonsters(List<TileException> exceptions)
-            {
-            foreach (Monster.Monster m in this._allGameItems.OfType<Monster.Monster>().Where(m => m.IsStill))
-                {
-                TilePos tp = m.TilePosition;
 
-                try
-                    {
-                    this._tiles[tp.X, tp.Y].SetOccupationByStaticItem();
-                    }
-                catch (TileException te)
-                    {
-                    var nte = new TileException(te, string.Format("Static monster {0} at tile {1},{2}", m.GetType().Name, tp.X, tp.Y));
-                    exceptions.Add(nte);
-                    }
-                }
-            }
-        
-        private void CheckOccupationByMovingMonsters(List<TileException> exceptions)
+        public Player Player
             {
-            foreach (Monster.Monster m in this._allGameItems.OfType<Monster.Monster>().Where(m => !m.IsStill))
+            get
                 {
-                TilePos tp = m.TilePosition;
-
-                try
-                    {
-                    this._tiles[tp.X, tp.Y].SetOccupationByMovingMonster();
-                    }
-                catch (TileException te)
-                    {
-                    var nte = new TileException(te, string.Format("Moving monster {0} at tile {1},{2}", m.GetType().Name, tp.X, tp.Y));
-                    exceptions.Add(nte);
-                    }
+                return _player;
                 }
             }
 
-        private void AddCrystalsToOccupiedList(IEnumerable<Crystal> crystals, List<TileException> exceptions)
+        public Texture2D LoadTexture(string textureName)
             {
-            foreach (Crystal c in crystals)
-                {
-                TilePos tp = c.TilePosition;
-                try
-                    {
-                    this._tiles[tp.X, tp.Y].SetOccupationByStaticItem();
-                    }
-                catch (TileException te)
-                    {
-                    var nte = new TileException(te, string.Format("Crystal at tile {0},{1}", tp.X, tp.Y));
-                    exceptions.Add(nte);
-                    }
-                }
-            }
-
-        private void AddForceFieldsToOccupiedList(IEnumerable<ForceField> forceFields, List<TileException> exceptions)
-            {
-            foreach (ForceField ff in forceFields)
-                {
-                TilePos tp = ff.TilePosition;
-                try
-                    {
-                    this._tiles[tp.X, tp.Y].SetOccupationByStaticItem();
-                    }
-                catch (TileException te)
-                    {
-                    var nte = new TileException(te, string.Format("ForceField at tile {0},{1}", tp.X, tp.Y));
-                    exceptions.Add(nte);
-                    }
-                }
-            }
-
-        private void ReviewPotentiallyOccupiedTiles(List<TileException> exceptions)
-            {
-            for (int y = 0; y < _tiles.GetLength(1); y++)
-                for (int x = 0; x < _tiles.GetLength(0); x++)
-                    {
-//                    if (this._wl.GetWorldAreaForTilePos(new TilePos(x, y)).Id > 5)
-//                        continue;
-
-                    Tile t = this._tiles[x, y];
-                    try
-                        {
-                        t.CheckIfIncorrectlyPotentiallyOccupied();
-                        }
-                    catch (TileException te)
-                        {
-                        var nte = new TileException(te, string.Format("Tile at {0},{1}", x, y));
-                        exceptions.Add(nte);
-                        }
-                    }
+            var result = this._wl.LoadTexture(this._contentManager, textureName);
+            return result;
             }
 
         public void ResetLevel(SpriteBatchWindowed spw)
@@ -251,14 +73,14 @@ namespace Labyrinth
                     this._interactiveGameItems.Remove(currentNode);
                     }
                 }
-            //this._shots.Clear();
 
-            StartState ss = _wl.StartStateAfterDeath(this.Player.TilePosition);
+            var worldAreaId = this._wl.GetWorldAreaIdForTilePos(this.Player.TilePosition);
+            StartState ss = this._wl.GetStartStateForWorldAreaId(worldAreaId);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             Reset(spw);
             }
         
-        private void Reset(SpriteBatchWindowed spw)
+        public void Reset(SpriteBatchWindowed spw)
             {
             Point roomStart = GetContainingRoom(Player.TilePosition).Location;
             spw.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
@@ -288,11 +110,11 @@ namespace Labyrinth
             {
             if (isDisposing)
                 {
-                if (this.Content != null)
+                if (this._contentManager != null)
                     {
-                    this.Content.Unload();
-                    this.Content.Dispose();
-                    this.Content = null;
+                    this._contentManager.Unload();
+                    this._contentManager.Dispose();
+                    this._contentManager = null;
                     }
                 }
 
@@ -309,48 +131,14 @@ namespace Labyrinth
             {
             var x = tp.X;
             var y = tp.Y;
-            var result = !(x < 0 || x >= Width || y < 0 || y >= Height);
+            var result = !(x < 0 || x >= this._wl.Width || y < 0 || y >= this._wl.Height);
             return result;
             }
 
-        /// <summary>
-        /// Width of World measured in tiles.
-        /// </summary>
-        private int Width
-            {
-            get { return _tiles.GetLength(0); }
-            }
-
-        /// <summary>
-        /// Height of the World measured in tiles.
-        /// </summary>
-        private int Height
-            {
-            get { return _tiles.GetLength(1); }
-            }
-        
         public void IncreaseScore(int score)
             {
             this.Game.AddScore(score);
             }
-        
-        //public bool CanPlayerMove(Direction d, Vector2 potentiallyMovingTowards)
-        //    {
-        //    if (d == Direction.None)
-        //        throw new ArgumentOutOfRangeException("d", "Invalid direction");
-            
-        //    bool result;
-        //    if (potentiallyMovingTowards == Boulder.Position && Boulder.Direction == Direction.None)
-        //        {
-        //        PushStatus ps = this.Boulder.CanBePushed(d);
-        //        result = (ps != PushStatus.No);
-        //        }
-        //    else
-        //        {
-        //        result = CanTileBeOccupied(potentiallyMovingTowards, false);
-        //        }
-        //    return result;
-        //    }
         
         public bool CanTileBeOccupied(TilePos tp, bool treatMoveableItemsAsImpassable)
             {
@@ -389,6 +177,12 @@ namespace Labyrinth
             this._doNotUpdate = true;
             }
 
+        public int GetWorldAreaIdForTilePos(TilePos tp)
+            {
+            var result = this._wl.GetWorldAreaIdForTilePos(tp);
+            return result;
+            }
+
         /// <summary>
         /// Updates all objects in the world, performs collision between them,
         /// and handles the time limit with scoring.
@@ -424,13 +218,6 @@ namespace Labyrinth
 
             if (Player.Direction != Direction.None)
                 {
-                TilePos tp = this.Player.TilePosition;
-                WorldArea wa = this._wl.GetWorldAreaForTilePos(tp);
-                if (!this._areasVisited.Contains(wa))
-                    {
-                    this._areasVisited.Push(wa);
-                    this.Game.SoundLibrary.Play(GameSound.PlayerEntersNewLevel);
-                    }
                 }
             }
 
@@ -441,8 +228,8 @@ namespace Labyrinth
                 if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
                 
-                WorldArea wa = this._wl.GetWorldAreaForTilePos(m.TilePosition);
-                if (wa.HasId && wa.Id < levelThatPlayerShouldHaveReached)
+                int worldAreaId = this._wl.GetWorldAreaIdForTilePos(m.TilePosition);
+                if (worldAreaId < levelThatPlayerShouldHaveReached)
                     m.IsActive = true;
                 }
             }
@@ -665,7 +452,7 @@ namespace Labyrinth
             
             var viewPort = GetViewPort(spriteBatch.WindowOffset);
 
-            DrawTiles(spriteBatch, viewPort);
+            DrawFloorTiles(spriteBatch, viewPort);
 
             var r = new Rectangle((viewPort.Left - 1) * Tile.Width, (viewPort.Top -1) * Tile.Height, (viewPort.Right + 2) * Tile.Width, (viewPort.Bottom + 1) * Tile.Height);
 
@@ -721,7 +508,7 @@ namespace Labyrinth
             throw new InvalidOperationException();
             }
 
-        private Rectangle GetViewPort(Vector2 windowOffset)
+        private static Rectangle GetViewPort(Vector2 windowOffset)
             {
             const int windowWidth = (WindowSizeX - 1) * Tile.Width;
             const int windowHeight = (WindowSizeY - 1) * Tile.Height;
@@ -736,16 +523,17 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Draws each tile in the World.
+        /// Draws the floor of the current view
         /// </summary>
-        private void DrawTiles(SpriteBatchWindowed spriteBatch, Rectangle r)
+        private void DrawFloorTiles(SpriteBatchWindowed spriteBatch, Rectangle r)
             {
             // draw the floor
             for (int y = r.Top; y <= r.Bottom; y++)
                 {
                 for (int x = r.Left; x <= r.Right; x++)
                     {
-                    Texture2D texture = _tiles[x, y].Floor;
+                    var tp = new TilePos(x, y);
+                    Texture2D texture = this._wl[tp].Floor;
                     if (texture != null)
                         {
                         Vector2 position = new Vector2(x, y) * Tile.Size;
@@ -772,28 +560,36 @@ namespace Labyrinth
             if (!this.Player.IsAlive())
                 return;
 
-            var currentWorld = this._wl.GetWorldAreaForTilePos(this.Player.TilePosition).Id;
-            var maxId = this._wl.GetMaximumId();
-            StartState newState = null;
-            for (int i = currentWorld + 1; i <= maxId; i++)
-            {
-                newState = this._wl.GetStartStateForWorld(i);
-                if (newState != null)
-                    break;
-            }
-            var itemToReplace = this._interactiveGameItems.Find(this.Boulder);
-            if (newState == null || itemToReplace == null)
+            int currentWorldAreaId = this._wl.GetWorldAreaIdForTilePos(this.Player.TilePosition);
+            int maxId = this._wl.GetMaximumWorldAreaId();
+            var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._wl.GetStartStateForWorldAreaId(i)).FirstOrDefault(startState => startState != null);
+            if (newState == null)
                 return;
 
-            var crystals = this._interactiveGameItems.OfType<Crystal>().Where(c => this._wl.GetWorldAreaForTilePos(c.TilePosition).Id == currentWorld);
+            var crystals = this._interactiveGameItems.OfType<Crystal>().Where(c => this._wl.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
             foreach (var c in crystals)
                 {
                 var i = new MovingItemAndStaticItemInteraction(this, this.Player, c);
                 i.Collide();
                 }
             this.Player.Reset(newState.PlayerPosition.ToPosition(), newState.PlayerEnergy);
-            this.Boulder = new Boulder(this, newState.BlockPosition.ToPosition());
-            itemToReplace.Value = this.Boulder;
+            var boulder = this._interactiveGameItems.OfType<Boulder>().FirstOrDefault();
+            if (boulder != null)
+                {
+                TilePos? tp = null;
+                for (int i = 0; i < 16; i++)
+                    {
+                    int x = (i % 2 == 0) ? 7 - (i / 2) : 8 + ((i - 1) / 2);
+                    var potentialPosition = new TilePos(x, newState.PlayerPosition.Y);
+                    if (!IsStaticItemOnTile(potentialPosition))
+                        {
+                        tp = potentialPosition;
+                        break;
+                        }
+                    }
+                if (tp.HasValue)
+                    boulder.Reset(tp.Value.ToPosition());
+                }
             Point roomStart = GetContainingRoom(Player.TilePosition).Location;
             this.Game.SpriteBatchWindowed.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
             }

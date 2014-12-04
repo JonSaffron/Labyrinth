@@ -46,6 +46,9 @@ namespace Labyrinth
         /// </summary>
         private int FrameIndex { get; set; }
 
+        /// <summary>
+        ///  Tracks whether a notification that the animation has completed has been sent
+        /// </summary>
         private bool _animationFinishedNotified;
 
         /// <summary>
@@ -58,29 +61,40 @@ namespace Labyrinth
         /// </summary>
         private double _time;
 
+        /// <summary>
+        /// Tracks whether the animation was to be player on the last occasion that Draw was called
+        /// </summary>
         private bool _wasMoving;
         
-        public delegate void NewFrameHandler(object sender, EventArgs e);
-        public event NewFrameHandler NewFrame;
+        /// <summary>
+        /// Used to notify a game object that the animation has progressed to the next frame
+        /// </summary>
+        public event EventHandler<EventArgs> NewFrame;
         
-        public delegate void AnimationFinishedHandler(object sender, EventArgs e);
-        public event AnimationFinishedHandler AnimationFinished;
+        /// <summary>
+        /// Used to notify a game object that the animation has completed showing all frames
+        /// </summary>
+        public event EventHandler<EventArgs> AnimationFinished;
         
         private void OnNewFrame(EventArgs e)
             {
-            if (NewFrame != null)
-                NewFrame(this, e);
+            var handler = NewFrame;
+
+            if (handler != null)
+                handler(this, e);
             }
         
         private void OnAnimationFinished(EventArgs e)
             {
-            if (AnimationFinished != null)
-                AnimationFinished(this, e);
+            var handler = AnimationFinished;
+
+            if (handler != null)
+                handler(this, e);
             }
         
-        public Vector2 Origin
+        public static Vector2 Origin
             {
-            get { return new Vector2(Animation.FrameWidth / 2.0f, Animation.FrameHeight / 2.0f); }
+            get { return new Vector2(Tile.Width / 2.0f, Tile.Height / 2.0f); }
             }
 
         /// <summary>
@@ -91,9 +105,6 @@ namespace Labyrinth
             // If this animation is already running, do not restart it.
             if (Animation == animation)
                 return;
-
-            if (animation.FrameCount > 1 && animation.BaseMovementsPerFrame == 0)
-                throw new InvalidOperationException("Cannot play a multi-framed animation with a frametime of 0.");
 
             // Start the new animation.
             this.Animation = animation;

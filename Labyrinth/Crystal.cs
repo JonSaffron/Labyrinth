@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -15,8 +14,7 @@ namespace Labyrinth
             this.Score = score;
             this.Energy = energy;
 
-            var texture = base.World.Content.Load<Texture2D>("Sprites/Crystal/Crystal");
-            var a = Animation.LoopingAnimation(texture, 4);
+            var a = Animation.LoopingAnimation(World, "Sprites/Crystal/Crystal", 4);
             this.Ap.PlayAnimation(a);
             }
 

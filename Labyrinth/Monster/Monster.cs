@@ -39,9 +39,8 @@ namespace Labyrinth.Monster
             this.Energy = energy;
             this._originalEnergy = energy;
             
-            var egg = world.Content.Load<Texture2D>("Sprites/Monsters/Egg");
-            this._eggAnimation = Animation.LoopingAnimation(egg, 3);
-            this._hatchingAnimation = Animation.LoopingAnimation(egg, 1);
+            this._eggAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 3);
+            this._hatchingAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 1);
             this.MonsterState = MonsterState.Normal;
             }
             

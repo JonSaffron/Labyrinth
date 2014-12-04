@@ -6,16 +6,20 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Labyrinth
     {
-    public sealed class SoundLibrary : IDisposable
+    public sealed class SoundLibrary : IDisposable, ISoundLibrary
         {
         private readonly Dictionary<GameSound, SoundEffect> _sounds;
         private readonly Dictionary<SoundEffectInstance, Tuple<GameSound, SoundEffectFinished>> _trackingInstances = new Dictionary<SoundEffectInstance, Tuple<GameSound, SoundEffectFinished>>();
 
         public delegate void SoundEffectFinished(object sender, SoundEffectFinishedEventArgs args);
     
-        public SoundLibrary(ContentManager cm)
+        public SoundLibrary()
             {
             this._sounds = new Dictionary<GameSound, SoundEffect>();
+            }
+
+        public void LoadContent(ContentManager cm)
+            {
             foreach (GameSound item in Enum.GetValues(typeof(GameSound)))
                 {
                 string path = string.Format("Sounds/{0}", Enum.GetName(typeof(GameSound), item));
@@ -24,32 +28,31 @@ namespace Labyrinth
                 }
             }
 
-        public SoundEffect this[GameSound sound]
+        public IGameSoundInstance GetSoundEffectInstance(GameSound gameSound)
             {
-            get
-                {
-                var result = this._sounds[sound];
-                return result;
-                }
+            var soundEffectInstance = this._sounds[gameSound].CreateInstance();
+            var result = new GameSoundInstance(soundEffectInstance);
+            return result;
             }
 
         public void Play(GameSound gameSound)
             {
-            SoundEffect se = this[gameSound];
-            SoundEffectInstance result = se.CreateInstance();
-            result.Play();
-            //se.Play();
+            PlaySound(gameSound, null);
             }
 
         public void Play(GameSound gameSound, SoundEffectFinished callback)
             {
             if (callback == null)
                 throw new ArgumentNullException("callback");
+            PlaySound(gameSound, callback);
+            }
 
-            SoundEffect se = this[gameSound];
-            SoundEffectInstance result = se.CreateInstance();
-            this._trackingInstances.Add(result, new Tuple<GameSound, SoundEffectFinished>(gameSound, callback));
-            result.Play();
+        private void PlaySound(GameSound gameSound, SoundEffectFinished callback)
+            {
+            SoundEffectInstance soundEffectInstance = this._sounds[gameSound].CreateInstance();
+            if (callback != null)
+                this._trackingInstances.Add(soundEffectInstance, new Tuple<GameSound, SoundEffectFinished>(gameSound, callback));
+            soundEffectInstance.Play();
             }
 
         public void CheckForStoppedInstances()
@@ -63,6 +66,7 @@ namespace Labyrinth
                     var callback = instance.Value.Item2;
                     var args = new SoundEffectFinishedEventArgs(gameSound);
                     callback(this, args);
+
                     instancesToDispose.Add(instance.Key);
                     }
 

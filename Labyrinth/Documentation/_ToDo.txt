@@ -1,4 +1,9 @@
-﻿green kiler cube not shooting, and seems to change frame too quickly
+﻿World should not be a public property of StaticItem
+Should Reset be a common method?
+collect game objects together into a separate object (rather than linked list)
+
+
+green kiler cube not shooting, and seems to change frame too quickly
 can't shoot eggs
 shots go through walls
 can't shoot fruit or mushrooms

@@ -8,26 +8,17 @@ namespace Labyrinth
         private static Direction _previousRequestedDirectionOfMovement;
         
         /// <summary>
-        /// Gets player horizontal movement and jump commands from input.
+        /// Gets player movement and fire action
         /// </summary>
-        public static Direction GetRequestedDirectionOfMovement(out bool isFiring, out bool moveToNextLevel)
+        public static Direction GetRequestedDirectionOfMovement(out bool isFiring, out bool moveToNextLevel, out bool toggleFullScreen)
             {
-            // Get input state.
-            //GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
             KeyboardState keyboardState = Keyboard.GetState();
 
             isFiring = IsKeyNewlyPressed(keyboardState, Keys.LeftControl);
 
             moveToNextLevel = IsKeyNewlyPressed(keyboardState, Keys.L) && keyboardState.IsKeyDown(Keys.LeftShift);
+            toggleFullScreen = IsKeyNewlyPressed(keyboardState, Keys.Enter) && keyboardState.IsKeyDown(Keys.LeftAlt);
 
-            //// Get analog horizontal movement.
-            //movement = gamePadState.ThumbSticks.Left.X * MoveStickScale;
-
-            //// Ignore small movements to prevent running in place.
-            //if (Math.Abs(movement) < 0.5f)
-            //    movement = 0.0f;
-
-            // If any digital horizontal movement input is found, override the analog movement.
             Direction result = Direction.None;
             if (IsKeyNewlyPressed(keyboardState, Keys.Left))
                 result = Direction.Left;

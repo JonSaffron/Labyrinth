@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -9,8 +8,7 @@ namespace Labyrinth
             {
             this.Energy = 255;
             
-            var texture = base.World.Content.Load<Texture2D>("Sprites/Props/Grave");
-            var a = Animation.StaticAnimation(texture);
+            var a = Animation.StaticAnimation(World, "Sprites/Props/Grave");
             this.Ap.PlayAnimation(a);
             }
         }

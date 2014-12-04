@@ -1,16 +1,46 @@
 ﻿namespace Labyrinth
     {
+    /// <summary>
+    /// How the map describes each tile's usage
+    /// </summary>
     public enum TileTypeByMap
         {
+        /// <summary>
+        /// Tile can be occupied by an object
+        /// </summary>
         Floor,
+
+        /// <summary>
+        /// Tile is a wall which cannot be occupied by another object
+        /// </summary>
         Wall,
+
+        /// <summary>
+        /// Tile is marked as being potentially occupied by an object
+        /// </summary>
         PotentiallyOccupied
         }
     
+    /// <summary>
+    /// What sort of object is occupying a tile
+    /// </summary>
     public enum TileTypeByData
         {
+        /// <summary>
+        /// Tile is not occupied by any objects
+        /// </summary>
         Free,
+
+        /// <summary>
+        /// Tile is occupied by an object that doesn't move
+        /// </summary>
+        /// <remarks>No more than one static object can occupy a given tile.</remarks>
         Static,
+
+        /// <summary>
+        /// Tile is initially occupied by one or more objects that move
+        /// </summary>
+        /// <remarks>More than one moving object can occupy a given tile.</remarks>
         Moving
         }
 

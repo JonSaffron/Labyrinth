@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -28,7 +27,13 @@ namespace Labyrinth
         private void LoadContent()
             {
             // Load animated textures.
-            _staticImage = Animation.StaticAnimation(World.Content.Load<Texture2D>("Sprites/Boulder/Boulder"));
+            _staticImage = Animation.StaticAnimation(World, "Sprites/Boulder/Boulder");
+            }
+
+        public void Reset(Vector2 position)
+            {
+            this.Position = position;
+            this.Direction = Direction.None;
             }
 
         public override bool IsExtant
@@ -54,6 +59,10 @@ namespace Labyrinth
         //    return result;
         //    }
         
+        /// <summary>
+        /// Used to begin a push action when the boulder is shot
+        /// </summary>
+        /// <param name="direction">Which direction the boulder should move</param>
         public void Push(Direction direction)
             {
             var ps = CanBePushed(direction);
@@ -75,6 +84,11 @@ namespace Labyrinth
                 }
             }
 
+        /// <summary>
+        /// Used to begin a push or bounce action by the player
+        /// </summary>
+        /// <param name="byWhom">The game object that is acting on the boulder</param>
+        /// <param name="direction">Which direction the specified game object is directing the boulder</param>
         public void PushOrBounce(MovingItem byWhom, Direction direction)
             {
             var ps = CanBePushedOrBounced(byWhom, direction);

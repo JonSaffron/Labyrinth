@@ -6,7 +6,7 @@ namespace Labyrinth
     /// <summary>
     /// Stores the appearance and collision behavior of a tile.
     /// </summary>
-    struct Tile
+    class Tile
         {
         public readonly Texture2D Floor;
 
@@ -93,14 +93,5 @@ namespace Labyrinth
                 return result;
                 }
             }
-
-        //public TileCollision Collision
-        //    {
-        //    get
-        //        {
-        //        TileCollision result = this._tileTypeByMap == TileTypeByMap.Wall ? TileCollision.Impassable : TileCollision.Passable;
-        //        return result;
-        //        }
-        //    }
         }
     }

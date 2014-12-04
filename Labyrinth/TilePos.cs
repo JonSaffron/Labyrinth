@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -19,15 +18,11 @@ namespace Labyrinth
         
         public static TilePos TilePosFromPosition(Vector2 position)
             {
-            //var x = (int)Math.Floor(position.X / Tile.Width);
-            //var y = (int)Math.Floor(position.Y / Tile.Height);
-
             var intx = (int)position.X / Tile.Width;
-            var inty= (int)position.Y / Tile.Height;
+            var inty = (int)position.Y / Tile.Height;
 
-            //Debug.Assert(intx ==x && inty == y);
-
-            return new TilePos(intx, inty);
+            var result = new TilePos(intx, inty);
+            return result;
             }
         
         public static bool operator ==(TilePos first, TilePos second)

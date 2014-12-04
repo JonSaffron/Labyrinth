@@ -33,7 +33,8 @@ namespace Labyrinth
         private readonly Animation _downAnimation;
 
         private readonly List<int> _crystalsCollected = new List<int>();
-        
+        private readonly List<int> _listOfWorldAreaIdsVisited = new List<int>();
+
         // Constants for controling horizontal movement
         private const float StandardSpeed = AnimationPlayer.BaseSpeed * 2;
 
@@ -42,8 +43,8 @@ namespace Labyrinth
         private int _countBeforeDecrementingEnergy;
         private const double TicksOfClock = 0.05f;
 
-        private readonly SoundEffectInstance _playerMovesFootOne;
-        private readonly SoundEffectInstance _playerMovesFootTwo;
+        private readonly IGameSoundInstance _playerMovesFootOne;
+        private readonly IGameSoundInstance _playerMovesFootTwo;
         private bool _whichFootFlag;
 
         /// <summary>
@@ -52,29 +53,27 @@ namespace Labyrinth
         public Player(World world, Vector2 position, int energy) : base(world, position)
             {
             // Load animated textures.
-            _leftRightAnimation = Animation.LoopingAnimation(World.Content.Load<Texture2D>("Sprites/Player/PlayerLeftFacing"), 1);
-            _upAnimation = Animation.LoopingAnimation(World.Content.Load<Texture2D>("Sprites/Player/PlayerUpFacing"), 1);
-            _downAnimation = Animation.LoopingAnimation(World.Content.Load<Texture2D>("Sprites/Player/PlayerDownFacing"), 1);
+            _leftRightAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerLeftFacing", 1);
+            _upAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerUpFacing", 1);
+            _downAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerDownFacing", 1);
 
             Ap.NewFrame += PlayerSpriteNewFrame;
             
             Reset(position, energy);
 
-            this._playerMovesFootOne = world.Game.SoundLibrary[GameSound.PlayerMoves].CreateInstance();
-            this._playerMovesFootTwo = world.Game.SoundLibrary[GameSound.PlayerMoves].CreateInstance();
+            this._playerMovesFootOne = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
+            this._playerMovesFootTwo = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
             this._playerMovesFootTwo.Pitch = -0.15f;
 
             this.ObjectCapability = ObjectCapability.CanPushOrCauseBounceBack;
             }
 
         private void PlayerSpriteNewFrame(object sender, EventArgs e)
-        {
+            {
             var playerMoves = _whichFootFlag ? this._playerMovesFootOne : this._playerMovesFootTwo;
-            //playerMoves.Stop();
             playerMoves.Play();
             _whichFootFlag = !_whichFootFlag;
-            //this.World.Game.SoundLibrary.Play(GameSound.PlayerMoves);
-        }
+            }
 
         /// <summary>
         /// Resets the player to life.
@@ -91,6 +90,8 @@ namespace Labyrinth
             this._countOfShotsBeforeCostingEnergy = 0;  // first shot will cost energy
             this._time = 0;
             this._countBeforeDecrementingEnergy = 0;
+
+            CheckIfEnteredNewWorldArea();
             }
 
         public override bool IsExtant
@@ -154,11 +155,14 @@ namespace Labyrinth
             
             bool isFiring;
             bool moveToNextLevel;
+            bool toggleFullScreen;
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Direction requestedDirection = Input.GetRequestedDirectionOfMovement(out isFiring, out moveToNextLevel);
+            Direction requestedDirection = Input.GetRequestedDirectionOfMovement(out isFiring, out moveToNextLevel, out toggleFullScreen);
 
             if (moveToNextLevel && this.Direction == Direction.None)
                 this.World.MoveUpALevel();
+            if (toggleFullScreen)
+                this.World.Game.ToggleFullScreen();
 
             // deal with changing which direction the player faces
             if (requestedDirection != Direction.None && requestedDirection != this._currentDirectionFaced)
@@ -207,6 +211,7 @@ namespace Labyrinth
                             }
                         break;
                     }
+                isMoving = this.Direction != Direction.None;
                 }
 
             if (isFiring)
@@ -225,20 +230,25 @@ namespace Labyrinth
                     }
                 }
             
-            if (this.Direction != Direction.None)
+            if (isMoving)
+                {
                 // still in motion
-                return isMoving;
+                if (CheckIfEnteredNewWorldArea())
+                    this.World.Game.SoundLibrary.Play(GameSound.PlayerEntersNewLevel);
+
+                return true;
+                }
 
             if (requestedDirection == Direction.None)
                 // no requested movement
-                return isMoving;
+                return false;
             
             if (changedFacingDirection)
-                return isMoving;
+                return false;
             
             TimeSpan timeSinceChangedDirection = gameTime.TotalGameTime - this._lastChangeOfDirection;
             if (timeSinceChangedDirection.Milliseconds < 75)
-                return isMoving;
+                return false;
             
             // start new movement
             
@@ -253,7 +263,17 @@ namespace Labyrinth
                 this.CurrentVelocity = StandardSpeed;
                 }
 
-            return isMoving;
+            return false;
+            }
+
+        private bool CheckIfEnteredNewWorldArea()
+            {
+            int worldAreaId = this.World.GetWorldAreaIdForTilePos(this.TilePosition);
+            if (this._listOfWorldAreaIdsVisited.Contains(worldAreaId))
+                return false;
+
+            this._listOfWorldAreaIdsVisited.Add(worldAreaId);
+            return true;
             }
 
         // todo public void BounceBack(Direction bounceBackDirection, GameTime gameTime)
