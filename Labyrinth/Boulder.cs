@@ -65,7 +65,7 @@ namespace Labyrinth
         /// <param name="direction">Which direction the boulder should move</param>
         public void Push(Direction direction)
             {
-            var ps = CanBePushed(direction);
+            var ps = CanBePushed(direction, false);
             switch (ps)
                 {
                 case PushStatus.No:

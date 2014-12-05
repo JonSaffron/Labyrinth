@@ -256,7 +256,7 @@ namespace Labyrinth
             TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, requestedDirection);
             Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
 
-            if (this.CanMoveTo(requestedDirection))
+            if (this.CanMoveTo(requestedDirection, false))
                 {
                 Direction = requestedDirection;
                 this.MovingTowards = potentiallyMovingTowards;
@@ -279,7 +279,7 @@ namespace Labyrinth
         // todo public void BounceBack(Direction bounceBackDirection, GameTime gameTime)
         public override void BounceBack(Direction direction)
             {
-            if (this.CanMoveTo(direction))
+            if (this.CanMoveTo(direction, true))
                 {
                 this.Direction = direction;
                 this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();

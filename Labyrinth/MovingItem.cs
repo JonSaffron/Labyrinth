@@ -47,18 +47,18 @@ namespace Labyrinth
                 }
             }
 
-        protected PushStatus CanBePushed(Direction direction)
+        protected PushStatus CanBePushed(Direction direction, bool isBouncingBack)
             {
-            var result = this.CanMoveTo(direction) ? PushStatus.Yes : PushStatus.No;
+            var result = this.CanMoveTo(direction, isBouncingBack) ? PushStatus.Yes : PushStatus.No;
             return result;
             }
 
         protected PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction)
             {
-            var result = CanBePushed(direction);
+            var result = CanBePushed(direction, false);
             if (result == PushStatus.No)
                 {
-                result = byWhom.CanBePushed(direction.Reversed());
+                result = byWhom.CanBePushed(direction.Reversed(), true);
                 if (result == PushStatus.Yes)
                     result = PushStatus.Bounce;
                 }
@@ -83,7 +83,9 @@ namespace Labyrinth
         // the square must not be occupied by an impassable object,
         // and any moveable objects must be able to move off in the same direction
 
-        protected internal bool CanMoveTo(Direction direction)
+
+
+        protected bool CanMoveTo(Direction direction, bool isBouncingBack)
             {
             TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
             var objectsOnTile = this.World.GetItemsOnTile(proposedDestination);
@@ -102,10 +104,10 @@ namespace Labyrinth
                         var mi = item as MovingItem;
                         if (mi == null || this.ObjectCapability == ObjectCapability.CannotMoveOthers)
                             return false;
-                        bool canCauseBounceBack = this.ObjectCapability == ObjectCapability.CanPushOrCauseBounceBack && !this.IsBouncingBack;
+                        bool canCauseBounceBack = this.ObjectCapability == ObjectCapability.CanPushOrCauseBounceBack && !isBouncingBack;
                         var canMove = canCauseBounceBack 
                             ? mi.CanBePushedOrBounced(this, direction)
-                            : mi.CanBePushed(direction);
+                            : mi.CanBePushed(direction, isBouncingBack);
                         if (canMove == PushStatus.No)
                             return false;
                         continue;
@@ -117,6 +119,12 @@ namespace Labyrinth
                 }
 
             return true;
+            }
+
+        internal bool TestCanMoveTo(Direction direction)
+            {
+            var result = this.CanMoveTo(direction, false);
+            return result;
             }
         }
     }
