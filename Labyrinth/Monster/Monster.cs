@@ -1,7 +1,6 @@
 ﻿using System;
 using Labyrinth.Annotations;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Monster
     {
@@ -10,8 +9,8 @@ namespace Labyrinth.Monster
         protected static readonly Random MonsterRandom = new Random();
         
         private MonsterMobility _mobility;
-        protected abstract Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility);
-        private Func<Monster, Direction> _determineDirection;
+        protected abstract Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility);
+        private Func<Monster, World, Direction> _determineDirection;
 
         public ChangeRooms ChangeRooms { get; set; }
         private MonsterState _monsterState;
@@ -210,7 +209,7 @@ namespace Labyrinth.Monster
             return result;
             }
 
-        private void SetDirectionAndDestination()
+        private void SetDirectionAndDestination(World w)
             {
             if (this.Mobility == MonsterMobility.Static || this.IsEgg)
                 {
@@ -220,12 +219,12 @@ namespace Labyrinth.Monster
 
             if (this._determineDirection == null)
                 throw new InvalidOperationException("Direction function not set.");
-            Direction d = this._determineDirection(this);
+            Direction d = this._determineDirection(this, this.World);
             
             if (d == Direction.None)
                 throw new InvalidOperationException();
             
-            this.Direction = MonsterMovement.UpdateDirectionWhereMovementBlocked(this, d);
+            this.Direction = MonsterMovement.UpdateDirectionWhereMovementBlocked(this, w, d);
             if (this.Direction == Direction.None)
                 {
                 this.MovingTowards = Vector2.Zero;
@@ -244,7 +243,7 @@ namespace Labyrinth.Monster
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this);
+            bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this, this.World);
             
             if (this.IsEgg && this._hatchingTimer != null)
                 this._hatchingTimer.Enabled = inSameRoom;
@@ -265,7 +264,7 @@ namespace Labyrinth.Monster
                 {
                 if (needToChooseDirection)
                     {
-                    this.SetDirectionAndDestination();
+                    this.SetDirectionAndDestination(this.World);
                     if (this.Flitters)
                         this._flitterFlag = !this._flitterFlag;
                     remainingMovement *= this._flitterFlag ? 2.0f : 0.5f;
@@ -324,7 +323,7 @@ namespace Labyrinth.Monster
                     }
                 }
 
-            if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && (MonsterRandom.Next(256) & 3) != 0 && this.Energy >= 4 && this.World.Player.IsExtant && MonsterMovement.IsPlayerInSight(this))
+            if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && (MonsterRandom.Next(256) & 3) != 0 && this.Energy >= 4 && this.World.Player.IsExtant && MonsterMovement.IsPlayerInSight(this, this.World))
                 {
                 CheckToFire();
                 }

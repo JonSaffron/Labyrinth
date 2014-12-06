@@ -14,7 +14,7 @@ namespace Labyrinth.Monster
             this.ShotsBounceOff = true;
             }
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {

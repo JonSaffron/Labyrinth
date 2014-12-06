@@ -7,14 +7,14 @@ namespace Labyrinth.Monster
     {
         private static readonly Random MonsterRandom = new Random();
 
-        public static Direction DetermineDirectionStandardPatrolling(Monster m)
+        public static Direction DetermineDirectionStandardPatrolling(Monster m, World w)
             {
             if (m.Direction == Direction.None)
                 throw new InvalidOperationException("Direction must be set for patrolling.");
 
             TilePos tp = m.TilePosition;
             TilePos pp = TilePos.GetPositionAfterOneMove(tp, m.Direction);
-            bool isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, true);
+            bool isCurrentlyMovingTowardsFreeSpace = w.CanTileBeOccupied(pp, true);
             Vector2 potentiallyMovingTowards = pp.ToPosition();
             bool isInSameRoom = IsInSameRoom(m.TilePosition, potentiallyMovingTowards);
             bool canContinueMovingInTheSameDirection = isCurrentlyMovingTowardsFreeSpace && isInSameRoom;
@@ -23,13 +23,13 @@ namespace Labyrinth.Monster
             return result;
             }
         
-        public static Direction DetermineDirectionRolling(Monster m)
+        public static Direction DetermineDirectionRolling(Monster m, World w)
             {
             if (m.Direction == Direction.None)
                 return RandomDirection();
             
             bool changeDirection = (MonsterRandom.Next(256) & 7) == 0;
-            var result = changeDirection ? AlterDirection(m.Direction) : DetermineDirectionStandardPatrolling(m);
+            var result = changeDirection ? AlterDirection(m.Direction) : DetermineDirectionStandardPatrolling(m, w);
             return result;
             }
 
@@ -86,7 +86,7 @@ namespace Labyrinth.Monster
             
             }
 
-        public static Direction RandomDirection(Monster m)
+        public static Direction RandomDirection(Monster m, World w)
             {
             var result = RandomDirection();
             return result;
@@ -107,17 +107,17 @@ namespace Labyrinth.Monster
                 }
             }
 
-        public static Direction DetermineDirectionCautious(Monster m)
+        public static Direction DetermineDirectionCautious(Monster m, World w)
             {
             Direction result;
-            if (IsCautious(m))
+            if (IsCautious(m, w))
                 {
                 bool alterDirection = m.Direction != Direction.None && (MonsterRandom.Next(256) & 3) == 0;
                 if (alterDirection)
                     result = AlterDirection(m.Direction);
                 else
                     {
-                    var d = DetermineDirectionTowardsPlayer(m);
+                    var d = DetermineDirectionTowardsPlayer(m, w);
                     result = (d == Direction.None) ? RandomDirection() : d.Reversed();
                     }
                 }
@@ -129,7 +129,7 @@ namespace Labyrinth.Monster
                     }
                 else
                     {
-                    result = DetermineDirectionTowardsPlayer(m);
+                    result = DetermineDirectionTowardsPlayer(m, w);
                     if (result == Direction.None)
                         result = RandomDirection();
                     }
@@ -137,20 +137,20 @@ namespace Labyrinth.Monster
             return result;
             }
         
-        public static Direction DetermineDirectionFullPursuit(Monster m)
+        public static Direction DetermineDirectionFullPursuit(Monster m, World w)
             {
-            Direction result = DetermineDirectionTowardsPlayer(m);
+            Direction result = DetermineDirectionTowardsPlayer(m, w);
             if (result == Direction.None)
                 result = RandomDirection();
             
-            result = UpdateDirectionWhereMovementBlocked(m, result);
+            result = UpdateDirectionWhereMovementBlocked(m, w, result);
             
-            if (m.World.Player != null)
+            if (w.Player != null)
                 {
                 TilePos tp = m.TilePosition;
                 TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, result);
                 Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
-                Vector2 diff = (potentiallyMovingTowards - m.World.Player.Position) / new Vector2(Tile.Width, Tile.Height);
+                Vector2 diff = (potentiallyMovingTowards - w.Player.Position) / new Vector2(Tile.Width, Tile.Height);
                 float tilesToPlayer = Math.Min(Math.Abs(diff.X), Math.Abs(diff.Y));
                 if (tilesToPlayer <= 2)
                     result = AlterDirection(result);
@@ -159,20 +159,20 @@ namespace Labyrinth.Monster
             return result;
             }
         
-        public static Direction DetermineDirectionSemiAggressive(Monster m)
+        public static Direction DetermineDirectionSemiAggressive(Monster m, World w)
             {
-            bool makeAggressiveMove = m.World.Player != null;
+            bool makeAggressiveMove = w.Player != null;
             makeAggressiveMove &= (MonsterRandom.Next(256) & 1) == 0;
             if (m.ChangeRooms != ChangeRooms.FollowsPlayer)
-                makeAggressiveMove &= IsPlayerInSameRoomAsMonster(m);
-            var shouldFollowPlayer = makeAggressiveMove && IsPlayerInSight(m);
-            var result = shouldFollowPlayer ? DetermineDirectionTowardsPlayer(m) : RandomDirection();
+                makeAggressiveMove &= IsPlayerInSameRoomAsMonster(m, w);
+            var shouldFollowPlayer = makeAggressiveMove && IsPlayerInSight(m, w);
+            var result = shouldFollowPlayer ? DetermineDirectionTowardsPlayer(m, w) : RandomDirection();
             return result;
             }
 
-        public static bool IsPlayerInSight(Monster m)
+        public static bool IsPlayerInSight(Monster m, World w)
             {
-            Vector2 diff = (m.Position - m.World.Player.Position) / new Vector2(Tile.Width, Tile.Height);
+            Vector2 diff = (m.Position - w.Player.Position) / new Vector2(Tile.Width, Tile.Height);
             bool result;
             if (Math.Abs(diff.X) >= Math.Abs(diff.Y))
                 {
@@ -187,12 +187,12 @@ namespace Labyrinth.Monster
             return result;
             }
 
-        private static Direction DetermineDirectionTowardsPlayer(Monster m)
+        private static Direction DetermineDirectionTowardsPlayer(Monster m, World w)
             {
-            if (m.World.Player == null)
+            if (w.Player == null)
                 return Direction.None;
             
-            Vector2 diff = (m.Position - m.World.Player.Position);
+            Vector2 diff = (m.Position - w.Player.Position);
             double hMove = MonsterRandom.NextDouble() * Math.Abs(diff.X);
             double vMove = MonsterRandom.NextDouble() * Math.Abs(diff.Y);
             Direction result;
@@ -207,9 +207,9 @@ namespace Labyrinth.Monster
             return result;
             }
 
-        public static bool IsPlayerInSameRoomAsMonster(Monster m)
+        public static bool IsPlayerInSameRoomAsMonster(Monster m, World w)
             {
-            Player p = m.World.Player;
+            Player p = w.Player;
             if (p == null || !p.IsExtant)
                 return false;
             
@@ -217,16 +217,16 @@ namespace Labyrinth.Monster
             return result;
             }
             
-        private static bool IsCautious(Monster m)
+        private static bool IsCautious(Monster m, World w)
             {
-            if (m.World.Player == null)
+            if (w.Player == null)
                 return false;
             int compareTo = m.Energy << 2;
-            bool result = m.World.Player.Energy > compareTo;
+            bool result = w.Player.Energy > compareTo;
             return result;
             }
 
-        public static Direction UpdateDirectionWhereMovementBlocked(Monster m, Direction d)
+        public static Direction UpdateDirectionWhereMovementBlocked(Monster m, World w, Direction d)
             {
             Direction intendedDirection = d;
             
@@ -242,7 +242,7 @@ namespace Labyrinth.Monster
                     continue;
                     }
                 
-                if (m.World.CanTileBeOccupied(potentiallyMovingTowardsTile, true))
+                if (w.CanTileBeOccupied(potentiallyMovingTowardsTile, true))
                     {
                     return d;
                     }                

@@ -20,7 +20,7 @@ namespace Labyrinth.Monster
             }
 
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
@@ -35,7 +35,7 @@ namespace Labyrinth.Monster
                 }
             }
 
-        private static Direction DetermineDirectionAggressive(Monster m)
+        private static Direction DetermineDirectionAggressive(Monster m, World w)
             {
             TilePos tp = m.TilePosition;
             bool isCurrentlyMovingTowardsFreeSpace;
@@ -44,7 +44,7 @@ namespace Labyrinth.Monster
             else
                 {
                 TilePos pp = TilePos.GetPositionAfterOneMove(tp, m.Direction);
-                isCurrentlyMovingTowardsFreeSpace = m.World.CanTileBeOccupied(pp, true);
+                isCurrentlyMovingTowardsFreeSpace = w.CanTileBeOccupied(pp, true);
                 
                 if (isCurrentlyMovingTowardsFreeSpace)
                     {
@@ -55,9 +55,9 @@ namespace Labyrinth.Monster
                 }
                 
             Direction newDirection = Direction.None;
-            if (m.World.Player != null)
+            if (w.Player != null)
                 {
-                TilePos playerPosition = m.World.Player.TilePosition;
+                TilePos playerPosition = w.Player.TilePosition;
                 int yDiff = tp.Y - playerPosition.Y;
                 int xDiff = tp.X - playerPosition.X;
                 
@@ -94,7 +94,7 @@ namespace Labyrinth.Monster
                 if (newDirection != Direction.None)
                     {
                     TilePos pp = TilePos.GetPositionAfterOneMove(tp, newDirection);
-                    if (!m.World.CanTileBeOccupied(pp, true))
+                    if (!w.CanTileBeOccupied(pp, true))
                         newDirection = Direction.None;
                     }
                 }
@@ -103,7 +103,7 @@ namespace Labyrinth.Monster
                 {                    
                 if (m.Direction == Direction.None)
                     {
-                    newDirection = MonsterMovement.RandomDirection(m);
+                    newDirection = MonsterMovement.RandomDirection(m, w);
                     }
                 else if (!isCurrentlyMovingTowardsFreeSpace)
                     {

@@ -109,11 +109,12 @@ namespace Labyrinth
             bool newLevel = (this._world == null);
             if (newLevel)
                 {
-                _world = LoadLevel("World1.xml");
-                _world.Reset(this._spriteBatch);
-                
+                // must be before playing sounds, otherwise they'll be cut off
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
+                
+                _world = LoadLevel("World1.xml");
+                _world.Reset(this._spriteBatch);
                 
                 this.ResetElapsedTime();
                 }

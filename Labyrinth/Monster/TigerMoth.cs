@@ -16,7 +16,7 @@ namespace Labyrinth.Monster
             this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsHavingBeenShot;
             }
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {

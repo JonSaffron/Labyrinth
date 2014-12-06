@@ -13,7 +13,7 @@ namespace Labyrinth
         private TilePos _tilePosition;
 
         #warning This property should not be public
-        public World World { get; private set; }
+        protected World World { get; private set; }
         
         protected StaticItem(World world, Vector2 position)
             {

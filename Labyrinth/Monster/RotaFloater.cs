@@ -11,7 +11,7 @@ namespace Labyrinth.Monster
             {
             }
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
@@ -20,7 +20,7 @@ namespace Labyrinth.Monster
                 case MonsterMobility.Patrolling:
                     return MonsterMovement.DetermineDirectionStandardPatrolling;
                 case MonsterMobility.Aggressive:
-                    Func<Monster, Direction> result = m => DetermineDirectionAggressive(this, ShouldMakeAnAggressiveMove);
+                    Func<Monster, World, Direction> result = (m, w) => DetermineDirectionAggressive(this, w, ShouldMakeAnAggressiveMove);
                     return result;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -33,12 +33,12 @@ namespace Labyrinth.Monster
             return result;
             }
 
-        private static Direction DetermineDirectionAggressive(Monster m, Func<bool> shouldMakeAnAggressiveMove)
+        private static Direction DetermineDirectionAggressive(Monster m, World w, Func<bool> shouldMakeAnAggressiveMove)
             {
-            var p = m.World.Player;
+            var p = w.Player;
             if (p == null || !p.IsExtant)
                 {
-                return MonsterMovement.DetermineDirectionRolling(m);
+                return MonsterMovement.DetermineDirectionRolling(m, w);
                 }
             
             TilePos tp = m.TilePosition;
@@ -87,13 +87,13 @@ namespace Labyrinth.Monster
             if (newDirection != Direction.None)
                 {
                 TilePos pp = TilePos.GetPositionAfterOneMove(tp, newDirection);
-                if (m.World.CanTileBeOccupied(pp, true))
+                if (w.CanTileBeOccupied(pp, true))
                     {
                     return newDirection;
                     }
                 }
 
-            return MonsterMovement.DetermineDirectionRolling(m);
+            return MonsterMovement.DetermineDirectionRolling(m, w);
             }
 
         private bool ShouldMakeAnAggressiveMove()
