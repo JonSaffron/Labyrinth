@@ -38,7 +38,7 @@ namespace Labyrinth
 
             if (this._staticItem is Wall)
                 {
-                this._shot.InstantDeath();
+                this._shot.InstantlyExpire();
                 return;
                 }
 
@@ -51,7 +51,7 @@ namespace Labyrinth
                 this._world.ConvertShotToBang(this._shot);
             else
                 this._world.AddShortBang(this._staticItem.Position);
-            this._shot.InstantDeath();
+            this._shot.InstantlyExpire();
             }
         }
     }

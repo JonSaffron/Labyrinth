@@ -120,6 +120,7 @@
     <Compile Include="Bang.cs" />
     <Compile Include="Boulder.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="GameObjectCollection.cs" />
     <Compile Include="GameSoundInstance.cs" />
     <Compile Include="GameTimer.cs" />
     <Compile Include="GameTimerCollection.cs" />

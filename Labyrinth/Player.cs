@@ -309,12 +309,13 @@ namespace Labyrinth
                 }
             }
         
-        public void InstantDeath()
+        public override int InstantlyExpire()
             {
             if (!this.IsExtant)
-                return;
+                return 0;
 
             UponDeath();
+            return 0;
             }
 
         private void UponDeath()

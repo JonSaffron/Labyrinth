@@ -28,6 +28,11 @@ namespace Labyrinth
                 }
             }
 
+        /// <summary>
+        /// Retrieves an instance of a sound effect.
+        /// </summary>
+        /// <param name="gameSound">Identifies the sound effect</param>
+        /// <returns>A reference to a sound effect. This should be retained whilst the sound is playing.</returns>
         public IGameSoundInstance GetSoundEffectInstance(GameSound gameSound)
             {
             var soundEffectInstance = this._sounds[gameSound].CreateInstance();
@@ -37,21 +42,17 @@ namespace Labyrinth
 
         public void Play(GameSound gameSound)
             {
-            PlaySound(gameSound, null);
+            SoundEffect soundEffect = this._sounds[gameSound];
+            soundEffect.Play();
             }
 
         public void Play(GameSound gameSound, SoundEffectFinished callback)
             {
             if (callback == null)
                 throw new ArgumentNullException("callback");
-            PlaySound(gameSound, callback);
-            }
 
-        private void PlaySound(GameSound gameSound, SoundEffectFinished callback)
-            {
             SoundEffectInstance soundEffectInstance = this._sounds[gameSound].CreateInstance();
-            if (callback != null)
-                this._trackingInstances.Add(soundEffectInstance, new Tuple<GameSound, SoundEffectFinished>(gameSound, callback));
+            this._trackingInstances.Add(soundEffectInstance, new Tuple<GameSound, SoundEffectFinished>(gameSound, callback));
             soundEffectInstance.Play();
             }
 

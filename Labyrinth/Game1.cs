@@ -20,6 +20,7 @@ namespace Labyrinth
         private const int BackBufferHeight = 640;
 
         private int _score;
+        private int _displayedScore;
         private int _lives;
         
         private Texture2D _digits;
@@ -42,6 +43,7 @@ namespace Labyrinth
             //this.TargetElapsedTime = new TimeSpan(this.TargetElapsedTime.Ticks * 4);
             this._lives = 2;
             this._score = 0;
+            this._displayedScore = 0;
             this.SoundLibrary = soundLibrary;
             }
 
@@ -144,6 +146,9 @@ namespace Labyrinth
                 System.Diagnostics.Trace.WriteLine(text);
                 }
 
+            if (this._displayedScore < this._score)
+                this._displayedScore++;
+
             base.Update(gameTime);
             }
 
@@ -231,7 +236,7 @@ namespace Labyrinth
             r.Inflate(-2, -2);
             DrawRectangle(spriteBatch, r, Color.Black);
             
-            int s = this._score;
+            int s = this._displayedScore;
             int i = 1;
             while (true)
                 {

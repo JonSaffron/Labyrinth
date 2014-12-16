@@ -7,7 +7,7 @@ namespace Labyrinth
         {
         // Movement
         public ShotType ShotType { get; private set; }
-        public bool HasRebounded {get; private set; }
+        public bool HasRebounded { get; private set; }
 
         private float _distanceToTravel;
 
@@ -131,28 +131,20 @@ namespace Labyrinth
             ResetDistanceToTravel();
             }
 
-        public virtual void InstantDeath()
-            {
-            if (!this.IsExtant)
-                return;
-            
-            this.Energy = 0;
-            }
-
         private static Vector2 GetBaseVectorForDirection(Direction d)
             {
             switch (d)
                 {
                 case Direction.Left: 
-                    return new Vector2(-1, 0);
+                    return -(Vector2.UnitX);
                 case Direction.Right:
-                    return new Vector2(1, 0);
+                    return Vector2.UnitX;
                 case Direction.Up:
-                    return new Vector2(0, -1);
+                    return -(Vector2.UnitY);
                 case Direction.Down:
-                    return new Vector2(0, 1);
+                    return Vector2.UnitY;
                 case Direction.None:
-                    return new Vector2(0, 0);
+                    return Vector2.Zero;
                 default:
                     throw new InvalidOperationException();
                 }

@@ -19,16 +19,5 @@ namespace Labyrinth.Monster
                 throw new ArgumentOutOfRangeException();
             return null;
             }
-
-        public override int InstantDeath()
-            {
-            if (!this.IsExtant)
-                return 0;
-            
-            // no score for crushing (presumably because it doesn't fight back)
-            this.Energy = 0;
-            this.World.Game.SoundLibrary.Play(GameSound.MonsterDies);
-            return 0;
-            }
         }
     }

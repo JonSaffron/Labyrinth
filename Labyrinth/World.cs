@@ -17,20 +17,20 @@ namespace Labyrinth
         
         // Entities in the World.
         private readonly Player _player;
-        private readonly LinkedList<StaticItem> _allGameItems; 
-        private readonly LinkedList<StaticItem> _interactiveGameItems; 
+        private readonly GameObjectCollection _gameObjects;
         
-        bool _doNotUpdate;
+        private bool _doNotUpdate;
         private readonly IWorldLoader _wl;
         
         // World content.   
-        public readonly Game1 Game;
         private ContentManager _contentManager;
 
         public const int WindowSizeX = 16;
         public const int WindowSizeY = 10;
             
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
+
+        public readonly Game1 Game;
 
         public World(Game1 game, IWorldLoader worldLoader)
             {
@@ -40,8 +40,7 @@ namespace Labyrinth
             this._contentManager = new ContentManager(game.Services, "Content");
 
             var gameItems = worldLoader.GetGameObjects(this).ToList();
-            this._allGameItems = new LinkedList<StaticItem>(gameItems);
-            this._interactiveGameItems = new LinkedList<StaticItem>(gameItems.Where(item => !(item is Wall)));
+            this._gameObjects = new GameObjectCollection(gameItems);
             this._player = gameItems.OfType<Player>().Single();
             }
 
@@ -61,19 +60,7 @@ namespace Labyrinth
 
         public void ResetLevel(SpriteBatchWindowed spw)
             {
-            var item = this._interactiveGameItems.First;
-            while (item != null)
-                {
-                var currentNode = item;
-                item = item.Next;
-
-                if (currentNode.Value is Bang || currentNode.Value is Shot)
-                    {
-                    this._allGameItems.Remove(currentNode.Value);
-                    this._interactiveGameItems.Remove(currentNode);
-                    }
-                }
-
+            this._gameObjects.RemoveBangsAndShots();
             var worldAreaId = this._wl.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             StartState ss = this._wl.GetStartStateForWorldAreaId(worldAreaId);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
@@ -162,7 +149,7 @@ namespace Labyrinth
 
         public IEnumerable<StaticItem> GetItemsOnTile(TilePos tp)
             {
-            var result = this._allGameItems.Where(gi => gi.IsExtant && gi.TilePosition == tp);
+            var result = this._gameObjects.GetItemsOnTile(tp);
             return result;
             } 
 
@@ -223,7 +210,7 @@ namespace Labyrinth
 
         private void UnlockLevel(int levelThatPlayerShouldHaveReached)
             {
-            foreach (Monster.Monster m in this._interactiveGameItems.OfType<Monster.Monster>())
+            foreach (Monster.Monster m in this._gameObjects.InteractiveItems.OfType<Monster.Monster>())
                 {
                 if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
@@ -238,22 +225,11 @@ namespace Labyrinth
             {
             const float minimumDistance = Tile.Height * Tile.Height;
 
-            var item = this._interactiveGameItems.First;
-
-            int i = 0;
-            int j = 0;
-            while (item != null)
+            int countOfGameItemsExamined = 0;
+            int countOfGameItems = 0;
+            foreach (var currentItem in this._gameObjects.GetSurvivingInteractiveItems())
                 {
-                var currentItem = item.Value;
-                item = item.Next;
-                j++;
-
-                if (!currentItem.IsExtant && !(currentItem is Player))
-                    {
-                    this._interactiveGameItems.Remove(currentItem);
-                    this._allGameItems.Remove(currentItem);
-                    continue;
-                    }
+                countOfGameItems++;
 
                 var mi = currentItem as MovingItem;
                 bool hasMoved = mi != null && mi.Update(gameTime);
@@ -262,29 +238,29 @@ namespace Labyrinth
 
                 Rectangle? bounds = null;
                 var currentItemPosition = currentItem.Position;
-                for (var si = this._interactiveGameItems.First; si != null; si = si.Next)
+                foreach (var si in this._gameObjects.AllItems)
                     {
-                    if (currentItem == si.Value)
+                    if (currentItem == si)
                         continue;   
 
-                    i++;
+                    countOfGameItemsExamined++;
 
-                    if (Math.Abs(Vector2.DistanceSquared(currentItemPosition, si.Value.Position)) <= minimumDistance)
+                    if (Math.Abs(Vector2.DistanceSquared(currentItemPosition, si.Position)) <= minimumDistance)
                         {
                         if (bounds == null)
                             {
-                            System.Diagnostics.Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si.Value));
+                            System.Diagnostics.Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si));
                             bounds = currentItem.BoundingRectangle;
                             }
-                        if (bounds.Value.Intersects(si.Value.BoundingRectangle))
+                        if (bounds.Value.Intersects(si.BoundingRectangle))
                             {
-                            System.Diagnostics.Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si.Value));
-                            BuildInteraction(currentItem, si.Value).Collide();
+                            System.Diagnostics.Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
+                            BuildInteraction(currentItem, si).Collide();
                             }
                         }
                     }
                 }
-                System.Diagnostics.Trace.WriteLine(string.Format("Checks run: {0}, from {1} items", i, j));
+            System.Diagnostics.Trace.WriteLine(string.Format("Checks run: {0}, from {1} items", countOfGameItemsExamined, countOfGameItems));
             }
 
         private IInteraction BuildInteraction(StaticItem thisGameItem, StaticItem thatGameItem)
@@ -326,8 +302,7 @@ namespace Labyrinth
                              ChangeRooms = ChangeRooms.FollowsPlayer,
                              MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately
                          };
-            this._interactiveGameItems.AddLast(dd);
-            this._allGameItems.AddLast(dd);
+            this._gameObjects.Add(dd);
             }
 
         /// <summary>
@@ -337,16 +312,14 @@ namespace Labyrinth
         public void ConvertShotToBang(Shot s)
             {
             var b = new Bang(this, s.Position, BangType.Short);
-            this._interactiveGameItems.AddLast(b);  
-            this._allGameItems.AddLast(b);  
-            s.InstantDeath();
+            this._gameObjects.Add(b);  
+            s.InstantlyExpire();
             }
         
         public void AddShortBang(Vector2 p)
             {
             var b = new Bang(this, p, BangType.Short);
-            this._interactiveGameItems.AddLast(b);
-            this._allGameItems.AddLast(b);
+            this._gameObjects.Add(b);
             }
             
         /// <summary>
@@ -356,35 +329,30 @@ namespace Labyrinth
         public void AddLongBang(Vector2 p)
             {
             var b = new Bang(this, p, BangType.Long);
-            this._interactiveGameItems.AddLast(b);  
-            this._allGameItems.AddLast(b);  
+            this._gameObjects.Add(b);  
             }
 
         public void AddGrave(TilePos tp)
             {
             var g = new Grave(this, tp.ToPosition());
-            this._interactiveGameItems.AddLast(g);
-            this._allGameItems.AddLast(g);
+            this._gameObjects.Add(g);
             }
         
         public void AddMushroom(TilePos tp)
             {
             var m = new Mushroom(this, tp.ToPosition());
-            this._interactiveGameItems.AddLast(m);
-            this._allGameItems.AddLast(m);
+            this._gameObjects.Add(m);
             }
         
         public void AddMonster(Monster.Monster m)
             {
-            this._interactiveGameItems.AddLast(m);
-            this._allGameItems.AddLast(m);
+            this._gameObjects.Add(m);
             }
         
         public void AddShot(ShotType st, Vector2 position, int energy, Direction d)
             {
             var s = new Shot(this, position, d, energy, st);
-            this._interactiveGameItems.AddLast(s);
-            this._allGameItems.AddLast(s);
+            this._gameObjects.Add(s);
             }
         
         public static Rectangle GetContainingRoom(TilePos tp)
@@ -456,9 +424,8 @@ namespace Labyrinth
 
             var r = new Rectangle((viewPort.Left - 1) * Tile.Width, (viewPort.Top -1) * Tile.Height, (viewPort.Right + 2) * Tile.Width, (viewPort.Bottom + 1) * Tile.Height);
 
-            foreach (var item in this._allGameItems)
-                if (r.Contains((int) item.Position.X, (int) item.Position.Y))
-                    item.Draw(gameTime, spriteBatch);
+            foreach (var item in this._gameObjects.AllItemsInRectangle(r))
+                item.Draw(gameTime, spriteBatch);
 /*                return;
 
             foreach (Wall w in this._gameItems.OfType<Wall>())
@@ -483,30 +450,6 @@ namespace Labyrinth
             foreach (Bang b in this._gameItems.OfType<Bang>())
                 b.Draw(gameTime, spriteBatch);
 */            }
-
-        public int GetZOrder(StaticItem si)
-            {
-            if (si is Wall)
-                return 0;
-            if (!(si is MovingItem) && !(si is Bang))
-                return 1;
-            var monster = si as Monster.Monster;
-            if (monster != null)
-                {
-                var result = monster.IsStill ? 2 : 3;
-                return result;
-                }
-            if (si is Player)
-                return 4;
-            if (si is Boulder)
-                return 5;
-            if (si is Shot)
-                return 6;
-            if (si is Bang)
-                return 7;
-
-            throw new InvalidOperationException();
-            }
 
         private static Rectangle GetViewPort(Vector2 windowOffset)
             {
@@ -545,13 +488,13 @@ namespace Labyrinth
 
         public bool ShotExists()
             {
-            bool result = this._interactiveGameItems.OfType<Shot>().Any(item => item.IsExtant);
+            bool result = this._gameObjects.InteractiveItems.OfType<Shot>().Any();
             return result;
             }
 
         public int HowManyCrystalsRemain()
             {
-            int result = this._interactiveGameItems.OfType<Crystal>().Count(c => c.IsExtant);
+            int result = this._gameObjects.InteractiveItems.OfType<Crystal>().Count();
             return result;
             }
 
@@ -566,14 +509,14 @@ namespace Labyrinth
             if (newState == null)
                 return;
 
-            var crystals = this._interactiveGameItems.OfType<Crystal>().Where(c => this._wl.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
+            var crystals = this._gameObjects.InteractiveItems.OfType<Crystal>().Where(c => this._wl.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
             foreach (var c in crystals)
                 {
                 var i = new MovingItemAndStaticItemInteraction(this, this.Player, c);
                 i.Collide();
                 }
             this.Player.Reset(newState.PlayerPosition.ToPosition(), newState.PlayerEnergy);
-            var boulder = this._interactiveGameItems.OfType<Boulder>().FirstOrDefault();
+            var boulder = this._gameObjects.InteractiveItems.OfType<Boulder>().FirstOrDefault();
             if (boulder != null)
                 {
                 TilePos? tp = null;

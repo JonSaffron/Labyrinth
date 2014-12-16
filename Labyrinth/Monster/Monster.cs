@@ -182,7 +182,7 @@ namespace Labyrinth.Monster
             {
             base.ReduceEnergy(energyToRemove);
             if (this.IsAlive())
-            {
+                {
                 var gs = this.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
                 this.World.Game.SoundLibrary.Play(gs);
                 return;
@@ -198,17 +198,6 @@ namespace Labyrinth.Monster
                 }
             }
         
-        public virtual int InstantDeath()
-            {
-            if (!this.IsExtant)
-                return 0;
-            
-            int result = this.Energy;
-            this.Energy = 0;
-            this.World.Game.SoundLibrary.Play(GameSound.MonsterDies);
-            return result;
-            }
-
         private void SetDirectionAndDestination(World w)
             {
             if (this.Mobility == MonsterMobility.Static || this.IsEgg)

@@ -56,7 +56,7 @@ namespace Labyrinth
                 var forceField = this._staticItem as ForceField;
                 if (forceField != null)
                 {
-                    player.InstantDeath();
+                    player.InstantlyExpire();
                     return;
                 }
 

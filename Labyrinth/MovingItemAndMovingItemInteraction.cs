@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Labyrinth.Monster;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -44,9 +45,8 @@ namespace Labyrinth
 
             if (this._player != null && this._monster1 != null)
                 {
-                int monsterEnergy = this._monster1.Energy;
+                int monsterEnergy = this._monster1.InstantlyExpire();
                 this._player.ReduceEnergy(monsterEnergy);
-                this._monster1.InstantDeath();
                 this._world.AddLongBang(this._monster1.Position);
                 this._world.Game.SoundLibrary.Play(GameSound.PlayerCollidesWithMonster);
                 return;
@@ -75,7 +75,7 @@ namespace Labyrinth
                 var boulderTile = TilePos.TilePosFromPosition(this._boulder.MovingTowards);
                 if (playerTile == boulderTile)
                     {
-                    this._player.InstantDeath();
+                    this._player.InstantlyExpire();
                     this._world.AddLongBang(this._player.Position);
                     }
                 return;
@@ -87,11 +87,14 @@ namespace Labyrinth
                 var boulderTile = TilePos.TilePosFromPosition(this._boulder.MovingTowards);
                 if (monsterTile == boulderTile)
                     {
-                    var energy = this._monster1.Energy;
-                    var score = ((energy >> 1) + 1) * 20;
-                    this._monster1.InstantDeath();
+                    var energy = this._monster1.InstantlyExpire();
                     this._world.AddLongBang(this._monster1.Position);
-                    this._world.IncreaseScore(score);
+                    this._world.Game.SoundLibrary.Play(GameSound.MonsterDies);
+                    if (!(this._monster1 is DeathCube))
+                        {
+                        var score = ((energy >> 1) + 1) * 20;
+                        this._world.IncreaseScore(score);
+                        }
                     }
                 
                 //return;
