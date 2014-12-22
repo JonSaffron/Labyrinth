@@ -188,10 +188,10 @@ namespace Labyrinth
 
         private void UpdateGameClock(GameTime gameTime)
             {
-            _time += gameTime.ElapsedGameTime.TotalSeconds;
-            while (_time > AnimationPlayer.GameClockResolution)
+            this._time += gameTime.ElapsedGameTime.TotalSeconds;
+            while (this._time > AnimationPlayer.GameClockResolution)
                 {
-                _time -= AnimationPlayer.GameClockResolution;
+                this._time -= AnimationPlayer.GameClockResolution;
                 if (this._gameClock < int.MaxValue)
                     this._gameClock++; 
 
@@ -201,10 +201,6 @@ namespace Labyrinth
                     this._levelUnlocked++;
                     UnlockLevel(this._levelUnlocked);
                     }
-                }
-
-            if (Player.Direction != Direction.None)
-                {
                 }
             }
 
@@ -426,30 +422,7 @@ namespace Labyrinth
 
             foreach (var item in this._gameObjects.AllItemsInRectangle(r))
                 item.Draw(gameTime, spriteBatch);
-/*                return;
-
-            foreach (Wall w in this._gameItems.OfType<Wall>())
-                w.Draw(gameTime, spriteBatch);
-
-            foreach (StaticItem si in this._gameItems.Where(m => !(m is MovingItem) && !(m is Bang)))
-                si.Draw(gameTime, spriteBatch);
-            
-            Player.Draw(gameTime, spriteBatch);
-
-            foreach (Monster.Monster m in this._gameItems.OfType<Monster.Monster>().Where(m => m.IsStill))
-                m.Draw(gameTime, spriteBatch);
-
-            foreach (Monster.Monster m in this._gameItems.OfType<Monster.Monster>().Where(m => !m.IsStill))
-                m.Draw(gameTime, spriteBatch);
-            
-            Boulder.Draw(gameTime, spriteBatch);
-            
-            foreach (Shot s in this._gameItems.OfType<Shot>())
-                s.Draw(gameTime, spriteBatch);
-
-            foreach (Bang b in this._gameItems.OfType<Bang>())
-                b.Draw(gameTime, spriteBatch);
-*/            }
+            }
 
         private static Rectangle GetViewPort(Vector2 windowOffset)
             {

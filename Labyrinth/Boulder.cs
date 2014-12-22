@@ -33,6 +33,7 @@ namespace Labyrinth
         public void Reset(Vector2 position)
             {
             this.Position = position;
+            this.MovingTowards = position;
             this.Direction = Direction.None;
             }
 

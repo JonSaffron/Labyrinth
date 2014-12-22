@@ -309,7 +309,7 @@ namespace Labyrinth
             var position = tilePos.ToPosition();
             var energy = int.Parse(wdef.GetAttribute("Energy"));
             var textureName = wdef.GetAttribute("Texture");
-            var result = new CrumblyWall(world, position, textureName, energy);
+            var result = new CrumblyWall(world, position, "Tiles/" + textureName, energy);
             return result;
             }
 

@@ -121,38 +121,46 @@ namespace Labyrinth
             if (Animation == null)
                 throw new NotSupportedException("No animation is currently playing.");
             
-            bool showFirstFrame = Animation.IsStaticAnimation || !runAnimation || (!this._wasMoving && Animation.LoopAnimation);
-            if (showFirstFrame)
+            
+            if (Animation.IsStaticAnimation)
                 {
-                FrameIndex = 0;
-                _time = 0;
+                // don't do anything
                 }
             else
                 {
-                // Process passing time.
-                _time += gameTime.ElapsedGameTime.TotalSeconds;
-                while (_time > this._frameTime)
+                bool showFirstFrame = !runAnimation || (!this._wasMoving && Animation.LoopAnimation);
+                if (showFirstFrame)
                     {
-                    _time -= this._frameTime;
-                    OnNewFrame(new EventArgs());
+                    FrameIndex = 0;
+                    _time = 0;
+                    }
+                else
+                    {
+                    // Process passing time.
+                    _time += gameTime.ElapsedGameTime.TotalSeconds;
+                    while (_time > this._frameTime)
+                        {
+                        _time -= this._frameTime;
+                        OnNewFrame(new EventArgs());
 
-                    // Advance the frame index; looping or clamping as appropriate.
-                    if (Animation.LoopAnimation)
-                        {
-                        FrameIndex = (FrameIndex + 1) % Animation.FrameCount;
-                        }
-                    else 
-                        {
-                        if (FrameIndex == (Animation.FrameCount - 1))
+                        // Advance the frame index; looping or clamping as appropriate.
+                        if (Animation.LoopAnimation)
                             {
-                            if (!_animationFinishedNotified)
-                                {
-                                OnAnimationFinished(new EventArgs());
-                                _animationFinishedNotified = true;
-                                }
+                            FrameIndex = (FrameIndex + 1) % Animation.FrameCount;
                             }
-                        else
-                            FrameIndex++;                        
+                        else 
+                            {
+                            if (FrameIndex == (Animation.FrameCount - 1))
+                                {
+                                if (!_animationFinishedNotified)
+                                    {
+                                    OnAnimationFinished(new EventArgs());
+                                    _animationFinishedNotified = true;
+                                    }
+                                }
+                            else
+                                FrameIndex++;                        
+                            }
                         }
                     }
                 }
@@ -160,7 +168,7 @@ namespace Labyrinth
             _wasMoving = runAnimation;
 
             // Calculate the source rectangle of the current frame.
-            var source = new Rectangle(FrameIndex * Animation.Texture.Height, 0, Animation.Texture.Height, Animation.Texture.Height);
+            var source = new Rectangle(FrameIndex * Animation.Texture.Width, 0, Animation.Texture.Width, Animation.Texture.Height);
 
             // Draw the current frame.
             spriteBatch.DrawInWindow(Animation.Texture, position, source, this.Rotation, Origin, this.SpriteEffect);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
@@ -19,7 +20,7 @@ namespace Labyrinth
             base.ReduceEnergy(energyToRemove);
 
             int stages = this.Ap.Animation.FrameCount - 1;
-            this.Ap.FrameIndex = stages - (this.Energy / this._initialEnergy * stages);
+            this.Ap.FrameIndex = stages - (int) Math.Floor(stages * this.Energy / (float) this._initialEnergy);
             }
 
         public override ObjectSolidity Solidity

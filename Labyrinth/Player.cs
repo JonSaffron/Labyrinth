@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -224,16 +225,16 @@ namespace Labyrinth
         private void TryToFire()
             {
             TilePos startPos = TilePos.GetPositionAfterOneMove(this.TilePosition, this._currentDirectionFaced);
-            if (this.World.CanTileBeOccupied(startPos, false) && this.Energy >= 4)
+            if (this.Energy < 4 || this.World.GetItemsOnTile(startPos).OfType<Wall>().Any()) 
+                return;
+
+            this.World.AddShot(ShotType.Player, startPos.ToPosition(), this.Energy >> 2, this._currentDirectionFaced);
+            this.World.Game.SoundLibrary.Play(GameSound.PlayerShoots);
+            _countOfShotsBeforeCostingEnergy--;
+            if (_countOfShotsBeforeCostingEnergy < 0)
                 {
-                this.World.AddShot(ShotType.Player, startPos.ToPosition(), this.Energy >> 2, this._currentDirectionFaced);
-                this.World.Game.SoundLibrary.Play(GameSound.PlayerShoots);
-                _countOfShotsBeforeCostingEnergy--;
-                if (_countOfShotsBeforeCostingEnergy < 0)
-                    {
-                    _countOfShotsBeforeCostingEnergy = 3;
-                    ReduceEnergy(1);
-                    }
+                _countOfShotsBeforeCostingEnergy = 3;
+                ReduceEnergy(1);
                 }
             }
 
