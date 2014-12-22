@@ -20,6 +20,7 @@ namespace Labyrinth
             this.Energy = energy;
             this.ShotType = shotType;
             this.CurrentVelocity = StandardSpeed;
+            SetDestination();
 
             string textureName;
             switch (this.ShotType)
@@ -58,7 +59,7 @@ namespace Labyrinth
             }
         
         /// <summary>
-        /// Gets a rectangle which bounds this player in world space.
+        /// Gets a rectangle which bounds this object in world space.
         /// </summary>
         public override Rectangle BoundingRectangle
             {
@@ -111,13 +112,30 @@ namespace Labyrinth
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
+            if (this._distanceToTravel <= 0 || this.Direction == Direction.None)
+                {
+                this.InstantlyExpire();
+                return false;
+                }
+
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            var distance = this.CurrentVelocity * elapsed;
-            Position += GetBaseVectorForDirection(this.Direction) * distance;
-            this._distanceToTravel -= distance;
-            if (this._distanceToTravel <= 0)
-                this.Energy = 0;
+            float remainingMovement = CurrentVelocity * elapsed;
+            this._distanceToTravel -= remainingMovement;
+            while (remainingMovement > 0)
+                {
+                bool needToChooseDirection;
+                this.ContinueMove(ref remainingMovement, out needToChooseDirection);
+                if (needToChooseDirection)
+                    SetDestination();
+                }
+
             return true;
+            }
+
+        private void SetDestination()
+            {
+            TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(this.TilePosition, this.Direction);
+            this.MovingTowards = potentiallyMovingTowardsTile.ToPosition();
             }
 
         public void Reverse()
@@ -129,25 +147,6 @@ namespace Labyrinth
             this.World.Game.SoundLibrary.Play(GameSound.ShotBounces);
             this.HasRebounded = true;
             ResetDistanceToTravel();
-            }
-
-        private static Vector2 GetBaseVectorForDirection(Direction d)
-            {
-            switch (d)
-                {
-                case Direction.Left: 
-                    return -(Vector2.UnitX);
-                case Direction.Right:
-                    return Vector2.UnitX;
-                case Direction.Up:
-                    return -(Vector2.UnitY);
-                case Direction.Down:
-                    return Vector2.UnitY;
-                case Direction.None:
-                    return Vector2.Zero;
-                default:
-                    throw new InvalidOperationException();
-                }
             }
         }
     }

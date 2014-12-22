@@ -75,435 +75,13 @@ OOOOOOOOOOOOOOOOOOOOOO    OOOOOOOOOOOOOOOOOOOOOOOOOOOO    OOOOOOOOOOOO    OOOOOO
 O              OO              OO              OO              OO              OO              OO              OO              O▓              ▓▓              ▓╝              ╚╝              ╚□□□□□□    □□□□□□□□□□□□    □□□□□□□□□□□□□□□□□□□□□□□□□□□□□  □□□□□□□
 O              OO      OO      OO              OO              OOO            OOOO     OO     OOOO            OOOO            OO▓╗            ╔▓▓╗     ╔╗     ╔▓╗              ╔╗              ╔□□□□□□□  □□□□□□□□□□□□□□  □□□□□□□□□     □□□□□□□□□□□□□□□□       □□
 O              OO      OO      OO              OO              OOO            OOOO     OO     OOOO      r     OOOO            OO▓╝            ╚▓▓╝     ╚╝     ╚▓╝    t        f╚╝              ╚□□□□□□□  □□□□□    □□□□□  □□□□□□□□□     □□□□□□□    □□□□□       □□
-O                                      OO              OO      OOO                     OO                     OOOO            #                               ╔▓╗ ╔▓▓▓╗╔╗╔▓▓▓╗                 ╔□□      s               f               f               p     □□
-O       S B                            OO   t          OO      OOO                     OO    r                OOOO         rr #                             r ╚▓╝ ╚▓▓▓╝╚╝╚▓▓▓╝                 ╚□□                                                            □□
+O                                      OO              OO      OOO                     OO                     OOOO            #               o               ╔▓╗ ╔▓▓▓╗╔╗╔▓▓▓╗                 ╔□□      s               f               f               p     □□
+O       S B                            OO   t          OO      OOO                     OO    r                OOOO         rr #               o             r ╚▓╝ ╚▓▓▓╝╚╝╚▓▓▓╝                 ╚□□                                                            □□
 O              OO      OO      OO              OO t            OOO            OOOO     OO     OOOO            OOOO t          OO▓╗            ╔▓▓╗     ╔╗     ╔▓╗X s        s X╔╗              ╔□□       □□□□□    □□□□□       □□□□     □□□□□□□    □□□□□       □□
 O              OO      OO      OO              OO              OOO            OOOO     OO     OOOO            OOOO            OO▓╝      S     ╚▓▓╝     ╚╝     ╚▓╝              ╚╝              ╚□□       □□□□□□□□□□□□□□       □□□□     □□□□□□□□□□□□□□□□       □□
 O              OO              OO              OO              OO              OO              OO              OO              O▓              ▓▓              ▓╗      fC      ╔╗              ╔□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□
 ©OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO▓╔╗╔╗╔╗╔╗╔╗╔╗╔╗▓▓╔╗╔╗╔╗╔╗╔╗╔╗╔╗▓▓╗╔▓▓╗╔╗╔╗╔▓▓╗╔▓▓╗╔▓▓╗╔╗╔╗╔▓▓╗╔▓□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□
   </Layout>
-  
-  <Crystals>      <!--- 50, 500, 1000, 2000, 4000, 6000, 8000 -->
-    <Item Left="2" Top="47" Id="1" Score="500" Energy="25" />
-    <Item Left="125" Top="42" Id="2" Score="5000" Energy="50" />
-    <Item Left="168" Top="78" Id="3" Score="10000" Energy="75" />
-    <Item Left="226" Top="7" Id="4" Score="20000" Energy="100" />
-    <Item Left="189" Top="34" Id="5" Score="40000" Energy="200" />
-    <Item Left="119" Top="5" Id="6" Score="60000" Energy="255" />
-    <Item Left="6" Top="36" Id="7" Score="80000" Energy="255" />
-          <!-- 19,32,4b,64,c8,ff,ff -->
-  </Crystals>
-  <ForceFields>
-    <Item Left="62" Top="44" Width="1" Height="2" CrystalRequired="1" />
-    <Item Left="126" Top="74" Width="1" Height="2" CrystalRequired="2" />
-    <Item Left="191" Top="64" Width="1" Height="2" CrystalRequired="3" />
-    <Item Left="194" Top="14" Width="1" Height="2" CrystalRequired="4" />
-    <Item Left="128" Top="34" Width="1" Height="2" CrystalRequired="5" />
-    <Item Left="64" Top="4" Width="1" Height="2" CrystalRequired="6" />
-  </ForceFields>
-  <Boulders>
-    <Item Left="10" Top="75" />
-  </Boulders>
-  <Monsters>
-    <!-- =-=-=-= -->
-    <!-- Level 1 -->
-    <!-- =-=-=-= -->
-
-    <!-- bottom row -->
-    <Monster Type="ThresherBrown" Left="44" Top="75" Energy="5" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="ThresherBrown" Left="50" Top="76" Energy="5" ChangeRooms="StaysWithinRoom" />
-
-    <!-- 2nd from bottom row -->
-    <Monster Type="ThresherBrown" Left="20" Top="63" Energy="5" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="ThresherBrown" Left="56" Top="65" Energy="5" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
-    
-    <!-- 3rd from bottom row -->
-    <Monster Type="ThresherBrown" Left="5" Top="53" Energy="7" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="ThresherBrown" Left="22" Top="53" Energy="10" ChangeRooms="MovesRoom" />
-    <Monster Type="ThresherBrown" Left="34" Top="54" Energy="16" Mobility="Placid" />
-    
-    <!-- top row -->
-    <Monster Type="ThresherBrown" Left="14" Top="41" Energy="14" Mobility="Placid" ChangeRooms="MovesRoom" />
-    <Monster Type="ThresherBrown" Left="3" Top="45" Energy="10" />
-    <Monster Type="ThresherBrown" Left="1" Top="48" Energy="16" ChangeRooms="StaysWithinRoom" />
-    
-    <Monster Type="ThresherBrown" Left="22" Top="43" Energy="10" ChangeRooms="MovesRoom" />
-
-    <Monster Type="ThresherBrown" Left="44" Top="47" Energy="20" />
-    <Monster Type="ThresherBrown" Left="44" Top="43" Energy="20" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="ThresherBrown" Left="44" Top="47" Energy="25" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
-
-    <Monster Type="ThresherBrown" Left="60" Top="43" Energy="25" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="ThresherBrown" Left="60" Top="47" Energy="20" Mobility="Placid" />
-
-    <!-- =-=-=-= -->
-    <!-- Level 2 -->
-    <!-- =-=-=-= -->
-
-    <!-- 2nd top -->
-    <Monster Type="ThresherBrown" Left="92" Top="47" Energy="30" />
-    
-    <!-- 3rd from top on left -->
-    <Monster Type="ThresherBrown" Left="77" Top="63" Energy="25" Mobility="Placid" />
-    <Monster Type="ThresherBrown" Left="77" Top="66" Energy="25" Mobility="Placid" />
-    
-    <!-- Bottom, 2nd in -->
-    <Monster Type="RotaFloaterBrown" Left="93" Top="75" Energy="30" />
-
-    <!-- Bottom, 3rd in -->
-    <Monster Type="RotaFloaterBrown" Left="104" Top="73" Energy="30" />
-    
-    <!-- 3rd from left, 3rd from top -->
-    <Monster Type="ThresherBrown" Left="104" Top="65" Energy="30" />
-    
-    <!-- 3rd from left, 2nd from top -->
-    <Monster Type="RotaFloaterBrown" Left="104" Top="52" Energy="25" />
-
-    <!-- 2nd from left, 2nd from top -->
-    <Monster Type="RotaFloaterBrown" Left="88" Top="53" Energy="30" />
-    
-    <!-- top line, 3rd from left -->
-    <Monster Type="RotaFloaterBrown" Left="99" Top="43" Energy="40" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="RotaFloaterBrown" Left="98" Top="45" Energy="40" />
-    <Monster Type="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" Direction="Up" />
-    <Monster Type="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" Direction="Right" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="DeathCube" Left="110" Top="44" Energy="255" />
-    <Monster Type="DeathCube" Left="110" Top="45" Energy="255" />
-    
-    <!-- Treasure room: top right-->
-    <Monster Type="ThresherBrown" Left="125" Top="42" Energy="45" />
-    <Monster Type="ThresherBrown" Left="125" Top="47" Energy="45" />
-    <Monster Type="RotaFloaterBrown" Left="125" Top="45" Energy="40" ChangeRooms="StaysWithinRoom" />
-    
-    <!-- 2nd from top, right side -->
-    <Monster Type="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" Direction="Up" />
-    
-    <!-- 3rd from top, right side -->
-    <Monster Type="ThresherBrown" Left="119" Top="68" Energy="55" IsEgg="true" TimeBeforeHatching="20" />
-    
-    <!-- Bottom right-->
-    <Monster Type="ThresherBrown" Left="115" Top="76" Energy="50" />
-    <Monster Type="RotaFloaterBrown" Left="124" Top="75" Energy="50" />
-    <Monster Type="RotaFloaterBrown" Left="123" Top="75" Energy="50" ChangeRooms="StaysWithinRoom" />
-    
-    <!-- =-=-=-= -->
-    <!-- Level 3 -->
-    <!-- =-=-=-= -->
-    
-    <!-- 3rd from top, left side -->
-    <Monster Type="RotaFloaterBrown" Left="140" Top="65" Energy="60" />
-    
-    <!-- 2nd from top, left side -->
-    <Monster Type="FlitterbugRed" Left="136" Top="55" Energy="60" />
-    
-    <!-- 2nd from left, top -->
-    <Monster Type="ThresherBrown" Left="150" Top="43" Energy="60" IsEgg="true" TimeBeforeHatching="60" />
-    <Monster Type="ThresherBrown" Left="153" Top="43" Energy="60" IsEgg="true" TimeBeforeHatching="40" />
-    
-    <!-- 2nd from left, 2nd from top -->
-    <Monster Type="FlitterbugRed" Left="156" Top="52" Energy="60" />
-    
-    <!-- 2nd from left, bottom -->
-    <Monster Type="RotaFloaterBrown" Left="156" Top="75" Energy="60" />
-    
-    <!-- 3rd from left, top -->
-    <Monster Type="RotaFloaterBrown" Left="162" Top="47" Energy="55" />
-    <Monster Type="RotaFloaterBrown" Left="172" Top="42" Energy="45" />
-    <Monster Type="RotaFloaterCyan" Left="172" Top="47" Energy="55" />
-    <Monster Type="ThresherBrown" Left="169" Top="47" Energy="60" IsEgg="true" TimeBeforeHatching="80" />
-    
-    <!-- right, 2nd from top -->
-    <Monster Type="ThresherBrown" Left="177" Top="51" Energy="70" IsEgg="true" TimeBeforeHatching="50" />
-    <Monster Type="ThresherBrown" Left="190" Top="58" Energy="70" IsEgg="true" TimeBeforeHatching="10" />
-
-    <!-- 3rd from left, 2 down -->
-    <Monster Type="KillerCubeGreen" Left="167" Top="57" Energy="60" />
-    
-    <!-- Treasure room -->
-    <Monster Type="ThresherBrown" Left="165" Top="73" Energy="60" />
-    <Monster Type="FlitterbugRed" Left="174" Top="73" Energy="60" />
-    <Monster Type="DeathCube" Left="161" Top="76" Energy="80" />
-    <Monster Type="DeathCube" Left="174" Top="76" Energy="80" />
-    <Monster Type="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="FlitterbugRed" Left="167" Top="78" Energy="90" IsEgg="true" TimeBeforeHatching="127" />
-
-    <!-- right, 3 down -->
-    <Monster Type="FlitterbugRed" Left="189" Top="61" Energy="80" />
-    <Monster Type="RotaFloaterCyan" Left="179" Top="62" Energy="80" />
-
-    <!-- =-=-=-= -->
-    <!-- Level 4 -->
-    <!-- =-=-=-= -->
-
-    <!-- bottom left corner -->
-    <Monster Type="RotaFloaterCyan" Left="200" Top="74" Energy="48" Direction="Left"  />
-    
-    <!-- bottom, 2nd from left -->
-    <Monster Type="FlitterbugRed" Left="216" Top="74" Energy="48" />
-    
-    <!-- bottom, 3rd from left -->
-    <Monster Type="FlitterbugRed" Left="232" Top="74" Energy="48" />
-    
-    <!-- bottom right corner -->
-    <Monster Type="ThresherCyan" Left="248" Top="74" Energy="48" Mobility="Cautious" />
-    
-    <!-- right, 2nd from bottom -->
-    <Monster Type="ThresherCyan" Left="248" Top="66" Energy="48" Mobility="Cautious" />
-             
-    <!-- right, 3rd from bottom -->
-    <Monster Type="RotaFloaterCyan" Left="247" Top="52" Energy="64" Direction="Right" />
-    <Monster Type="RotaFloaterCyan" Left="249" Top="52" Energy="48" Direction="Right" />
-    <Monster Type="ThresherCyan" Left="248" Top="54" Energy="48" Mobility="Cautious" />
-    
-    <!-- 2nd from right, 3rd from bottom -->
-    <Monster Type="FlitterbugRed" Left="232" Top="54" Energy="48" />
-    
-    <!-- 2nd from right, 2nd from bottom -->
-    <Monster Type="ThresherCyan" Left="231" Top="63" Energy="48" Mobility="Cautious" />
-    
-    <!-- 2nd from left, 2nd from bottom -->
-    <Monster Type="FlitterbugRed" Left="215" Top="64" Energy="64" />
-    
-    <!-- 2nd from left, 3rd from bottom -->
-    <Monster Type="FlitterbugRed" Left="216" Top="54" Energy="48" />
-    
-    <!-- left, 3rd from bottom -->
-    <Monster Type="RotaFloaterCyan" Left="198" Top="54" Energy="48" Direction="Right" />
-    
-    <!-- right, 5th from top -->
-    <Monster Type="FlitterbugRed" Left="248" Top="42" Energy="48" LaysEggs="true"  />
-    
-    <!-- right, 4th from top -->
-    <Monster Type="FlitterbugRed" Left="242" Top="32" Energy="48" LaysEggs="true"  />
-    <Monster Type="FlitterbugRed" Left="253" Top="33" Energy="48" LaysEggs="true"  />
-
-    <!-- right, 3rd from top -->
-    <Monster Type="ThresherCyan" Left="248" Top="21" Energy="48" Mobility="Cautious" />
-    
-    <!-- right, 2nd from top -->
-    <Monster Type="FlitterbugRed" Left="247" Top="11" Energy="48" LaysEggs="true" />
-    <Monster Type="ThresherCyan" Left="242" Top="14" Energy="48" Mobility="Cautious" />
-    
-    <!-- top right corner -->
-    <Monster Type="DeathCube" Left="243" Top="4" Energy="80" />
-    <Monster Type="DeathCube" Left="243" Top="5" Energy="80" />
-    
-    <!-- Treasure room (top, 2nd from right) -->
-    <Monster Type="RotaFloaterCyan" Left="226" Top="5" Energy="48" />
-    <Monster Type="RotaFloaterCyan" Left="226" Top="6" Energy="48" />
-    <Monster Type="RotaFloaterCyan" Left="227" Top="6" Energy="48" />
-    <Monster Type="ThresherCyan" Left="232" Top="4" Energy="64" Mobility="Cautious" />
-    <Monster Type="ThresherCyan" Left="232" Top="5" Energy="64" />
-    <Monster Type="FlitterbugRed" Left="227" Top="4" Energy="48" LaysEggs="true" />
-    <Monster Type="KillerCubeGreen" Left="234" Top="2" Energy="48" />
-
-    <!-- 2nd from top, 2nd from right -->
-    <Monster Type="FlitterbugRed" Left="232" Top="14" Energy="64" LaysEggs="true" />
-    <Monster Type="KillerCubeGreen" Left="231" Top="17" Energy="64" />
-    
-    <!-- 3rd from top, 2nd from right -->
-    <Monster Type="CrazyCrawler" Left="232" Top="28" Energy="40" />
-    
-    <!-- 4th from top, 2nd from right -->
-    <Monster Type="FlitterbugRed" Left="232" Top="37" Energy="64" LaysEggs="true" />
-    <Monster Type="CrazyCrawler" Left="233" Top="37" Energy="28" />
-    
-    <!-- 5th from top, 2nd from right-->
-    <Monster Type="ThresherCyan" Left="231" Top="45" Energy="72" LaysEggs="true" />
-    
-    <!-- 5th from top, left-->
-    <Monster Type="CrazyCrawler" Left="199" Top="44" Energy="40" />
-    
-    <!-- 4th from top, left -->
-    <Monster Type="CrazyCrawler" Left="200" Top="31" Energy="40" />
-    
-    <!-- 3rd from top, left -->
-    <Monster Type="FlitterbugRed" Left="199" Top="25" Energy="72" LaysEggs="true" />
-    
-    <!-- 4th from top, 2nd from left -->
-    <Monster Type="ThresherCyan" Left="215" Top="35" Energy="72" LaysEggs="true" />
-    
-    <!-- 3rd from top, 2nd from left -->
-    <Monster Type="ThresherCyan" Left="216" Top="25" Energy="72" LaysEggs="true" />
-    
-    <!-- 2nd from top, 2nd from left -->
-    <Monster Type="RotaFloaterCyan" Left="215" Top="12" Energy="48" Direction="Right" />
-    <Monster Type="RotaFloaterCyan" Left="216" Top="13" Energy="48" Direction="Left" />
-    
-    <!-- top, 2nd from left -->
-    <Monster Type="CrazyCrawler" Left="209" Top="4" Energy="40" />
-    <Monster Type="CrazyCrawler" Left="215" Top="5" Energy="40" />
-    
-    <!-- Top left -->
-    <Monster Type="FlitterbugRed" Left="199" Top="5" Energy="80" LaysEggs="true" />
-    
-    <!-- 2nd from top, left -->
-    <Monster Type="CrazyCrawler" Left="199" Top="15" Energy="48" />
-    <Monster Type="FlitterbugRed" Left="201" Top="15" Energy="80" LaysEggs="true" />
-
-    <!-- =-=-=-= -->
-    <!-- Level 5 -->
-    <!-- =-=-=-= -->
-
-    <!-- 2nd from top, right -->
-    <Monster Type="CrazyCrawler" Left="178" Top="11" Energy="50" />
-    <Monster Type="ThresherCyan" Left="184" Top="15" Energy="90" LaysEggs="true" />
-    
-    <!-- top right -->
-    <Monster Type="KillerCubeRed" Left="178" Top="2" Energy="150" />
-    
-    <!-- top, 2nd from right -->
-    <Monster Type="FlitterbugCyan" Left="168" Top="5" Energy="150" LaysEggs="false" Mobility="Cautious" />
-    
-    <!-- top, 2nd from left -->
-    <Monster Type="KillerCubeRed" Left="152" Top="4" Energy="100" />
-    
-    <!-- top left -->
-    <Monster Type="FlitterbugCyan" Left="130" Top="7" Energy="100" Mobility="Cautious" />
-    
-    <!-- 2nd down on left -->
-    <Monster Type="CrazyCrawler" Left="136" Top="14" Energy="80" />
-    
-    <!-- 2nd down, 2nd from left -->
-    <Monster Type="ThresherCyan" Left="147" Top="13" Energy="90" />
-    
-    <!-- 2nd down, 3rd from left -->
-    <Monster Type="KillerCubeRed" Left="162" Top="12" Energy="150" />
-    
-    <!-- 3rd from top, right -->
-    <Monster Type="KillerCubeRed" Left="189" Top="27" Energy="150" />
-    
-    <!-- 3rd from top, 3rd from left -->
-    <Monster Type="FlitterbugCyan" Left="168" Top="26" Energy="150" LaysEggs="false" Mobility="Cautious" />
-    
-    <!-- bottom, 2nd from left -->
-    <Monster Type="CrazyCrawler" Left="148" Top="37" Energy="80" />
-    
-    <!-- bottom, 3rd from left -->
-    <Monster Type="FlitterbugCyan" Left="174" Top="34" Energy="100" Mobility="Cautious" />
-    <Monster Type="FlitterbugCyan" Left="174" Top="35" Energy="100" Mobility="Cautious" />
-    
-    <!-- treasure room, bottom right -->
-    <Monster Type="KillerCubeGreen" Left="177" Top="31" Energy="100" />
-    <Monster Type="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" Direction="Left" />
-    <Monster Type="KillerCubeGreen" Left="184" Top="38" Energy="100" />
-    <Monster Type="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" Direction="Left" />
-    <Monster Type="CrazyCrawler" Left="182" Top="33" Energy="80" />
-    <Monster Type="CrazyCrawler" Left="182" Top="35" Energy="80" />
-    <Monster Type="CrazyCrawler" Left="185" Top="34" Energy="80" Mobility="Placid" />
-    
-    <!-- bottom left -->
-    <Monster Type="DiamondDemon" Left="141" Top="32" Energy="40" Mobility="Placid" />
-
-    <!-- =-=-=-= -->
-    <!-- Level 6 -->
-    <!-- =-=-=-= -->
-
-    <!-- Bottom right -->
-    <Monster Type="DiamondDemon" Left="117" Top="32" Energy="32" Mobility="Placid" LaysEggs="false" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="DiamondDemon" Left="115" Top="33" Energy="24" Mobility="Placid" ChangeRoom="StaysWithinRoom" />
-    <Monster Type="DiamondDemon" Left="114" Top="36" Energy="24" Mobility="Placid" />
-    
-    <!-- Bottom, 2nd from right -->
-    <Monster Type="FlitterbugCyan" Left="98" Top="37" Energy="144" LaysEggs="true" />
-    
-    <!-- Bottom, 2nd from left -->
-    <Monster Type="FlitterbugBrown" Left="88" Top="35" Energy="90" />
-    
-    <!-- 2nd from bottom, right -->
-    <Monster Type="FlitterbugCyan" Left="120" Top="25" Energy="144" LaysEggs="true" />
-    
-    <!-- 2nd from bottom, 2nd from right -->
-    <Monster Type="FlitterbugBrown" Left="98" Top="22" Energy="80" />
-    
-    <!-- 2nd from bottom, left -->
-    <Monster Type="FlitterbugBrown" Left="66" Top="22" Energy="96" />
-    <Monster Type="KillerCubeRed" Left="66" Top="27" Energy="120" />
-    
-    <!-- 2nd from top, left -->
-    <Monster Type="FlitterbugCyan" Left="72" Top="15" Energy="144" LaysEggs="true" />
-    
-    <!-- 2nd from top, 2nd from left -->
-    <Monster Type="CrazyCrawler" Left="87" Top="11" Energy="72" />
-    <Monster Type="KillerCubeRed" Left="90" Top="11" Energy="120" />
-    
-    <!-- 2nd from top, 2nd from right -->
-    <Monster Type="TigerMoth" Left="109" Top="12" Energy="120" />
-    <Monster Type="TigerMoth" Left="109" Top="17" Energy="120" />
-    
-    <!-- Treasure room, top right-->
-    <Monster Type="TigerMoth" Left="120" Top="5" Energy="96" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" Direction="Down" ChangeRoom="StaysWithinRoom" />
-    <Monster Type="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" Direction="Right" ChangeRoom="StaysWithinRoom" />
-    <Monster Type="CrazyCrawler" Left="118" Top="3" Energy="72" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="CrazyCrawler" Left="121" Top="3" Energy="72" />
-    <Monster Type="FlitterbugBrown" Left="125" Top="5" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
-    
-    <!-- Top, 2nd from right -->
-    <Monster Type="TigerMoth" Left="104" Top="5" Energy="120" />
-    
-    <!-- Top, 2nd from left -->
-    <Monster Type="TigerMoth" Left="82" Top="2" Energy="120" />
-
-    <!-- =-=-=-= -->
-    <!-- Level 7 -->
-    <!-- =-=-=-= -->
-    
-    <!-- Top, 3rd from left -->
-    <Monster Type="TigerMoth" Left="40" Top="5" Energy="120" LaysEggs="false" ChangeRooms="FollowsPlayer" />
-    <Monster Type="TigerMoth" Left="34" Top="1" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
-    
-    <!-- Top, 2nd from left -->
-    <Monster Type="FlitterbugBrown" Left="18" Top="8" Energy="120" Mobility="Cautious" LaysEggs="true" ChangeRooms="FollowsPlayer" />
-    
-    <!-- Top left -->
-    <Monster Type="Butterfly" Left="8" Top="5" Energy="120" LaysEggs="false" />
-    
-    <!-- 2nd from top, left -->
-    <Monster Type="Butterfly" Left="9" Top="13" Energy="120" LaysEggs="false" />
-    
-    <!-- 2nd from top, 2nd from left -->
-    <Monster Type="Butterfly" Left="25" Top="13" Energy="120" />
-    
-    <!-- 2nd from top, 3rd from left -->
-    <Monster Type="FlitterbugBrown" Left="34" Top="18" Energy="120" Mobility="Cautious" LaysEggs="true" ChangeRooms="FollowsPlayer" />
-    
-    <!-- 2nd from top, right -->
-    <Monster Type="TigerMoth" Left="55" Top="16" Energy="120" LaysEggs="false" ChangeRooms="FollowsPlayer" />
-    <Monster Type="TigerMoth" Left="61" Top="18" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
-    
-    <!-- 3rd from top, 2nd from right -->
-    <Monster Type="Butterfly" Left="39" Top="26" Energy="120" />
-    
-    <!-- 3rd from top, right -->
-    <Monster Type="Joker" Left="54" Top="26" Energy="90" />
-    
-    <!-- Bottom right -->
-    <Monster Type="Joker" Left="54" Top="36" Energy="90" />
-    <Monster Type="Joker" Left="56" Top="35" Energy="90" ChangeRooms="MovesRoom" />
-    
-    <!-- Bottom, 3rd from left -->
-    <Monster Type="Butterfly" Left="38" Top="37" Energy="120" />
-    
-    <!-- Bottom, 2nd from left -->
-    <Monster Type="Butterfly" Left="19" Top="33" Energy="120" />
-    
-    <!-- 3rd from top, 2nd from left -->
-    <Monster Type="Butterfly" Left="17" Top="25" Energy="120" />
-    <Monster Type="Butterfly" Left="17" Top="24" Energy="120" />
-    
-    <!-- 3rd from top, left -->
-    <Monster Type="Joker" Left="7" Top="27" Energy="90" />
-    <Monster Type="Butterfly" Left="1" Top="24" Energy="120" />
-    
-    <!-- Final room, bottom left -->
-    <Monster Type="Joker" Left="1" Top="34" Energy="120" LaysEggs="false" ChangeRooms="MovesRoom" />
-    <Monster Type="Joker" Left="9" Top="33" Energy="120" />
-    <Monster Type="Joker" Left="6" Top="37" Energy="150" LaysEggs="false" LaysMushrooms="true" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="Joker" Left="1" Top="32" Energy="120" SplitsOnHit="false" />
-    <Monster Type="Joker" Left="13" Top="38" Energy="120" />
-  </Monsters>
 
   <Areas>
     <!-- Level 1 -->
@@ -523,7 +101,7 @@ O              OO              OO              OO              OO              O
         <FruitDef Type="Apple" Quantity="8" />
       </FruitDefinitions>
     </Area>
-    
+
     <!-- Level 2 -->
     <Area Id="2" Top="40" Left="64" Width="64" Height="40">
       <StartPos PlayerLeft="72" PlayerTop="45" StartEnergy="100" BlockLeft="74" BlockTop="45" WorldStart="false" />
@@ -542,7 +120,7 @@ O              OO              OO              OO              OO              O
         <FruitDef Type="Watermelon" Quantity="8" />
       </FruitDefinitions>
     </Area>
-    
+
     <!-- Level 3 -->
     <Area Id="3" Top="40" Left="128" Width="64" Height="40">
       <StartPos PlayerLeft="136" PlayerTop="77" StartEnergy="150" BlockLeft="138" BlockTop="77" WorldStart="false" />
@@ -562,13 +140,14 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="K" Type="PotentiallyOccupied" />
         <TileDef Symbol="X" Type="PotentiallyOccupied" />
         <TileDef Symbol="#" Type="PotentiallyOccupied" />
+        <TileDef Symbol="o" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
         <FruitDef Type="Pineapple" Quantity="12" />
         <FruitDef Type="Watermelon" Quantity="12" />
       </FruitDefinitions>
     </Area>
-    
+
     <!-- Level 4 -->
     <Area Id="5" Top="0" Left="192" Width="64" Height="80">
       <StartPos PlayerLeft="200" PlayerTop="65" StartEnergy="200" BlockLeft="202" BlockTop="65" WorldStart="false" />
@@ -600,7 +179,7 @@ O              OO              OO              OO              OO              O
         <FruitDef Type="Strawberry" Quantity="20" />
       </FruitDefinitions>
     </Area>
-    
+
     <!-- Level 5 -->
     <Area Id="6" Top="0" Left="128" Width="64" Height="40">
       <StartPos PlayerLeft="183" PlayerTop="15" StartEnergy="200" BlockLeft="185" BlockTop="15" WorldStart="false" />
@@ -626,7 +205,7 @@ O              OO              OO              OO              OO              O
         <FruitDef Type="Cherries" Quantity="24" />
       </FruitDefinitions>
     </Area>
-    
+
     <!-- Level 6 -->
     <Area Id="7" Top="0" Left="64" Width="64" Height="40">
       <StartPos PlayerLeft="119" PlayerTop="35" StartEnergy="255" BlockLeft="117" BlockTop="35" WorldStart="false" />
@@ -675,4 +254,428 @@ O              OO              OO              OO              OO              O
       <FruitDef Type="Acorn" Quantity="64" />
     </FruitDefinitions>
   </Areas>
+
+  <Objects>
+    <Boulder Left="10" Top="75" />
+
+    <!-- Crystals -->
+    <!-- scores: 50, 500, 1000, 2000, 4000, 6000, 8000 -->
+    <!-- energy: 19,32,4b,64,c8,ff,ff -->
+    <Crystal Left="2" Top="47" Id="1" Score="500" Energy="25" />
+    <Crystal Left="125" Top="42" Id="2" Score="5000" Energy="50" />
+    <Crystal Left="168" Top="78" Id="3" Score="10000" Energy="75" />
+    <Crystal Left="226" Top="7" Id="4" Score="20000" Energy="100" />
+    <Crystal Left="189" Top="34" Id="5" Score="40000" Energy="200" />
+    <Crystal Left="119" Top="5" Id="6" Score="60000" Energy="255" />
+    <Crystal Left="6" Top="36" Id="7" Score="80000" Energy="255" />
+
+    <!-- ForceFields -->
+    <ForceField Left="62" Top="44" Width="1" Height="2" CrystalRequired="1" />
+    <ForceField Left="126" Top="74" Width="1" Height="2" CrystalRequired="2" />
+    <ForceField Left="191" Top="64" Width="1" Height="2" CrystalRequired="3" />
+    <ForceField Left="194" Top="14" Width="1" Height="2" CrystalRequired="4" />
+    <ForceField Left="128" Top="34" Width="1" Height="2" CrystalRequired="5" />
+    <ForceField Left="64" Top="4" Width="1" Height="2" CrystalRequired="6" />
+
+    <!-- Monsters -->
+
+    <!-- =-=-=-= -->
+    <!-- Level 1 -->
+    <!-- =-=-=-= -->
+
+    <!-- bottom row -->
+    <Monster Type="ThresherBrown" Left="44" Top="75" Energy="5" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="ThresherBrown" Left="50" Top="76" Energy="5" ChangeRooms="StaysWithinRoom" />
+
+    <!-- 2nd from bottom row -->
+    <Monster Type="ThresherBrown" Left="20" Top="63" Energy="5" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="ThresherBrown" Left="56" Top="65" Energy="5" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
+
+    <!-- 3rd from bottom row -->
+    <Monster Type="ThresherBrown" Left="5" Top="53" Energy="7" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="ThresherBrown" Left="22" Top="53" Energy="10" ChangeRooms="MovesRoom" />
+    <Monster Type="ThresherBrown" Left="34" Top="54" Energy="16" Mobility="Placid" />
+
+    <!-- top row -->
+    <Monster Type="ThresherBrown" Left="14" Top="41" Energy="14" Mobility="Placid" ChangeRooms="MovesRoom" />
+    <Monster Type="ThresherBrown" Left="3" Top="45" Energy="10" />
+    <Monster Type="ThresherBrown" Left="1" Top="48" Energy="16" ChangeRooms="StaysWithinRoom" />
+
+    <Monster Type="ThresherBrown" Left="22" Top="43" Energy="10" ChangeRooms="MovesRoom" />
+
+    <Monster Type="ThresherBrown" Left="44" Top="47" Energy="20" />
+    <Monster Type="ThresherBrown" Left="44" Top="43" Energy="20" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="ThresherBrown" Left="44" Top="47" Energy="25" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
+
+    <Monster Type="ThresherBrown" Left="60" Top="43" Energy="25" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="ThresherBrown" Left="60" Top="47" Energy="20" Mobility="Placid" />
+
+    <!-- =-=-=-= -->
+    <!-- Level 2 -->
+    <!-- =-=-=-= -->
+
+    <!-- 2nd top -->
+    <Monster Type="ThresherBrown" Left="92" Top="47" Energy="30" />
+
+    <!-- 3rd from top on left -->
+    <Monster Type="ThresherBrown" Left="77" Top="63" Energy="25" Mobility="Placid" />
+    <Monster Type="ThresherBrown" Left="77" Top="66" Energy="25" Mobility="Placid" />
+
+    <!-- Bottom, 2nd in -->
+    <Monster Type="RotaFloaterBrown" Left="93" Top="75" Energy="30" />
+
+    <!-- Bottom, 3rd in -->
+    <Monster Type="RotaFloaterBrown" Left="104" Top="73" Energy="30" />
+
+    <!-- 3rd from left, 3rd from top -->
+    <Monster Type="ThresherBrown" Left="104" Top="65" Energy="30" />
+
+    <!-- 3rd from left, 2nd from top -->
+    <Monster Type="RotaFloaterBrown" Left="104" Top="52" Energy="25" />
+
+    <!-- 2nd from left, 2nd from top -->
+    <Monster Type="RotaFloaterBrown" Left="88" Top="53" Energy="30" />
+
+    <!-- top line, 3rd from left -->
+    <Monster Type="RotaFloaterBrown" Left="99" Top="43" Energy="40" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterBrown" Left="98" Top="45" Energy="40" />
+    <Monster Type="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" Direction="Up" />
+    <Monster Type="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" Direction="Right" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="DeathCube" Left="110" Top="44" Energy="255" />
+    <Monster Type="DeathCube" Left="110" Top="45" Energy="255" />
+
+    <!-- Treasure room: top right-->
+    <Monster Type="ThresherBrown" Left="125" Top="42" Energy="45" />
+    <Monster Type="ThresherBrown" Left="125" Top="47" Energy="45" />
+    <Monster Type="RotaFloaterBrown" Left="125" Top="45" Energy="40" ChangeRooms="StaysWithinRoom" />
+
+    <!-- 2nd from top, right side -->
+    <Monster Type="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" Direction="Up" />
+
+    <!-- 3rd from top, right side -->
+    <Monster Type="ThresherBrown" Left="119" Top="68" Energy="55" IsEgg="true" TimeBeforeHatching="20" />
+
+    <!-- Bottom right-->
+    <Monster Type="ThresherBrown" Left="115" Top="76" Energy="50" />
+    <Monster Type="RotaFloaterBrown" Left="124" Top="75" Energy="50" />
+    <Monster Type="RotaFloaterBrown" Left="123" Top="75" Energy="50" ChangeRooms="StaysWithinRoom" />
+
+    <!-- =-=-=-= -->
+    <!-- Level 3 -->
+    <!-- =-=-=-= -->
+
+    <!-- 3rd from top, left side -->
+    <Monster Type="RotaFloaterBrown" Left="140" Top="65" Energy="60" />
+
+    <!-- 2nd from top, left side -->
+    <Monster Type="FlitterbugRed" Left="136" Top="55" Energy="60" />
+
+    <!-- 2nd from left, top -->
+    <Monster Type="ThresherBrown" Left="150" Top="43" Energy="60" IsEgg="true" TimeBeforeHatching="60" />
+    <Monster Type="ThresherBrown" Left="153" Top="43" Energy="60" IsEgg="true" TimeBeforeHatching="40" />
+
+    <!-- 2nd from left, 2nd from top -->
+    <Monster Type="FlitterbugRed" Left="156" Top="52" Energy="60" />
+
+    <!-- 2nd from left, bottom -->
+    <Monster Type="RotaFloaterBrown" Left="156" Top="75" Energy="60" />
+
+    <!-- 3rd from left, top -->
+    <Monster Type="RotaFloaterBrown" Left="162" Top="47" Energy="55" />
+    <Monster Type="RotaFloaterBrown" Left="172" Top="42" Energy="45" />
+    <Monster Type="RotaFloaterCyan" Left="172" Top="47" Energy="55" />
+    <Monster Type="ThresherBrown" Left="169" Top="47" Energy="60" IsEgg="true" TimeBeforeHatching="80" />
+
+    <!-- right, 2nd from top -->
+    <Monster Type="ThresherBrown" Left="177" Top="51" Energy="70" IsEgg="true" TimeBeforeHatching="50" />
+    <Monster Type="ThresherBrown" Left="190" Top="58" Energy="70" IsEgg="true" TimeBeforeHatching="10" />
+
+    <!-- 3rd from left, 2 down -->
+    <Monster Type="KillerCubeGreen" Left="167" Top="57" Energy="60" />
+
+    <!-- Treasure room -->
+    <Monster Type="ThresherBrown" Left="165" Top="73" Energy="60" />
+    <Monster Type="FlitterbugRed" Left="174" Top="73" Energy="60" />
+    <Monster Type="DeathCube" Left="161" Top="76" Energy="80" />
+    <Monster Type="DeathCube" Left="174" Top="76" Energy="80" />
+    <Monster Type="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="FlitterbugRed" Left="167" Top="78" Energy="90" IsEgg="true" TimeBeforeHatching="127" />
+
+    <!-- right, 3 down -->
+    <Monster Type="FlitterbugRed" Left="189" Top="61" Energy="80" />
+    <Monster Type="RotaFloaterCyan" Left="179" Top="62" Energy="80" />
+
+    <!-- =-=-=-= -->
+    <!-- Level 4 -->
+    <!-- =-=-=-= -->
+
+    <!-- bottom left corner -->
+    <Monster Type="RotaFloaterCyan" Left="200" Top="74" Energy="48" Direction="Left"  />
+
+    <!-- bottom, 2nd from left -->
+    <Monster Type="FlitterbugRed" Left="216" Top="74" Energy="48" />
+
+    <!-- bottom, 3rd from left -->
+    <Monster Type="FlitterbugRed" Left="232" Top="74" Energy="48" />
+
+    <!-- bottom right corner -->
+    <Monster Type="ThresherCyan" Left="248" Top="74" Energy="48" Mobility="Cautious" />
+
+    <!-- right, 2nd from bottom -->
+    <Monster Type="ThresherCyan" Left="248" Top="66" Energy="48" Mobility="Cautious" />
+
+    <!-- right, 3rd from bottom -->
+    <Monster Type="RotaFloaterCyan" Left="247" Top="52" Energy="64" Direction="Right" />
+    <Monster Type="RotaFloaterCyan" Left="249" Top="52" Energy="48" Direction="Right" />
+    <Monster Type="ThresherCyan" Left="248" Top="54" Energy="48" Mobility="Cautious" />
+
+    <!-- 2nd from right, 3rd from bottom -->
+    <Monster Type="FlitterbugRed" Left="232" Top="54" Energy="48" />
+
+    <!-- 2nd from right, 2nd from bottom -->
+    <Monster Type="ThresherCyan" Left="231" Top="63" Energy="48" Mobility="Cautious" />
+
+    <!-- 2nd from left, 2nd from bottom -->
+    <Monster Type="FlitterbugRed" Left="215" Top="64" Energy="64" />
+
+    <!-- 2nd from left, 3rd from bottom -->
+    <Monster Type="FlitterbugRed" Left="216" Top="54" Energy="48" />
+
+    <!-- left, 3rd from bottom -->
+    <Monster Type="RotaFloaterCyan" Left="198" Top="54" Energy="48" Direction="Right" />
+
+    <!-- right, 5th from top -->
+    <Monster Type="FlitterbugRed" Left="248" Top="42" Energy="48" LaysEggs="true"  />
+
+    <!-- right, 4th from top -->
+    <Monster Type="FlitterbugRed" Left="242" Top="32" Energy="48" LaysEggs="true"  />
+    <Monster Type="FlitterbugRed" Left="253" Top="33" Energy="48" LaysEggs="true"  />
+
+    <!-- right, 3rd from top -->
+    <Monster Type="ThresherCyan" Left="248" Top="21" Energy="48" Mobility="Cautious" />
+
+    <!-- right, 2nd from top -->
+    <Monster Type="FlitterbugRed" Left="247" Top="11" Energy="48" LaysEggs="true" />
+    <Monster Type="ThresherCyan" Left="242" Top="14" Energy="48" Mobility="Cautious" />
+
+    <!-- top right corner -->
+    <Monster Type="DeathCube" Left="243" Top="4" Energy="80" />
+    <Monster Type="DeathCube" Left="243" Top="5" Energy="80" />
+
+    <!-- Treasure room (top, 2nd from right) -->
+    <Monster Type="RotaFloaterCyan" Left="226" Top="5" Energy="48" />
+    <Monster Type="RotaFloaterCyan" Left="226" Top="6" Energy="48" />
+    <Monster Type="RotaFloaterCyan" Left="227" Top="6" Energy="48" />
+    <Monster Type="ThresherCyan" Left="232" Top="4" Energy="64" Mobility="Cautious" />
+    <Monster Type="ThresherCyan" Left="232" Top="5" Energy="64" />
+    <Monster Type="FlitterbugRed" Left="227" Top="4" Energy="48" LaysEggs="true" />
+    <Monster Type="KillerCubeGreen" Left="234" Top="2" Energy="48" />
+
+    <!-- 2nd from top, 2nd from right -->
+    <Monster Type="FlitterbugRed" Left="232" Top="14" Energy="64" LaysEggs="true" />
+    <Monster Type="KillerCubeGreen" Left="231" Top="17" Energy="64" />
+
+    <!-- 3rd from top, 2nd from right -->
+    <Monster Type="CrazyCrawler" Left="232" Top="28" Energy="40" />
+
+    <!-- 4th from top, 2nd from right -->
+    <Monster Type="FlitterbugRed" Left="232" Top="37" Energy="64" LaysEggs="true" />
+    <Monster Type="CrazyCrawler" Left="233" Top="37" Energy="28" />
+
+    <!-- 5th from top, 2nd from right-->
+    <Monster Type="ThresherCyan" Left="231" Top="45" Energy="72" LaysEggs="true" />
+
+    <!-- 5th from top, left-->
+    <Monster Type="CrazyCrawler" Left="199" Top="44" Energy="40" />
+
+    <!-- 4th from top, left -->
+    <Monster Type="CrazyCrawler" Left="200" Top="31" Energy="40" />
+
+    <!-- 3rd from top, left -->
+    <Monster Type="FlitterbugRed" Left="199" Top="25" Energy="72" LaysEggs="true" />
+
+    <!-- 4th from top, 2nd from left -->
+    <Monster Type="ThresherCyan" Left="215" Top="35" Energy="72" LaysEggs="true" />
+
+    <!-- 3rd from top, 2nd from left -->
+    <Monster Type="ThresherCyan" Left="216" Top="25" Energy="72" LaysEggs="true" />
+
+    <!-- 2nd from top, 2nd from left -->
+    <Monster Type="RotaFloaterCyan" Left="215" Top="12" Energy="48" Direction="Right" />
+    <Monster Type="RotaFloaterCyan" Left="216" Top="13" Energy="48" Direction="Left" />
+
+    <!-- top, 2nd from left -->
+    <Monster Type="CrazyCrawler" Left="209" Top="4" Energy="40" />
+    <Monster Type="CrazyCrawler" Left="215" Top="5" Energy="40" />
+
+    <!-- Top left -->
+    <Monster Type="FlitterbugRed" Left="199" Top="5" Energy="80" LaysEggs="true" />
+
+    <!-- 2nd from top, left -->
+    <Monster Type="CrazyCrawler" Left="199" Top="15" Energy="48" />
+    <Monster Type="FlitterbugRed" Left="201" Top="15" Energy="80" LaysEggs="true" />
+
+    <!-- =-=-=-= -->
+    <!-- Level 5 -->
+    <!-- =-=-=-= -->
+
+    <!-- 2nd from top, right -->
+    <Monster Type="CrazyCrawler" Left="178" Top="11" Energy="50" />
+    <Monster Type="ThresherCyan" Left="184" Top="15" Energy="90" LaysEggs="true" />
+
+    <!-- top right -->
+    <Monster Type="KillerCubeRed" Left="178" Top="2" Energy="150" />
+
+    <!-- top, 2nd from right -->
+    <Monster Type="FlitterbugCyan" Left="168" Top="5" Energy="150" LaysEggs="false" Mobility="Cautious" />
+
+    <!-- top, 2nd from left -->
+    <Monster Type="KillerCubeRed" Left="152" Top="4" Energy="100" />
+
+    <!-- top left -->
+    <Monster Type="FlitterbugCyan" Left="130" Top="7" Energy="100" Mobility="Cautious" />
+
+    <!-- 2nd down on left -->
+    <Monster Type="CrazyCrawler" Left="136" Top="14" Energy="80" />
+
+    <!-- 2nd down, 2nd from left -->
+    <Monster Type="ThresherCyan" Left="147" Top="13" Energy="90" />
+
+    <!-- 2nd down, 3rd from left -->
+    <Monster Type="KillerCubeRed" Left="162" Top="12" Energy="150" />
+
+    <!-- 3rd from top, right -->
+    <Monster Type="KillerCubeRed" Left="189" Top="27" Energy="150" />
+
+    <!-- 3rd from top, 3rd from left -->
+    <Monster Type="FlitterbugCyan" Left="168" Top="26" Energy="150" LaysEggs="false" Mobility="Cautious" />
+
+    <!-- bottom, 2nd from left -->
+    <Monster Type="CrazyCrawler" Left="148" Top="37" Energy="80" />
+
+    <!-- bottom, 3rd from left -->
+    <Monster Type="FlitterbugCyan" Left="174" Top="34" Energy="100" Mobility="Cautious" />
+    <Monster Type="FlitterbugCyan" Left="174" Top="35" Energy="100" Mobility="Cautious" />
+
+    <!-- treasure room, bottom right -->
+    <Monster Type="KillerCubeGreen" Left="177" Top="31" Energy="100" />
+    <Monster Type="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" Direction="Left" />
+    <Monster Type="KillerCubeGreen" Left="184" Top="38" Energy="100" />
+    <Monster Type="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" Direction="Left" />
+    <Monster Type="CrazyCrawler" Left="182" Top="33" Energy="80" />
+    <Monster Type="CrazyCrawler" Left="182" Top="35" Energy="80" />
+    <Monster Type="CrazyCrawler" Left="185" Top="34" Energy="80" Mobility="Placid" />
+
+    <!-- bottom left -->
+    <Monster Type="DiamondDemon" Left="141" Top="32" Energy="40" Mobility="Placid" />
+
+    <!-- =-=-=-= -->
+    <!-- Level 6 -->
+    <!-- =-=-=-= -->
+
+    <!-- Bottom right -->
+    <Monster Type="DiamondDemon" Left="117" Top="32" Energy="32" Mobility="Placid" LaysEggs="false" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="DiamondDemon" Left="115" Top="33" Energy="24" Mobility="Placid" ChangeRoom="StaysWithinRoom" />
+    <Monster Type="DiamondDemon" Left="114" Top="36" Energy="24" Mobility="Placid" />
+
+    <!-- Bottom, 2nd from right -->
+    <Monster Type="FlitterbugCyan" Left="98" Top="37" Energy="144" LaysEggs="true" />
+
+    <!-- Bottom, 2nd from left -->
+    <Monster Type="FlitterbugBrown" Left="88" Top="35" Energy="90" />
+
+    <!-- 2nd from bottom, right -->
+    <Monster Type="FlitterbugCyan" Left="120" Top="25" Energy="144" LaysEggs="true" />
+
+    <!-- 2nd from bottom, 2nd from right -->
+    <Monster Type="FlitterbugBrown" Left="98" Top="22" Energy="80" />
+
+    <!-- 2nd from bottom, left -->
+    <Monster Type="FlitterbugBrown" Left="66" Top="22" Energy="96" />
+    <Monster Type="KillerCubeRed" Left="66" Top="27" Energy="120" />
+
+    <!-- 2nd from top, left -->
+    <Monster Type="FlitterbugCyan" Left="72" Top="15" Energy="144" LaysEggs="true" />
+
+    <!-- 2nd from top, 2nd from left -->
+    <Monster Type="CrazyCrawler" Left="87" Top="11" Energy="72" />
+    <Monster Type="KillerCubeRed" Left="90" Top="11" Energy="120" />
+
+    <!-- 2nd from top, 2nd from right -->
+    <Monster Type="TigerMoth" Left="109" Top="12" Energy="120" />
+    <Monster Type="TigerMoth" Left="109" Top="17" Energy="120" />
+
+    <!-- Treasure room, top right-->
+    <Monster Type="TigerMoth" Left="120" Top="5" Energy="96" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" Direction="Down" ChangeRoom="StaysWithinRoom" />
+    <Monster Type="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" Direction="Right" ChangeRoom="StaysWithinRoom" />
+    <Monster Type="CrazyCrawler" Left="118" Top="3" Energy="72" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="CrazyCrawler" Left="121" Top="3" Energy="72" />
+    <Monster Type="FlitterbugBrown" Left="125" Top="5" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+
+    <!-- Top, 2nd from right -->
+    <Monster Type="TigerMoth" Left="104" Top="5" Energy="120" />
+
+    <!-- Top, 2nd from left -->
+    <Monster Type="TigerMoth" Left="82" Top="2" Energy="120" />
+
+    <!-- =-=-=-= -->
+    <!-- Level 7 -->
+    <!-- =-=-=-= -->
+
+    <!-- Top, 3rd from left -->
+    <Monster Type="TigerMoth" Left="40" Top="5" Energy="120" LaysEggs="false" ChangeRooms="FollowsPlayer" />
+    <Monster Type="TigerMoth" Left="34" Top="1" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+
+    <!-- Top, 2nd from left -->
+    <Monster Type="FlitterbugBrown" Left="18" Top="8" Energy="120" Mobility="Cautious" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+
+    <!-- Top left -->
+    <Monster Type="Butterfly" Left="8" Top="5" Energy="120" LaysEggs="false" />
+
+    <!-- 2nd from top, left -->
+    <Monster Type="Butterfly" Left="9" Top="13" Energy="120" LaysEggs="false" />
+
+    <!-- 2nd from top, 2nd from left -->
+    <Monster Type="Butterfly" Left="25" Top="13" Energy="120" />
+
+    <!-- 2nd from top, 3rd from left -->
+    <Monster Type="FlitterbugBrown" Left="34" Top="18" Energy="120" Mobility="Cautious" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+
+    <!-- 2nd from top, right -->
+    <Monster Type="TigerMoth" Left="55" Top="16" Energy="120" LaysEggs="false" ChangeRooms="FollowsPlayer" />
+    <Monster Type="TigerMoth" Left="61" Top="18" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+
+    <!-- 3rd from top, 2nd from right -->
+    <Monster Type="Butterfly" Left="39" Top="26" Energy="120" />
+
+    <!-- 3rd from top, right -->
+    <Monster Type="Joker" Left="54" Top="26" Energy="90" />
+
+    <!-- Bottom right -->
+    <Monster Type="Joker" Left="54" Top="36" Energy="90" />
+    <Monster Type="Joker" Left="56" Top="35" Energy="90" ChangeRooms="MovesRoom" />
+
+    <!-- Bottom, 3rd from left -->
+    <Monster Type="Butterfly" Left="38" Top="37" Energy="120" />
+
+    <!-- Bottom, 2nd from left -->
+    <Monster Type="Butterfly" Left="19" Top="33" Energy="120" />
+
+    <!-- 3rd from top, 2nd from left -->
+    <Monster Type="Butterfly" Left="17" Top="25" Energy="120" />
+    <Monster Type="Butterfly" Left="17" Top="24" Energy="120" />
+
+    <!-- 3rd from top, left -->
+    <Monster Type="Joker" Left="7" Top="27" Energy="90" />
+    <Monster Type="Butterfly" Left="1" Top="24" Energy="120" />
+
+    <!-- Final room, bottom left -->
+    <Monster Type="Joker" Left="1" Top="34" Energy="120" LaysEggs="false" ChangeRooms="MovesRoom" />
+    <Monster Type="Joker" Left="9" Top="33" Energy="120" />
+    <Monster Type="Joker" Left="6" Top="37" Energy="150" LaysEggs="false" LaysMushrooms="true" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="Joker" Left="1" Top="32" Energy="120" SplitsOnHit="false" />
+    <Monster Type="Joker" Left="13" Top="38" Energy="120" />
+  </Objects>
 </World>

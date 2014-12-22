@@ -238,7 +238,7 @@ namespace Labyrinth
 
                 Rectangle? bounds = null;
                 var currentItemPosition = currentItem.Position;
-                foreach (var si in this._gameObjects.AllItems)
+                foreach (var si in currentItem is Shot ? this._gameObjects.AllItems : this._gameObjects.InteractiveItems)
                     {
                     if (currentItem == si)
                         continue;   

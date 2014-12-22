@@ -42,7 +42,7 @@ namespace Labyrinth
                 return;
                 }
 
-            if (!(this._staticItem is Fruit) && !(this._staticItem is Grave) && !(this._staticItem is Mushroom)) 
+            if (!(this._staticItem is Fruit) && !(this._staticItem is Grave) && !(this._staticItem is Mushroom) && !(this._staticItem is CrumblyWall)) 
                 return;
 
             this._world.Game.SoundLibrary.Play(GameSound.StaticObjectShotAndInjured);

@@ -263,18 +263,13 @@ namespace Labyrinth.Monster
                         _stepTime -= AnimationPlayer.GameClockResolution;
                         DoMonsterAction(inSameRoom);
                         }
-
                     }
 
                 if (this.Direction == Direction.None)
-                    {
-                    remainingMovement = 0;
-                    }
-                else
-                    {
-                    this.ContinueMove(ref remainingMovement, out needToChooseDirection);
-                    result = true;
-                    }                
+                    break;
+
+                this.ContinueMove(ref remainingMovement, out needToChooseDirection);
+                result = true;
                 }
 
             while (_stepTime >= AnimationPlayer.GameClockResolution)

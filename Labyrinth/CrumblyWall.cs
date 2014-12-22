@@ -1,0 +1,34 @@
+﻿using Microsoft.Xna.Framework;
+
+namespace Labyrinth
+    {
+    class CrumblyWall : StaticItem
+        {
+        private readonly int _initialEnergy;
+
+        public CrumblyWall(World world, Vector2 position, string textureName, int energy) : base(world, position)
+            {
+            var a = Animation.StaticAnimation(World, textureName);
+            this.Ap.PlayAnimation(a);
+            this.Energy = energy;
+            this._initialEnergy = energy;
+            }
+
+        public override void ReduceEnergy(int energyToRemove)
+            {
+            base.ReduceEnergy(energyToRemove);
+
+            int stages = this.Ap.Animation.FrameCount - 1;
+            this.Ap.FrameIndex = stages - (this.Energy / this._initialEnergy * stages);
+            }
+
+        public override ObjectSolidity Solidity
+            {
+            get
+                {
+                var result = this.IsExtant ? ObjectSolidity.Impassable : ObjectSolidity.Passable;
+                return result;
+                }
+            }
+        }
+    }

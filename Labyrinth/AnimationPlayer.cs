@@ -44,7 +44,7 @@ namespace Labyrinth
         /// <summary>
         /// Gets the index of the current frame in the animation.
         /// </summary>
-        private int FrameIndex { get; set; }
+        public int FrameIndex { get; set; }
 
         /// <summary>
         ///  Tracks whether a notification that the animation has completed has been sent

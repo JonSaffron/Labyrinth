@@ -142,26 +142,57 @@ namespace Labyrinth
             var playerStartPositions = this._worldAreas.Where(wa => wa.StartState != null).Select(wa => new Grave(world, wa.StartState.PlayerPosition.ToPosition()));
             exceptions.AddRange(SetTileOccupation(ref tiles, playerStartPositions, false));
 
-            var boulders = GetListOfBoulders(world).ToList();
-            result.AddRange(boulders);
-            exceptions.AddRange(SetTileOccupation(ref tiles, boulders, false));
+            var objects = this._xmlDoc.SelectNodes("World/Objects/*");
+            if (objects == null)
+                throw new InvalidOperationException("No Objects node in world definition.");
+            foreach (XmlElement definition in objects)
+                {
+                StaticItem[] newItems; 
 
-            var monsters = GetListOfMonsters(world).ToList();
-            result.AddRange(monsters);
-            exceptions.AddRange(SetTileOccupation(ref tiles, monsters.Where(m => m.IsStill), false));
-            
-            var crystals = GetListOfCrystals(world).ToList();
-            result.AddRange(crystals);
-            exceptions.AddRange(SetTileOccupation(ref tiles, crystals, false));
+                switch (definition.LocalName)
+                    {
+                    case "Boulder":
+                        {
+                        newItems = new StaticItem[] { GetBoulder(world, definition) };
+                        break;
+                        }
 
-            var forceFields = GetListOfForceFields(world).ToList();
-            result.AddRange(forceFields);
-            exceptions.AddRange(SetTileOccupation(ref tiles, forceFields, false));
-            
+                    case "Monster":
+                        {
+                        newItems = new StaticItem[] { GetMonster(world, definition) };
+                        break;
+                        }
+
+                    case "Crystal":
+                        {
+                        newItems = new StaticItem[] { GetCrystal(world, definition) };
+                        break;
+                        }
+
+                    case "ForceField":
+                        {
+                        newItems = GetForceFields(world, definition).Cast<StaticItem>().ToArray();
+                        break;
+                        }
+
+                    case "CrumblyWall":
+                        {
+                        newItems = new StaticItem[] { GetCrumblyWall(world, definition) };
+                        break;
+                        }
+
+                    default:
+                        throw new InvalidOperationException("Unknown object " + definition.LocalName);
+                    }
+
+                result.AddRange(newItems);
+                exceptions.AddRange(SetTileOccupation(ref tiles, newItems.Where(item => !(item is Monster.Monster) || ((Monster.Monster) item).IsStill), false));
+                }
+
             var fruit = GetListOfFruit(world, ref tiles);
             result.AddRange(fruit);
 
-            exceptions.AddRange(SetTileOccupation(ref tiles, monsters.Where(m => !m.IsStill), true));
+            exceptions.AddRange(SetTileOccupation(ref tiles, result.OfType<Monster.Monster>().Where(m => !m.IsStill), true));
             
             ReviewPotentiallyOccupiedTiles(ref tiles, exceptions);
             
@@ -199,106 +230,86 @@ namespace Labyrinth
             return result;
             }
 
-        private IEnumerable<Monster.Monster> GetListOfMonsters(World world)
+        private static Monster.Monster GetMonster(World world, XmlElement mdef)
             {
-            var result = new List<Monster.Monster>();
-            var monsters = this._xmlDoc.SelectNodes("World/Monsters/Monster");
-            if (monsters == null)
-                throw new InvalidOperationException();
-            foreach (XmlElement mdef in monsters)
+            string type = mdef.GetAttribute("Type");
+            var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
+            Vector2 position = tilePos.ToPosition();
+            int e = int.Parse(mdef.GetAttribute("Energy"));
+            Monster.Monster result = Monster.Monster.Create(type, world, position, e);
+            string direction = mdef.GetAttribute("Direction");
+            if (!string.IsNullOrEmpty(direction))
+                result.Direction = (Direction)Enum.Parse(typeof(Direction), direction);
+            string mobility = mdef.GetAttribute("Mobility");
+            if (!String.IsNullOrEmpty(mobility))
+                result.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);
+            string changeRooms = mdef.GetAttribute("ChangeRooms");
+            if (!string.IsNullOrEmpty(changeRooms))
+                result.ChangeRooms = (ChangeRooms)Enum.Parse(typeof(ChangeRooms), changeRooms);
+            string isEggAttribute = mdef.GetAttribute("IsEgg");
+            string timeBeforeHatchingAttribute = mdef.GetAttribute("TimeBeforeHatching");
+            if (!string.IsNullOrEmpty(isEggAttribute) && !string.IsNullOrEmpty(timeBeforeHatchingAttribute))
                 {
-                string type = mdef.GetAttribute("Type");
-                var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
-                Vector2 position = tilePos.ToPosition();
-                //if (!world.CanTileBeOccupied(tilePos, true))
-                //    throw new InvalidOperationException(string.Format("Position ({0}, {1}) for monster {2} is an impassable tile.", tilePos.X, tilePos.Y, type));
-                int e = int.Parse(mdef.GetAttribute("Energy"));
-                Monster.Monster m = Monster.Monster.Create(type, world, position, e);
-                string direction = mdef.GetAttribute("Direction");
-                if (!string.IsNullOrEmpty(direction))
-                    m.Direction = (Direction)Enum.Parse(typeof(Direction), direction);
-                string mobility = mdef.GetAttribute("Mobility");
-                if (!String.IsNullOrEmpty(mobility))
-                    m.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);
-                string changeRooms = mdef.GetAttribute("ChangeRooms");
-                if (!string.IsNullOrEmpty(changeRooms))
-                    m.ChangeRooms = (ChangeRooms)Enum.Parse(typeof(ChangeRooms), changeRooms);
-                string isEggAttribute = mdef.GetAttribute("IsEgg");
-                string timeBeforeHatchingAttribute = mdef.GetAttribute("TimeBeforeHatching");
-                if (!string.IsNullOrEmpty(isEggAttribute) && !string.IsNullOrEmpty(timeBeforeHatchingAttribute))
+                bool isEgg = Boolean.Parse(isEggAttribute);
+                int timeBeforeHatching = int.Parse(timeBeforeHatchingAttribute);
+                if (isEgg)
                     {
-                    bool isEgg = Boolean.Parse(isEggAttribute);
-                    int timeBeforeHatching = int.Parse(timeBeforeHatchingAttribute);
-                    if (isEgg)
-                        {
-                        m.DelayBeforeHatching = timeBeforeHatching | 1;
-                        }
+                    result.DelayBeforeHatching = timeBeforeHatching | 1;
                     }
-                string laysMushrooms = mdef.GetAttribute("LaysMushrooms");
-                if (!string.IsNullOrEmpty(laysMushrooms))
-                    {
-                    m.LaysMushrooms = Boolean.Parse(laysMushrooms);
-                    }
-                string laysEggs = mdef.GetAttribute("LaysEggs");
-                if (!string.IsNullOrEmpty(laysEggs))
-                    {
-                    m.LaysEggs = Boolean.Parse(laysEggs);
-                    }
-                string splitsOnHit = mdef.GetAttribute("SplitsOnHit");
-                if (!string.IsNullOrEmpty(splitsOnHit))
-                    {
-                    m.SplitsOnHit = Boolean.Parse(splitsOnHit);
-                    }
-                result.Add(m);
+                }
+            string laysMushrooms = mdef.GetAttribute("LaysMushrooms");
+            if (!string.IsNullOrEmpty(laysMushrooms))
+                {
+                result.LaysMushrooms = Boolean.Parse(laysMushrooms);
+                }
+            string laysEggs = mdef.GetAttribute("LaysEggs");
+            if (!string.IsNullOrEmpty(laysEggs))
+                {
+                result.LaysEggs = Boolean.Parse(laysEggs);
+                }
+            string splitsOnHit = mdef.GetAttribute("SplitsOnHit");
+            if (!string.IsNullOrEmpty(splitsOnHit))
+                {
+                result.SplitsOnHit = Boolean.Parse(splitsOnHit);
                 }
             
             return result;
             }
 
-        private IEnumerable<Crystal> GetListOfCrystals(World world)
+        private static Crystal GetCrystal(World world, XmlElement cdef)
             {
-            var crystals = this._xmlDoc.SelectNodes("World/Crystals/Item");
-            if (crystals == null)
-                throw new InvalidOperationException();
-            var result = (from XmlElement cdef in crystals
-                          let id = int.Parse(cdef.GetAttribute("Id"))
-                          let tilePos = new TilePos(int.Parse(cdef.GetAttribute("Left")), int.Parse(cdef.GetAttribute("Top")))
-                          let position = tilePos.ToPosition()
-                          let score = int.Parse(cdef.GetAttribute("Score"))
-                          let energy = int.Parse(cdef.GetAttribute("Energy"))
-                          select new Crystal(world, position, id, score, energy)).ToList();
+            var id = int.Parse(cdef.GetAttribute("Id"));
+            var tilePos = new TilePos(int.Parse(cdef.GetAttribute("Left")), int.Parse(cdef.GetAttribute("Top")));
+            var position = tilePos.ToPosition();
+            var score = int.Parse(cdef.GetAttribute("Score"));
+            var energy = int.Parse(cdef.GetAttribute("Energy"));
+            var result = new Crystal(world, position, id, score, energy);
             return result;
             }
 
-        private IEnumerable<Boulder> GetListOfBoulders(World world)
+        private static Boulder GetBoulder(World world, XmlElement bdef)
             {
-            var boulders = this._xmlDoc.SelectNodes("World/Boulders/Item");
-            if (boulders == null)
-                throw new InvalidOperationException();
-            var result = (from XmlElement bdef in boulders
-                          let tilePos = new TilePos(int.Parse(bdef.GetAttribute("Left")), int.Parse(bdef.GetAttribute("Top")))
-                          let position = tilePos.ToPosition()
-                          select new Boulder(world, position)).ToList();
+            var tilePos = new TilePos(int.Parse(bdef.GetAttribute("Left")), int.Parse(bdef.GetAttribute("Top")));
+            var position = tilePos.ToPosition();
+            var result = new Boulder(world, position);
             return result;
             }
 
-        private IEnumerable<ForceField> GetListOfForceFields(World world)
+        private static IEnumerable<ForceField> GetForceFields(World world, XmlElement fdef)
             {
-            var result = new List<ForceField>();
-            var forceFields = this._xmlDoc.SelectNodes("World/ForceFields/Item");
-            if (forceFields == null)
-                throw new InvalidOperationException();
-            foreach (XmlElement fdef in forceFields)
-                {
-                Rectangle r = WorldArea.GetRectangleFromDefinition(fdef);
-                int crystalRequired = int.Parse(fdef.GetAttribute("CrystalRequired"));
-                foreach (TilePos p in r.PointsInside())
-                    {
-                    Vector2 position = p.ToPosition();
-                    var f = new ForceField(world, position, crystalRequired);
-                    result.Add(f);
-                    }
-                }
+            int crystalRequired = int.Parse(fdef.GetAttribute("CrystalRequired"));
+            Rectangle r = WorldArea.GetRectangleFromDefinition(fdef);
+            var result = r.PointsInside().Select(tp => new ForceField(world, tp.ToPosition(), crystalRequired));
+            return result;
+            }
+
+        private static CrumblyWall GetCrumblyWall(World world, XmlElement wdef)
+            {
+            var tilePos = new TilePos(int.Parse(wdef.GetAttribute("Left")), int.Parse(wdef.GetAttribute("Top")));
+            var position = tilePos.ToPosition();
+            var energy = int.Parse(wdef.GetAttribute("Energy"));
+            var textureName = wdef.GetAttribute("Texture");
+            var result = new CrumblyWall(world, position, textureName, energy);
             return result;
             }
 
@@ -370,14 +381,13 @@ namespace Labyrinth
                         {
                         case TileTypeByMap.Wall:
                             floor = world.LoadTexture("Tiles/" + defaultFloorName);
-                            tiles[p.X, p.Y] = new Tile(floor, td.TileTypeByMap);
-                            var position = new Vector2(p.X * Tile.Width + (Tile.Width / 2), p.Y * Tile.Height + (Tile.Height / 2));
-                            var wall = new Wall(world, position, "Tiles/" + td.TextureName);
+                            tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Wall);
+                            var wall = new Wall(world, p.ToPosition(), "Tiles/" + td.TextureName);
                             result.Add(wall);
                             break;
                         case TileTypeByMap.Floor:
                             floor = world.LoadTexture("Tiles/" + td.TextureName);
-                            tiles[p.X, p.Y] = new Tile(floor, td.TileTypeByMap);
+                            tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Floor);
                             break;
                         case TileTypeByMap.PotentiallyOccupied:
                             floor = world.LoadTexture("Tiles/" + defaultFloorName);

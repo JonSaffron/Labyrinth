@@ -115,8 +115,8 @@ namespace Labyrinth
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
                 
-                _world = LoadLevel("World1.xml");
-                _world.Reset(this._spriteBatch);
+                this._world = LoadLevel("World1.xml");
+                this._world.Reset(this._spriteBatch);
                 
                 this.ResetElapsedTime();
                 }
@@ -128,15 +128,16 @@ namespace Labyrinth
             switch (lrt)
                 {
                 case LevelReturnType.FinishedLevel:
-                    _world.Dispose();
-                    _world = null;
+                    this._world.Dispose();
+                    this._world = null;
+                    this._lives++;
                     break;
                 
                 case LevelReturnType.LostLife:
-                    if (_lives == 0)
+                    if (this._lives == 0)
                         this.Exit();
-                    _lives--;
-                    _world.ResetLevel(_spriteBatch);
+                    this._lives--;
+                    this._world.ResetLevel(_spriteBatch);
                     break;
                 }
 
