@@ -168,7 +168,7 @@ namespace Labyrinth
             _wasMoving = runAnimation;
 
             // Calculate the source rectangle of the current frame.
-            var source = new Rectangle(FrameIndex * Animation.Texture.Width, 0, Animation.Texture.Width, Animation.Texture.Height);
+            var source = new Rectangle(FrameIndex * Tile.Width, 0, Tile.Width, Tile.Height);
 
             // Draw the current frame.
             spriteBatch.DrawInWindow(Animation.Texture, position, source, this.Rotation, Origin, this.SpriteEffect);
