@@ -9,11 +9,11 @@ namespace Labyrinth.Test
     {
     class WorldLoaderForTest : IWorldLoader
         {
-        private readonly string _layout;
+        private string _layout;
 
-        public WorldLoaderForTest(string world)
+        public void LoadWorld(string worldLayout)
             {
-            this._layout = world;
+            this._layout = worldLayout;
             }
 
         public int GetMaximumWorldAreaId()
@@ -86,6 +86,7 @@ namespace Labyrinth.Test
                 {
                 for (int x = 0; x < lines[y].Length; x++)
                     {
+                    var position = new TilePos(x, y).ToPosition();
                     var c = lines[y][x];
                     switch (c)
                         {
@@ -93,13 +94,16 @@ namespace Labyrinth.Test
                             break;
                         case '#':
                             Trace.WriteLine(System.IO.Directory.GetCurrentDirectory());
-                            result.Add(new Wall(world, new TilePos(x, y).ToPosition(), "Tiles/Floor1"));
+                            result.Add(new Wall(world, position, "Tiles/Floor1"));
                             break;
                         case 'p':
-                            result.Add(new Player(world, new TilePos(x, y).ToPosition(), 255));
+                            result.Add(new Player(world, position, 255));
                             break;
                         case 'b':
-                            result.Add(new Boulder(world, new TilePos(x, y).ToPosition()));
+                            result.Add(new Boulder(world, position));
+                            break;
+                        case 'g':
+                            result.Add(new Grave(world, position));
                             break;
                         default:
                             throw new InvalidOperationException();

@@ -53,6 +53,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <XnaCompressContent>false</XnaCompressContent>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -104,7 +105,6 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml">
       <Private>False</Private>
@@ -114,25 +114,33 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddScoreEventArgs.cs" />
     <Compile Include="Animation.cs" />
     <Compile Include="AnimationPlayer.cs" />
     <Compile Include="Bang.cs" />
     <Compile Include="Boulder.cs" />
     <Compile Include="CrumblyWall.cs" />
+    <Compile Include="Explosion.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="GameInput.cs" />
     <Compile Include="GameObjectCollection.cs" />
     <Compile Include="GameSoundInstance.cs" />
     <Compile Include="GameTimer.cs" />
-    <Compile Include="GameTimerCollection.cs" />
     <Compile Include="IInteraction.cs" />
     <Compile Include="IGameSoundInstance.cs" />
-    <Compile Include="ISoundLibrary.cs" />
+    <Compile Include="IMonsterWeapon.cs" />
+    <Compile Include="InteractionWithMovingItems.cs" />
+    <Compile Include="IPlayerInput.cs" />
+    <Compile Include="ISoundPlayer.cs" />
+    <Compile Include="IPlayerWeapon.cs" />
+    <Compile Include="ISpriteBatch.cs" />
     <Compile Include="IWorldLoader.cs" />
-    <Compile Include="MovingItemAndMovingItemInteraction.cs" />
-    <Compile Include="MovingItemAndStaticItemInteraction.cs" />
+    <Compile Include="Mine.cs" />
+    <Compile Include="MineLayer.cs" />
+    <Compile Include="InteractionWithStaticItems.cs" />
+    <Compile Include="NoSoundPlayer.cs" />
+    <Compile Include="NullGameSoundInstance.cs" />
+    <Compile Include="NullSoundPlayer.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="ShotAndStaticItemInteraction.cs" />
     <Compile Include="Monster\Butterfly.cs" />
     <Compile Include="Monster\CrazyCrawler.cs" />
     <Compile Include="Monster\FlitterbugBrown.cs" />
@@ -147,11 +155,16 @@
     <Compile Include="Fruit.cs" />
     <Compile Include="FruitDefinition.cs" />
     <Compile Include="Grave.cs" />
-    <Compile Include="Input.cs" />
+    <Compile Include="PlayerInput.cs" />
     <Compile Include="Monster\Joker.cs" />
     <Compile Include="Monster\KillerCube.cs" />
     <Compile Include="Monster\KillerCubeGreen.cs" />
     <Compile Include="Monster\KillerCubeRed.cs" />
+    <Compile Include="Shot.cs" />
+    <Compile Include="SoundPlayer.cs" />
+    <Compile Include="SpriteBatchFullScreen.cs" />
+    <Compile Include="StandardMonsterWeapon.cs" />
+    <Compile Include="StandardPlayerWeapon.cs" />
     <Compile Include="StaticItemAndStaticItemInteraction.cs" />
     <Compile Include="Wall.cs" />
     <Compile Include="World.cs" />
@@ -168,8 +181,7 @@
     <Compile Include="Monster\RotaFloater.cs" />
     <Compile Include="Monster\RotaFloaterBrown.cs" />
     <Compile Include="Monster\RotaFloaterCyan.cs" />
-    <Compile Include="Shot.cs" />
-    <Compile Include="ShotAndMovingItemInteraction.cs" />
+    <Compile Include="StandardShot.cs" />
     <Compile Include="SoundEffectFinishedEventArgs.cs" />
     <Compile Include="SoundLibrary.cs" />
     <Compile Include="SpriteBatchWindowed.cs" />

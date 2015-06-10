@@ -1,0 +1,38 @@
+
+1. Player moves into space occupied by boulder. Boulder checks adjacent space. Space is empty so boulder move into it.
+2. Player moves into space occupied by boulder. Boulder checks adjacent space.
+  Space is occupied, so boulder checks if the object pushing it can be pushed back.
+  Space behind player is free, so both player and boulder can move backwards.
+3. Player moves into space occupied by boulder. Boulder checks adjacent space.
+  Space is occupied, so boulder checks if the object pushing it can be pushed back.
+  Space behind player is occupied, so player moves back to original position.
+4. Player moves into space occupied by boulder. Boulder checks adjacent space.
+  Space is occupied, so boulder checks if the object pushing it can be pushed back.
+  Space behind player contains another moveable object, so player must check if the second object can be moved.
+  There is space for the second object to move into, so the player and the first boulder move backwards, and the second object moves too.
+5. Player moves into space occupied by boulder. Boulder checks adjacent space.
+  Space is occupied, so boulder checks if the object pushing it can be pushed back.
+  Space behind player contains another moveable object, so player must check if the second object can be moved.
+  The second object cannot move, so the player moves back to the original position.
+6. Wall-boulder-player-boulder-boulder-space
+7. Wall-space-boulder-shot
+8. Wall-boulder-shot
+
+
+
+Note that shots can push, but cannot start a pushback.
+So boulder and player must have a method that answers the question "can be pushed".
+
+1. Calls Boulder.CanBePushed(byWhom, suggesteddestination) which returns yes
+2. Calls Boulder.CanBePushed(byWhom, suggesteddestination) which
+  Calls Player.CanBeBouncedBack(tile behind player) which returns yes
+3. Calls Boulder.CanBePushed(byWhom, suggesteddestination) which
+  Calls Player.CanBeBouncedBack(tile behind player) which returns no
+4. Calls Boulder.CanBePushed(byWhom, suggesteddestination) which
+  Calls Player.CanBeBouncedBack(tile behind player) which
+  calls 2ndBoulder.CanBeBouncedBack(tile two behind player) which return yes
+5. Calls Boulder.CanBePushed(byWhom, suggesteddestination) which
+  Calls Player.CanBeBouncedBack(tile behind player) which
+  calls 2ndBoulder.CanBeBouncedBack(tile two behind player) which return no
+
+If a shot hits a boulder, it can call CanBeBouncedBack so that it won't try to bounce.

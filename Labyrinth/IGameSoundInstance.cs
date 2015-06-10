@@ -2,7 +2,7 @@
     {
     public interface IGameSoundInstance
         {
-        void Play();
+        void Play(ISoundPlayer soundPlayer);
         float Pitch { get; set; }
         }
     }

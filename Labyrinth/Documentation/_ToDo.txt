@@ -37,7 +37,7 @@ If space ahead is not free, then tend to go back in opposite direction. Or a fre
 If aggressive, and on same or adjacent line to player and moving perpendicular than may change direction.
 
 
--- Stop shot after a certain amount of movementC:\Users\Jon\Documents\Visual Studio 2010\Projects\Labyrinth\WindowsGame1\_ToDo.txt
+-- Stop shot after a certain amount of movement
 
 -- Monsters in front of eggs
 

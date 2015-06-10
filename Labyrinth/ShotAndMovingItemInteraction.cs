@@ -28,6 +28,7 @@ namespace Labyrinth
                 return;
 
             // block, player, shot, monster (death cube & crazy crawler)
+#warning this should really be checking the object capabilities
             var block = this._movingItem as Boulder;
             if (block != null)
                 {
@@ -40,8 +41,16 @@ namespace Labyrinth
                 {
                 this._movingItem.ReduceEnergy(this._shot.Energy);
                 if (this._movingItem.IsAlive())
-                    this._world.Game.SoundLibrary.Play(GameSound.PlayerInjured);
+                    this._world.Game.SoundPlayer.Play(GameSound.PlayerInjured);
                 this._world.ConvertShotToBang(this._shot);
+                return;
+                }
+
+            var mine = this._movingItem as Mine;
+            if (mine != null)
+                {
+                mine.SteppedOnBy(this._shot);
+                this._shot.InstantlyExpire();
                 return;
                 }
 
@@ -54,10 +63,11 @@ namespace Labyrinth
                 if (monster.Mobility == MonsterMobility.Patrolling)
                     monster.Mobility = MonsterMobility.Placid;
             
-                if (monster.ShotsBounceOff)
+                var standardShot = this._shot as StandardShot;
+                if (standardShot != null && monster.ShotsBounceOff)
                     {
-                    if (!this._shot.HasRebounded)
-                        this._shot.Reverse();
+                    if (!standardShot.HasRebounded)
+                        standardShot.Reverse();
                     return;
                     }
             
@@ -67,23 +77,26 @@ namespace Labyrinth
                 if (monster.IsAlive())
                     {
                     var sound = monster.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
-                    this._world.Game.SoundLibrary.Play(sound);
+                    this._world.Game.SoundPlayer.Play(sound);
                     }
                 this._world.ConvertShotToBang(this._shot);
                 return;
                 }
 
-            var shot = this._movingItem as Shot;
-            if (shot != null && shot.ShotType != this._shot.ShotType && shot.Direction == this._shot.Direction.Reversed())
+            var standardShot1 = this._shot as StandardShot;
+            var standardShot2 = this._movingItem as StandardShot;
+            if (standardShot1 != null && standardShot2 != null 
+                && standardShot2.ShotType != standardShot1.ShotType 
+                && standardShot2.Direction == standardShot1.Direction.Reversed())
                 {
-                int minEnergy = Math.Min(shot.Energy, this._shot.Energy);
-                this._world.Game.SoundLibrary.Play(GameSound.StaticObjectShotAndInjured);
-                shot.ReduceEnergy(minEnergy);
-                if (!shot.IsExtant)
-                    this._world.ConvertShotToBang(shot);
-                this._shot.ReduceEnergy(minEnergy);
-                if (!this._shot.IsExtant)
-                    this._world.ConvertShotToBang(this._shot);
+                int minEnergy = Math.Min(standardShot2.Energy, standardShot1.Energy);
+                this._world.Game.SoundPlayer.Play(GameSound.StaticObjectShotAndInjured);
+                standardShot2.ReduceEnergy(minEnergy);
+                if (!standardShot2.IsExtant)
+                    this._world.ConvertShotToBang(standardShot2);
+                standardShot1.ReduceEnergy(minEnergy);
+                if (!standardShot1.IsExtant)
+                    this._world.ConvertShotToBang(standardShot1);
                 }
 
             // todo: add tiles?

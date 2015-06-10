@@ -1,8 +1,7 @@
 using System;
-using System.IO;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Labyrinth
     {
@@ -11,40 +10,46 @@ namespace Labyrinth
     /// </summary>
     public class Game1 : Game
         {
-        private SpriteBatchWindowed _spriteBatch;
-        private World _world;
+        public const int RoomSizeWidth = 16 * Tile.Width;
+        public const int RoomSizeHeight = 10 * Tile.Height;
+        private const int ZoomWhilstWindowed = 2;
 
-        public ISoundLibrary SoundLibrary {get; private set;}
+        public IPlayerInput PlayerInput { get; private set; }
+        public ISoundPlayer SoundPlayer { get; private set; }
+        public ISpriteBatch SpriteBatch { get; private set; }
+        internal World World { get; private set; }
+        
+        private readonly GraphicsDeviceManager _gdm;
+        private readonly SoundLibrary _soundLibrary = new SoundLibrary();
+        private readonly IWorldLoader _worldLoader;
 
-        private const int BackBufferWidth = 1024;
-        private const int BackBufferHeight = 640;
-
+        private Texture2D _digits;
+        private Texture2D _life;
         private int _score;
         private int _displayedScore;
         private int _lives;
         
-        private Texture2D _digits;
-        private Texture2D _life;
-        private Texture2D _rectangleTexture;
-        
-        private readonly GraphicsDeviceManager _gdm;
-
-        public Game1(ISoundLibrary soundLibrary)
+        internal Game1(IPlayerInput playerInput, IWorldLoader worldLoader)
             {
-            if (soundLibrary == null)
-                throw new ArgumentNullException("soundLibrary");
-
+            if (playerInput == null)
+                throw new ArgumentNullException("playerInput");
+            if (worldLoader == null)
+                throw new ArgumentNullException("worldLoader");
+            this.PlayerInput = playerInput;
+            this.PlayerInput.GameInput = new GameInput(this);
+            this._worldLoader = worldLoader;
+            
             this._gdm = new GraphicsDeviceManager(this)
                             {
-                                PreferredBackBufferWidth = BackBufferWidth,
-                                PreferredBackBufferHeight = BackBufferHeight
+                                PreferredBackBufferWidth = RoomSizeWidth * ZoomWhilstWindowed,
+                                PreferredBackBufferHeight = RoomSizeHeight * ZoomWhilstWindowed
                             };
             this.Content.RootDirectory = "Content";
             //this.TargetElapsedTime = new TimeSpan(this.TargetElapsedTime.Ticks * 4);
             this._lives = 2;
             this._score = 0;
             this._displayedScore = 0;
-            this.SoundLibrary = soundLibrary;
+            this.SoundPlayer = new NullSoundPlayer();
             }
 
         /// <summary>
@@ -53,15 +58,13 @@ namespace Labyrinth
         protected override void LoadContent()
             {
             // Create a new SpriteBatch, which can be used to draw textures.
-            this._spriteBatch = new SpriteBatchWindowed(this.GraphicsDevice) {Zoom = 2};
+            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
 
             this._digits = Content.Load<Texture2D>("Display/Digits");
             this._life = Content.Load<Texture2D>("Display/Life");
 
-            _rectangleTexture = new Texture2D(this.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            _rectangleTexture.SetData(new [] { Color.White });
-
-            this.SoundLibrary.LoadContent(this.Content);
+            this._soundLibrary.LoadContent(this.Content);
+            this.SetSoundPlayer(1, 0);
             }
 
         /// <summary>
@@ -69,11 +72,12 @@ namespace Labyrinth
         /// </summary>
         protected override void UnloadContent()
             {
-            if (this._world == null) 
+            if (this.World == null) 
                 return;
             
-            this._world.Dispose();
-            this._world = null;
+            this.World.Dispose();
+            this.SpriteBatch.Dispose();
+            this.World = null;
             }
 
         public void AddScore(int score)
@@ -83,65 +87,45 @@ namespace Labyrinth
 
             this._score += score;
             }
-        
-        public SpriteBatchWindowed SpriteBatchWindowed
-            {
-            get
-                {
-                return this._spriteBatch;
-                }
-            }
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// <param name="gameTime">Time passed since the last call to Update</param>
         protected override void Update(GameTime gameTime)
             {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (this.World == null)
                 {
-                this.Exit();
-                return;
-                }
-
-            SoundLibrary.CheckForStoppedInstances();
-
-            bool newLevel = (this._world == null);
-            if (newLevel)
-                {
-                // must be before playing sounds, otherwise they'll be cut off
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                
-                this._world = LoadLevel("World1.xml");
-                this._world.Reset(this._spriteBatch);
-                
-                this.ResetElapsedTime();
+                LoadLevel("World1.xml");
                 }
             
-            if (!this.IsActive && !newLevel)
-                return;
-            
-            LevelReturnType lrt = _world.Update(gameTime);
+
+            base.Update(gameTime);
+            this._soundLibrary.CheckForStoppedInstances();
+
+            // ReSharper disable once PossibleNullReferenceException
+            LevelReturnType lrt = this.World.Update(gameTime);
             switch (lrt)
                 {
                 case LevelReturnType.FinishedLevel:
-                    this._world.Dispose();
-                    this._world = null;
+                    this.World.Dispose();
+                    this.World = null;
                     this._lives++;
                     break;
                 
                 case LevelReturnType.LostLife:
                     if (this._lives == 0)
+                        {
                         this.Exit();
+                        return;
+                        }
                     this._lives--;
-                    this._world.ResetLevel(_spriteBatch);
+                    this.World.ResetLevelAfterLosingLife(SpriteBatch);
                     break;
                 }
 
-            if (gameTime.IsRunningSlowly && !newLevel)
+            if (gameTime.IsRunningSlowly)
                 {
                 string text = string.Format("{0}: Running slowly", gameTime.TotalGameTime);
                 System.Diagnostics.Trace.WriteLine(text);
@@ -150,136 +134,154 @@ namespace Labyrinth
             if (this._displayedScore < this._score)
                 this._displayedScore++;
 
-            base.Update(gameTime);
+            ProcessGameInput();
+            }
+
+        private void ProcessGameInput()
+            {
+            var gameInput = this.PlayerInput.GameInput;
+            if (gameInput.HasGameExitBeenTriggered)
+                this.Exit();
+
+            if (gameInput.HasToggleFullScreenBeenTriggered)
+                ToggleFullScreen();
+                
+            int changeToEnabled = (gameInput.HasSoundOnBeenTriggered ? 1 : 0) + (gameInput.HasSoundOffBeenTriggered ? -1 : 0);
+            int changeToVolume = (gameInput.HasSoundIncreaseBeenTriggered ? 1 : 0) + (gameInput.HasSoundDecreaseBeenTriggered  ? -1 : 0);
+            SetSoundPlayer(changeToEnabled, changeToVolume);
+
+            if (gameInput.HasMoveToNextLevelBeenTriggered && this.World != null)
+                {
+                this.World.MoveUpALevel();
+                }
             }
 
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// <param name="gameTime">Time passed since the last call to Draw</param>
         protected override void Draw(GameTime gameTime)
             {
             GraphicsDevice.Clear(Color.Black);
 
             // Draw the sprite.
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            if (this._world != null)
+            SpriteBatch.Begin();
+            if (this.World != null)
                 {
-                this._world.Draw(gameTime, _spriteBatch);
-                DrawStatus(_spriteBatch);
+                this.World.Draw(gameTime, SpriteBatch);
+                DrawStatus(SpriteBatch);
                 }
-            _spriteBatch.End();
+            SpriteBatch.End();
 
             base.Draw(gameTime);
             }
             
-        private World LoadLevel(string levelPath)
+        internal void LoadLevel(string level)
             {
-            levelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Levels/" + levelPath);
-            if (!File.Exists(levelPath))
-                throw new Exception("No levels found.");
-
             // Load the World.
-            var x = new WorldLoader(levelPath);
-            var result = new World(this, x);
-            return result;
+            this._worldLoader.LoadWorld(level);
+            this.World = new World(this, this._worldLoader);
+            this.World.ResetLevelForStartingNewLife(this.SpriteBatch);
             }
         
-        private void DrawStatus(SpriteBatchWindowed spriteBatch)
+        private void DrawStatus(ISpriteBatch spriteBatch)
             {
             DrawEnergy(spriteBatch);
             DrawScoreAndLives(spriteBatch);
             }
         
-        private void DrawEnergy(SpriteBatchWindowed spriteBatch)
+        private void DrawEnergy(ISpriteBatch spriteBatch)
             {
-            float zoom = spriteBatch.Zoom;
             var r = new Rectangle(22, 6, 148, 20);
-            DrawRectangle(spriteBatch, r, Color.Blue);
+            spriteBatch.DrawRectangle(r, Color.Blue);
             
             r.Inflate(-2, -2);
-            DrawRectangle(spriteBatch, r, Color.Black);
+            spriteBatch.DrawRectangle(r, Color.Black);
             
-            if (!this._world.Player.IsExtant)
+            r = new Rectangle(32, 12, 128, 8);
+            spriteBatch.DrawRectangle(r, Color.Blue);
+            
+            if (!this.World.Player.IsExtant)
                 return;
             
-            int barLength;
-            Color barColour;
-            
-            if (this._world.Player.Energy >= 4)
-                {
-                barLength = this._world.Player.Energy >> 2;
-                if (barLength > 64)
-                    barLength = 64;
-                if (barLength < 64)
-                    {
-                    var x = (int)((16 + barLength) * zoom);
-                    var w = (int)((64 - barLength) * zoom);
-                    r = new Rectangle(x, 12, w, 8);
-                    DrawRectangle(spriteBatch, r, Color.Blue);
-                    }
-                barColour = Color.Green;
-                }
-            else
-                {
-                barLength = (this._world.Player.Energy + 1) << 4;
-                barColour = Color.Red;
-                }
-            r = new Rectangle(32, 12, (int)(barLength * spriteBatch.Zoom), 8);
-            DrawRectangle(spriteBatch, r, barColour);
+            bool isAboutToDie = this.World.Player.Energy < 4;
+            int barLength = isAboutToDie ? (this.World.Player.Energy + 1) << 4 : Math.Min(this.World.Player.Energy >> 2, 64);
+            Color barColour = isAboutToDie ? Color.Red : Color.Green;
+            r = new Rectangle(32, 12, barLength * 2, 8);
+            spriteBatch.DrawRectangle(r, barColour);
+
+#if DEBUG
+            r = new Rectangle(168, 8, 28, 16);
+            spriteBatch.DrawRectangle(r, Color.Black);
+            DrawValue(spriteBatch, this.World.Player.Energy, 168 + 24, 8);
+#endif
             }
 
-        private void DrawScoreAndLives(SpriteBatchWindowed spriteBatch)
+        private void DrawScoreAndLives(ISpriteBatch spriteBatch)
             {
             var r = new Rectangle(342, 6, 148, 20);
-            DrawRectangle(spriteBatch, r, Color.Blue);
+            spriteBatch.DrawRectangle(r, Color.Blue);
             
             r.Inflate(-2, -2);
-            DrawRectangle(spriteBatch, r, Color.Black);
+            spriteBatch.DrawRectangle(r, Color.Black);
             
-            int s = this._displayedScore;
+            DrawValue(spriteBatch, this._displayedScore, 416, 8);
+
+            for (int i = 0; i < this._lives; i++)
+                {
+                Vector2 destination = new Vector2(480 - ((i + 1) * 16), 8) + spriteBatch.WindowOffset;
+                spriteBatch.DrawEntireTexture(this._life, destination);
+                }
+            }
+
+        private void DrawValue(ISpriteBatch spriteBatch, int value, int right, int top)
+            {
             int i = 1;
             while (true)
                 {
-                int d = s % 10;
-                var source = new Rectangle(d * 6, 0, 6, 16);
-                Vector2 destination = new Vector2(416 - (i * 8), 8) + spriteBatch.WindowOffset;
-                spriteBatch.DrawInWindow(this._digits, destination, source, 0.0f, Vector2.Zero);
-                s = s / 10;
-                if (s == 0)
+                int digit = value % 10;
+                var source = new Rectangle(digit * 6, 0, 6, 16);
+                Vector2 destination = new Vector2(right - (i * 8), top) + spriteBatch.WindowOffset;
+                spriteBatch.DrawTexture(this._digits, destination, source, 0.0f, Vector2.Zero);
+                value = value / 10;
+                if (value == 0)
                     break;
                 i++;
                 }
-            
-            //s = this._world.Player.Energy;
-            //i = 1;
-            //while (true)
-            //    {
-            //    int d = s % 10;
-            //    var source = new Rectangle(d * 6, 0, 6, 16);
-            //    Vector2 destination = new Vector2(500 - (i * 8), 8) + spriteBatch.WindowOffset;
-            //    spriteBatch.DrawInWindow(this._digits, destination, source, Vector2.Zero, SpriteEffects.None);
-            //    s = s / 10;
-            //    if (s == 0)
-            //        break;
-            //    i++;
-            //    }
-            
-            for (i = 0; i < this._lives; i++)
-                {
-                Vector2 destination = new Vector2(480 - ((i + 1) * 16), 8) + spriteBatch.WindowOffset;
-                spriteBatch.DrawInWindow(this._life, destination);
-                }
             }
 
-        private void DrawRectangle(SpriteBatchWindowed spriteBatch, Rectangle r, Color colour)
-            {
-            spriteBatch.DrawInWindow(_rectangleTexture, r, colour);
-            }
-
-        public void ToggleFullScreen()
+        private void ToggleFullScreen()
             {
             this._gdm.ToggleFullScreen();
+            var windowOffset = this.SpriteBatch.WindowOffset;
+            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
+            SpriteBatch.WindowOffset = windowOffset;
+            }
+
+        private static ISpriteBatch GetSpriteBatch(GraphicsDevice graphicsDevice, bool isFullScreen)
+            {
+            var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, ZoomWhilstWindowed);
+            return result;
+            }
+
+        /// <summary>
+        /// Updates the sound player properties
+        /// </summary>
+        /// <param name="changeToEnabled">If set to a positive value then sound will be enabled, if set to a negative value then sound will be disabled</param>
+        /// <param name="changeToVolume">If set to a positive value then the volume will be increased, if set to a negative value then the volume will be decreased.</param>
+        private void SetSoundPlayer(int changeToEnabled, int changeToVolume)
+            {
+            if (changeToVolume != 0)
+                {
+                float newVolume = SoundEffect.MasterVolume + Math.Sign(changeToVolume) * 0.1f;
+                newVolume = Math.Min(1.0f, Math.Max(0.0f, newVolume));
+                SoundEffect.MasterVolume = newVolume;
+                }
+
+            if (changeToEnabled > 0 && !(this.SoundPlayer is SoundPlayer))
+                this.SoundPlayer = new SoundPlayer(this._soundLibrary);
+            else if (changeToEnabled < 0 && !(this.SoundPlayer is NoSoundPlayer))
+                this.SoundPlayer =  new NoSoundPlayer(this._soundLibrary);
             }
         }
     }

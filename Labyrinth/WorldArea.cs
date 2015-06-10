@@ -124,7 +124,7 @@ namespace Labyrinth
             int px = int.Parse(startPos.GetAttribute("PlayerLeft"));
             int py = int.Parse(startPos.GetAttribute("PlayerTop"));
             var p = new TilePos(px, py);
-            if (!this.Area.Contains(p))
+            if (!this.Area.ContainsTile(p))
                 throw new InvalidOperationException();
 
             int startEnergy = int.Parse(startPos.GetAttribute("StartEnergy"));

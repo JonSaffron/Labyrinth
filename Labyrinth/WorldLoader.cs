@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
@@ -12,16 +13,20 @@ namespace Labyrinth
     {
     class WorldLoader : IWorldLoader
         {
-        private readonly XmlDocument _xmlDoc = new XmlDocument();
-        private readonly List<WorldArea> _worldAreas;
+        private XmlDocument _xmlDoc;
+        private List<WorldArea> _worldAreas;
         private Tile[,] _tiles;
         
         private static readonly Random Rnd = new Random();
         
-        public WorldLoader(string file)
+        public void LoadWorld(string levelName)
             {
-            this._xmlDoc.Load(file);
+            string levelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Levels/", levelName);
+            if (!File.Exists(levelPath))
+                throw new ArgumentOutOfRangeException(levelPath);
             
+            this._xmlDoc = new XmlDocument();
+            this._xmlDoc.Load(levelPath);
             this._worldAreas = LoadAreas();
             }
         
@@ -30,7 +35,11 @@ namespace Labyrinth
         /// </summary>
         public int Width
             {
-            get { return _tiles.GetLength(0); }
+            get 
+                { 
+                var result = this._tiles.GetLength(0);
+                return result;
+                }
             }
 
         /// <summary>
@@ -38,7 +47,11 @@ namespace Labyrinth
         /// </summary>
         public int Height
             {
-            get { return _tiles.GetLength(1); }
+            get 
+                { 
+                var result = this._tiles.GetLength(1);
+                return result;
+                }
             }
         
         public Tile this[TilePos tp]
@@ -254,7 +267,7 @@ namespace Labyrinth
                 int timeBeforeHatching = int.Parse(timeBeforeHatchingAttribute);
                 if (isEgg)
                     {
-                    result.DelayBeforeHatching = timeBeforeHatching | 1;
+                    result.SetDelayBeforeHatching(timeBeforeHatching | 1);
                     }
                 }
             string laysMushrooms = mdef.GetAttribute("LaysMushrooms");
@@ -428,11 +441,13 @@ namespace Labyrinth
             return result;
             }
 
-        private static void ReviewPotentiallyOccupiedTiles(ref Tile[,] tiles, List<TileException> exceptions)
+        private static void ReviewPotentiallyOccupiedTiles(ref Tile[,] tiles, ICollection<TileException> exceptions)
             {
-            for (int y = 0; y < tiles.GetLength(1); y++)
+            var cy = tiles.GetLength(1);
+            var cx = tiles.GetLength(0);
+            for (int y = 0; y < cy; y++)
                 {
-                for (int x = 0; x < tiles.GetLength(0); x++)
+                for (int x = 0; x < cx; x++)
                     {
                     Tile t = tiles[x, y];
                     try

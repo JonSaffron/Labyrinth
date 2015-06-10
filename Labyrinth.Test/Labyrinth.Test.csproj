@@ -57,17 +57,15 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestPushAndBounceBack.cs" />
-    <Compile Include="NullGameSoundInstance.cs" />
-    <Compile Include="NullSoundLibrary.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="PlayerController.cs" />
+    <Compile Include="ShootBoulderTest.cs" />
+    <Compile Include="PushAndBounceBackTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SuppressDrawComponent.cs" />
+    <Compile Include="TestMortonCode.cs" />
     <Compile Include="WorldLoaderForTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +76,10 @@
       <Project>{F462AC55-20C5-4202-A82A-E389428BFD02}</Project>
       <Name>Labyrinth</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="PushAndBounceBack.png" />
+    <Content Include="ShootAndPush.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

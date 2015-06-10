@@ -27,8 +27,16 @@ namespace Labyrinth
             {
             get
                 {
-                var result = this.IsExtant ? ObjectSolidity.Impassable : ObjectSolidity.Passable;
+                var result = this.IsExtant ? ObjectSolidity.Impassable : ObjectSolidity.Stationary;
                 return result;
+                }
+            }
+
+        public override int DrawOrder
+            {
+            get
+                {
+                return (int) SpriteDrawOrder.Wall;
                 }
             }
         }

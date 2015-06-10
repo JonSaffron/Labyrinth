@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Labyrinth
 {
@@ -42,14 +43,14 @@ namespace Labyrinth
                     this._world.IncreaseScore(crystal.Score);
                     player.CrystalCollected(crystal);
                     crystal.SetTaken();
-                    int howManyCrystalsRemain = this._world.HowManyCrystalsRemain();
+                    int howManyCrystalsRemain = this._world.GameObjects.DistinctItemsOfType<Crystal>().Count();
                     if (howManyCrystalsRemain == 0)
                         {
-                        this._world.Game.SoundLibrary.Play(GameSound.PlayerFinishesWorld, SoundEffectFinished);
+                        this._world.Game.SoundPlayer.Play(GameSound.PlayerFinishesWorld, SoundEffectFinished);
                         this._world.SetDoNotUpdate();
                         }
                     else
-                        this._world.Game.SoundLibrary.Play(GameSound.PlayerCollectsCrystal);
+                        this._world.Game.SoundPlayer.Play(GameSound.PlayerCollectsCrystal);
                     return;
                 }
 
@@ -63,7 +64,7 @@ namespace Labyrinth
                 var fruit = this._staticItem as Fruit;
                 if (fruit != null)
                 {
-                    this._world.Game.SoundLibrary.Play(GameSound.PlayerEatsFruit);
+                    this._world.Game.SoundPlayer.Play(GameSound.PlayerEatsFruit);
                     player.AddEnergy(fruit.Energy);
                     fruit.SetTaken();
                     return;
@@ -72,7 +73,7 @@ namespace Labyrinth
                 var mushroom = this._staticItem as Mushroom;
                 if (mushroom != null)
                 {
-                    this._world.Game.SoundLibrary.Play(GameSound.PlayerInjured);
+                    this._world.Game.SoundPlayer.Play(GameSound.PlayerInjured);
                     int r = mushroom.CalculateEnergyToRemove(player);
                     if (r > 0)
                         player.ReduceEnergy(r);

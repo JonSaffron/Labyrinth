@@ -86,7 +86,7 @@ namespace Labyrinth.Monster
                 }
             if (newDirection != Direction.None)
                 {
-                TilePos pp = TilePos.GetPositionAfterOneMove(tp, newDirection);
+                TilePos pp = tp.GetPositionAfterOneMove(newDirection);
                 if (w.CanTileBeOccupied(pp, true))
                     {
                     return newDirection;

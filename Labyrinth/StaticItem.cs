@@ -41,6 +41,12 @@ namespace Labyrinth
                 {
                 this._position = value;
                 this._tilePosition = TilePos.TilePosFromPosition(value);
+
+                const int width = Tile.Width;
+                const int height = Tile.Height;
+                var left = (int)Math.Round(value.X - (width / 2.0));
+                var top = (int)Math.Round(value.Y - (height / 2.0));
+                this.BoundingRectangle = new Rectangle(left, top, width, height);
                 }
             }
 
@@ -98,7 +104,6 @@ namespace Labyrinth
                 }
             }
         
-        #warning perhaps this should be a virtual reset method
         /// <summary>
         /// Creates a new animation player for the object
         /// </summary>
@@ -108,28 +113,19 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Gets the boundries of the game object's position for basic collision detection purposes
+        /// Gets the boundaries of the game object's position for basic collision detection purposes
         /// </summary>
-        public virtual Rectangle BoundingRectangle
-            {
-            get
-                {
-                var left = (int)Math.Round(Position.X - AnimationPlayer.Origin.X);
-                var top = (int)Math.Round(Position.Y - AnimationPlayer.Origin.Y);
-
-                return new Rectangle(left, top, Tile.Width, Tile.Height);
-                }
-            }
+        public virtual Rectangle BoundingRectangle { get; protected set; }
 
         /// <summary>
         /// Draws the object if it has any energy remaining
         /// </summary>
         /// <param name="gt">The current gametime</param>
         /// <param name="spriteBatch">The spritebatch to draw to</param>
-        public virtual void Draw(GameTime gt, SpriteBatchWindowed spriteBatch)
+        public virtual void Draw(GameTime gt, ISpriteBatch spriteBatch)
             {
-            if (IsExtant)
-                Ap.Draw(gt, spriteBatch, Position);
+            if (this.IsExtant)
+                this.Ap.Draw(gt, spriteBatch, this.Position);
             }
         
         /// <summary>
@@ -176,8 +172,13 @@ namespace Labyrinth
             {
             get
                 {
-                return ObjectSolidity.Passable;
+                return ObjectSolidity.Stationary;
                 }
             }
+
+        /// <summary>
+        /// Gets the order that objects are drawn in (lowest before highest)
+        /// </summary>
+        public abstract int DrawOrder { get; }
         }
     }

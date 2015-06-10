@@ -25,5 +25,13 @@ namespace Labyrinth
                 return ObjectSolidity.Impassable;
                 }
             }
+
+        public override int DrawOrder
+            {
+            get
+                {
+                return (int) SpriteDrawOrder.Wall;
+                }
+            }
         }
     }

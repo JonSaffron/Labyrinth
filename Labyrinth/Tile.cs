@@ -89,7 +89,7 @@ namespace Labyrinth
             {
             get
                 {
-                bool result = (this._tileTypeByMap == TileTypeByMap.Floor)  && (this._tileTypeByData == TileTypeByData.Free);
+                bool result = (this._tileTypeByMap == TileTypeByMap.Floor) && (this._tileTypeByData == TileTypeByData.Free);
                 return result;
                 }
             }

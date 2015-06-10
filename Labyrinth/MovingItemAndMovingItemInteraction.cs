@@ -10,8 +10,12 @@ namespace Labyrinth
         private readonly World _world;
         private readonly Player _player;
         private readonly Boulder _boulder;
+        private readonly Mine _mine;
         private readonly Monster.Monster _monster1;
         private readonly Monster.Monster _monster2;
+
+        private readonly MovingItem _moveableObject;
+        private readonly MovingItem _insubstantialObject;
 
         public MovingItemAndMovingItemInteraction(World world, MovingItem movingItem1, MovingItem movingItem2)
             {
@@ -30,8 +34,12 @@ namespace Labyrinth
             var items = new[] {movingItem1, movingItem2};
             this._player = items.OfType<Player>().SingleOrDefault();
             this._boulder = items.OfType<Boulder>().SingleOrDefault();
+            this._mine = items.OfType<Mine>().SingleOrDefault();
             this._monster1 = items.OfType<Monster.Monster>().FirstOrDefault();
             this._monster2 = items.OfType<Monster.Monster>().Skip(1).FirstOrDefault();
+
+            this._moveableObject = items.FirstOrDefault(item => item.Solidity == ObjectSolidity.Moveable);
+            this._insubstantialObject = items.FirstOrDefault(item => item.Solidity == ObjectSolidity.Insubstantial);
             }
 
         public void Collide()
@@ -40,64 +48,62 @@ namespace Labyrinth
                 (this._player != null && !this._player.IsExtant)
              || (this._monster1 != null && !this._monster1.IsExtant)
              || (this._monster2 != null && !this._monster2.IsExtant)
-             || (this._boulder != null && !this._boulder.IsExtant))
+             || (this._boulder != null && !this._boulder.IsExtant)
+             || (this._mine != null && !this._mine.IsExtant))
                 return;
+
+            if (this._mine != null)
+                {
+                var steppedOnBy = this._player ?? this._monster1 ?? (MovingItem) this._boulder;
+                this._mine.SteppedOnBy(steppedOnBy);
+                return;
+                }
 
             if (this._player != null && this._monster1 != null)
                 {
                 int monsterEnergy = this._monster1.InstantlyExpire();
                 this._player.ReduceEnergy(monsterEnergy);
-                this._world.AddLongBang(this._monster1.Position);
-                this._world.Game.SoundLibrary.Play(GameSound.PlayerCollidesWithMonster);
+                this._world.AddBang(this._monster1.Position, BangType.Long);
+                this._world.Game.SoundPlayer.Play(GameSound.PlayerCollidesWithMonster);
                 return;
                 }
-                
-            if (this._boulder != null && this._player != null)
+            
+            if (this._moveableObject != null && this._insubstantialObject != null)
                 {
-                Vector2 difference = this._player.Position - this._boulder.Position;
-                float distanceApart = Math.Abs(difference.Length());
-                if (distanceApart >= 40)
-                    return;
-
-                if (this._boulder.Direction == Direction.None && this._player.Direction != Direction.None && !this._player.IsBouncingBack)
+                // test whether moveable object can be pushed or bounced
+                if ((this._insubstantialObject.Capability == ObjectCapability.CanPushOthers || this._insubstantialObject.Capability == ObjectCapability.CanPushOrCauseBounceBack)
+                    && this._moveableObject.Direction == Direction.None && this._insubstantialObject.Direction != Direction.None && !this._insubstantialObject.IsBouncingBack)
                     {
-                    // cannot crush if not moving - can it be pushed?
-                    this._boulder.PushOrBounce(this._player, this._player.Direction);
-                    return;
-                    }
-                
-                // is the player in danger of being crushed?
-                if (this._boulder.Direction == this._player.Direction)
-                    return;
-
-                var playerPosition = this._player.Direction == Direction.None ? this._player.Position : this._player.MovingTowards;
-                var playerTile = TilePos.TilePosFromPosition(playerPosition);
-                var boulderTile = TilePos.TilePosFromPosition(this._boulder.MovingTowards);
-                if (playerTile == boulderTile)
-                    {
-                    this._player.InstantlyExpire();
-                    this._world.AddLongBang(this._player.Position);
-                    }
-                return;
-                }
-
-            if (this._boulder != null && this._monster1 != null)
-                {
-                var monsterTile = TilePos.TilePosFromPosition(this._monster1.Position);
-                var boulderTile = TilePos.TilePosFromPosition(this._boulder.MovingTowards);
-                if (monsterTile == boulderTile)
-                    {
-                    var energy = this._monster1.InstantlyExpire();
-                    this._world.AddLongBang(this._monster1.Position);
-                    this._world.Game.SoundLibrary.Play(GameSound.MonsterDies);
-                    if (!(this._monster1 is DeathCube))
+                    Vector2 difference = this._moveableObject.Position - this._insubstantialObject.Position;
+                    float distanceApart = Math.Abs(difference.Length());
+                    if (distanceApart < 40)
                         {
-                        var score = ((energy >> 1) + 1) * 20;
-                        this._world.IncreaseScore(score);
+                        this._moveableObject.PushOrBounce(this._player, this._insubstantialObject.Direction);
+                        return;
                         }
                     }
-                
-                //return;
+
+                // test whether the moveable object crushing the insubstantial object
+                if (this._moveableObject.Direction != Direction.None && this._moveableObject.Direction != this._insubstantialObject.Direction)
+                    {
+                    var insubstantialObjectPosition = this._insubstantialObject.Direction == Direction.None ? this._insubstantialObject.Position : this._insubstantialObject.MovingTowards;
+                    var insubtantialObjectTile = TilePos.TilePosFromPosition(insubstantialObjectPosition);
+                    var moveableObjectTile = TilePos.TilePosFromPosition(this._moveableObject.MovingTowards);
+                    if (insubtantialObjectTile == moveableObjectTile)
+                        {
+                        var energy = this._insubstantialObject.InstantlyExpire();
+                        this._world.AddBang(this._insubstantialObject.Position, BangType.Long);
+                        if (this._insubstantialObject is Monster.Monster)
+                            {
+                            this._world.Game.SoundPlayer.Play(GameSound.MonsterDies);
+                            if (!(this._insubstantialObject is DeathCube))
+                                {
+                                var score = ((energy >> 1) + 1) * 20;
+                                this._world.IncreaseScore(score);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

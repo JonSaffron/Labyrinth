@@ -29,10 +29,11 @@ namespace Labyrinth
             if (!this._shot.IsExtant || !this._staticItem.IsExtant)
                 return;
 
-            if (this._staticItem is ForceField)
+            var standardShot = this._shot as StandardShot;
+            if (standardShot != null && this._staticItem is ForceField)
                 {
-                if (!this._shot.HasRebounded)
-                    this._shot.Reverse();
+                if (!standardShot.HasRebounded)
+                    standardShot.Reverse();
                 return;
                 }
 
@@ -45,12 +46,12 @@ namespace Labyrinth
             if (!(this._staticItem is Fruit) && !(this._staticItem is Grave) && !(this._staticItem is Mushroom) && !(this._staticItem is CrumblyWall)) 
                 return;
 
-            this._world.Game.SoundLibrary.Play(GameSound.StaticObjectShotAndInjured);
+            this._world.Game.SoundPlayer.Play(GameSound.StaticObjectShotAndInjured);
             this._staticItem.ReduceEnergy(this._shot.Energy);
             if (this._staticItem.IsExtant)
                 this._world.ConvertShotToBang(this._shot);
             else
-                this._world.AddShortBang(this._staticItem.Position);
+                this._world.AddBang(this._staticItem.Position, BangType.Short);
             this._shot.InstantlyExpire();
             }
         }

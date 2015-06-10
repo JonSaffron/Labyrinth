@@ -7,9 +7,8 @@ namespace Labyrinth.Monster
         {
         public KillerCubeRed(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.NormalAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/KillerCubeRed", 3);
+            this.SetNormalAnimation(Animation.LoopingAnimation(World, "Sprites/Monsters/KillerCubeRed", 3));
             
-            this.CurrentVelocity = AnimationPlayer.BaseSpeed;
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
             }
@@ -43,13 +42,13 @@ namespace Labyrinth.Monster
                 isCurrentlyMovingTowardsFreeSpace = false;
             else
                 {
-                TilePos pp = TilePos.GetPositionAfterOneMove(tp, m.Direction);
+                TilePos pp = tp.GetPositionAfterOneMove(m.Direction);
                 isCurrentlyMovingTowardsFreeSpace = w.CanTileBeOccupied(pp, true);
                 
                 if (isCurrentlyMovingTowardsFreeSpace)
                     {
                     Vector2 newPos = pp.ToPosition();
-                    if (!MonsterMovement.IsInSameRoom(m.TilePosition, newPos) && MonsterRandom.Next(4) != 0)
+                    if (!MonsterMovement.IsInSameRoom(m.Position, newPos) && MonsterRandom.Next(4) != 0)
                         isCurrentlyMovingTowardsFreeSpace = false;
                     }
                 }
@@ -93,7 +92,7 @@ namespace Labyrinth.Monster
 
                 if (newDirection != Direction.None)
                     {
-                    TilePos pp = TilePos.GetPositionAfterOneMove(tp, newDirection);
+                    TilePos pp = tp.GetPositionAfterOneMove(newDirection);
                     if (!w.CanTileBeOccupied(pp, true))
                         newDirection = Direction.None;
                     }

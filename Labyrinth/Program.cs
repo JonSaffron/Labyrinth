@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Forms;
 
 namespace Labyrinth
     {
@@ -7,22 +8,25 @@ namespace Labyrinth
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main(string[] args)
+        static int Main(string[] args)
             {
+            int result;
             try
                 {
-                using (var soundLibrary = new SoundLibrary())
+                var playerInput = new PlayerInput();
+                var wl = new WorldLoader();
+                using (var game = new Game1(playerInput, wl))
                     {
-                    using (var game = new Game1(soundLibrary))
-                        {
-                        game.Run();
-                        }
+                    game.Run();
                     }
+                result = 0;
                 }
             catch (ApplicationException e)
                 {
-                System.Windows.Forms.MessageBox.Show(e.Message);
+                MessageBox.Show(e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                result = 1;
                 }
+            return result;
             }
         }
     }

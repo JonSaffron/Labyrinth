@@ -6,94 +6,138 @@ namespace Labyrinth
     internal abstract class MovingItem : StaticItem
         {
         public Direction Direction { get; set;}
-        protected float CurrentVelocity { get; set; }
         public Vector2 MovingTowards { get; protected set; }
-        protected ObjectCapability ObjectCapability { get; set; }
+        public Vector2 OriginalPosition { get; protected set; }
+        protected decimal CurrentVelocity { get; set; }
 
         public abstract bool Update(GameTime gameTime);
 
         protected MovingItem(World world, Vector2 position) : base(world, position)
             {
             this.MovingTowards = position;
-            this.ObjectCapability = ObjectCapability.CannotMoveOthers;
             }
 
         /// <summary>
         /// Moves a sprite from its current position towards its destination
         /// </summary>
-        /// <param name="maxMovementRemaining">On entry: specifies the maximum distance that the sprite can travel. On exit: specifies how much of that distance remains</param>
-        /// <param name="hasArrivedAtDestination">On exit: specifies whether the sprite has arrived at the point it was moving towards</param>
-        /// <remarks>On exit, if hasArrivedAtDestination is set, then maxMovementRemaining will be above 0, 
-        /// otherwise hasArrivedAtDestination will be false, and maxMovementRemaining will be 0.</remarks>
-        protected virtual void ContinueMove(ref float maxMovementRemaining, out bool hasArrivedAtDestination)
+        /// <param name="timeRemaining">On entry: specifies the amount of time that the sprite can use to travel. On exit: specifies how much of that time remains</param>
+        /// <returns>True if the object has been able to complete a move to the tile at MovingTowards, or False if it ran out of time during the movement.</returns>
+        /// <remarks>On exit, when returning True, the timeRemaining parameter will return a positive value, 
+        /// otherwise timeRemaining will return 0.</remarks>
+        protected virtual bool TryToCompleteMoveToTarget(ref double timeRemaining)
             {
-            if (maxMovementRemaining <= 0)
-                throw new ArgumentOutOfRangeException("maxMovementRemaining");
+            if (timeRemaining <= 0)
+                throw new ArgumentOutOfRangeException("timeRemaining");
+            if (this.CurrentVelocity == 0)
+                throw new InvalidOperationException("Object has no velocity.");
 
-            var distanceToDestination = Vector2.Distance(this.Position, this.MovingTowards);
-            hasArrivedAtDestination = (distanceToDestination <= maxMovementRemaining);
+            var timeToReachDestination = Vector2.Distance(this.Position, this.MovingTowards) / (double) this.CurrentVelocity;
+            bool hasArrivedAtDestination = (timeToReachDestination <= timeRemaining);
             if (hasArrivedAtDestination)
                 {
-                maxMovementRemaining -= distanceToDestination;
+                timeRemaining -= timeToReachDestination;
                 this.Position = this.MovingTowards;
+                StandStill();
                 }
             else
                 {
                 var vectorBetweenPoints = this.MovingTowards - this.Position;
                 var unitVectorOfTravel = Vector2.Normalize(vectorBetweenPoints);
-                var displacement = unitVectorOfTravel * maxMovementRemaining;
+                var distanceToTravel = (float) (timeRemaining * (float) this.CurrentVelocity);
+                var displacement = unitVectorOfTravel * distanceToTravel;
                 this.Position += displacement;
-                maxMovementRemaining = 0;
+                timeRemaining = 0;
                 }
+            return hasArrivedAtDestination;
             }
 
-        protected PushStatus CanBePushed(Direction direction, bool isBouncingBack)
+        private PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction, bool isBounceBackPossible)
             {
-            var result = this.CanMoveTo(direction, isBouncingBack) ? PushStatus.Yes : PushStatus.No;
+            if (this.Solidity != ObjectSolidity.Moveable)
+                return PushStatus.No;
+
+            bool isPushable = byWhom.Capability == ObjectCapability.CanPushOthers || byWhom.Capability == ObjectCapability.CanPushOrCauseBounceBack;
+            if (!isPushable)
+                return PushStatus.No;
+
+            // first check if the object can be pushed
+            if (this.CanMoveInDirection(direction, isBounceBackPossible))
+                return PushStatus.Yes;
+
+            // is bounce back possible?
+            if (byWhom.Capability != ObjectCapability.CanPushOrCauseBounceBack || !isBounceBackPossible)
+                return PushStatus.No;
+
+            var result = byWhom.CanMoveInDirection(direction.Reversed(), false) ? PushStatus.Bounce : PushStatus.No;
             return result;
             }
 
-        protected PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction)
+        /// <summary>
+        /// Determines whether an object can move in the specified direction
+        /// </summary>
+        /// <param name="direction">The direction to test for</param>
+        /// <returns>True if the object is able to begin a movement in the specified direction, even if it might then bounce backwards</returns>
+        internal bool CanMoveInDirection(Direction direction)
             {
-            var result = CanBePushed(direction, false);
-            if (result == PushStatus.No)
-                {
-                result = byWhom.CanBePushed(direction.Reversed(), true);
-                if (result == PushStatus.Yes)
-                    result = PushStatus.Bounce;
-                }
+            var result = this.CanMoveInDirection(direction, true);
             return result;
             }
 
-        public virtual void BounceBack(Direction direction)
+        /// <summary>
+        /// Used to begin a push or bounce action by the player
+        /// </summary>
+        /// <param name="byWhom">The game object that is acting on the boulder</param>
+        /// <param name="direction">Which direction the specified game object is directing the boulder</param>
+        public void PushOrBounce(MovingItem byWhom, Direction direction)
             {
-            throw new InvalidOperationException();
-            }
-
-        public bool IsBouncingBack
-            {
-            get
+            var ps = CanBePushedOrBounced(byWhom, direction, true);
+            switch (ps)
                 {
-                var result = this.Direction != Direction.None && Math.Abs(this.CurrentVelocity - AnimationPlayer.BounceBackSpeed) < 1.0;
-                return result;
+                case PushStatus.No:
+                    return;
+
+                case PushStatus.Yes:
+                    {
+                    System.Diagnostics.Trace.WriteLine(string.Format("{0} is pushing {1}", byWhom.GetType().Name, this.GetType().Name));
+                    this.Move(direction, this.StandardSpeed);
+                    return;
+                    }
+
+                case PushStatus.Bounce:
+                    {
+                    System.Diagnostics.Trace.WriteLine(string.Format("{0} is bouncing {1}", byWhom.GetType().Name, this.GetType().Name));
+                    var reverseDirection = direction.Reversed();
+                    this.Move(reverseDirection, this.BounceBackSpeed);
+                    byWhom.Move(reverseDirection, this.BounceBackSpeed);
+                    this.World.Game.SoundPlayer.Play(GameSound.BoulderBounces);
+                    return;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
                 }
             }
 
-        // can a moving object move onto a particular square?
-        // the square must not be occupied by an impassable object,
-        // and any moveable objects must be able to move off in the same direction
-
-
-
-        protected bool CanMoveTo(Direction direction, bool isBouncingBack)
+        /// <summary>
+        /// Returns whether or not the object can begin to move in the specified direction
+        /// </summary>
+        /// <param name="direction">The direction to test for</param>
+        /// <param name="isBounceBackPossible">Specifies whether the movement is allowed to start a bounce back</param>
+        /// <returns>True if the object can start to move in the specified direction</returns>
+        /// <remarks>In order to move, the target tile must not be occupied by an impassable object, and 
+        /// a moveable object must be able to move off the target tile in the same direction.</remarks>
+        private bool CanMoveInDirection(Direction direction, bool isBounceBackPossible)
             {
             TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
-            var objectsOnTile = this.World.GetItemsOnTile(proposedDestination);
+            if (!this.World.IsTileWithinWorld(proposedDestination))
+                return false;
+            var objectsOnTile = this.World.GameObjects.GetItemsOnTile(proposedDestination);
             foreach (var item in objectsOnTile)
                 {
                 switch (item.Solidity)
                     {
-                    case ObjectSolidity.Passable:
+                    case ObjectSolidity.Stationary:
+                    case ObjectSolidity.Insubstantial:
                         continue;
 
                     case ObjectSolidity.Impassable:
@@ -102,15 +146,12 @@ namespace Labyrinth
                     case ObjectSolidity.Moveable:
                         {
                         var mi = item as MovingItem;
-                        if (mi == null || this.ObjectCapability == ObjectCapability.CannotMoveOthers)
+                        if (mi == null)
                             return false;
-                        bool canCauseBounceBack = this.ObjectCapability == ObjectCapability.CanPushOrCauseBounceBack && !isBouncingBack;
-                        var canMove = canCauseBounceBack 
-                            ? mi.CanBePushedOrBounced(this, direction)
-                            : mi.CanBePushed(direction, isBouncingBack);
-                        if (canMove == PushStatus.No)
-                            return false;
-                        continue;
+                        var canMove = mi.CanBePushedOrBounced(this, direction, isBounceBackPossible);
+                        if (canMove == PushStatus.Yes || canMove == PushStatus.Bounce)
+                            continue;
+                        return false;
                         }
 
                     default:
@@ -121,10 +162,70 @@ namespace Labyrinth
             return true;
             }
 
-        internal bool TestCanMoveTo(Direction direction)
+        /// <summary>
+        /// Starts the object moving
+        /// </summary>
+        /// <param name="direction">The direction to move in</param>
+        /// <param name="speed">The speed to move at</param>
+        protected void Move(Direction direction, decimal speed)
             {
-            var result = this.CanMoveTo(direction, false);
-            return result;
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1}", this.GetType().Name, direction));
+            this.Direction = direction;
+            this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();
+            this.CurrentVelocity = speed;
+            }
+
+        protected void StandStill()
+            {
+            this.Direction = Direction.None;
+            this.CurrentVelocity = 0;
+            }
+
+        public bool IsMoving
+            {
+            get
+                {
+                var result = this.Direction != Direction.None && this.CurrentVelocity != 0 && this.MovingTowards != this.Position;
+                return result;
+                }
+            }
+
+        /// <summary>
+        /// Gets an indication of how solid the object is
+        /// </summary>
+        public override ObjectSolidity Solidity
+            {
+            get
+                {
+                return ObjectSolidity.Insubstantial;
+                }
+            }
+
+        /// <summary>
+        /// Gets an indication of what effect this object can have on others
+        /// </summary>
+        public virtual ObjectCapability Capability
+            {
+            get
+                {
+                return ObjectCapability.CannotMoveOthers;
+                }
+            }
+
+        protected virtual decimal StandardSpeed
+            {
+            get
+                {
+                return AnimationPlayer.BaseSpeed;
+                }
+            }
+
+        protected virtual decimal BounceBackSpeed
+            {
+            get
+                {
+                return AnimationPlayer.BounceBackSpeed;
+                }
             }
         }
     }

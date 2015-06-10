@@ -1,8 +1,8 @@
-﻿namespace Labyrinth.Test
+﻿namespace Labyrinth
     {
     class NullGameSoundInstance : IGameSoundInstance
         {
-        public void Play()
+        public void Play(ISoundPlayer soundPlayer)
             {
             // nothing to do
             }

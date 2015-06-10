@@ -6,13 +6,11 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Labyrinth
     {
-    public sealed class SoundLibrary : IDisposable, ISoundLibrary
+    public sealed class SoundLibrary : IDisposable
         {
         private readonly Dictionary<GameSound, SoundEffect> _sounds;
         private readonly Dictionary<SoundEffectInstance, Tuple<GameSound, SoundEffectFinished>> _trackingInstances = new Dictionary<SoundEffectInstance, Tuple<GameSound, SoundEffectFinished>>();
 
-        public delegate void SoundEffectFinished(object sender, SoundEffectFinishedEventArgs args);
-    
         public SoundLibrary()
             {
             this._sounds = new Dictionary<GameSound, SoundEffect>();
@@ -28,32 +26,21 @@ namespace Labyrinth
                 }
             }
 
-        /// <summary>
-        /// Retrieves an instance of a sound effect.
-        /// </summary>
-        /// <param name="gameSound">Identifies the sound effect</param>
-        /// <returns>A reference to a sound effect. This should be retained whilst the sound is playing.</returns>
-        public IGameSoundInstance GetSoundEffectInstance(GameSound gameSound)
+        public SoundEffect this[GameSound gameSound]
             {
-            var soundEffectInstance = this._sounds[gameSound].CreateInstance();
-            var result = new GameSoundInstance(soundEffectInstance);
+            get
+                {
+                var result = this._sounds[gameSound];
+                return result;
+                }
+            }
+
+        public SoundEffectInstance GetTrackedInstance(GameSound gameSound, SoundEffectFinished callback)
+            {
+            var result = this[gameSound].CreateInstance();
+            var tuple = new Tuple<GameSound, SoundEffectFinished>(gameSound, callback);
+            this._trackingInstances.Add(result, tuple);
             return result;
-            }
-
-        public void Play(GameSound gameSound)
-            {
-            SoundEffect soundEffect = this._sounds[gameSound];
-            soundEffect.Play();
-            }
-
-        public void Play(GameSound gameSound, SoundEffectFinished callback)
-            {
-            if (callback == null)
-                throw new ArgumentNullException("callback");
-
-            SoundEffectInstance soundEffectInstance = this._sounds[gameSound].CreateInstance();
-            this._trackingInstances.Add(soundEffectInstance, new Tuple<GameSound, SoundEffectFinished>(gameSound, callback));
-            soundEffectInstance.Play();
             }
 
         public void CheckForStoppedInstances()

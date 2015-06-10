@@ -1,5 +1,7 @@
 ﻿namespace Labyrinth
     {
+    public delegate void SoundEffectFinished(object sender, SoundEffectFinishedEventArgs args);
+
     /// <summary>
     /// How the map describes each tile's usage
     /// </summary>
@@ -16,7 +18,7 @@
         Wall,
 
         /// <summary>
-        /// Tile is marked as being potentially occupied by an object
+        /// Tile is expected to be occupied by an object
         /// </summary>
         PotentiallyOccupied
         }
@@ -77,17 +79,22 @@
     enum ObjectSolidity
         {
         /// <summary>
-        /// An object can move into a space occupied by a passable object
+        /// An object that does not move such as a crystal. Only a single stationary object can occupy a given space. Insubstatial objects can move into the same space though.
         /// </summary>
-        Passable,
+        Stationary,
 
         /// <summary>
-        /// An object can push a moveable object away and take its place
+        /// An object that is typically on the move like the player. Any number of insubstantial objects can occupy the same space.
+        /// </summary>
+        Insubstantial,
+        
+        /// <summary>
+        /// A solid object that can be moved such as the boulder. It may occupy the same position as a stationary object.
         /// </summary>
         Moveable,
 
         /// <summary>
-        /// An object cannot move into a space occupied by an impassable object
+        /// A solid object such as a wall. Only a single object impassable object can occupy a given position.
         /// </summary>
         Impassable
         }
@@ -103,12 +110,12 @@
         CannotMoveOthers,
 
         /// <summary>
-        /// An object that can push another object in the same direction
+        /// An object that can push another object in the same direction (i.e. shot)
         /// </summary>
         CanPushOthers,
 
         /// <summary>
-        /// An object that can push another objecct in the same direction or cause it to bounce backwards
+        /// An object that can push another objecct in the same direction or cause it to bounce backwards (i.e. player)
         /// </summary>
         CanPushOrCauseBounceBack
         }
@@ -186,6 +193,13 @@
         Hatching
         }
 
+    public enum FiringState
+        {
+        None,
+        Pulse,
+        Continuous
+        }
+
     public enum GameSound
         {
         BoulderBounces,
@@ -211,5 +225,21 @@
         MonsterShattersIntoNewLife,
         PlayerStartsNewLife,
         StaticObjectShotAndInjured
+        }
+
+    /// <summary>
+    /// Lower number items will be drawn first.
+    /// </summary>
+    public enum SpriteDrawOrder
+        {
+        Wall = 0,
+        StaticItem = 1,
+        ForceField = 2,
+        StaticMonster = 3,
+        MovingMonster = 4,
+        Player = 5,
+        Boulder = 6,
+        Shot = 7,
+        Bang = 8
         }
     }

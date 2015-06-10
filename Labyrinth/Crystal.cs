@@ -27,6 +27,14 @@ namespace Labyrinth
                 }
             }
 
+        public override int DrawOrder
+            {
+            get
+                {
+                return (int) SpriteDrawOrder.StaticItem;
+                }
+            }
+
         public void SetTaken()
             {
             this._isTaken = true;

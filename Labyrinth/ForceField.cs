@@ -22,5 +22,13 @@ namespace Labyrinth
                 return result;
                 }
             }
+
+        public override int DrawOrder
+            {
+            get
+                {
+                return (int) SpriteDrawOrder.ForceField;
+                }
+            }
         }
     }

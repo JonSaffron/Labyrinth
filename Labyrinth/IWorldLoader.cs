@@ -6,6 +6,8 @@ namespace Labyrinth
     {
     internal interface IWorldLoader
         {
+        void LoadWorld(string levelName);
+
         int GetMaximumWorldAreaId();
         StartState GetStartStateForWorldAreaId(int id);
         int GetWorldAreaIdForTilePos(TilePos tp);

@@ -1,5 +1,5 @@
 current monster data 400 to 7bf
-
+-------------------------------
 400 to 4bf		-- room number - FF indicates this is a free slot, FE indicates this is a template
 4c0 to 57f		-- if egg then points towards template monster
 					otherwise controls behaviour
@@ -98,7 +98,7 @@ bdc				-- delay until game's main loop ends
 	offset 3	-- position between tiles (between 0 and 3)
 	offset 4	-- direction (0 left, 1 right, 2 up, 3 down, 4 still)
 	offset 5	-- contents of tile being occupied?
-	offset 6	-- index into above lists identifying monster
+	offset 6	-- index into above lists identifying monster, or for a shot: 2 indicates that it has rebounded
 	offset 7	-- toggle flag with &FF indicating moving at double speed, 0 at normal speed
 	offset 8	-- not really used
 	offset 9	-- the base index of the animation to show
@@ -152,22 +152,22 @@ bdc				-- delay until game's main loop ends
 					third is energy
 					fourth is not used
 
-0: 27 24 6E		cyan rotafloater, rolling, follows player, 6e
-1: A3 69 32		diamond demon, placid, shoots, follows player, lays eggs, 32
-2: 25 26 64		red flitterbug, attracted, follows player, 64
-3: 25 42 78		cyan thresher, attracted, follows player, lays eggs & mushrooms, 78
-4: A7 28 96		red killer cube, rolling, shoots, follows player, 96
-5: 25 66 6E		red flitterbug, attracted, follows player, lays eggs, 6e
-6: A3 69 32		diamond demon, placid, shoots, follows player, lays eggs, 32
-7: 25 2E 28		crazy crawler, attracted, follows player, 28
-8: 26 27 96		cyan flitterbug, cautious, follows player, 96
-9: 45 0B 78		tiger moth, attracted, not sure whether it moves rooms, shoots once shot, lays mushrooms, 78
-A: 25 3A A0		brown flitterbug, attracted, follows player, splits, a0
-B: 25 7A A0		brown flitterbug, attracted, follows player, splis, lays eggs, a0
-C: A4 6C 78		butterfly, full pursuit, shoots, follows player, lays eggs, 78
-D: A6 7D 78		joker, cautious, shoots, follows player, lays eggs, 78
-E: 25 2E 28		crazy crawler, attracted, follows player, 28
-F: 26 02 64		cyan thresher, cautious, follows player, lays mushrooms, 64
+0: 27 24 6E		cyan rotafloater,	rolling,		follows player,										110
+1: A3 69 32		diamond demon,		placid,			follows player, shoots, lays eggs,					50
+2: 25 26 64		red flitterbug,		attracted,		follows player,										100
+3: 25 42 78		cyan thresher,		attracted,		follows player, lays eggs & mushrooms,				120
+4: A7 28 96		red killer cube,	rolling,		follows player, shoots,								150
+5: 25 66 6E		red flitterbug,		attracted,		follows player, lays eggs,							110
+6: A3 69 32		diamond demon,		placid,			follows player, shoots, lays eggs,					50
+7: 25 2E 28		crazy crawler,		attracted,		follows player,										40
+8: 26 27 96		cyan flitterbug,	cautious,		follows player,										150
+9: 45 0B 78		tiger moth,			attracted,		moves rooms,	shoots once shot, lays mushrooms,	120
+A: 25 3A A0		brown flitterbug,	attracted,		follows player, splits,								160
+B: 25 7A A0		brown flitterbug,	attracted,		follows player, splits, lays eggs,					160
+C: A4 6C 78		butterfly,			full pursuit,	follows player, shoots, lays eggs,					120
+D: A6 7D 78		joker,				cautious,		follows player, shoots, splits, lays eggs,			120
+E: 25 2E 28		crazy crawler,		attracted,		follows player,										40
+F: 26 02 64		cyan thresher,		cautious,		follows player, lays mushrooms,						100
 
 5800			-- start of screen memory
 
@@ -3706,6 +3706,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 27F1 8D C9 0B  STA 0BC9                 -- store zero in the flag
 27F4 60        RTS                      
 
+
+
 27F5 AD CE 0B  LDA 0BCE                 -- get countdown
 27F8 30 04     BMI 27FE                 -- branch when negative to choose random monster
 27FA CE CE 0B  DEC 0BCE                 -- decrement countdown
@@ -4246,8 +4248,9 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2BA9 A9 FF     LDA #FF                  
 2BAB 85 88     STA 88                   -- reset flag. This can be used later to indicate that someone/thing has been shot
 2BAD BD 06 0C  LDA 0C06,X               -- get identifier (will be 1 for player shot, 3 for block, otherwise the animation slot of the monster firing)
-2BB0 C9 03     CMP #03                  
-2BB2 D0 73     BNE 2C27                 -- branch if not block
+2BB0 C9 03     CMP #03                  -- are we dealing with the block?
+2BB2 D0 73     BNE 2C27                 -- if not, branch to process shot
+
 2BB4 BD 00 0C  LDA 0C00,X               -- get status/occupant of slot
 2BB7 C9 FE     CMP #FE                  -- get status of block
 2BB9 D0 0E     BNE 2BC9                 -- 
@@ -4317,7 +4320,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2C3E C9 1F     CMP #1F                  -- is it off-screen?
 2C40 F0 6C     BEQ 2CAE                 -- branch if so
 2C42 C9 14     CMP #14                  
-2C44 90 3E     BCC 2C84                 -- branch if 13 or less (wall)
+2C44 90 3E     BCC 2C84                 -- branch if 13 or less (wall is 12 or less, 13 is block)
 2C46 9D 05 0C  STA 0C05,X               -- get previous contents of tile
 2C49 20 90 1C  JSR 1C90                 -- combine x & y back to tile number
 2C4C 9D 01 0C  STA 0C01,X               -- store new position
@@ -5505,6 +5508,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3476 88        DEY                      
 3477 10 F9     BPL 3472                 
 3479 60        RTS                      
+
 347A A2 02     LDX #02                  
 347C A0 01     LDY #01                  
 347E A9 12     LDA #12                  
@@ -5897,26 +5901,32 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3784 29 7F     AND #7F                  -- only lowest 7 bits
 3786 F0 F5     BEQ 377D                 -- but not 0 - try again if zero
 3788 99 00 04  STA 0400,Y               -- store monster room number
-378B 4A        LSR A                    -- divide by 2
+
+378B 4A        LSR A                    -- divide room number by 2
 378C 29 07     AND #07                  -- keep only the 3 lowest bits (so A is between 0 and 7)
 378E 85 70     STA 70                   -- store the number for later
+
 3790 AD 44 FE  LDA FE44                 -- get random number
 3793 29 07     AND #07                  -- only lowest 3 bits (between 0 and 7)
 3795 18        CLC                      
-3796 65 70     ADC 70                   -- add together to give a number between 0 and 14
-3798 0A        ASL A                    -- multiply by 2
-3799 0A        ASL A                    -- multiply by 2
-379A AA        TAX                      
+3796 65 70     ADC 70                   -- add together to give a number between 0 and 14 to index into data at 57c0
+
+3798 0A        ASL A                    -- multiply by 2 (number now equals 0, 2, 4 ... 28)
+3799 0A        ASL A                    -- multiply by 2 (number now equals 0, 4, 8 ... 56)
+379A AA        TAX                      -- store the result
+
 379B A9 FF     LDA #FF                  
 379D 99 80 05  STA 0580,Y               -- store unset monster tile number
-37A0 99 40 06  STA 0640,Y               -- set maximum energy
+37A0 99 40 06  STA 0640,Y               -- set maximum energy (which may be overwritten in a moment)
+
 37A3 BD C0 57  LDA 57C0,X               
 37A6 99 C0 04  STA 04C0,Y               -- set monster movement & behaviour 
+
 37A9 BD C1 57  LDA 57C1,X               
 37AC 99 00 07  STA 0700,Y               -- set monster type
 
 37AF AD A6 0B  LDA 0BA6                 -- get world number
-37B2 F0 06     BEQ 37BA                 -- branch if world 2
+37B2 F0 06     BEQ 37BA                 -- branch ovver setting energy if already on world 2
 37B4 BD C2 57  LDA 57C2,X               
 37B7 99 40 06  STA 0640,Y               -- set monster energy
 

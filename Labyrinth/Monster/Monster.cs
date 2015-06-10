@@ -13,8 +13,7 @@ namespace Labyrinth.Monster
         private Func<Monster, World, Direction> _determineDirection;
 
         public ChangeRooms ChangeRooms { get; set; }
-        private MonsterState _monsterState;
-        private int _delayBeforeHatching;
+        private MonsterState _monsterState = MonsterState.Normal;
         [CanBeNull] private GameTimer _hatchingTimer;
         protected bool Flitters { private get; set; }
         private bool _flitterFlag;
@@ -25,13 +24,16 @@ namespace Labyrinth.Monster
         public bool ShotsBounceOff { get; protected set; }
         public MonsterShootBehaviour MonsterShootBehaviour { private get; set;}
         
+        [NotNull]
+        private IMonsterWeapon _weapon = new StandardMonsterWeapon();
+
         private Animation _normalAnimation;
         private readonly Animation _eggAnimation;
         private readonly Animation _hatchingAnimation;
 
         private readonly int _originalEnergy;
 
-        private float _stepTime;
+        private double _stepTime;
 
         protected Monster(World world, Vector2 position, int energy) : base(world, position)
             {
@@ -40,7 +42,6 @@ namespace Labyrinth.Monster
             
             this._eggAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 3);
             this._hatchingAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 1);
-            this.MonsterState = MonsterState.Normal;
             }
             
         public static Monster Create(string type, World world, Vector2 position, int energy)
@@ -95,25 +96,16 @@ namespace Labyrinth.Monster
                 }
             }
 
-        public int DelayBeforeHatching
+        public void SetDelayBeforeHatching(int value)
             {
-            get
-                {
-                var result = this._delayBeforeHatching;
-                return result;
-                }
-            set
-                {
-                this._delayBeforeHatching = value;
-                this.MonsterState = MonsterState.Egg;
-                this._hatchingTimer = new GameTimer(this.World.Game, value * AnimationPlayer.GameClockResolution, EggIsHatching, false);
-                }
+            this.MonsterState = MonsterState.Egg;
+            this._hatchingTimer = new GameTimer(this.World.Game, value*AnimationPlayer.GameClockResolution, EggIsHatching, false);
             }
 
         private void EggIsHatching(object sender, EventArgs args)
             {
             this.MonsterState = MonsterState.Hatching;
-            this.World.Game.SoundLibrary.Play(GameSound.EggHatches, EggHasHatched);
+            this.World.Game.SoundPlayer.Play(GameSound.EggHatches, EggHasHatched);
             }
 
         private void EggHasHatched(object sender, SoundEffectFinishedEventArgs args)
@@ -121,29 +113,21 @@ namespace Labyrinth.Monster
             this.MonsterState = MonsterState.Normal;
             }
 
-        public Animation NormalAnimation
+        protected void SetNormalAnimation(Animation value)
             {
-            get
-                {
-                var result = this._normalAnimation;
-                return result;
-                }
-            set
-                {
-                this._normalAnimation = value;
-                if (this.MonsterState == MonsterState.Normal)
-                    this.Ap.PlayAnimation(value);
-                }
+            this._normalAnimation = value;
+            if (this.MonsterState == MonsterState.Normal)
+                this.Ap.PlayAnimation(value);
             }
 
-        public MonsterState MonsterState
+        private MonsterState MonsterState
             {
             get
                 {
                 var result = this._monsterState;
                 return result;
                 }
-            private set
+            set
                 {
                 Animation animation;
                 switch (value)
@@ -155,7 +139,7 @@ namespace Labyrinth.Monster
                         animation = this._hatchingAnimation;
                         break;
                     case MonsterState.Normal:
-                        animation = this.NormalAnimation;
+                        animation = this._normalAnimation;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -184,47 +168,52 @@ namespace Labyrinth.Monster
             if (this.IsAlive())
                 {
                 var gs = this.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
-                this.World.Game.SoundLibrary.Play(gs);
+                this.World.Game.SoundPlayer.Play(gs);
                 return;
                 }
 
-            this.World.Game.SoundLibrary.Play(GameSound.MonsterDies);
-            this.World.AddLongBang(this.Position);
+            this.World.Game.SoundPlayer.Play(GameSound.MonsterDies);
+            this.World.AddBang(this.Position, BangType.Long);
             if (this.SplitsOnHit)
                 {
                 for (int i = 1; i <= 2; i++)
                     this.World.AddDiamondDemon(this);
-                this.World.Game.SoundLibrary.Play(GameSound.MonsterShattersIntoNewLife);
+                this.World.Game.SoundPlayer.Play(GameSound.MonsterShattersIntoNewLife);
                 }
             }
-        
-        private void SetDirectionAndDestination(World w)
+
+        public override int DrawOrder
+            {
+            get
+                {
+                var result = this.IsStill ? SpriteDrawOrder.StaticMonster : SpriteDrawOrder.MovingMonster;
+                return (int) result;
+                }
+            }
+
+        private bool SetDirectionAndDestination(World w)
             {
             if (this.Mobility == MonsterMobility.Static || this.IsEgg)
                 {
-                this.Direction = Direction.None;
-                return;
+                this.StandStill();
+                return false;
                 }   
 
             if (this._determineDirection == null)
                 throw new InvalidOperationException("Direction function not set.");
             Direction d = this._determineDirection(this, this.World);
-            
             if (d == Direction.None)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("The monster's DetermineDirection routine should not return None.");
             
-            this.Direction = MonsterMovement.UpdateDirectionWhereMovementBlocked(this, w, d);
-            if (this.Direction == Direction.None)
+            d = MonsterMovement.UpdateDirectionWhereMovementBlocked(this, w, d);
+            if (d == Direction.None)
                 {
-                this.MovingTowards = Vector2.Zero;
+                this.StandStill();
+                return false;
                 }
-            else
-                {
-                TilePos tp = this.TilePosition;
-                TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(tp, this.Direction);
-                Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
-                this.MovingTowards = potentiallyMovingTowards;
-                }
+
+            this.Move(d, this.StandardSpeed);
+            return true;
             }
         
         /// <summary>
@@ -232,6 +221,8 @@ namespace Labyrinth.Monster
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
+            this.OriginalPosition = this.Position;
+
             bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this, this.World);
             
             if (this.IsEgg && this._hatchingTimer != null)
@@ -245,30 +236,28 @@ namespace Labyrinth.Monster
                 return false;
 
             bool result = false;
-            var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            _stepTime += elapsed;
-            float remainingMovement = (CurrentVelocity * (_flitterFlag ? 2 : 1)) * elapsed;
-            bool needToChooseDirection = (this.Direction == Direction.None);
-            while (remainingMovement > 0)
+            var remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
+            this._stepTime += remainingTime;
+            while (remainingTime > 0)
                 {
-                if (needToChooseDirection)
+                if (_stepTime >= AnimationPlayer.GameClockResolution)
                     {
-                    this.SetDirectionAndDestination(this.World);
-                    if (this.Flitters)
-                        this._flitterFlag = !this._flitterFlag;
-                    remainingMovement *= this._flitterFlag ? 2.0f : 0.5f;
+                    _stepTime -= AnimationPlayer.GameClockResolution;
+                    DoMonsterAction(inSameRoom);
+                    }
 
-                    if (_stepTime >= AnimationPlayer.GameClockResolution)
+                if (!this.IsMoving)
+                    {
+                    if (!this.SetDirectionAndDestination(this.World))
+                        break;
+
+                    if (this.Flitters)
                         {
-                        _stepTime -= AnimationPlayer.GameClockResolution;
-                        DoMonsterAction(inSameRoom);
+                        this._flitterFlag = !this._flitterFlag;
                         }
                     }
 
-                if (this.Direction == Direction.None)
-                    break;
-
-                this.ContinueMove(ref remainingMovement, out needToChooseDirection);
+                this.TryToCompleteMoveToTarget(ref remainingTime);
                 result = true;
                 }
 
@@ -282,12 +271,12 @@ namespace Labyrinth.Monster
 
         private void DoMonsterAction(bool inSameRoom)
             {
-            if (this.LaysMushrooms && !this.IsEgg && this.World.ShotExists() && inSameRoom && (MonsterRandom.Next(256) & 1) == 0 && IsDirectionCompatible(this.World.Player.Direction, this.Direction))
+            if (this.LaysMushrooms && !this.IsEgg && this.World.GameObjects.DoesShotExist() && inSameRoom && (MonsterRandom.Next(256) & 1) == 0 && IsDirectionCompatible(this.World.Player.Direction, this.Direction))
                 {
                 TilePos tp = this.TilePosition;
                 if (!this.World.IsStaticItemOnTile(tp))
                     {
-                    this.World.Game.SoundLibrary.Play(GameSound.MonsterLaysMushroom);
+                    this.World.Game.SoundPlayer.Play(GameSound.MonsterLaysMushroom);
                     this.World.AddMushroom(tp);
                     }
                 }
@@ -297,11 +286,11 @@ namespace Labyrinth.Monster
                 TilePos tp = this.TilePosition;
                 if (this.World.IsStaticItemOnTile(tp))
                     {
-                    this.World.Game.SoundLibrary.Play(GameSound.MonsterLaysEgg);
+                    this.World.Game.SoundPlayer.Play(GameSound.MonsterLaysEgg);
                     Monster m = this.Clone();
                     m.ResetAnimationPlayerAfterClone();
                     m.Energy = this._originalEnergy;
-                    m.DelayBeforeHatching = (MonsterRandom.Next(256) & 0x1f) + 8;
+                    m.SetDelayBeforeHatching((MonsterRandom.Next(256) & 0x1f) + 8);
                     m.LaysEggs = false;
                     this.World.AddMonster(m);
                     }
@@ -309,7 +298,7 @@ namespace Labyrinth.Monster
 
             if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && (MonsterRandom.Next(256) & 3) != 0 && this.Energy >= 4 && this.World.Player.IsExtant && MonsterMovement.IsPlayerInSight(this, this.World))
                 {
-                CheckToFire();
+                this._weapon.FireIfYouLike(this, this.World);
                 }
             }
 
@@ -342,66 +331,43 @@ namespace Labyrinth.Monster
             return result;
             }
 
-        protected override void ContinueMove(ref float maxMovementRemaining, out bool hasArrivedAtDestination)
+        protected override bool TryToCompleteMoveToTarget(ref double timeRemaining)
             {
-            Rectangle currentRoom = World.GetContainingRoom(this.TilePosition);
+            Rectangle currentRoom = World.GetContainingRoom(this.Position);
             
-            base.ContinueMove(ref maxMovementRemaining, out hasArrivedAtDestination);
+            var result = base.TryToCompleteMoveToTarget(ref timeRemaining);
 
-            Rectangle newRoom = World.GetContainingRoom(this.TilePosition);
+            Rectangle newRoom = World.GetContainingRoom(this.Position);
             if (currentRoom != newRoom)
                 {
-                Rectangle playerRoom = World.GetContainingRoom(World.Player.TilePosition);
+                Rectangle playerRoom = World.GetContainingRoom(World.Player.Position);
                 if (currentRoom == playerRoom)
-                    this.World.Game.SoundLibrary.Play(GameSound.MonsterLeavesRoom);
+                    this.World.Game.SoundPlayer.Play(GameSound.MonsterLeavesRoom);
                 else if (newRoom == playerRoom)
-                    this.World.Game.SoundLibrary.Play(GameSound.MonsterEntersRoom);
+                    this.World.Game.SoundPlayer.Play(GameSound.MonsterEntersRoom);
+                }
+            return result;
+            }
+
+        /// <summary>
+        /// Gets an indication of how solid the object is
+        /// </summary>
+        public override ObjectSolidity Solidity
+            {
+            get
+                {
+                var result = this.IsStill ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
+                return result;
                 }
             }
 
-        private void CheckToFire()
+        protected override decimal StandardSpeed
             {
-            TilePos tp = this.TilePosition;
-            TilePos playerPosition = this.World.Player.TilePosition;
-            
-            Direction firingDirection = Direction.None;
-            int xDiff = Math.Sign(tp.X - playerPosition.X);
-            int yDiff = Math.Sign(tp.Y - playerPosition.Y);
-            if (xDiff == 0)
+            get
                 {
-                switch (yDiff)
-                    {
-                    case 1: firingDirection = Direction.Up; break;
-                    case -1: firingDirection = Direction.Down; break;
-                    }
+                var result = AnimationPlayer.BaseSpeed * (this.Flitters && this._flitterFlag ? 2 : 1);
+                return result;
                 }
-            else if (yDiff == 0)
-                {
-                switch (xDiff)
-                    {
-                    case 1: firingDirection = Direction.Left; break;
-                    case -1: firingDirection = Direction.Right; break;
-                    }
-                }
-                
-            if (firingDirection == Direction.None)
-                return;
-
-            // Do any walls intervene?
-            TilePos startPos = TilePos.GetPositionAfterOneMove(this.TilePosition, firingDirection);
-            TilePos testPos = startPos;
-            while (true)
-                {
-                bool isClear = this.World.CanTileBeOccupied(testPos, false);
-                if (!isClear)
-                    return;
-                testPos = TilePos.GetPositionAfterOneMove(testPos, firingDirection);
-                if (testPos == playerPosition)
-                    break;
-                }
-                
-            this.World.AddShot(ShotType.Monster, startPos.ToPosition(), this.Energy >> 2, firingDirection);
-            this.World.Game.SoundLibrary.Play(GameSound.MonsterShoots);
             }
         }
     }

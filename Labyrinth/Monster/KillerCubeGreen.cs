@@ -7,7 +7,7 @@ namespace Labyrinth.Monster
         {
         public KillerCubeGreen(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.NormalAnimation = Animation.LoopingAnimation(World, "sprites/Monsters/KillerCubeGreen", 3);
+            this.SetNormalAnimation(Animation.LoopingAnimation(World, "sprites/Monsters/KillerCubeGreen", 3));
             
             this.Mobility = MonsterMobility.Static;
             this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;

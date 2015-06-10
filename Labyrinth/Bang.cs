@@ -13,10 +13,10 @@ namespace Labyrinth
             switch (bangType)
                 {
                 case BangType.Short:
-                    a = Animation.SingleAnimation(World, "Sprites/Props/ShortBang", 3);
+                    a = Animation.SingleRunAnimation(World, "Sprites/Props/ShortBang", 3);
                     break;
                 case BangType.Long:
-                    a = Animation.SingleAnimation(World, "Sprites/Props/LongBang", 3);
+                    a = Animation.SingleRunAnimation(World, "Sprites/Props/LongBang", 3);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("bangType");
@@ -38,6 +38,14 @@ namespace Labyrinth
             get
                 {
                 return this._isExtant;
+                }
+            }
+
+        public override int DrawOrder
+            {
+            get
+                {
+                return (int) SpriteDrawOrder.Bang;
                 }
             }
         }

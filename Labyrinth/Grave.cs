@@ -11,5 +11,13 @@ namespace Labyrinth
             var a = Animation.StaticAnimation(World, "Sprites/Props/Grave");
             this.Ap.PlayAnimation(a);
             }
+
+        public override int DrawOrder
+            {
+            get
+                {
+                return (int) SpriteDrawOrder.StaticItem;
+                }
+            }
         }
     }

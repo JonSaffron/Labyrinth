@@ -3,35 +3,65 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
-    public class SpriteBatchWindowed : SpriteBatch
+    public class SpriteBatchWindowed : ISpriteBatch
         {
-        public float Zoom { get; set; }
+        private readonly SpriteBatch _spriteBatch;
+        private readonly float _zoom;
+        private readonly Texture2D _rectangleTexture;
+
         public Vector2 WindowOffset { get; set; }
-        
-        public SpriteBatchWindowed(GraphicsDevice graphicsDevice) : base(graphicsDevice)
+
+        public SpriteBatchWindowed(GraphicsDevice graphicsDevice, float zoom)
             {
-            Zoom = 1;
+            this._spriteBatch = new SpriteBatch(graphicsDevice);
+            this._zoom = zoom;
+
+            this._rectangleTexture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            this._rectangleTexture.SetData(new [] { Color.White });
             }
         
-        public void DrawInWindow(Texture2D texture, Vector2 position)
+        public void Begin()
             {
-            this.DrawInWindow(texture, position, null, 0.0f, Vector2.Zero);
+            this._spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            }
+
+        public void End()
+            {
+            this._spriteBatch.End();
+            }
+
+        public void Dispose()
+            {
+            this.Dispose(true);
+            }
+
+        private void Dispose(bool disposing)
+            {
+            if (disposing && !this._spriteBatch.IsDisposed)
+                {
+                this._spriteBatch.Dispose();
+                }
+            }
+
+        public void DrawEntireTexture(Texture2D texture, Vector2 position)
+            {
+            this.DrawTexture(texture, position, null, 0.0f, Vector2.Zero);
             }
         
-        public void DrawInWindow(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None)
+        public void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None)
             {
-            Vector2 destination = (position - WindowOffset) * Zoom;
-            base.Draw(texture, destination, sourceRectangle, Color.White, rotation, origin, Zoom, effects, 0);
+            Vector2 destination = (position - WindowOffset) * _zoom;
+            this._spriteBatch.Draw(texture, destination, sourceRectangle, Color.White, rotation, origin, _zoom, effects, 0);
             }
         
-        public void DrawInWindow(Texture2D texture, Rectangle destinationRectangle, Color color)
+        public void DrawRectangle(Rectangle destinationRectangle, Color color)
             {
-            var x = (int)(destinationRectangle.X * Zoom);
-            var y = (int)(destinationRectangle.Y * Zoom);
-            var width = (int)(destinationRectangle.Width * Zoom);
-            var height = (int)(destinationRectangle.Height * Zoom);
+            var x = (int)(destinationRectangle.X * _zoom);
+            var y = (int)(destinationRectangle.Y * _zoom);
+            var width = (int)(destinationRectangle.Width * _zoom);
+            var height = (int)(destinationRectangle.Height * _zoom);
             var r = new Rectangle(x, y, width, height);
-            base.Draw(texture, r, color);
+            this._spriteBatch.Draw(this._rectangleTexture, r, color);
             }
         }
     }

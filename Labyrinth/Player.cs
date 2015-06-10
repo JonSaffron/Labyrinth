@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Labyrinth.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -23,22 +23,24 @@ namespace Labyrinth
     class Player : MovingItem
         {
         // Movement
-        //public Vector2 MovingTowards {get; private set;}
         private Direction _currentDirectionFaced; // can't be none
-        private TimeSpan _lastChangeOfDirection;
+        private TimeSpan _whenCanMoveInDirectionFaced;
+        private readonly TimeSpan _delayBeforeMovingInDirectionFaced = TimeSpan.FromMilliseconds(75);
+        
+        [NotNull] private IPlayerWeapon _weapon1;
+        [NotNull] private IPlayerWeapon _weapon2;
 
         // Animations
-        private readonly Animation _leftRightAnimation;
-        private readonly Animation _upAnimation;
-        private readonly Animation _downAnimation;
+        private readonly Animation _leftRightMovingAnimation;
+        private readonly Animation _upMovingAnimation;
+        private readonly Animation _downMovingAnimation;
+        private readonly Animation _leftRightStaticAnimation;
+        private readonly Animation _upStaticAnimation;
+        private readonly Animation _downStaticAnimation;
 
         private readonly List<int> _crystalsCollected = new List<int>();
         private readonly List<int> _listOfWorldAreaIdsVisited = new List<int>();
 
-        // Constants for controling horizontal movement
-        private const float StandardSpeed = AnimationPlayer.BaseSpeed * 2;
-
-        private int _countOfShotsBeforeCostingEnergy;
         private double _time;
         private int _countBeforeDecrementingEnergy;
         private const double TicksOfClock = 0.05f;
@@ -48,31 +50,33 @@ namespace Labyrinth
         private bool _whichFootFlag;
 
         /// <summary>
-        /// Constructors a new player.
+        /// Constructs a new player.
         /// </summary>
         public Player(World world, Vector2 position, int energy) : base(world, position)
             {
             // Load animated textures.
-            _leftRightAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerLeftFacing", 1);
-            _upAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerUpFacing", 1);
-            _downAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerDownFacing", 1);
+            this._leftRightMovingAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerLeftFacing", 1);
+            this._upMovingAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerUpFacing", 1);
+            this._downMovingAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerDownFacing", 1);
+            this._leftRightStaticAnimation = Animation.StaticAnimation(World, "Sprites/Player/PlayerLeftFacing");
+            this._upStaticAnimation = Animation.StaticAnimation(World, "Sprites/Player/PlayerUpFacing");
+            this._downStaticAnimation = Animation.StaticAnimation(World, "Sprites/Player/PlayerDownFacing");
 
             Ap.NewFrame += PlayerSpriteNewFrame;
             
+            this._weapon1 = new StandardPlayerWeapon();
+            this._weapon2 = new MineLayer();
             Reset(position, energy);
 
-            this._playerMovesFootOne = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
-            this._playerMovesFootTwo = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
+            this._playerMovesFootOne = world.Game.SoundPlayer.GetSoundEffectInstance(GameSound.PlayerMoves);
+            this._playerMovesFootTwo = world.Game.SoundPlayer.GetSoundEffectInstance(GameSound.PlayerMoves);
             this._playerMovesFootTwo.Pitch = -0.15f;
-
-            this.ObjectCapability = ObjectCapability.CanPushOrCauseBounceBack;
-            this.CurrentVelocity = StandardSpeed;
             }
 
         private void PlayerSpriteNewFrame(object sender, EventArgs e)
             {
             var playerMoves = _whichFootFlag ? this._playerMovesFootOne : this._playerMovesFootTwo;
-            playerMoves.Play();
+            playerMoves.Play(this.World.Game.SoundPlayer);
             _whichFootFlag = !_whichFootFlag;
             }
 
@@ -85,13 +89,14 @@ namespace Labyrinth
             {
             Position = position;
             Energy = energy;
-            _currentDirectionFaced = Direction.Left;
+            this._currentDirectionFaced = Direction.Left;
             Direction = Direction.None;
-            Ap.PlayAnimation(_leftRightAnimation);
-            this._countOfShotsBeforeCostingEnergy = 0;  // first shot will cost energy
+            Ap.PlayAnimation(_leftRightStaticAnimation);
             this._time = 0;
             this._countBeforeDecrementingEnergy = 0;
 
+            this._weapon1.Reset();
+            this._weapon2.Reset();
             CheckIfEnteredNewWorldArea();
             }
 
@@ -104,57 +109,69 @@ namespace Labyrinth
                 }
             }
 
+        public override int DrawOrder
+            {
+            get
+                {
+                return (int) SpriteDrawOrder.Player;
+                }
+            }
+
         /// <summary>
         /// Handles input, performs physics, and animates the player sprite.
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
             bool result = false;
-            var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            float remainingMovement = CurrentVelocity * elapsed;
-            bool needToChooseDirection = (this.Direction == Direction.None);
-            while (remainingMovement > 0)
+            var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
+            this.OriginalPosition = this.Position;
+            while (timeRemaining > 0)
                 {
-                if (needToChooseDirection)
-                    this.SetDirectionAndDestination(gameTime);
-
-                if (this.Direction == Direction.None)
+                if (!this.IsMoving && !this.SetDirectionAndDestination(gameTime))
                     break;
 
-                this.ContinueMove(ref remainingMovement, out needToChooseDirection);
-                if (CheckIfEnteredNewWorldArea())
-                    this.World.Game.SoundLibrary.Play(GameSound.PlayerEntersNewLevel);
                 result = true;
+                this.TryToCompleteMoveToTarget(ref timeRemaining);
+                if (CheckIfEnteredNewWorldArea())
+                    this.World.Game.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
                 }
 
             if (!IsExtant)
                 return false;
             
-            SetAnimation();
+            SetAnimation(result);
             UpdateEnergy(gameTime);
 
             return result;
             }
 
-        private void SetAnimation()
+        private void SetAnimation(bool isMoving)
             {
             Animation a;
+            SpriteEffects se;
             switch (this._currentDirectionFaced)
                 {
                 case Direction.Left:
+                    a = isMoving ? this._leftRightMovingAnimation : this._leftRightStaticAnimation;
+                    se = SpriteEffects.None;
+                    break;
                 case Direction.Right:
-                    a = _leftRightAnimation;
+                    a = isMoving ? this._leftRightMovingAnimation : this._leftRightStaticAnimation;
+                    se = SpriteEffects.FlipHorizontally;
                     break;
                 case Direction.Up:
-                    a = _upAnimation;
+                    a = isMoving ? this._upMovingAnimation : this._upStaticAnimation;
+                    se = SpriteEffects.None;
                     break;
                 case Direction.Down:
-                    a = _downAnimation;
+                    a = isMoving ? this._downMovingAnimation : this._downStaticAnimation;
+                    se = SpriteEffects.None;
                     break;
                 default:
                     throw new InvalidOperationException();
                 }
             Ap.PlayAnimation(a);
+            Ap.SpriteEffect = se;
             }
 
         private void UpdateEnergy(GameTime gameTime)
@@ -165,77 +182,49 @@ namespace Labyrinth
                 this._time -= TicksOfClock;
 
                 this._countBeforeDecrementingEnergy--;
-                if (this._countBeforeDecrementingEnergy < 0)
+                if (this._countBeforeDecrementingEnergy > 0) 
+                    continue;
+                _countBeforeDecrementingEnergy = (((this.Energy >> 1) ^ 0xFF) & 0x7F) + 1;
+
+                if (this.Energy == 0)
                     {
-                    _countBeforeDecrementingEnergy = ((this.Energy >> 1) ^ 0xFF) & 0x7F;
-                    if (this.Energy > 0)
-                        ReduceEnergy(1);
+                    UponDeath();
+                    return;
                     }
+
+                ReduceEnergy(1);
                 }
             }
 
         /// <summary>
         /// Updates the player's velocity and position based on input, gravity, etc.
         /// </summary>
-        private void SetDirectionAndDestination(GameTime gameTime)
+        private bool SetDirectionAndDestination(GameTime gameTime)
             {
-            this.Direction = Direction.None;
-            bool isFiring;
-            bool moveToNextLevel;
-            bool toggleFullScreen;
-            Direction requestedDirection = Input.GetRequestedDirectionOfMovement(out isFiring, out moveToNextLevel, out toggleFullScreen);
+            IPlayerInput playerInput = this.World.Game.PlayerInput;
+            playerInput.ProcessInput(gameTime);
 
-            if (isFiring)
-                {
-                TryToFire();
-                }
-            else
-                {
-                if (moveToNextLevel)
-                    this.World.MoveUpALevel();
-                if (toggleFullScreen)
-                    this.World.Game.ToggleFullScreen();
-                }
+            this._weapon1.Fire(this, this.World, playerInput.FireStatus1, this._currentDirectionFaced);
+            this._weapon2.Fire(this, this.World, playerInput.FireStatus2, this._currentDirectionFaced);
+            var requestedDirection = playerInput.Direction;
             if (requestedDirection == Direction.None)
-                return;
-                            
+                return false;
+            
             // deal with changing which direction the player faces
             if (requestedDirection != this._currentDirectionFaced)
                 {
                 this._currentDirectionFaced = requestedDirection;
-                this._lastChangeOfDirection = gameTime.TotalGameTime;
-                return;
+                this._whenCanMoveInDirectionFaced = gameTime.TotalGameTime.Add(this._delayBeforeMovingInDirectionFaced);
+                return false;
                 }
-            TimeSpan timeSinceChangedDirection = gameTime.TotalGameTime - this._lastChangeOfDirection;
-            if (timeSinceChangedDirection.Milliseconds < 75)
-                return;
+            if (gameTime.TotalGameTime < this._whenCanMoveInDirectionFaced)
+                return false;
             
             // start new movement
-            if (this.CanMoveTo(requestedDirection, false))
-                {
-                TilePos potentiallyMovingTowardsTile = TilePos.GetPositionAfterOneMove(this.TilePosition, requestedDirection);
-                Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
-
-                this.Direction = requestedDirection;
-                this.MovingTowards = potentiallyMovingTowards;
-                this.CurrentVelocity = StandardSpeed;
-                }
-            }
-
-        private void TryToFire()
-            {
-            TilePos startPos = TilePos.GetPositionAfterOneMove(this.TilePosition, this._currentDirectionFaced);
-            if (this.Energy < 4 || this.World.GetItemsOnTile(startPos).OfType<Wall>().Any()) 
-                return;
-
-            this.World.AddShot(ShotType.Player, startPos.ToPosition(), this.Energy >> 2, this._currentDirectionFaced);
-            this.World.Game.SoundLibrary.Play(GameSound.PlayerShoots);
-            _countOfShotsBeforeCostingEnergy--;
-            if (_countOfShotsBeforeCostingEnergy < 0)
-                {
-                _countOfShotsBeforeCostingEnergy = 3;
-                ReduceEnergy(1);
-                }
+            var result = this.CanMoveInDirection(requestedDirection);
+            if (result)
+                this.Move(requestedDirection, StandardSpeed);
+            return result;
             }
 
         private bool CheckIfEnteredNewWorldArea()
@@ -248,23 +237,11 @@ namespace Labyrinth
             return true;
             }
 
-        public override void BounceBack(Direction direction)
-            {
-            if (this.CanMoveTo(direction, true))
-                {
-                this.Direction = direction;
-                this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();
-                this.CurrentVelocity = AnimationPlayer.BounceBackSpeed;
-                }
-            }
-
         public void AddEnergy(int energy)
             {
             if (energy <= 0)
                 throw new ArgumentOutOfRangeException("energy", energy, "Must be above 0.");
-            this.Energy += energy;
-            if (this.Energy > 255)
-                this.Energy = 255;
+            this.Energy = Math.Min(this.Energy + energy, 255);
             }
 
         public override void ReduceEnergy(int energyToRemove)
@@ -289,11 +266,12 @@ namespace Labyrinth
 
         private void UponDeath()
             {
+            System.Diagnostics.Trace.WriteLine("*** Player Died ***");
             this.Energy = 0;
             this._countBeforeDecrementingEnergy = 0;
 
-            this.World.Game.SoundLibrary.Play(GameSound.PlayerDies, SoundEffectFinished);
-            this.World.AddLongBang(this.Position);
+            this.World.Game.SoundPlayer.Play(GameSound.PlayerDies, SoundEffectFinished);
+            this.World.AddBang(this.Position, BangType.Long);
             this.World.AddGrave(this.TilePosition);
             }
 
@@ -318,17 +296,32 @@ namespace Labyrinth
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="spriteBatch"></param>
-        public override void Draw(GameTime gameTime, SpriteBatchWindowed spriteBatch)
+        public override void Draw(GameTime gameTime, ISpriteBatch spriteBatch)
             {
             if (!IsExtant)
                 return;
             
             // Flip the sprite to face the way we are moving.
             Ap.SpriteEffect = _currentDirectionFaced == Direction.Right ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-            bool isMoving = this.Direction != Direction.None && this.Direction == this._currentDirectionFaced;
 
             // Draw that sprite.
-            Ap.Draw(gameTime, spriteBatch, Position, isMoving);
+            Ap.Draw(gameTime, spriteBatch, Position);
+            }
+
+        public override ObjectCapability Capability
+            {
+            get
+                {
+                return ObjectCapability.CanPushOrCauseBounceBack;
+                }
+            }
+
+        protected override decimal StandardSpeed
+            {
+            get
+                {
+                return AnimationPlayer.BaseSpeed * 2;
+                }
             }
         }
     }

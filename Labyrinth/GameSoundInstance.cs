@@ -11,11 +11,6 @@ namespace Labyrinth
             this._sourceEffectInstance = soundEffectInstance;
             }
 
-        public void Play()
-            {
-            this._sourceEffectInstance.Play();
-            }
-
         public float Pitch
             {
             get
@@ -26,6 +21,11 @@ namespace Labyrinth
                 {
                 this._sourceEffectInstance.Pitch = value;
                 }
+            }
+
+        public void Play(ISoundPlayer soundPlayer)
+            {
+            soundPlayer.Play(this._sourceEffectInstance);
             }
         }
     }

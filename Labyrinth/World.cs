@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Labyrinth.Annotations;
 using Microsoft.Xna.Framework;
@@ -11,26 +12,22 @@ namespace Labyrinth
     {
     class World : IDisposable
         {
+        public const int WindowSizeX = 16;
+        public const int WindowSizeY = 10;
+
         private int _gameClock;
         private double _time;
         private int _levelUnlocked;
-        
-        // Entities in the World.
-        private readonly Player _player;
-        private readonly GameObjectCollection _gameObjects;
-        
-        private bool _doNotUpdate;
-        private readonly IWorldLoader _wl;
-        
-        // World content.   
-        private ContentManager _contentManager;
-
-        public const int WindowSizeX = 16;
-        public const int WindowSizeY = 10;
-            
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
+        private bool _doNotUpdate;
+        
+        [NotNull] public readonly Game1 Game;
+        [NotNull] public readonly GameObjectCollection GameObjects;
+        [NotNull] public readonly Player Player;
 
-        public readonly Game1 Game;
+        [NotNull] private readonly IWorldLoader _wl;
+        [NotNull] private readonly ContentManager _contentManager;
+        [NotNull] private readonly List<StaticItem>[] _itemsToDrawByZOrder;
 
         public World(Game1 game, IWorldLoader worldLoader)
             {
@@ -40,16 +37,12 @@ namespace Labyrinth
             this._contentManager = new ContentManager(game.Services, "Content");
 
             var gameItems = worldLoader.GetGameObjects(this).ToList();
-            this._gameObjects = new GameObjectCollection(gameItems);
-            this._player = gameItems.OfType<Player>().Single();
-            }
+            this.GameObjects = new GameObjectCollection(worldLoader.Width, worldLoader.Height, gameItems);
+            this.Player = gameItems.OfType<Player>().Single();
 
-        public Player Player
-            {
-            get
-                {
-                return _player;
-                }
+            this._itemsToDrawByZOrder = new List<StaticItem>[10];
+            for (int i = 0; i < this._itemsToDrawByZOrder.GetLength(0); i++)
+                this._itemsToDrawByZOrder[i] = new List<StaticItem>();
             }
 
         public Texture2D LoadTexture(string textureName)
@@ -58,20 +51,24 @@ namespace Labyrinth
             return result;
             }
 
-        public void ResetLevel(SpriteBatchWindowed spw)
+        public void ResetLevelAfterLosingLife(ISpriteBatch spw)
             {
-            this._gameObjects.RemoveBangsAndShots();
+            this.GameObjects.RemoveBangsAndShots();
             var worldAreaId = this._wl.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             StartState ss = this._wl.GetStartStateForWorldAreaId(worldAreaId);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
-            Reset(spw);
+            this.GameObjects.UpdatePosition(this.Player);
+            ResetLevelForStartingNewLife(spw);
             }
         
-        public void Reset(SpriteBatchWindowed spw)
+        public void ResetLevelForStartingNewLife(ISpriteBatch spw)
             {
-            Point roomStart = GetContainingRoom(Player.TilePosition).Location;
-            spw.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
-            this.Game.SoundLibrary.Play(GameSound.PlayerStartsNewLife);
+            if (spw != null)
+                {
+                Point roomStart = GetContainingRoom(this.Player.Position).Location;
+                spw.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
+                }
+            this.Game.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
             this._levelReturnType = LevelReturnType.Normal;
             _doNotUpdate = false;
             }
@@ -95,14 +92,9 @@ namespace Labyrinth
         [PublicAPIAttribute]
         protected void Dispose(bool isDisposing)
             {
-            if (isDisposing)
+            if (isDisposing && !this.IsDisposed)
                 {
-                if (this._contentManager != null)
-                    {
-                    this._contentManager.Unload();
-                    this._contentManager.Dispose();
-                    this._contentManager = null;
-                    }
+                this._contentManager.Dispose();
                 }
 
             this.IsDisposed = true;
@@ -114,7 +106,7 @@ namespace Labyrinth
         /// impossible to escape past the left or right edges, but allowing things
         /// to jump beyond the top of the World and fall off the bottom.
         /// </summary>
-        private bool IsTileWithinWorld(TilePos tp)
+        public bool IsTileWithinWorld(TilePos tp)
             {
             var x = tp.X;
             var y = tp.Y;
@@ -127,12 +119,19 @@ namespace Labyrinth
             this.Game.AddScore(score);
             }
         
+        /// <summary>
+        /// Tests whether the specified position can be occupied.
+        /// </summary>
+        /// <remarks>This is only to be used to determine whether moving objects can (temporarily) occupy the tile</remarks>
+        /// <param name="tp">The tile position to test</param>
+        /// <param name="treatMoveableItemsAsImpassable">If true then an item such as the boulder will be treated as impassable</param>
+        /// <returns>True if the specified tile can be occupied</returns>
         public bool CanTileBeOccupied(TilePos tp, bool treatMoveableItemsAsImpassable)
             {
             if (!IsTileWithinWorld(tp))
                 return false;
 
-            var objectsAtPosition = GetItemsOnTile(tp);
+            var objectsAtPosition = this.GameObjects.GetItemsOnTile(tp);
             var isTileAlreadyOccupied = treatMoveableItemsAsImpassable
                 ? objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable || gi.Solidity == ObjectSolidity.Moveable)
                 : objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable);
@@ -140,18 +139,18 @@ namespace Labyrinth
             return result;
             }
 
+        /// <summary>
+        /// Tests whether any non-moving items are currently occupying the specified position
+        /// </summary>
+        /// <remarks>This is only to be used when looking to place non-moving items</remarks>
+        /// <param name="tp">The tile position to test</param>
+        /// <returns>True if there is already a static item occupying the specified position</returns>
         public bool IsStaticItemOnTile(TilePos tp)
             {
-            var objectsAtPosition = GetItemsOnTile(tp);
-            var result = objectsAtPosition.Any(gi => !(gi is MovingItem));
+            var objectsAtPosition = this.GameObjects.GetItemsOnTile(tp);
+            var result = objectsAtPosition.Any(gi => gi.Solidity != ObjectSolidity.Insubstantial);
             return result;
             }
-
-        public IEnumerable<StaticItem> GetItemsOnTile(TilePos tp)
-            {
-            var result = this._gameObjects.GetItemsOnTile(tp);
-            return result;
-            } 
 
         public void SetLevelReturnType(LevelReturnType levelReturnType)
             {
@@ -206,7 +205,7 @@ namespace Labyrinth
 
         private void UnlockLevel(int levelThatPlayerShouldHaveReached)
             {
-            foreach (Monster.Monster m in this._gameObjects.InteractiveItems.OfType<Monster.Monster>())
+            foreach (Monster.Monster m in this.GameObjects.DistinctItemsOfType<Monster.Monster>())
                 {
                 if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
@@ -221,71 +220,87 @@ namespace Labyrinth
             {
             const float minimumDistance = Tile.Height * Tile.Height;
 
-            int countOfGameItemsExamined = 0;
+            int countOfGameItemsThatMoved = 0;
             int countOfGameItems = 0;
-            foreach (var currentItem in this._gameObjects.GetSurvivingInteractiveItems())
+            int countOfInteractions = 0;
+            foreach (var currentItem in this.GameObjects.GetSurvivingInteractiveItems())
                 {
                 countOfGameItems++;
 
-                var mi = currentItem as MovingItem;
-                bool hasMoved = mi != null && mi.Update(gameTime);
-                if (!hasMoved)
+                if (!currentItem.Update(gameTime))
                     continue;
+                this.GameObjects.UpdatePosition(currentItem);
+                countOfGameItemsThatMoved++;
 
                 Rectangle? bounds = null;
                 var currentItemPosition = currentItem.Position;
-                foreach (var si in currentItem is Shot ? this._gameObjects.AllItems : this._gameObjects.InteractiveItems)
+                foreach (var si in this.GameObjects.AllItemsInRectangle(currentItem.BoundingRectangle))
                     {
                     if (currentItem == si)
                         continue;   
-
-                    countOfGameItemsExamined++;
 
                     if (Math.Abs(Vector2.DistanceSquared(currentItemPosition, si.Position)) <= minimumDistance)
                         {
                         if (bounds == null)
                             {
-                            System.Diagnostics.Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si));
+                            Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si));
                             bounds = currentItem.BoundingRectangle;
                             }
                         if (bounds.Value.Intersects(si.BoundingRectangle))
                             {
-                            System.Diagnostics.Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
+                            countOfInteractions++;
+                            Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
                             BuildInteraction(currentItem, si).Collide();
                             }
                         }
                     }
                 }
-            System.Diagnostics.Trace.WriteLine(string.Format("Checks run: {0}, from {1} items", countOfGameItemsExamined, countOfGameItems));
+            if (countOfGameItemsThatMoved > 0)
+                Trace.WriteLine(string.Format("Total interactive items: {0}, those that moved: {1}, interactions: {2}", countOfGameItems, countOfGameItemsThatMoved, countOfInteractions));
             }
 
         private IInteraction BuildInteraction(StaticItem thisGameItem, StaticItem thatGameItem)
             {
             IInteraction result;
             var items = new[] { thisGameItem, thatGameItem };
-            var shot = items.OfType<Shot>().FirstOrDefault();
-            if (shot != null)
+            var staticItem = items.FirstOrDefault(item => !(item is MovingItem));
+            if (staticItem != null)
                 {
-                var otherItem = items.Single(item => item != shot);
+                var otherItem = items.Single(item => item != staticItem);
                 var movingItem = otherItem as MovingItem;
-                result = movingItem != null
-                    ? (IInteraction) new ShotAndMovingItemInteraction(this, shot, movingItem)
-                    : new ShotAndStaticItemInteraction(this, shot, otherItem);
+                if (otherItem is MovingItem)
+                    result = new InteractionWithStaticItems(this, staticItem, movingItem);
+                else
+                    result = new StaticItemAndStaticItemInteraction(this, staticItem, otherItem);
                 }
             else
                 {
-                var movingItem = items.OfType<MovingItem>().FirstOrDefault();
-                if (movingItem != null)
-                    {
-                    var otherItem = items.Single(item => item != movingItem);
-                    var otherMovingItem = otherItem as MovingItem;
-                    result = otherMovingItem != null
-                        ? (IInteraction) new MovingItemAndMovingItemInteraction(this, movingItem, otherMovingItem)
-                        : new MovingItemAndStaticItemInteraction(this, movingItem, otherItem);
-                    }
-                else
-                    result = new StaticItemAndStaticItemInteraction(this, thisGameItem, thatGameItem);
+                result = new InteractionWithMovingItems(this, (MovingItem) thisGameItem, (MovingItem) thatGameItem);
                 }
+
+            //var shot = items.OfType<Shot>().FirstOrDefault();
+            //if (shot != null)
+            //    {
+            //    var otherItem = items.Single(item => item != shot);
+            //    var movingItem = otherItem as MovingItem;
+            //    result = movingItem != null
+            //        ? (IInteraction) new ShotAndMovingItemInteraction(this, shot, movingItem)
+            //        : new ShotAndStaticItemInteraction(this, shot, otherItem);
+            //    }
+            //else
+            //    {
+            //    var movingItem = items.OfType<MovingItem>().FirstOrDefault();
+            //    if (movingItem != null)
+            //        {
+            //        var otherItem = items.Single(item => item != movingItem);
+            //        var otherMovingItem = otherItem as MovingItem;
+            //        result = otherMovingItem != null
+            //            ? (IInteraction) new MovingItemAndMovingItemInteraction(this, movingItem, otherMovingItem)
+            //            : new MovingItemAndStaticItemInteraction(this, movingItem, otherItem);
+            //        }
+            //    else
+            //        result = new StaticItemAndStaticItemInteraction(this, thisGameItem, thatGameItem);
+            //    }
             return result;
             }
 
@@ -298,110 +313,97 @@ namespace Labyrinth
                              ChangeRooms = ChangeRooms.FollowsPlayer,
                              MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately
                          };
-            this._gameObjects.Add(dd);
+            this.GameObjects.Add(dd);
             }
 
         /// <summary>
         /// Place short bang at a shot's position and remove the shot
         /// </summary>
-        /// <param name="s">The</param>
+        /// <param name="s">An instance of a shot to convert</param>
         public void ConvertShotToBang(Shot s)
             {
-            var b = new Bang(this, s.Position, BangType.Short);
-            this._gameObjects.Add(b);  
+            AddBang(s.Position, BangType.Short);
             s.InstantlyExpire();
             }
         
-        public void AddShortBang(Vector2 p)
-            {
-            var b = new Bang(this, p, BangType.Short);
-            this._gameObjects.Add(b);
-            }
-            
         /// <summary>
-        /// Add long bang (when player or monster dies)
+        /// Add bang
         /// </summary>
         /// <param name="p">Position to place the sprite</param>
-        public void AddLongBang(Vector2 p)
+        /// <param name="bangType">The type of bang to create</param>
+        public void AddBang(Vector2 p, BangType bangType)
             {
-            var b = new Bang(this, p, BangType.Long);
-            this._gameObjects.Add(b);  
+            var b = new Bang(this, p, bangType);
+            this.GameObjects.Add(b);  
             }
 
         public void AddGrave(TilePos tp)
             {
             var g = new Grave(this, tp.ToPosition());
-            this._gameObjects.Add(g);
+            this.GameObjects.Add(g);
             }
         
         public void AddMushroom(TilePos tp)
             {
             var m = new Mushroom(this, tp.ToPosition());
-            this._gameObjects.Add(m);
+            this.GameObjects.Add(m);
             }
         
         public void AddMonster(Monster.Monster m)
             {
-            this._gameObjects.Add(m);
+            this.GameObjects.Add(m);
             }
         
-        public void AddShot(ShotType st, Vector2 position, int energy, Direction d)
+        public void AddShot(StandardShot s)
             {
-            var s = new Shot(this, position, d, energy, st);
-            this._gameObjects.Add(s);
+            this.GameObjects.Add(s);
+            }
+
+        public void AddExplosion(Vector2 position, int energy)
+            {
+            var e = new Explosion(this, position, energy);
+            this.GameObjects.Add(e);
             }
         
-        public static Rectangle GetContainingRoom(TilePos tp)
+        public void AddMine(Vector2 position)
             {
-            int roomx = tp.X / WindowSizeX;
-            int roomy = tp.Y / WindowSizeY;
-            var r = new Rectangle(roomx * WindowSizeX * Tile.Width, roomy * WindowSizeY * Tile.Height, WindowSizeX * Tile.Width, WindowSizeY * Tile.Height);
+            var m = new Mine(this, position);
+            this.GameObjects.Add(m);
+            }
+
+        public static Rectangle GetContainingRoom(Vector2 position)
+            {
+            const int roomWidth = WindowSizeX * Tile.Width;
+            const int roomHeight = WindowSizeY * Tile.Height;
+
+            var roomx = (int) (position.X / roomWidth);
+            var roomy = (int) (position.Y / roomHeight);
+            var r = new Rectangle(roomx * roomWidth, roomy * roomHeight, roomWidth, roomHeight);
             return r;
             }
         
-        private void RecalculateWindow(GameTime gameTime, SpriteBatchWindowed spriteBatchWindowed)
+        private void RecalculateWindow(GameTime gameTime, ISpriteBatch spriteBatchWindowed)
             {
-            if (this.Player == null)
-                return;
+            const float currentVelocity = 750;
             
-            Point movingTowards = GetContainingRoom(Player.TilePosition).Location;
+            var roomRectangle = GetContainingRoom(this.Player.Position);
+            var movingTowards = new Vector2(roomRectangle.Left, roomRectangle.Top);
             Vector2 position = spriteBatchWindowed.WindowOffset;
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            const float currentVelocity = 750;
+            float remainingMovement = currentVelocity * elapsed;
 
-            switch (Math.Sign(movingTowards.X - spriteBatchWindowed.WindowOffset.X))
+            var distanceToDestination = Vector2.Distance(position, movingTowards);
+            bool hasArrivedAtDestination = (distanceToDestination <= remainingMovement);
+            if (hasArrivedAtDestination)
                 {
-                case -1:
-                    position += new Vector2(-currentVelocity, 0) * elapsed;
-                    if (position.X < movingTowards.X)
-                        {
-                        position = new Vector2(movingTowards.X, position.Y);
-                        }
-                    break;
-                case 1:
-                    position += new Vector2(currentVelocity, 0) * elapsed;
-                    if (position.X > movingTowards.X)
-                        {
-                        position = new Vector2(movingTowards.X, position.Y);
-                        }
-                    break;
+                position = movingTowards;
                 }
-            switch (Math.Sign(movingTowards.Y - spriteBatchWindowed.WindowOffset.Y))
+            else
                 {
-                case -1:
-                    position += new Vector2(0, -currentVelocity) * elapsed;
-                    if (position.Y < movingTowards.Y)
-                        {
-                        position = new Vector2(position.X, movingTowards.Y);
-                        }
-                    break;
-                case 1:
-                    position += new Vector2(0, currentVelocity) * elapsed;
-                    if (position.Y > movingTowards.Y)
-                        {
-                        position = new Vector2(position.X, movingTowards.Y);
-                        }
-                    break;
+                var vectorBetweenPoints = movingTowards - position;
+                var unitVectorOfTravel = Vector2.Normalize(vectorBetweenPoints);
+                var displacement = unitVectorOfTravel * remainingMovement;
+                position += displacement;
                 }
             
             spriteBatchWindowed.WindowOffset = position;
@@ -410,65 +412,65 @@ namespace Labyrinth
         /// <summary>
         /// Draw everything in the World from background to foreground.
         /// </summary>
-        public void Draw(GameTime gameTime, SpriteBatchWindowed spriteBatch)
+        public void Draw(GameTime gameTime, ISpriteBatch spriteBatch)
             {
             RecalculateWindow(gameTime, spriteBatch);
             
-            var viewPort = GetViewPort(spriteBatch.WindowOffset);
-
+            var viewPort = GetRectangleEnclosingTilesThatAreCurrentlyInView(spriteBatch.WindowOffset);
             DrawFloorTiles(spriteBatch, viewPort);
+            
+            var r = new Rectangle(viewPort.Left * Tile.Width, viewPort.Top * Tile.Height, viewPort.Width * Tile.Width, viewPort.Height * Tile.Height);
+            var itemsToDraw = this.GameObjects.AllItemsInRectangle(r);
+            foreach (var item in itemsToDraw)
+                {
+                int zOrder = item.DrawOrder;
+                this._itemsToDrawByZOrder[zOrder].Add(item);
+                }
 
-            var r = new Rectangle((viewPort.Left - 1) * Tile.Width, (viewPort.Top -1) * Tile.Height, (viewPort.Right + 2) * Tile.Width, (viewPort.Bottom + 1) * Tile.Height);
-
-            foreach (var item in this._gameObjects.AllItemsInRectangle(r))
-                item.Draw(gameTime, spriteBatch);
+            foreach (var list in this._itemsToDrawByZOrder)
+                {
+                foreach (var item in list)
+                    item.Draw(gameTime, spriteBatch);
+                list.Clear();
+                }
             }
 
-        private static Rectangle GetViewPort(Vector2 windowOffset)
+        private static Rectangle GetRectangleEnclosingTilesThatAreCurrentlyInView(Vector2 windowOffset)
             {
-            const int windowWidth = (WindowSizeX - 1) * Tile.Width;
-            const int windowHeight = (WindowSizeY - 1) * Tile.Height;
-            
             var roomStartX = (int)Math.Floor(windowOffset.X / Tile.Width);
             var roomStartY = (int)Math.Floor(windowOffset.Y / Tile.Height);
-            var roomEndX = (int)Math.Ceiling((windowOffset.X + windowWidth)  / Tile.Width);
+            
+            const int windowWidth = WindowSizeX * Tile.Width;
+            const int windowHeight = WindowSizeY * Tile.Height;
+            
+            var roomEndX = (int)Math.Ceiling((windowOffset.X + windowWidth) / Tile.Width);
             var roomEndY = (int)Math.Ceiling((windowOffset.Y + windowHeight) / Tile.Height);
 
             var result = new Rectangle(roomStartX, roomStartY, roomEndX - roomStartX, roomEndY - roomStartY);
+            Debug.Assert(result.Width == WindowSizeX || result.Width == (WindowSizeX + 1));
+            Debug.Assert(result.Height == WindowSizeY || result.Height == (WindowSizeY + 1));
             return result;
             }
 
         /// <summary>
         /// Draws the floor of the current view
         /// </summary>
-        private void DrawFloorTiles(SpriteBatchWindowed spriteBatch, Rectangle r)
+        private void DrawFloorTiles(ISpriteBatch spriteBatch, Rectangle r)
             {
             // draw the floor
-            for (int y = r.Top; y <= r.Bottom; y++)
+            for (int y = r.Top; y < r.Bottom; y++)
                 {
-                for (int x = r.Left; x <= r.Right; x++)
+                for (int x = r.Left; x < r.Right; x++)
                     {
                     var tp = new TilePos(x, y);
                     Texture2D texture = this._wl[tp].Floor;
                     if (texture != null)
                         {
                         Vector2 position = new Vector2(x, y) * Tile.Size;
-                        spriteBatch.DrawInWindow(texture, position);
+                        spriteBatch.DrawEntireTexture(texture, position);
                         }
                     }
                 }
-            }
-
-        public bool ShotExists()
-            {
-            bool result = this._gameObjects.InteractiveItems.OfType<Shot>().Any();
-            return result;
-            }
-
-        public int HowManyCrystalsRemain()
-            {
-            int result = this._gameObjects.InteractiveItems.OfType<Crystal>().Count();
-            return result;
             }
 
         public void MoveUpALevel()
@@ -482,14 +484,15 @@ namespace Labyrinth
             if (newState == null)
                 return;
 
-            var crystals = this._gameObjects.InteractiveItems.OfType<Crystal>().Where(c => this._wl.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
+            var crystals = this.GameObjects.DistinctItemsOfType<Crystal>().Where(c => this._wl.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
             foreach (var c in crystals)
                 {
-                var i = new MovingItemAndStaticItemInteraction(this, this.Player, c);
+                var i = new InteractionWithStaticItems(this, c, this.Player);
                 i.Collide();
                 }
             this.Player.Reset(newState.PlayerPosition.ToPosition(), newState.PlayerEnergy);
-            var boulder = this._gameObjects.InteractiveItems.OfType<Boulder>().FirstOrDefault();
+            this.GameObjects.UpdatePosition(this.Player);
+            var boulder = this.GameObjects.DistinctItemsOfType<Boulder>().FirstOrDefault();
             if (boulder != null)
                 {
                 TilePos? tp = null;
@@ -504,10 +507,13 @@ namespace Labyrinth
                         }
                     }
                 if (tp.HasValue)
+                    {
                     boulder.Reset(tp.Value.ToPosition());
+                    this.GameObjects.UpdatePosition(boulder);
+                    }
                 }
-            Point roomStart = GetContainingRoom(Player.TilePosition).Location;
-            this.Game.SpriteBatchWindowed.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
+            Point roomStart = GetContainingRoom(this.Player.Position).Location;
+            this.Game.SpriteBatch.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
             }
         }
     }
