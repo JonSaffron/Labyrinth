@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Labyrinth
+namespace Labyrinth.GameObjects
     {
     abstract class Shot : MovingItem
         {

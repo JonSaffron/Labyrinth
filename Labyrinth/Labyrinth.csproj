@@ -262,7 +262,6 @@
     <None Include="Documentation\Book1.xls" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Monster\" />
     <Folder Include="Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

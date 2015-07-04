@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth

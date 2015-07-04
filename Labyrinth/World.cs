@@ -6,7 +6,7 @@ using Labyrinth.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Labyrinth.Monster;
+using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
@@ -205,7 +205,7 @@ namespace Labyrinth
 
         private void UnlockLevel(int levelThatPlayerShouldHaveReached)
             {
-            foreach (Monster.Monster m in this.GameObjects.DistinctItemsOfType<Monster.Monster>())
+            foreach (Monster m in this.GameObjects.DistinctItemsOfType<Monster>())
                 {
                 if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
@@ -304,7 +304,7 @@ namespace Labyrinth
             return result;
             }
 
-        public void AddDiamondDemon(Monster.Monster m)
+        public void AddDiamondDemon(Monster m)
             {
             var dd = new DiamondDemon(this, m.Position, 30)
                          {
@@ -349,7 +349,7 @@ namespace Labyrinth
             this.GameObjects.Add(m);
             }
         
-        public void AddMonster(Monster.Monster m)
+        public void AddMonster(Monster m)
             {
             this.GameObjects.Add(m);
             }

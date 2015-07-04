@@ -1,4 +1,6 @@
-﻿namespace Labyrinth
+﻿using Labyrinth.GameObjects;
+
+namespace Labyrinth
     {
     interface IMonsterWeapon
         {

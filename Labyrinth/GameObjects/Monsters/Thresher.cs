@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth.Monster
+namespace Labyrinth.GameObjects
     {
     // sealed so that we can safely make virtual method calls from the constructor
     abstract class Thresher : Monster

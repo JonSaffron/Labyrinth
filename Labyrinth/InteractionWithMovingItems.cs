@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Labyrinth.Monster;
+using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -50,7 +50,7 @@ namespace Labyrinth
             var player = items.OfType<Player>().SingleOrDefault();
             if (player != null)
                 {
-                var monster = items.Single(item => item != player) as Monster.Monster;
+                var monster = items.Single(item => item != player) as Monster;
                 if (monster != null)
                     {
                     int monsterEnergy = monster.InstantlyExpire();
@@ -103,7 +103,7 @@ namespace Labyrinth
                     {
                     var energy = movingObject.InstantlyExpire();
                     this._world.AddBang(movingObject.Position, BangType.Long);
-                    if (movingObject is Monster.Monster)
+                    if (movingObject is Monster)
                         {
                         this._world.Game.SoundPlayer.Play(GameSound.MonsterDies);
                         if (!(movingObject is DeathCube))
@@ -129,7 +129,7 @@ namespace Labyrinth
                 return true;
                 }
 
-            var monster = movingItem as Monster.Monster;
+            var monster = movingItem as Monster;
             if (monster != null)
                 {
                 var result = ShotHitsMonster(world, shot, monster);
@@ -178,7 +178,7 @@ namespace Labyrinth
             return true;
             }
 
-        private static bool ShotHitsMonster(World world, Shot shot, Monster.Monster monster)
+        private static bool ShotHitsMonster(World world, Shot shot, Monster monster)
             {
             if (!monster.IsActive)
                 monster.IsActive = true;

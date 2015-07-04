@@ -26,7 +26,7 @@ namespace Labyrinth
             {
             var p = new Point(tp.X, tp.Y);
             var result = rect.Contains(p);
-            return rect.Contains(p);
+            return result;
             }
 
         public static bool ContainsPosition(this Rectangle rect, Vector2 point)

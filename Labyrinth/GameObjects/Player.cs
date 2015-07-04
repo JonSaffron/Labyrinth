@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
  *  If new key pressed change direction being faced. Cache the direction.
  */
 
-namespace Labyrinth
+namespace Labyrinth.GameObjects
     {
     /// <summary>
     /// Our fearless adventurer!

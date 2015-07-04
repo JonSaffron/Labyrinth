@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
+using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -199,13 +200,13 @@ namespace Labyrinth
                     }
 
                 result.AddRange(newItems);
-                exceptions.AddRange(SetTileOccupation(ref tiles, newItems.Where(item => !(item is Monster.Monster) || ((Monster.Monster) item).IsStill), false));
+                exceptions.AddRange(SetTileOccupation(ref tiles, newItems.Where(item => !(item is Monster) || ((Monster) item).IsStill), false));
                 }
 
             var fruit = GetListOfFruit(world, ref tiles);
             result.AddRange(fruit);
 
-            exceptions.AddRange(SetTileOccupation(ref tiles, result.OfType<Monster.Monster>().Where(m => !m.IsStill), true));
+            exceptions.AddRange(SetTileOccupation(ref tiles, result.OfType<Monster>().Where(m => !m.IsStill), true));
             
             ReviewPotentiallyOccupiedTiles(ref tiles, exceptions);
             
@@ -243,13 +244,13 @@ namespace Labyrinth
             return result;
             }
 
-        private static Monster.Monster GetMonster(World world, XmlElement mdef)
+        private static Monster GetMonster(World world, XmlElement mdef)
             {
             string type = mdef.GetAttribute("Type");
             var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
             Vector2 position = tilePos.ToPosition();
             int e = int.Parse(mdef.GetAttribute("Energy"));
-            Monster.Monster result = Monster.Monster.Create(type, world, position, e);
+            Monster result = Monster.Create(type, world, position, e);
             string direction = mdef.GetAttribute("Direction");
             if (!string.IsNullOrEmpty(direction))
                 result.Direction = (Direction)Enum.Parse(typeof(Direction), direction);

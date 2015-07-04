@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Labyrinth.GameObjects;
 using NUnit.Framework;
 
 namespace Labyrinth.Test

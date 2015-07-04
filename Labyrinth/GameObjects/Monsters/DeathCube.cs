@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth.Monster
+namespace Labyrinth.GameObjects
     {
     sealed class DeathCube : Monster
         {

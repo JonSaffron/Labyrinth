@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth
+namespace Labyrinth.GameObjects
     {
     class CrumblyWall : StaticItem
         {

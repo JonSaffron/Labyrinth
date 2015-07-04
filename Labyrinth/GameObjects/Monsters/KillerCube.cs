@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Labyrinth.Monster
+namespace Labyrinth.GameObjects
     {
     abstract class KillerCube : Monster
         {
