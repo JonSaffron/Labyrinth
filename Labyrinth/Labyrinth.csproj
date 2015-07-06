@@ -114,8 +114,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animation.cs" />
-    <Compile Include="AnimationPlayer.cs" />
+    <Compile Include="Services\Display\Animation.cs" />
+    <Compile Include="Services\Display\AnimationPlayer.cs" />
     <Compile Include="GameObjects\Bang.cs" />
     <Compile Include="GameObjects\Boulder.cs" />
     <Compile Include="GameObjects\CrumblyWall.cs" />
@@ -123,7 +123,8 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="GameInput.cs" />
     <Compile Include="GameObjectCollection.cs" />
-    <Compile Include="GameSoundInstance.cs" />
+    <Compile Include="Services\Input\PlayerController.cs" />
+    <Compile Include="Services\Sound\GameSoundInstance.cs" />
     <Compile Include="GameTimer.cs" />
     <Compile Include="Interfaces\IInteraction.cs" />
     <Compile Include="Interfaces\IGameSoundInstance.cs" />
@@ -137,9 +138,9 @@
     <Compile Include="GameObjects\Mine.cs" />
     <Compile Include="MineLayer.cs" />
     <Compile Include="InteractionWithStaticItems.cs" />
-    <Compile Include="NoSoundPlayer.cs" />
-    <Compile Include="NullGameSoundInstance.cs" />
-    <Compile Include="NullSoundPlayer.cs" />
+    <Compile Include="Services\Sound\NoSoundPlayer.cs" />
+    <Compile Include="Services\Sound\NullGameSoundInstance.cs" />
+    <Compile Include="Services\Sound\NullSoundPlayer.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="GameObjects\Monsters\Butterfly.cs" />
     <Compile Include="GameObjects\Monsters\CrazyCrawler.cs" />
@@ -153,16 +154,17 @@
     <Compile Include="GameObjects\Monsters\FlitterbugRed.cs" />
     <Compile Include="GameObjects\ForceField.cs" />
     <Compile Include="GameObjects\Fruit.cs" />
-    <Compile Include="FruitDefinition.cs" />
+    <Compile Include="Services\WorldBuilding\FruitDefinition.cs" />
     <Compile Include="GameObjects\Grave.cs" />
-    <Compile Include="PlayerInput.cs" />
+    <Compile Include="Services\Input\PlayerInput.cs" />
     <Compile Include="GameObjects\Monsters\Joker.cs" />
     <Compile Include="GameObjects\Monsters\KillerCube.cs" />
     <Compile Include="GameObjects\Monsters\KillerCubeGreen.cs" />
     <Compile Include="GameObjects\Monsters\KillerCubeRed.cs" />
     <Compile Include="GameObjects\Shot.cs" />
-    <Compile Include="SoundPlayer.cs" />
-    <Compile Include="SpriteBatchFullScreen.cs" />
+    <Compile Include="Services\Sound\SoundPlayer.cs" />
+    <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
+    <Compile Include="Services\WorldBuilding\WorldLoaderForTest.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
     <Compile Include="StandardPlayerWeapon.cs" />
     <Compile Include="StaticItemAndStaticItemInteraction.cs" />
@@ -183,19 +185,19 @@
     <Compile Include="GameObjects\Monsters\RotaFloaterCyan.cs" />
     <Compile Include="GameObjects\StandardShot.cs" />
     <Compile Include="SoundEffectFinishedEventArgs.cs" />
-    <Compile Include="SoundLibrary.cs" />
-    <Compile Include="SpriteBatchWindowed.cs" />
-    <Compile Include="StartState.cs" />
+    <Compile Include="Services\Sound\SoundLibrary.cs" />
+    <Compile Include="Services\Display\SpriteBatchWindowed.cs" />
+    <Compile Include="Services\WorldBuilding\StartState.cs" />
     <Compile Include="GameObjects\StaticItem.cs" />
     <Compile Include="GameObjects\Monsters\Thresher.cs" />
     <Compile Include="GameObjects\Monsters\ThresherBrown.cs" />
     <Compile Include="GameObjects\Monsters\ThresherCyan.cs" />
-    <Compile Include="Tile.cs" />
-    <Compile Include="TileDefinition.cs" />
-    <Compile Include="TileException.cs" />
+    <Compile Include="Services\WorldBuilding\Tile.cs" />
+    <Compile Include="Services\WorldBuilding\TileDefinition.cs" />
+    <Compile Include="Services\WorldBuilding\TileException.cs" />
     <Compile Include="TilePos.cs" />
-    <Compile Include="WorldArea.cs" />
-    <Compile Include="WorldLoader.cs" />
+    <Compile Include="Services\WorldBuilding\WorldArea.cs" />
+    <Compile Include="Services\WorldBuilding\WorldLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
@@ -261,9 +263,7 @@
   <ItemGroup>
     <None Include="Documentation\Book1.xls" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
