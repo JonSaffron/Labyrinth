@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Labyrinth.Services.Display;
+using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {

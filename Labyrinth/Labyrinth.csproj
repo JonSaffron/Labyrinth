@@ -139,8 +139,6 @@
     <Compile Include="MineLayer.cs" />
     <Compile Include="InteractionWithStaticItems.cs" />
     <Compile Include="Services\Sound\NoSoundPlayer.cs" />
-    <Compile Include="Services\Sound\NullGameSoundInstance.cs" />
-    <Compile Include="Services\Sound\NullSoundPlayer.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="GameObjects\Monsters\Butterfly.cs" />
     <Compile Include="GameObjects\Monsters\CrazyCrawler.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using Labyrinth.GameObjects;
+using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
     {

@@ -6,7 +6,7 @@ using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Labyrinth.Test
+namespace Labyrinth.Services.WorldBuilding
     {
     class WorldLoaderForTest : IWorldLoader
         {

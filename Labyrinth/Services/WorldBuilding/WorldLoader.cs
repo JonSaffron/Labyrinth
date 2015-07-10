@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Labyrinth
+namespace Labyrinth.Services.WorldBuilding
     {
     class WorldLoader : IWorldLoader
         {

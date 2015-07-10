@@ -1,5 +1,7 @@
 using System;
 using System.Windows.Forms;
+using Labyrinth.Services.Input;
+using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
     {

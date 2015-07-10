@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Audio;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Sound
     {
     class GameSoundInstance : IGameSoundInstance
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Labyrinth
+namespace Labyrinth.Services.WorldBuilding
     {
     class TileException : Exception
         {

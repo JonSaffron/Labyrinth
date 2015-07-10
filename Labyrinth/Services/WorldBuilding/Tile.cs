@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Labyrinth
+namespace Labyrinth.Services.WorldBuilding
     {
     /// <summary>
     /// Stores the appearance and collision behavior of a tile.

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Display
     {
     public class SpriteBatchWindowed : ISpriteBatch
         {

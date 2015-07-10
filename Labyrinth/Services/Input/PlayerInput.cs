@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Input
     {
     class PlayerInput : IPlayerInput
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth.Test
+namespace Labyrinth.Services.Input
     {
     class PlayerController : IPlayerInput
         {

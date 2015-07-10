@@ -1,4 +1,4 @@
-﻿namespace Labyrinth
+﻿namespace Labyrinth.Services.WorldBuilding
     {
     class StartState
         {

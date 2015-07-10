@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Labyrinth.Annotations;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -68,8 +69,8 @@ namespace Labyrinth.GameObjects
             this._weapon2 = new MineLayer();
             Reset(position, energy);
 
-            this._playerMovesFootOne = world.Game.SoundPlayer.GetSoundEffectInstance(GameSound.PlayerMoves);
-            this._playerMovesFootTwo = world.Game.SoundPlayer.GetSoundEffectInstance(GameSound.PlayerMoves);
+            this._playerMovesFootOne = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
+            this._playerMovesFootTwo = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
             this._playerMovesFootTwo.Pitch = -0.15f;
             }
 

@@ -1,4 +1,7 @@
 using System;
+using Labyrinth.Services.Display;
+using Labyrinth.Services.Sound;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -49,7 +52,6 @@ namespace Labyrinth
             this._lives = 2;
             this._score = 0;
             this._displayedScore = 0;
-            this.SoundPlayer = new NullSoundPlayer();
             }
 
         /// <summary>
@@ -267,8 +269,8 @@ namespace Labyrinth
         /// <summary>
         /// Updates the sound player properties
         /// </summary>
-        /// <param name="changeToEnabled">If set to a positive value then sound will be enabled, if set to a negative value then sound will be disabled</param>
-        /// <param name="changeToVolume">If set to a positive value then the volume will be increased, if set to a negative value then the volume will be decreased.</param>
+        /// <param name="changeToEnabled">If set to a positive value then sound will be enabled, if set to a negative value then sound will be disabled. Zero indicates no change.</param>
+        /// <param name="changeToVolume">If set to a positive value then the volume will be increased, if set to a negative value then the volume will be decreased. Zero indicates no change.</param>
         private void SetSoundPlayer(int changeToEnabled, int changeToVolume)
             {
             if (changeToVolume != 0)
@@ -282,6 +284,14 @@ namespace Labyrinth
                 this.SoundPlayer = new SoundPlayer(this._soundLibrary);
             else if (changeToEnabled < 0 && !(this.SoundPlayer is NoSoundPlayer))
                 this.SoundPlayer =  new NoSoundPlayer(this._soundLibrary);
+            }
+
+        public SoundLibrary SoundLibrary
+            {
+            get
+                {
+                return this._soundLibrary;
+                }
             }
         }
     }

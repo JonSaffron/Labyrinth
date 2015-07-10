@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Audio;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Sound
     {
     class SoundPlayer : ISoundPlayer
         {
@@ -10,18 +10,6 @@ namespace Labyrinth
         public SoundPlayer(SoundLibrary soundLibrary)
             {
             this._soundLibrary = soundLibrary;
-            }
-
-        /// <summary>
-        /// Retrieves an instance of a sound effect.
-        /// </summary>
-        /// <param name="gameSound">Identifies the sound effect</param>
-        /// <returns>A reference to a sound effect. This should be retained whilst the sound is playing.</returns>
-        public IGameSoundInstance GetSoundEffectInstance(GameSound gameSound)
-            {
-            var soundEffectInstance = this._soundLibrary[gameSound].CreateInstance();
-            var result = new GameSoundInstance(soundEffectInstance);
-            return result;
             }
 
         public void Play(GameSound gameSound)

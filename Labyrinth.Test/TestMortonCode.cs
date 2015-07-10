@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Labyrinth.GameObjects;
+using Labyrinth.Services.Input;
+using Labyrinth.Services.WorldBuilding;
 using NUnit.Framework;
 
 namespace Labyrinth.Test

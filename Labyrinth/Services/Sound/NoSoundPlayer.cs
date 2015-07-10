@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Audio;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Sound
     {
     class NoSoundPlayer : ISoundPlayer
         {
@@ -10,14 +10,6 @@ namespace Labyrinth
         public NoSoundPlayer(SoundLibrary soundLibrary)
             {
             this._soundLibrary = soundLibrary;
-            }
-
-        public IGameSoundInstance GetSoundEffectInstance(GameSound gameSound)
-            {
-            var soundEffectInstance = this._soundLibrary[gameSound].CreateInstance();
-            soundEffectInstance.Volume = 0;
-            var result = new GameSoundInstance(soundEffectInstance);
-            return result;
             }
 
         public void Play(GameSound gameSound)

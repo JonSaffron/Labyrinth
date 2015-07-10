@@ -1,7 +1,8 @@
 ﻿using System;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Display
     {
     /// <summary>
     /// Represents an animated texture.

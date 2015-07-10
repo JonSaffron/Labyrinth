@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Sound
     {
     public sealed class SoundLibrary : IDisposable
         {
@@ -40,6 +40,18 @@ namespace Labyrinth
             var result = this[gameSound].CreateInstance();
             var tuple = new Tuple<GameSound, SoundEffectFinished>(gameSound, callback);
             this._trackingInstances.Add(result, tuple);
+            return result;
+            }
+
+        /// <summary>
+        /// Retrieves an instance of a sound effect.
+        /// </summary>
+        /// <param name="gameSound">Identifies the sound effect</param>
+        /// <returns>A reference to a sound effect. This should be retained whilst the sound is playing.</returns>
+        public IGameSoundInstance GetSoundEffectInstance(GameSound gameSound)
+            {
+            var soundEffectInstance = this[gameSound].CreateInstance();
+            var result = new GameSoundInstance(soundEffectInstance);
             return result;
             }
 

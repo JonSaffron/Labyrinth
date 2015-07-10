@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth
+namespace Labyrinth.Services.WorldBuilding
     {
     class WorldArea : IEquatable<WorldArea>
         {

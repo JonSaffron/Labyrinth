@@ -1,4 +1,4 @@
-﻿namespace Labyrinth
+﻿namespace Labyrinth.Services.Sound
     {
     class NullGameSoundInstance : IGameSoundInstance
         {
