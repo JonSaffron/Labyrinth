@@ -12,7 +12,7 @@ using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
-    class World : IDisposable
+    public class World : IDisposable
         {
         public const int WindowSizeX = 16;
         public const int WindowSizeY = 10;

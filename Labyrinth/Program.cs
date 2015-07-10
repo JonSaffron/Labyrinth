@@ -1,5 +1,7 @@
 using System;
 using System.Windows.Forms;
+using Castle.MicroKernel.Registration;
+using Castle.Windsor;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.WorldBuilding;
 
@@ -12,12 +14,15 @@ namespace Labyrinth
         /// </summary>
         static int Main(string[] args)
             {
+            var container = new WindsorContainer();
+            container.Register(Component.For<Game1>());
+            container.Register(Component.For<IPlayerInput>().ImplementedBy<PlayerInput>());
+            container.Register(Component.For<IWorldLoader>().ImplementedBy<WorldLoader>());
+
             int result;
             try
                 {
-                var playerInput = new PlayerInput();
-                var wl = new WorldLoader();
-                using (var game = new Game1(playerInput, wl))
+                using (var game = container.Resolve<Game1>())
                     {
                     game.Run();
                     }

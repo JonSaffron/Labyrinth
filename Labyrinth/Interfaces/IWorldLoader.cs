@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
-    internal interface IWorldLoader
+    public interface IWorldLoader
         {
         void LoadWorld(string levelName);
 

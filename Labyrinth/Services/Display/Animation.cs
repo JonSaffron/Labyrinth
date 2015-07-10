@@ -12,7 +12,7 @@ namespace Labyrinth.Services.Display
     /// as wide as each animation is tall. The number of frames in the
     /// animation are inferred from this.
     /// </remarks>
-    class Animation : IEquatable<Animation>
+    public class Animation : IEquatable<Animation>
         {
         /// <summary>
         /// All frames in the animation arranged horizontally.
@@ -30,6 +30,11 @@ namespace Labyrinth.Services.Display
         /// continue playing from the beginning?
         /// </summary>
         public bool LoopAnimation { get; private set; }
+
+        /// <summary>
+        /// The number of frames contained in the texture
+        /// </summary>
+        public int FrameCount { get; private set; }
 
         /// <summary>
         /// Constructs a new animation using a static image
@@ -78,14 +83,7 @@ namespace Labyrinth.Services.Display
             this.Texture = world.LoadTexture(textureName);
             this.BaseMovementsPerFrame = baseMovementsPerFrame;
             this.LoopAnimation = loopAnimation;
-            }
-
-        /// <summary>
-        /// Gets the number of frames in the animation.
-        /// </summary>
-        public int FrameCount
-            {
-            get { return Texture.Width / Tile.Width; }
+            this.FrameCount = (baseMovementsPerFrame == 0) ? 1 : (this.Texture.Width / Tile.Width);
             }
 
         /// <summary>

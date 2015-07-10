@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    abstract class Monster : MovingItem
+    public abstract class Monster : MovingItem
         {
         protected static readonly Random MonsterRandom = new Random();
         

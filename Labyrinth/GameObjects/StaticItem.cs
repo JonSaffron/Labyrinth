@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    abstract class StaticItem
+    public abstract class StaticItem
         {
         private Vector2 _position;
         private TilePos _tilePosition;

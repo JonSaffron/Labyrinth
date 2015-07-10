@@ -8,7 +8,7 @@ namespace Labyrinth.Services.Display
     /// <summary>
     /// Controls playback of an Animation.
     /// </summary>
-    class AnimationPlayer
+    public class AnimationPlayer
         {
         // Number of base movements a sprite can make per second
         private const int MovementsPerSecond = 20;

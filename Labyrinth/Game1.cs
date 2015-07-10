@@ -32,7 +32,7 @@ namespace Labyrinth
         private int _displayedScore;
         private int _lives;
         
-        internal Game1(IPlayerInput playerInput, IWorldLoader worldLoader)
+        public Game1(IPlayerInput playerInput, IWorldLoader worldLoader)
             {
             if (playerInput == null)
                 throw new ArgumentNullException("playerInput");

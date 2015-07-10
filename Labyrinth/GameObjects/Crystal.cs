@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Crystal : StaticItem
+    public class Crystal : StaticItem
         {
         public int CrystalId { get; private set; }
         public int Score { get; private set; }

@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth.Services.WorldBuilding
     {
-    class StartState
+    public class StartState
         {
         public TilePos PlayerPosition { get; private set; }
         public int PlayerEnergy { get; private set; }

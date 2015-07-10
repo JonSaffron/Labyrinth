@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class StandardShot : Shot
+    public class StandardShot : Shot
         {
         // Movement
         public ShotType ShotType { get; private set; }

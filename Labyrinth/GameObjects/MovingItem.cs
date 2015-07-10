@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    internal abstract class MovingItem : StaticItem
+    public abstract class MovingItem : StaticItem
         {
         public Direction Direction { get; set;}
         public Vector2 MovingTowards { get; protected set; }

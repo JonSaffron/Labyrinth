@@ -9,7 +9,7 @@ namespace Labyrinth
     /// <summary>
     /// Keeps track of the objects in the game
     /// </summary>
-    class GameObjectCollection
+    public class GameObjectCollection
         {
         private readonly List<StaticItem>[] _allGameItems;
         private readonly LinkedList<MovingItem> _interactiveGameItems; 

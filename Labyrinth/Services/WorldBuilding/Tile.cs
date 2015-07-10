@@ -6,7 +6,7 @@ namespace Labyrinth.Services.WorldBuilding
     /// <summary>
     /// Stores the appearance and collision behavior of a tile.
     /// </summary>
-    class Tile
+    public class Tile
         {
         public readonly Texture2D Floor;
 

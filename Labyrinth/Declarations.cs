@@ -52,13 +52,13 @@
         Error
         }
 
-    enum ShotType
+    public enum ShotType
         {
         Player,
         Monster
         }
-    
-    enum BangType
+
+    public enum BangType
         {
         Short,
         Long
@@ -76,7 +76,7 @@
     /// <summary>
     /// Describes how solid an object is
     /// </summary>
-    enum ObjectSolidity
+    public enum ObjectSolidity
         {
         /// <summary>
         /// An object that does not move such as a crystal. Only a single stationary object can occupy a given space. Insubstatial objects can move into the same space though.
@@ -102,7 +102,7 @@
     /// <summary>
     /// Describes what an object is capable of doing to another object
     /// </summary>
-    enum ObjectCapability
+    public enum ObjectCapability
         {
         /// <summary>
         /// An object that cannot move another object
@@ -136,15 +136,15 @@
         Cherries = 5,
         Acorn = 6
         }
-    
-    enum LevelReturnType
+
+    public enum LevelReturnType
         {
         Normal,
         LostLife,
         FinishedLevel
         }
-    
-    enum MonsterMobility
+
+    public enum MonsterMobility
         {
         /// <summary>
         /// Not moving
@@ -171,15 +171,15 @@
         /// </summary>
         Cautious
         }
-    
-    enum ChangeRooms
+
+    public enum ChangeRooms
         {
         StaysWithinRoom,
         MovesRoom,
         FollowsPlayer
         }
-    
-    enum MonsterShootBehaviour
+
+    public enum MonsterShootBehaviour
         {
         None,
         ShootsImmediately,
