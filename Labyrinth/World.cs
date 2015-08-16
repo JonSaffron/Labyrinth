@@ -252,7 +252,9 @@ namespace Labyrinth
                             {
                             countOfInteractions++;
                             Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
-                            BuildInteraction(currentItem, si).Collide();
+                            var interaction = BuildInteraction(currentItem, si);
+                            if (interaction != null)
+                                interaction.Collide();
                             }
                         }
                     }
@@ -261,49 +263,26 @@ namespace Labyrinth
                 Trace.WriteLine(string.Format("Total interactive items: {0}, those that moved: {1}, interactions: {2}", countOfGameItems, countOfGameItemsThatMoved, countOfInteractions));
             }
 
+        [CanBeNull]
         private IInteraction BuildInteraction(StaticItem thisGameItem, StaticItem thatGameItem)
             {
-            IInteraction result;
             var items = new[] { thisGameItem, thatGameItem };
             var staticItem = items.FirstOrDefault(item => !(item is MovingItem));
-            if (staticItem != null)
+            if (staticItem == null)
                 {
-                var otherItem = items.Single(item => item != staticItem);
-                var movingItem = otherItem as MovingItem;
-                if (otherItem is MovingItem)
-                    result = new InteractionWithStaticItems(this, staticItem, movingItem);
-                else
-                    result = new StaticItemAndStaticItemInteraction(this, staticItem, otherItem);
+                IInteraction result = new InteractionWithMovingItems(this, (MovingItem) thisGameItem, (MovingItem) thatGameItem);
+                return result;
                 }
-            else
+            
+            var otherItem = items.Single(item => item != staticItem);
+            var movingItem = otherItem as MovingItem;
+            if (otherItem is MovingItem)
                 {
-                result = new InteractionWithMovingItems(this, (MovingItem) thisGameItem, (MovingItem) thatGameItem);
+                IInteraction result = new InteractionWithStaticItems(this, staticItem, movingItem);
+                return result;
                 }
 
-            //var shot = items.OfType<Shot>().FirstOrDefault();
-            //if (shot != null)
-            //    {
-            //    var otherItem = items.Single(item => item != shot);
-            //    var movingItem = otherItem as MovingItem;
-            //    result = movingItem != null
-            //        ? (IInteraction) new ShotAndMovingItemInteraction(this, shot, movingItem)
-            //        : new ShotAndStaticItemInteraction(this, shot, otherItem);
-            //    }
-            //else
-            //    {
-            //    var movingItem = items.OfType<MovingItem>().FirstOrDefault();
-            //    if (movingItem != null)
-            //        {
-            //        var otherItem = items.Single(item => item != movingItem);
-            //        var otherMovingItem = otherItem as MovingItem;
-            //        result = otherMovingItem != null
-            //            ? (IInteraction) new MovingItemAndMovingItemInteraction(this, movingItem, otherMovingItem)
-            //            : new MovingItemAndStaticItemInteraction(this, movingItem, otherItem);
-            //        }
-            //    else
-            //        result = new StaticItemAndStaticItemInteraction(this, thisGameItem, thatGameItem);
-            //    }
-            return result;
+            return null;
             }
 
         public void AddDiamondDemon(Monster m)

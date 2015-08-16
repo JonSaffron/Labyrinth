@@ -129,7 +129,7 @@
     <Compile Include="GameObjects\CrumblyWall.cs" />
     <Compile Include="GameObjects\Explosion.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="GameInput.cs" />
+    <Compile Include="Services\Input\GameInput.cs" />
     <Compile Include="GameObjectCollection.cs" />
     <Compile Include="Services\Input\PlayerController.cs" />
     <Compile Include="Services\Sound\GameSoundInstance.cs" />
@@ -173,7 +173,6 @@
     <Compile Include="Services\WorldBuilding\WorldLoaderForTest.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
     <Compile Include="StandardPlayerWeapon.cs" />
-    <Compile Include="StaticItemAndStaticItemInteraction.cs" />
     <Compile Include="GameObjects\Wall.cs" />
     <Compile Include="World.cs" />
     <Compile Include="GameObjects\Monsters\Monster.cs" />
@@ -190,7 +189,7 @@
     <Compile Include="GameObjects\Monsters\RotaFloaterBrown.cs" />
     <Compile Include="GameObjects\Monsters\RotaFloaterCyan.cs" />
     <Compile Include="GameObjects\StandardShot.cs" />
-    <Compile Include="SoundEffectFinishedEventArgs.cs" />
+    <Compile Include="Services\Sound\SoundEffectFinishedEventArgs.cs" />
     <Compile Include="Services\Sound\SoundLibrary.cs" />
     <Compile Include="Services\Display\SpriteBatchWindowed.cs" />
     <Compile Include="Services\WorldBuilding\StartState.cs" />
