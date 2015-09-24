@@ -64,7 +64,9 @@
     <Compile Include="PushAndBounceBackTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SuppressDrawComponent.cs" />
+    <Compile Include="TestActiveSoundService.cs" />
     <Compile Include="TestMortonCode.cs" />
+    <Compile Include="TestInstanceCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

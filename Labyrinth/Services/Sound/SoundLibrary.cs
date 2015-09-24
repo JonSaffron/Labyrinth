@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -8,74 +9,142 @@ namespace Labyrinth.Services.Sound
     {
     public sealed class SoundLibrary : IDisposable
         {
-        private readonly Dictionary<GameSound, SoundEffect> _sounds;
-        private readonly Dictionary<SoundEffectInstance, Tuple<GameSound, SoundEffectFinished>> _trackingInstances = new Dictionary<SoundEffectInstance, Tuple<GameSound, SoundEffectFinished>>();
+        private Dictionary<string, SoundEffect> _soundResources;
+        private Dictionary<GameSound,  SoundEffectInstanceCache> _cachedInstances;
 
-        public SoundLibrary()
-            {
-            this._sounds = new Dictionary<GameSound, SoundEffect>();
-            }
+        private const string SoundsFolder = "Sounds";
 
         public void LoadContent(ContentManager cm)
             {
-            foreach (GameSound item in Enum.GetValues(typeof(GameSound)))
-                {
-                string path = string.Format("Sounds/{0}", Enum.GetName(typeof(GameSound), item));
-                var se = cm.Load<SoundEffect>(path);
-                this._sounds.Add(item, se);
-                }
+            var listOfWavFiles = GetListOfWavFiles(cm.RootDirectory);
+            this._soundResources = LoadResources(cm, listOfWavFiles);
+            this._cachedInstances = BuildCache();
             }
 
-        public SoundEffect this[GameSound gameSound]
+        public ISoundEffectInstance this[GameSound gameSound]
             {
             get
                 {
-                var result = this._sounds[gameSound];
+                var result = this._cachedInstances[gameSound].GetNext();
                 return result;
                 }
             }
 
-        public SoundEffectInstance GetTrackedInstance(GameSound gameSound, SoundEffectFinished callback)
+        public TimeSpan GetDuration(GameSound gameSound)
             {
-            var result = this[gameSound].CreateInstance();
-            var tuple = new Tuple<GameSound, SoundEffectFinished>(gameSound, callback);
-            this._trackingInstances.Add(result, tuple);
+            var result = this._cachedInstances[gameSound].SoundDuration;
             return result;
             }
 
-        /// <summary>
-        /// Retrieves an instance of a sound effect.
-        /// </summary>
-        /// <param name="gameSound">Identifies the sound effect</param>
-        /// <returns>A reference to a sound effect. This should be retained whilst the sound is playing.</returns>
-        public IGameSoundInstance GetSoundEffectInstance(GameSound gameSound)
+        private static IEnumerable<FileInfo> GetListOfWavFiles(string rootDirectoryForResources)
             {
-            var soundEffectInstance = this[gameSound].CreateInstance();
-            var result = new GameSoundInstance(soundEffectInstance);
+            var pathToSoundsFolder = string.Format(@"{0}\{1}", rootDirectoryForResources, SoundsFolder);
+            var dir = new DirectoryInfo(pathToSoundsFolder);
+            if (!dir.Exists)
+                throw new DirectoryNotFoundException(pathToSoundsFolder);
+            FileInfo[] files = dir.GetFiles("*.wav");
+            return files;
+            } 
+
+        private static Dictionary<string, SoundEffect> LoadResources(ContentManager cm, IEnumerable<FileInfo> listOfWavFiles)
+            {
+            var result = 
+                (from file in listOfWavFiles 
+                select Path.GetFileNameWithoutExtension(file.Name) into resourceName 
+                select string.Format("{0}/{1}", SoundsFolder, resourceName) into pathToResource 
+                select cm.Load<SoundEffect>(pathToResource)).ToDictionary(se => se.Name);
             return result;
             }
 
-        public void CheckForStoppedInstances()
+        private Dictionary<GameSound,  SoundEffectInstanceCache> BuildCache()
             {
-            lock (this._trackingInstances)
+            var result = new Dictionary<GameSound,  SoundEffectInstanceCache>();
+            foreach (GameSound item in Enum.GetValues(typeof(GameSound)))
                 {
-                var instancesToDispose = new List<SoundEffectInstance>();
-                foreach (var instance in this._trackingInstances.Where(i => i.Key.State == SoundState.Stopped))
-                    {
-                    var gameSound = instance.Value.Item1;
-                    var callback = instance.Value.Item2;
-                    var args = new SoundEffectFinishedEventArgs(gameSound);
-                    callback(this, args);
+                var copyOfItem = item;
+                Func<ISoundEffectInstance> createSoundEffectInstance = () => CreateInstance(copyOfItem);
 
-                    instancesToDispose.Add(instance.Key);
-                    }
-
-                foreach (SoundEffectInstance instance in instancesToDispose)
-                    {
-                    this._trackingInstances.Remove(instance);
-                    instance.Dispose();
-                    }
+                int cacheSize = GetCacheSize(item);
+                TimeSpan soundDuration = GetSoundEffect(copyOfItem).Duration;
+                var cache = new SoundEffectInstanceCache(cacheSize, soundDuration, copyOfItem, createSoundEffectInstance);
+                result.Add(item, cache);
                 }
+            return result;
+            }
+
+        private ISoundEffectInstance CreateInstance(GameSound gameSound)
+            {
+            var sei = GetSoundEffect(gameSound).CreateInstance();
+            switch (gameSound)
+                {
+                case GameSound.PlayerMovesSecondFoot:
+                    sei.Pitch = -0.15f;
+                    break;
+                }
+            var result = new SoundEffectInstance(sei);
+            return result;
+            }
+
+        private SoundEffect GetSoundEffect(GameSound gameSound)
+            {
+            SoundEffect result;
+            switch (gameSound)
+                {
+                case GameSound.PlayerMovesFirstFoot:
+                case GameSound.PlayerMovesSecondFoot:
+                    result = this._soundResources["PlayerMoves"];
+                    break;
+                default:
+                    result = this._soundResources[gameSound.ToString()];
+                    break;
+                }
+            return result;
+            }
+
+        private static int GetCacheSize(GameSound gameSound)
+            {
+            int result;
+            switch (gameSound)
+                {
+                case GameSound.PlayerCollectsCrystal:
+                case GameSound.PlayerFinishesWorld:
+                case GameSound.PlayerEntersNewLevel:
+                case GameSound.PlayerDies:
+                case GameSound.PlayerMovesFirstFoot:
+                case GameSound.PlayerMovesSecondFoot:
+                case GameSound.PlayerStartsNewLife:
+                    result = 1;
+                    break;
+
+                default:
+                    result = 3;
+                    break;
+                }
+            return result;
+            }
+
+        private bool DoesSoundRequirePosition(GameSound gameSound)
+            {
+            switch (gameSound)
+                {
+                case GameSound.BoulderBounces:
+                case GameSound.PlayerCollidesWithMonster:
+                case GameSound.PlayerShootsAndInjuresEgg:
+                case GameSound.MonsterDies:
+                case GameSound.MonsterEntersRoom:
+                case GameSound.EggHatches:
+                case GameSound.PlayerShootsAndInjuresMonster:
+                case GameSound.MonsterLaysEgg:
+                case GameSound.MonsterLaysMushroom:
+                case GameSound.MonsterLeavesRoom:
+                case GameSound.MonsterShoots:
+                case GameSound.ShotBounces:
+                case GameSound.MonsterShattersIntoNewLife:
+                case GameSound.StaticObjectShotAndInjured:
+                    return true;
+                }
+
+            return false;
             }
 
 #region Disposable
@@ -100,18 +169,20 @@ namespace Labyrinth.Services.Sound
 
             if (isDisposing)
                 {
-                lock (this._trackingInstances)
+                if (this._cachedInstances != null)
                     {
-                    var instancesToDispose = new List<SoundEffectInstance>(this._trackingInstances.Keys);
-
-                    foreach (SoundEffectInstance instance in instancesToDispose)
+                    foreach (var item in this._cachedInstances)
                         {
-                        this._trackingInstances.Remove(instance);
-                        instance.Dispose();
+                        item.Value.Dispose();
                         }
-                    
-                    instancesToDispose.Clear();
-                    }                
+                    }
+                if (this._soundResources != null)
+                    {
+                    foreach (var item in this._soundResources)
+                        {
+                        item.Value.Dispose();
+                        }
+                    }
                 }
 
             this._disposed = true;

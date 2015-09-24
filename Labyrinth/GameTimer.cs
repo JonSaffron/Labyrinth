@@ -10,7 +10,7 @@ namespace Labyrinth
 
         public delegate void GameTimerCompleted(object sender, EventArgs args);
 
-        public GameTimer(Game game, double timeToElapse, GameTimerCompleted callBack, bool isEnabled = true) : base(game)
+        public GameTimer(Game1 game, double timeToElapse, GameTimerCompleted callBack, bool isEnabled = true) : base(game)
             {
             if (timeToElapse < 0)
                 throw new ArgumentOutOfRangeException("timeToElapse");

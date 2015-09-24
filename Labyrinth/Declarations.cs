@@ -202,29 +202,30 @@
 
     public enum GameSound
         {
-        BoulderBounces,
-        PlayerCollectsCrystal,
-        PlayerCollidesWithMonster,
-        PlayerShootsAndInjuresEgg,
-        PlayerEatsFruit,
-        PlayerFinishesWorld,
-        MonsterDies,
-        MonsterEntersRoom,
-        EggHatches,
-        PlayerShootsAndInjuresMonster,
-        MonsterLaysEgg,
-        MonsterLaysMushroom,
-        MonsterLeavesRoom,
-        MonsterShoots,
-        PlayerEntersNewLevel,
-        PlayerDies,
-        PlayerInjured,
-        PlayerMoves,
-        PlayerShoots,
-        ShotBounces,
-        MonsterShattersIntoNewLife,
-        PlayerStartsNewLife,
-        StaticObjectShotAndInjured
+        BoulderBounces,                     // position of boulder
+        PlayerCollectsCrystal,              // single instance
+        PlayerCollidesWithMonster,          // position of bang
+        PlayerShootsAndInjuresEgg,          // position of egg
+        PlayerEatsFruit,                    // no position
+        PlayerFinishesWorld,                // single instance
+        MonsterDies,                        // position of bang
+        MonsterEntersRoom,                  // position of monster
+        EggHatches,                         // position of egg
+        PlayerShootsAndInjuresMonster,      // position of monster
+        MonsterLaysEgg,                     // position of monster
+        MonsterLaysMushroom,                // position of monster
+        MonsterLeavesRoom,                  // position of monster
+        MonsterShoots,                      // position of monster
+        PlayerEntersNewLevel,               // single instance
+        PlayerDies,                         // single instance
+        PlayerInjured,                      // no position
+        PlayerMovesFirstFoot,               // single instance
+        PlayerMovesSecondFoot,              // single instance
+        PlayerShoots,                       // no position
+        ShotBounces,                        // position of shot
+        MonsterShattersIntoNewLife,         // position of bang
+        PlayerStartsNewLife,                // single instance
+        StaticObjectShotAndInjured          // position of object
         }
 
     /// <summary>

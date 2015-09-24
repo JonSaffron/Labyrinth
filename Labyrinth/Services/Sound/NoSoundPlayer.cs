@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework.Audio;
+using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.Sound
     {
@@ -27,9 +27,14 @@ namespace Labyrinth.Services.Sound
             soundEffectInstance.Play();
             }
 
-        public void Play(SoundEffectInstance soundEffectInstance)
+        public void Play(GameSound gameSound, StaticItem gameObject)
             {
-            // nothing to do
+            throw new NotImplementedException();
+            }
+
+        public void Play(GameSound gameSound, StaticItem gameObject, SoundEffectFinished callback)
+            {
+            throw new NotImplementedException();
             }
         }
     }

@@ -122,6 +122,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="Interfaces\IGameObject.cs" />
+    <Compile Include="Services\Sound\ActiveSound.cs" />
+    <Compile Include="Services\Sound\ActiveSoundForObject.cs" />
+    <Compile Include="Interfaces\IActiveSound.cs" />
+    <Compile Include="Interfaces\IActiveSoundService.cs" />
+    <Compile Include="Interfaces\ICentrePointProvider.cs" />
+    <Compile Include="Interfaces\ISoundEffectInstance.cs" />
+    <Compile Include="IoC.cs" />
     <Compile Include="Services\Display\Animation.cs" />
     <Compile Include="Services\Display\AnimationPlayer.cs" />
     <Compile Include="GameObjects\Bang.cs" />
@@ -129,13 +138,12 @@
     <Compile Include="GameObjects\CrumblyWall.cs" />
     <Compile Include="GameObjects\Explosion.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Services\Input\GameController.cs" />
     <Compile Include="Services\Input\GameInput.cs" />
     <Compile Include="GameObjectCollection.cs" />
     <Compile Include="Services\Input\PlayerController.cs" />
-    <Compile Include="Services\Sound\GameSoundInstance.cs" />
     <Compile Include="GameTimer.cs" />
     <Compile Include="Interfaces\IInteraction.cs" />
-    <Compile Include="Interfaces\IGameSoundInstance.cs" />
     <Compile Include="Interfaces\IMonsterWeapon.cs" />
     <Compile Include="InteractionWithMovingItems.cs" />
     <Compile Include="Interfaces\IPlayerInput.cs" />
@@ -146,7 +154,6 @@
     <Compile Include="GameObjects\Mine.cs" />
     <Compile Include="MineLayer.cs" />
     <Compile Include="InteractionWithStaticItems.cs" />
-    <Compile Include="Services\Sound\NoSoundPlayer.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="GameObjects\Monsters\Butterfly.cs" />
     <Compile Include="GameObjects\Monsters\CrazyCrawler.cs" />
@@ -160,6 +167,10 @@
     <Compile Include="GameObjects\Monsters\FlitterbugRed.cs" />
     <Compile Include="GameObjects\ForceField.cs" />
     <Compile Include="GameObjects\Fruit.cs" />
+    <Compile Include="Services\Sound\ActiveSoundService.cs" />
+    <Compile Include="Services\Sound\InstanceCache.cs" />
+    <Compile Include="Services\Sound\SoundEffectInstance.cs" />
+    <Compile Include="Services\Sound\SoundEffectInstanceCache.cs" />
     <Compile Include="Services\WorldBuilding\FruitDefinition.cs" />
     <Compile Include="GameObjects\Grave.cs" />
     <Compile Include="Services\Input\PlayerInput.cs" />

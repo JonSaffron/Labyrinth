@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public abstract class StaticItem
+    public abstract class StaticItem : IGameObject
         {
         private Vector2 _position;
         private TilePos _tilePosition;
@@ -43,13 +43,17 @@ namespace Labyrinth.GameObjects
                 {
                 this._position = value;
                 this._tilePosition = TilePos.TilePosFromPosition(value);
-
-                const int width = Tile.Width;
-                const int height = Tile.Height;
-                var left = (int)Math.Round(value.X - (width / 2.0));
-                var top = (int)Math.Round(value.Y - (height / 2.0));
-                this.BoundingRectangle = new Rectangle(left, top, width, height);
+                SetBoundingRectangle(value);
                 }
+            }
+
+        private void SetBoundingRectangle(Vector2 position)
+            {
+            const int width = Tile.Width;
+            const int height = Tile.Height;
+            var left = (int)Math.Round(position.X - (width / 2.0));
+            var top = (int)Math.Round(position.Y - (height / 2.0));
+            this.BoundingRectangle = new Rectangle(left, top, width, height);
             }
 
         /// <summary>

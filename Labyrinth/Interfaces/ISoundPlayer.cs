@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Audio;
+﻿using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
@@ -6,6 +6,7 @@ namespace Labyrinth
         {
         void Play(GameSound gameSound);
         void Play(GameSound gameSound, SoundEffectFinished callback);
-        void Play(SoundEffectInstance soundEffectInstance);
+        void Play(GameSound gameSound, StaticItem gameObject);
+        void Play(GameSound gameSound, StaticItem gameObject, SoundEffectFinished callback);
         }
     }

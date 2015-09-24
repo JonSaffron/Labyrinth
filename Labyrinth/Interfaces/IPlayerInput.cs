@@ -1,3 +1,4 @@
+using Labyrinth.Services.Input;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth

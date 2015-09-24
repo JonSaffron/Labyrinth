@@ -100,7 +100,7 @@ namespace Labyrinth.GameObjects
         public void SetDelayBeforeHatching(int value)
             {
             this.MonsterState = MonsterState.Egg;
-            this._hatchingTimer = new GameTimer(this.World.Game, value*AnimationPlayer.GameClockResolution, EggIsHatching, false);
+            this._hatchingTimer = new GameTimer(this.World.Game, value * AnimationPlayer.GameClockResolution, EggIsHatching, false);
             }
 
         private void EggIsHatching(object sender, EventArgs args)

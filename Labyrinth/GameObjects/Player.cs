@@ -46,8 +46,6 @@ namespace Labyrinth.GameObjects
         private int _countBeforeDecrementingEnergy;
         private const double TicksOfClock = 0.05f;
 
-        private readonly IGameSoundInstance _playerMovesFootOne;
-        private readonly IGameSoundInstance _playerMovesFootTwo;
         private bool _whichFootFlag;
 
         /// <summary>
@@ -68,16 +66,12 @@ namespace Labyrinth.GameObjects
             this._weapon1 = new StandardPlayerWeapon();
             this._weapon2 = new MineLayer();
             Reset(position, energy);
-
-            this._playerMovesFootOne = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
-            this._playerMovesFootTwo = world.Game.SoundLibrary.GetSoundEffectInstance(GameSound.PlayerMoves);
-            this._playerMovesFootTwo.Pitch = -0.15f;
             }
 
         private void PlayerSpriteNewFrame(object sender, EventArgs e)
             {
-            var playerMoves = _whichFootFlag ? this._playerMovesFootOne : this._playerMovesFootTwo;
-            playerMoves.Play(this.World.Game.SoundPlayer);
+            var playerMoves = _whichFootFlag ? GameSound.PlayerMovesFirstFoot : GameSound.PlayerMovesSecondFoot;
+            this.World.Game.SoundPlayer.Play(playerMoves);
             _whichFootFlag = !_whichFootFlag;
             }
 

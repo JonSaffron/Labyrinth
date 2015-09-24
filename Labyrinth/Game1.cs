@@ -1,5 +1,6 @@
 using System;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.Input;
 using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -31,7 +32,18 @@ namespace Labyrinth
         private int _score;
         private int _displayedScore;
         private int _lives;
-        
+
+        public static Game1 Current { get; private set; }
+
+        public static Game1 Create()
+            {
+            if (Current != null)
+                Current.Dispose();
+
+            Current = IoC.Resolve<Game1>();
+            return Current;
+            }
+
         public Game1(IPlayerInput playerInput, IWorldLoader worldLoader)
             {
             if (playerInput == null)
@@ -104,7 +116,6 @@ namespace Labyrinth
             
 
             base.Update(gameTime);
-            this._soundLibrary.CheckForStoppedInstances();
 
             // ReSharper disable once PossibleNullReferenceException
             LevelReturnType lrt = this.World.Update(gameTime);
@@ -280,10 +291,11 @@ namespace Labyrinth
                 SoundEffect.MasterVolume = newVolume;
                 }
 
-            if (changeToEnabled > 0 && !(this.SoundPlayer is SoundPlayer))
-                this.SoundPlayer = new SoundPlayer(this._soundLibrary);
-            else if (changeToEnabled < 0 && !(this.SoundPlayer is NoSoundPlayer))
-                this.SoundPlayer =  new NoSoundPlayer(this._soundLibrary);
+            //todo
+            //if (changeToEnabled > 0 && !(this.SoundPlayer is SoundPlayer))
+            //    this.SoundPlayer = new SoundPlayer(this._soundLibrary);
+            //else if (changeToEnabled < 0 && !(this.SoundPlayer is NoSoundPlayer))
+            //    this.SoundPlayer =  new NoSoundPlayer(this._soundLibrary);
             }
 
         public SoundLibrary SoundLibrary
