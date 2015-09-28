@@ -97,19 +97,20 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public void SetDelayBeforeHatching(int value)
+        public void SetDelayBeforeHatching(int gameTicks)
             {
             this.MonsterState = MonsterState.Egg;
-            this._hatchingTimer = new GameTimer(this.World.Game, value * AnimationPlayer.GameClockResolution, EggIsHatching, false);
+            var timeSpan = TimeSpan.FromSeconds(gameTicks * AnimationPlayer.GameClockResolution);
+            this._hatchingTimer = GameTimer.AddGameTimer(this.World.Game, timeSpan, EggIsHatching, false);
             }
 
         private void EggIsHatching(object sender, EventArgs args)
             {
             this.MonsterState = MonsterState.Hatching;
-            this.World.Game.SoundPlayer.Play(GameSound.EggHatches, EggHasHatched);
+            PlaySoundWithCallback(GameSound.EggHatches, EggHasHatched);
             }
 
-        private void EggHasHatched(object sender, SoundEffectFinishedEventArgs args)
+        private void EggHasHatched(object sender, EventArgs args)
             {
             this.MonsterState = MonsterState.Normal;
             }

@@ -103,7 +103,7 @@ namespace Labyrinth
             int howManyCrystalsRemain = world.GameObjects.DistinctItemsOfType<Crystal>().Count();
             if (howManyCrystalsRemain == 0)
                 {
-                world.Game.SoundPlayer.Play(GameSound.PlayerFinishesWorld,
+                world.Game.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
                     (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedLevel));
                 world.SetDoNotUpdate();
                 }

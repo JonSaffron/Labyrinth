@@ -1,5 +1,4 @@
-﻿using System;
-using Labyrinth.Services.Sound;
+﻿using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Moq;
@@ -65,188 +64,160 @@ namespace Labyrinth.Test
             Assert.AreEqual(SoundState.Stopped, item.SoundEffectInstance.State);
             }
 
-        //[Test]
-        //public void GivenThatTheActiveSoundListIsNotEmptyCanADifferentSoundBeAdded()
-        //    {
-        //    var ass = new ActiveSoundService();
-        //    var sei1 = new Mock<ISoundEffectInstance>();
-        //    var sei2 = new Mock<ISoundEffectInstance>();
-           
-        //    ass.Add(sei1.Object, null);
-        //    ass.Add(sei2.Object, null);
-
-        //    Assert.Equals(ass.Count, 2);
-        //    }
-
-        //[Test]
-        //public void GivenThatTheActiveSoundListContainsAGivenInstanceDoesThatSoundRestartWhenAddedAgain()
-        //    {
-        //    var ass = new ActiveSoundService();
-        //    var sei = new Mock<ISoundEffectInstance>();
-            
-        //    ass.Add(sei.Object, null);
-        //    ass.Add(sei.Object, null);
-
-        //    Assert.Equals(ass.Count, 1);
-        //    Assert.IsTrue(ass[0].RestartPlay);
-        //    }
-
-        //[Test]
-        //public void GivenThatTheActiveSoundListIsNotEmptyDoesClearLeaveItEmpty()
-        //    {
-        //    var ass = new ActiveSoundService();
-        //    var sei = new Mock<ISoundEffectInstance>();
-            
-        //    ass.Add(sei.Object, null);
-        //    ass.Add(sei.Object, null);
-        //    ass.Clear();
-
-        //    Assert.Equals(ass.Count, 0);
-        //    }
-
-        //[Test]
-        //public void GivenTheListContainsACompletedItemDoesUpdateDropThatItem()
-        //    {
-        //    var ass = new ActiveSoundService();
-        //    var sei = new Mock<ISoundEffectInstance>();
-        //    sei.Setup(finishedPlaying => finishedPlaying.State).Returns(SoundState.Stopped);
-            
-        //    ass.Add(sei.Object, null);
-        //    ass.Update(Vector2.Zero);
-
-        //    Assert.Equals(ass.Count, 0);
-        //    }
-
-        //[Test]
-        //public void DoesAPlayingSoundStopIfTheAssociatedObjectIsNoLongerExtant()
-        //    {
-        //    var ass = new ActiveSoundService();
-        //    var sei = new Mock<ISoundEffectInstance>();
-        //    var gameObject = new Mock<StaticItem>();
-        //    gameObject.SetupSequence(deadGameObject => deadGameObject.IsExtant)
-        //        .Returns(true)
-        //        .Returns(false);
-
-        //    ass.Add(sei.Object, gameObject.Object);
-        //    ass.Update(Vector2.Zero);
-
-        //    Assert.Equals(ass.Count, 0);
-        //    }
-
-        //[Test]
-        //public void DoesAPlayingSoundChangeItsPanningWhenItsAssociatedObjectMoves()
-        //    {
-        //    var ass = new ActiveSoundService();
-        //    var sei = new Mock<ISoundEffectInstance>();
-        //    var gameObject = new Mock<StaticItem>();
-        //    gameObject.Setup(movingObject => movingObject.IsExtant).Returns(true);
-        //    gameObject.SetupSequence(movingObject => movingObject.Position)
-        //        .Returns(new Vector2(-10, 0))
-        //        .Returns(new Vector2(10, 0));
-
-        //    var seiInstance = sei.Object;
-        //    ass.Add(seiInstance, gameObject.Object);
-        //    var initialPanning = seiInstance.Pan;
-        //    ass.Update(Vector2.Zero);
-        //    var updatedPanning = seiInstance.Pan;
-
-        //    Assert.AreNotEqual(initialPanning, updatedPanning);
-        //    }
-
-        //[Test]
-        //public void DoesAPlayingSoundChangeItsVolumeWhenItsAssociatedObjectMoves()
-        //    {
-        //    var ass = new ActiveSoundService();
-        //    var sei = new Mock<ISoundEffectInstance>();
-        //    var gameObject = new Mock<StaticItem>();
-        //    gameObject.Setup(movingObject => movingObject.IsExtant).Returns(true);
-        //    gameObject.SetupSequence(movingObject => movingObject.Position)
-        //        .Returns(Vector2.Zero)
-        //        .Returns(new Vector2(100, 0));
-
-        //    var seiInstance = sei.Object;
-        //    ass.Add(seiInstance, gameObject.Object);
-        //    var initialVolume = seiInstance.Volume;
-        //    ass.Update(Vector2.Zero);
-        //    var updatedVolume = seiInstance.Volume;
-
-        //    Assert.AreNotEqual(initialVolume, updatedVolume);
-        //    }
-
-        class DummySoundEffectInstance : ISoundEffectInstance
+        [Test]
+        public void GivenThatTheActiveSoundListIsNotEmptyCanADifferentSoundBeAdded()
             {
-            private SoundState _state = SoundState.Stopped;
-            private float _pan;
-            private float _volume;
-            private string _instanceName = "Instance";
+            var ass = new ActiveSoundService();
+            var sei1 = new DummySoundEffectInstance {InstanceName = "one"};
+            var sei2 = new DummySoundEffectInstance {InstanceName = "two"};
+            var activeSound1 = new ActiveSound(sei1);
+            var activeSound2 = new ActiveSound(sei2);
 
-            public DummySoundEffectInstance()
-                {
-                Volume = 1.0f;
-                }
+            ass.Add(activeSound1);
+            ass.Add(activeSound2);
 
-            public void Dispose()
-                {
-                // nothing to do
-                }
+            Assert.AreEqual(2, ass.Count);
+            }
 
-            public void Play()
-                {
-                this._state = SoundState.Playing;
-                }
+        [Test]
+        public void GivenThatTheActiveSoundListContainsAGivenInstanceDoesThatSoundRestartWhenAddedAgain()
+            {
+            var ass = new ActiveSoundService();
+            var sei = new DummySoundEffectInstance();
+            var activeSound = new ActiveSound(sei);
+            
+            ass.Add(activeSound);
+            ass.Add(activeSound);
 
-            public void Stop()
-                {
-                this._state = SoundState.Stopped;
-                }
+            Assert.AreEqual(1, ass.Count);
+            activeSound = (ActiveSound) ass[0];
+            Assert.IsTrue(activeSound.RestartPlay);
+            }
 
-            public string InstanceName
-                {
-                get
-                    {
-                    return this._instanceName;
-                    }
-                set
-                    {
-                    this._instanceName = value;
-                    }
-                }
+        [Test]
+        public void GivenThatTheActiveSoundListPlaysASoundWithAGameObjectWillAddingTheSoundAgainWithoutAGameObjectResetThePanAndVolume()
+            {
+            var ass = new ActiveSoundService();
+            var sei = new DummySoundEffectInstance();
+            var gameObject = new Mock<IGameObject>();
+            gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(true);
+            gameObject.Setup(objectToTheSide => objectToTheSide.Position).Returns(new Vector2(10, 10));
+            var centrePointProvider = new Mock<ICentrePointProvider>();
+            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            var activeSoundWithObject = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
+            var activeSoundWithoutObject = new ActiveSound(sei);
+            
+            ass.Add(activeSoundWithObject);
+            ass.Add(activeSoundWithoutObject);
 
-            public SoundState State
-                {
-                get
-                    {
-                    return _state;
-                    }
-                }
+            Assert.AreEqual(1, ass.Count);
+            activeSoundWithoutObject = (ActiveSound) ass[0];
+            Assert.IsTrue(activeSoundWithoutObject.RestartPlay);
+            ass.Update();
+            Assert.IsFalse(activeSoundWithoutObject.RestartPlay);
+            Assert.AreEqual(1, activeSoundWithoutObject.SoundEffectInstance.Volume);
+            Assert.AreEqual(0, activeSoundWithoutObject.SoundEffectInstance.Pan);
+            }
 
-            public float Pan
-                {
-                get
-                    {
-                    return _pan;
-                    }
-                set
-                    {
-                    if (value < -1.0f || value > 1.0f)
-                        throw new ArgumentOutOfRangeException();
-                    _pan = value;
-                    }
-                }
+        [Test]
+        public void GivenThatTheActiveSoundListIsNotEmptyDoesClearLeaveItEmpty()
+            {
+            var ass = new ActiveSoundService();
+            var sei1 = new DummySoundEffectInstance { InstanceName = "one" };
+            var sei2 = new DummySoundEffectInstance { InstanceName = "two" };
+            var activeSound1 = new ActiveSound(sei1);
+            var activeSound2 = new ActiveSound(sei2);
+            
+            ass.Add(activeSound1);
+            ass.Add(activeSound2);
+            ass.Clear();
+            ass.Update();
 
-            public float Volume
-                {
-                get
-                    {
-                    return _volume;
-                    }
-                set
-                    {
-                    if (value < 0.0f || value > 1.0f)
-                        throw new ArgumentOutOfRangeException();
-                    _volume = value;
-                    }
-                }
+            Assert.AreEqual(0, ass.Count);
+            }
+
+        [Test]
+        public void GivenTheListContainsACompletedItemDoesUpdateDropThatItem()
+            {
+            var ass = new ActiveSoundService();
+            var sei = new DummySoundEffectInstance();
+            var activeSound = new ActiveSound(sei);
+            
+            ass.Add(activeSound);
+            Assert.AreEqual(1, ass.Count);
+            var item = ass[0];
+            Assert.AreEqual(SoundState.Playing, item.SoundEffectInstance.State);
+
+            activeSound.Stop();
+            ass.Update();
+
+            Assert.AreEqual(ass.Count, 0);
+            }
+
+        [Test]
+        public void DoesAPlayingSoundStopIfTheAssociatedObjectIsNoLongerExtant()
+            {
+            var ass = new ActiveSoundService();
+            var sei = new DummySoundEffectInstance();
+
+            var gameObject = new Mock<IGameObject>();
+            gameObject.SetupSequence(deadGameObject => deadGameObject.IsExtant)
+                .Returns(true)
+                .Returns(false);
+            var centrePointProvider = new Mock<ICentrePointProvider>();
+            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
+
+            ass.Add(activeSound);
+            ass.Update();
+
+            Assert.AreEqual(1, ass.Count);
+            var item = ass[0];
+            Assert.AreEqual(SoundState.Stopped, item.SoundEffectInstance.State);
+            }
+        
+        [Test]
+        public void DoesAPlayingSoundChangeItsPanningWhenItsAssociatedObjectMoves()
+            {
+            var ass = new ActiveSoundService();
+            var sei = new DummySoundEffectInstance();
+            var gameObject = new Mock<IGameObject>();
+            gameObject.Setup(movingObject => movingObject.IsExtant).Returns(true);
+            gameObject.SetupSequence(movingObject => movingObject.Position)
+                .Returns(new Vector2(-10, 0))
+                .Returns(new Vector2(10, 0));
+            var centrePointProvider = new Mock<ICentrePointProvider>();
+            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
+
+            ass.Add(activeSound);
+            var initialPanning = sei.Pan;
+            ass.Update();
+            var updatedPanning = sei.Pan;
+
+            Assert.AreNotEqual(initialPanning, updatedPanning);
+            }
+
+        [Test]
+        public void DoesAPlayingSoundChangeItsVolumeWhenItsAssociatedObjectMoves()
+            {
+            var ass = new ActiveSoundService();
+            var sei = new DummySoundEffectInstance();
+            var gameObject = new Mock<IGameObject>();
+            gameObject.Setup(movingObject => movingObject.IsExtant).Returns(true);
+            gameObject.SetupSequence(movingObject => movingObject.Position)
+                .Returns(Vector2.Zero)
+                .Returns(new Vector2(100, 0));
+            var centrePointProvider = new Mock<ICentrePointProvider>();
+            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
+
+            ass.Add(activeSound);
+            var initialVolume = sei.Volume;
+            ass.Update();
+            var updatedVolume = sei.Volume;
+
+            Assert.AreNotEqual(initialVolume, updatedVolume);
             }
         }
     }

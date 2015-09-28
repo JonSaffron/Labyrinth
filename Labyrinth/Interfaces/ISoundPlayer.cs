@@ -1,12 +1,17 @@
-﻿using Labyrinth.GameObjects;
+﻿using System;
 
 namespace Labyrinth
     {
     public interface ISoundPlayer
         {
         void Play(GameSound gameSound);
-        void Play(GameSound gameSound, SoundEffectFinished callback);
-        void Play(GameSound gameSound, StaticItem gameObject);
-        void Play(GameSound gameSound, StaticItem gameObject, SoundEffectFinished callback);
+        void PlayWithCallback(GameSound gameSound, EventHandler callback);
+        void PlayForObject(GameSound gameSound, IGameObject gameObject);
+        void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, EventHandler callback);
+
+        void Enable();
+        void Disable();
+        void TurnItUp();
+        void TurnItDown();
         }
     }

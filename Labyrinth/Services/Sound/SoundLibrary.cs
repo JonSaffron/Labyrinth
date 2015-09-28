@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 
@@ -19,12 +18,18 @@ namespace Labyrinth.Services.Sound
             var listOfWavFiles = GetListOfWavFiles(cm.RootDirectory);
             this._soundResources = LoadResources(cm, listOfWavFiles);
             this._cachedInstances = BuildCache();
+            this._disposed = false;
             }
 
         public ISoundEffectInstance this[GameSound gameSound]
             {
             get
                 {
+                if (this._disposed)
+                    throw new ObjectDisposedException("SoundLibrary");
+                if (this._cachedInstances == null)
+                    throw new InvalidOperationException("Library resources have not been loaded - call LoadContent first.");
+
                 var result = this._cachedInstances[gameSound].GetNext();
                 return result;
                 }
@@ -32,6 +37,11 @@ namespace Labyrinth.Services.Sound
 
         public TimeSpan GetDuration(GameSound gameSound)
             {
+            if (this._disposed)
+                throw new ObjectDisposedException("SoundLibrary");
+                if (this._cachedInstances == null)
+                    throw new InvalidOperationException("Library resources have not been loaded - call LoadContent first.");
+
             var result = this._cachedInstances[gameSound].SoundDuration;
             return result;
             }
@@ -42,17 +52,21 @@ namespace Labyrinth.Services.Sound
             var dir = new DirectoryInfo(pathToSoundsFolder);
             if (!dir.Exists)
                 throw new DirectoryNotFoundException(pathToSoundsFolder);
-            FileInfo[] files = dir.GetFiles("*.wav");
+            FileInfo[] files = dir.GetFiles("*.xnb");
             return files;
             } 
 
         private static Dictionary<string, SoundEffect> LoadResources(ContentManager cm, IEnumerable<FileInfo> listOfWavFiles)
             {
-            var result = 
-                (from file in listOfWavFiles 
-                select Path.GetFileNameWithoutExtension(file.Name) into resourceName 
-                select string.Format("{0}/{1}", SoundsFolder, resourceName) into pathToResource 
-                select cm.Load<SoundEffect>(pathToResource)).ToDictionary(se => se.Name);
+            var result = new Dictionary<string, SoundEffect>();
+            foreach (var file in listOfWavFiles)
+                {
+                var resourceName = Path.GetFileNameWithoutExtension(file.Name);
+                var pathToResource = string.Format("{0}/{1}", SoundsFolder, resourceName);
+                var soundEffect = cm.Load<SoundEffect>(pathToResource);
+                soundEffect.Name = resourceName;
+                result.Add(resourceName, soundEffect);
+                }
             return result;
             }
 
@@ -123,66 +137,27 @@ namespace Labyrinth.Services.Sound
             return result;
             }
 
-        private bool DoesSoundRequirePosition(GameSound gameSound)
-            {
-            switch (gameSound)
-                {
-                case GameSound.BoulderBounces:
-                case GameSound.PlayerCollidesWithMonster:
-                case GameSound.PlayerShootsAndInjuresEgg:
-                case GameSound.MonsterDies:
-                case GameSound.MonsterEntersRoom:
-                case GameSound.EggHatches:
-                case GameSound.PlayerShootsAndInjuresMonster:
-                case GameSound.MonsterLaysEgg:
-                case GameSound.MonsterLaysMushroom:
-                case GameSound.MonsterLeavesRoom:
-                case GameSound.MonsterShoots:
-                case GameSound.ShotBounces:
-                case GameSound.MonsterShattersIntoNewLife:
-                case GameSound.StaticObjectShotAndInjured:
-                    return true;
-                }
-
-            return false;
-            }
-
 #region Disposable
 
         private bool _disposed;
 
         public void Dispose()
             {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-            }
-
-        ~SoundLibrary()
-            {
-            Dispose(false);
-            }
-
-        private void Dispose(bool isDisposing)
-            {
-            if (this._disposed)
-                return;
-
-            if (isDisposing)
+            if (this._cachedInstances != null)
                 {
-                if (this._cachedInstances != null)
+                foreach (var item in this._cachedInstances)
                     {
-                    foreach (var item in this._cachedInstances)
-                        {
-                        item.Value.Dispose();
-                        }
+                    item.Value.Dispose();
                     }
-                if (this._soundResources != null)
+                this._cachedInstances = null;
+                }
+            if (this._soundResources != null)
+                {
+                foreach (var item in this._soundResources)
                     {
-                    foreach (var item in this._soundResources)
-                        {
-                        item.Value.Dispose();
-                        }
+                    item.Value.Dispose();
                     }
+                this._soundResources = null;
                 }
 
             this._disposed = true;

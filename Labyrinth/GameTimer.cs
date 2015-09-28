@@ -5,14 +5,19 @@ namespace Labyrinth
     {
     public class GameTimer : GameComponent
         {
-        public double TimeRemaining { get; private set; }
-        private readonly GameTimerCompleted _callBack;
+        public TimeSpan TimeRemaining { get; private set; }
+        private readonly EventHandler _callBack;
 
-        public delegate void GameTimerCompleted(object sender, EventArgs args);
-
-        public GameTimer(Game1 game, double timeToElapse, GameTimerCompleted callBack, bool isEnabled = true) : base(game)
+        public static GameTimer AddGameTimer(Game1 game, TimeSpan timeToElapse, EventHandler callBack, bool isEnabled = true)
             {
-            if (timeToElapse < 0)
+            var gt = new GameTimer(game, timeToElapse, callBack, isEnabled);
+            game.Components.Add(gt);
+            return gt;
+            }
+
+        private GameTimer(Game1 game, TimeSpan timeToElapse, EventHandler callBack, bool isEnabled = true) : base(game)
+            {
+            if (timeToElapse.Ticks < 0)
                 throw new ArgumentOutOfRangeException("timeToElapse");
             if (callBack == null)
                 throw new ArgumentNullException("callBack");
@@ -20,13 +25,12 @@ namespace Labyrinth
             this.TimeRemaining = timeToElapse;
             this._callBack = callBack;
             this.Enabled = isEnabled;
-            this.Game.Components.Add(this);
             }
 
         public override void Update(GameTime gameTime)
             {
-            this.TimeRemaining -= gameTime.ElapsedGameTime.TotalSeconds;
-            if (TimeRemaining <= 0)
+            this.TimeRemaining -= gameTime.ElapsedGameTime;
+            if (TimeRemaining.Ticks <= 0)
                 {
                 this.Game.Components.Remove(this);
                 this._callBack(this, new EventArgs());

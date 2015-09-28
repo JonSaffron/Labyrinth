@@ -265,12 +265,12 @@ namespace Labyrinth.GameObjects
             this.Energy = 0;
             this._countBeforeDecrementingEnergy = 0;
 
-            this.World.Game.SoundPlayer.Play(GameSound.PlayerDies, SoundEffectFinished);
+            PlaySoundWithCallback(GameSound.PlayerDies, SoundEffectFinished);
             this.World.AddBang(this.Position, BangType.Long);
             this.World.AddGrave(this.TilePosition);
             }
 
-        private void SoundEffectFinished(object sender, SoundEffectFinishedEventArgs args)
+        private void SoundEffectFinished(object sender, EventArgs args)
             {
             this.World.SetLevelReturnType(LevelReturnType.LostLife);
             }

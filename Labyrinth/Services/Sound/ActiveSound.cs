@@ -6,7 +6,7 @@ namespace Labyrinth.Services.Sound
     public class ActiveSound : IActiveSound
         {
         public ISoundEffectInstance SoundEffectInstance { get; private set; }
-        protected bool RestartPlay;
+        public bool RestartPlay { get; private set; }
 
         public ActiveSound(ISoundEffectInstance soundEffectInstance)
             {

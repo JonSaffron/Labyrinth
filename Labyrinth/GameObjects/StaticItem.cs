@@ -186,5 +186,15 @@ namespace Labyrinth.GameObjects
         /// Gets the order that objects are drawn in (lowest before highest)
         /// </summary>
         public abstract int DrawOrder { get; }
+
+        public void PlaySound(GameSound gameSound)
+            {
+            this.World.Game.SoundPlayer.PlayForObject(gameSound, this);
+            }
+
+        public void PlaySoundWithCallback(GameSound gameSound, EventHandler callback)
+            {
+            this.World.Game.SoundPlayer.PlayForObjectWithCallback(gameSound, this, callback);
+            }
         }
     }

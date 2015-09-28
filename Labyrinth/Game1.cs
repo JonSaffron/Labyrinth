@@ -4,7 +4,6 @@ using Labyrinth.Services.Input;
 using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
@@ -12,7 +11,7 @@ namespace Labyrinth
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Game
+    public class Game1 : Game, ICentrePointProvider
         {
         public const int RoomSizeWidth = 16 * Tile.Width;
         public const int RoomSizeHeight = 10 * Tile.Height;
@@ -24,7 +23,6 @@ namespace Labyrinth
         internal World World { get; private set; }
         
         private readonly GraphicsDeviceManager _gdm;
-        private readonly SoundLibrary _soundLibrary = new SoundLibrary();
         private readonly IWorldLoader _worldLoader;
 
         private Texture2D _digits;
@@ -77,8 +75,9 @@ namespace Labyrinth
             this._digits = Content.Load<Texture2D>("Display/Digits");
             this._life = Content.Load<Texture2D>("Display/Life");
 
-            this._soundLibrary.LoadContent(this.Content);
-            this.SetSoundPlayer(1, 0);
+            var soundLibrary = new SoundLibrary();
+            soundLibrary.LoadContent(this.Content);
+            this.SoundPlayer = new SoundPlayer(soundLibrary, this);
             }
 
         /// <summary>
@@ -160,8 +159,16 @@ namespace Labyrinth
                 ToggleFullScreen();
                 
             int changeToEnabled = (gameInput.HasSoundOnBeenTriggered ? 1 : 0) + (gameInput.HasSoundOffBeenTriggered ? -1 : 0);
+            if (changeToEnabled < 0)
+                this.SoundPlayer.Disable();
+            else if (changeToEnabled > 0)
+                SoundPlayer.Enable();
+
             int changeToVolume = (gameInput.HasSoundIncreaseBeenTriggered ? 1 : 0) + (gameInput.HasSoundDecreaseBeenTriggered  ? -1 : 0);
-            SetSoundPlayer(changeToEnabled, changeToVolume);
+            if (changeToVolume < 0)
+                this.SoundPlayer.TurnItDown();
+            else if (changeToVolume > 0)
+                this.SoundPlayer.TurnItUp();
 
             if (gameInput.HasMoveToNextLevelBeenTriggered && this.World != null)
                 {
@@ -277,32 +284,13 @@ namespace Labyrinth
             return result;
             }
 
-        /// <summary>
-        /// Updates the sound player properties
-        /// </summary>
-        /// <param name="changeToEnabled">If set to a positive value then sound will be enabled, if set to a negative value then sound will be disabled. Zero indicates no change.</param>
-        /// <param name="changeToVolume">If set to a positive value then the volume will be increased, if set to a negative value then the volume will be decreased. Zero indicates no change.</param>
-        private void SetSoundPlayer(int changeToEnabled, int changeToVolume)
-            {
-            if (changeToVolume != 0)
+        public Vector2 CentrePoint 
+            { 
+            get 
                 {
-                float newVolume = SoundEffect.MasterVolume + Math.Sign(changeToVolume) * 0.1f;
-                newVolume = Math.Min(1.0f, Math.Max(0.0f, newVolume));
-                SoundEffect.MasterVolume = newVolume;
-                }
-
-            //todo
-            //if (changeToEnabled > 0 && !(this.SoundPlayer is SoundPlayer))
-            //    this.SoundPlayer = new SoundPlayer(this._soundLibrary);
-            //else if (changeToEnabled < 0 && !(this.SoundPlayer is NoSoundPlayer))
-            //    this.SoundPlayer =  new NoSoundPlayer(this._soundLibrary);
-            }
-
-        public SoundLibrary SoundLibrary
-            {
-            get
-                {
-                return this._soundLibrary;
+                var centreOfRoom = new Vector2(RoomSizeWidth / 2, RoomSizeHeight / 2);
+                var result = this.SpriteBatch.WindowOffset + centreOfRoom;
+                return result;
                 }
             }
         }
