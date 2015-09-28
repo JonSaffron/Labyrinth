@@ -55,8 +55,7 @@ namespace Labyrinth
                     {
                     int monsterEnergy = monster.InstantlyExpire();
                     player.ReduceEnergy(monsterEnergy);
-                    this._world.AddBang(monster.Position, BangType.Long);
-                    this._world.Game.SoundPlayer.Play(GameSound.PlayerCollidesWithMonster);
+                    this._world.AddBang(monster.Position, BangType.Long, GameSound.PlayerCollidesWithMonster);
                     return;
                     }
                 }
@@ -102,13 +101,13 @@ namespace Labyrinth
                 if (insubtantialObjectTile == moveableObjectTile)
                     {
                     var energy = movingObject.InstantlyExpire();
-                    this._world.AddBang(movingObject.Position, BangType.Long);
+                    var b = this._world.AddBang(movingObject.Position, BangType.Long);
                     if (movingObject is Monster)
                         {
-                        this._world.Game.SoundPlayer.Play(GameSound.MonsterDies);
+                        b.PlaySound(GameSound.MonsterDies);
                         if (!(movingObject is DeathCube))
                             {
-                            var score = ((energy >> 1) + 1)*20;
+                            var score = ((energy >> 1) + 1) * 20;
                             this._world.IncreaseScore(score);
                             }
                         }
@@ -122,10 +121,10 @@ namespace Labyrinth
             {
             if (movingItem is Player)
                 {
+                var bang = world.ConvertShotToBang(shot);
                 movingItem.ReduceEnergy(shot.Energy);
                 if (movingItem.IsAlive())
-                    world.Game.SoundPlayer.Play(GameSound.PlayerInjured);
-                world.ConvertShotToBang(shot);
+                    bang.PlaySound(GameSound.PlayerInjured);
                 return true;
                 }
 
@@ -167,14 +166,17 @@ namespace Labyrinth
                 return false;
                 }
             
+            // todo: check what the original game does. It may not create more than one bang.
             int minEnergy = Math.Min(standardShot2.Energy, standardShot1.Energy);
-            world.Game.SoundPlayer.Play(GameSound.StaticObjectShotAndInjured);
+            Bang bang = null;
             standardShot2.ReduceEnergy(minEnergy);
             if (!standardShot2.IsExtant)
-                world.ConvertShotToBang(standardShot2);
+                bang = world.ConvertShotToBang(standardShot2);
             standardShot1.ReduceEnergy(minEnergy);
             if (!standardShot1.IsExtant)
-                world.ConvertShotToBang(standardShot1);
+                bang = world.ConvertShotToBang(standardShot1);
+            if (bang != null)   // bang will always be not null
+                bang.PlaySound(GameSound.StaticObjectShotAndInjured);
             return true;
             }
 
@@ -197,12 +199,12 @@ namespace Labyrinth
             var score = ((Math.Min(shot.Energy, monster.Energy) >> 1) + 1)*10;
             world.IncreaseScore(score);
             monster.ReduceEnergy(shot.Energy);
+            var bang = world.ConvertShotToBang(shot);
             if (monster.IsAlive())
                 {
                 var sound = monster.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
-                world.Game.SoundPlayer.Play(sound);
+                bang.PlaySound(sound);
                 }
-            world.ConvertShotToBang(shot);
             return true;
             }
         }

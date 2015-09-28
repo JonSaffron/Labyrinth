@@ -80,7 +80,7 @@ namespace Labyrinth
 
         private static void PlayerPoisonedByMushroom(World world, Mushroom mushroom, Player player)
             {
-            world.Game.SoundPlayer.Play(GameSound.PlayerInjured);
+            player.PlaySound(GameSound.PlayerInjured);
             int r = mushroom.CalculateEnergyToRemove(player);
             if (r > 0)
                 player.ReduceEnergy(r);
@@ -89,7 +89,7 @@ namespace Labyrinth
 
         private static void PlayerEatsFruit(World world, Player player, Fruit fruit)
             {
-            world.Game.SoundPlayer.Play(GameSound.PlayerEatsFruit);
+            player.PlaySound(GameSound.PlayerEatsFruit);
             player.AddEnergy(fruit.Energy);
             fruit.SetTaken();
             }
@@ -121,15 +121,16 @@ namespace Labyrinth
 
             if (staticItem is Fruit || staticItem is Grave || staticItem is Mushroom || staticItem is CrumblyWall)
                 {
-                world.Game.SoundPlayer.Play(GameSound.StaticObjectShotAndInjured);
                 staticItem.ReduceEnergy(shot.Energy);
+                Bang bang;
                 if (staticItem.IsExtant)
-                    world.ConvertShotToBang(shot);
+                    bang = world.ConvertShotToBang(shot);
                 else
                     {
-                    world.AddBang(staticItem.Position, BangType.Short);
+                    bang = world.AddBang(staticItem.Position, BangType.Short);
                     shot.InstantlyExpire();
                     }
+                bang.PlaySound(GameSound.StaticObjectShotAndInjured);
                 return;
                 }
 

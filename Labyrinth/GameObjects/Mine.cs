@@ -206,7 +206,7 @@ namespace Labyrinth.GameObjects
 
             public FiredState(Mine mine) : base(mine)
                 {
-                this.Mine.World.Game.SoundPlayer.Play(GameSound.MonsterDies);
+                this.Mine.PlaySound(GameSound.MonsterDies);
                 }
 
             public override void SteppedOnBy(MovingItem movingItem)

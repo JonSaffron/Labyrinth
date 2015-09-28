@@ -170,17 +170,17 @@ namespace Labyrinth.GameObjects
             if (this.IsAlive())
                 {
                 var gs = this.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
-                this.World.Game.SoundPlayer.Play(gs);
+                this.PlaySound(gs);
                 return;
                 }
 
-            this.World.Game.SoundPlayer.Play(GameSound.MonsterDies);
+            this.PlaySound(GameSound.MonsterDies);
             this.World.AddBang(this.Position, BangType.Long);
             if (this.SplitsOnHit)
                 {
                 for (int i = 1; i <= 2; i++)
                     this.World.AddDiamondDemon(this);
-                this.World.Game.SoundPlayer.Play(GameSound.MonsterShattersIntoNewLife);
+                this.PlaySound(GameSound.MonsterShattersIntoNewLife);
                 }
             }
 
@@ -278,7 +278,7 @@ namespace Labyrinth.GameObjects
                 TilePos tp = this.TilePosition;
                 if (!this.World.IsStaticItemOnTile(tp))
                     {
-                    this.World.Game.SoundPlayer.Play(GameSound.MonsterLaysMushroom);
+                    this.PlaySound(GameSound.MonsterLaysMushroom);
                     this.World.AddMushroom(tp);
                     }
                 }
@@ -288,7 +288,7 @@ namespace Labyrinth.GameObjects
                 TilePos tp = this.TilePosition;
                 if (this.World.IsStaticItemOnTile(tp))
                     {
-                    this.World.Game.SoundPlayer.Play(GameSound.MonsterLaysEgg);
+                    this.PlaySound(GameSound.MonsterLaysEgg);
                     Monster m = this.Clone();
                     m.ResetAnimationPlayerAfterClone();
                     m.Energy = this._originalEnergy;
@@ -344,9 +344,9 @@ namespace Labyrinth.GameObjects
                 {
                 Rectangle playerRoom = World.GetContainingRoom(World.Player.Position);
                 if (currentRoom == playerRoom)
-                    this.World.Game.SoundPlayer.Play(GameSound.MonsterLeavesRoom);
+                    this.PlaySound(GameSound.MonsterLeavesRoom);
                 else if (newRoom == playerRoom)
-                    this.World.Game.SoundPlayer.Play(GameSound.MonsterEntersRoom);
+                    this.PlaySound(GameSound.MonsterEntersRoom);
                 }
             return result;
             }

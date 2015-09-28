@@ -18,7 +18,7 @@ namespace Labyrinth
             var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * new Vector2(Tile.Width, Tile.Height) / 2;
             var shot = new StandardShot(world, startPos, firingDirection, source.Energy >> 2, ShotType.Monster);
             world.AddShot(shot);
-            world.Game.SoundPlayer.Play(GameSound.MonsterShoots);
+            source.PlaySound(GameSound.MonsterShoots);
             }
 
         private static Direction DetermineFiringDirection(TilePos fromTilePos, TilePos towardsTilePos)

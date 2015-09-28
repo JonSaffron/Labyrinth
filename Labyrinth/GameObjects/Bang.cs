@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Bang : StaticItem
+    public class Bang : StaticItem
         {
         private bool _isExtant;
         

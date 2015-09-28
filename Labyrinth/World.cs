@@ -301,10 +301,11 @@ namespace Labyrinth
         /// Place short bang at a shot's position and remove the shot
         /// </summary>
         /// <param name="s">An instance of a shot to convert</param>
-        public void ConvertShotToBang(Shot s)
+        public Bang ConvertShotToBang(Shot s)
             {
-            AddBang(s.Position, BangType.Short);
+            var result = AddBang(s.Position, BangType.Short);
             s.InstantlyExpire();
+            return result;
             }
         
         /// <summary>
@@ -312,10 +313,19 @@ namespace Labyrinth
         /// </summary>
         /// <param name="p">Position to place the sprite</param>
         /// <param name="bangType">The type of bang to create</param>
-        public void AddBang(Vector2 p, BangType bangType)
+        public Bang AddBang(Vector2 p, BangType bangType)
             {
             var b = new Bang(this, p, bangType);
-            this.GameObjects.Add(b);  
+            this.GameObjects.Add(b);
+            return b;
+            }
+
+        public Bang AddBang(Vector2 p, BangType bangType, GameSound gameSound)
+            {
+            var b = new Bang(this, p, bangType);
+            this.GameObjects.Add(b);
+            b.PlaySound(gameSound);
+            return b;
             }
 
         public void AddGrave(TilePos tp)

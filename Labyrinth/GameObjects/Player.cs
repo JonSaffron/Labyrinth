@@ -71,7 +71,7 @@ namespace Labyrinth.GameObjects
         private void PlayerSpriteNewFrame(object sender, EventArgs e)
             {
             var playerMoves = _whichFootFlag ? GameSound.PlayerMovesFirstFoot : GameSound.PlayerMovesSecondFoot;
-            this.World.Game.SoundPlayer.Play(playerMoves);
+            this.PlaySound(playerMoves);
             _whichFootFlag = !_whichFootFlag;
             }
 
@@ -128,7 +128,7 @@ namespace Labyrinth.GameObjects
                 result = true;
                 this.TryToCompleteMoveToTarget(ref timeRemaining);
                 if (CheckIfEnteredNewWorldArea())
-                    this.World.Game.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
+                    this.PlaySound(GameSound.PlayerEntersNewLevel);
                 }
 
             if (!IsExtant)

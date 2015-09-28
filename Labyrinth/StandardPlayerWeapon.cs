@@ -28,7 +28,7 @@ namespace Labyrinth
             shot.SetPosition(startPos);
 
             world.AddShot(shot);
-            world.Game.SoundPlayer.Play(GameSound.PlayerShoots);
+            source.PlaySound(GameSound.PlayerShoots);
             _countOfShotsBeforeCostingEnergy--;
             if (_countOfShotsBeforeCostingEnergy < 0)
                 {

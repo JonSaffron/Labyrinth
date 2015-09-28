@@ -48,14 +48,15 @@ namespace Labyrinth.Services.Sound
         private void UpdateVolumeAndPanning()
             {
             var centrePoint = this.CentrePointProvider.CentrePoint;
-            var differenceInPosition = centrePoint - GameObject.Position;
+            var differenceInPosition = GameObject.Position - centrePoint;
 
             var adjustedDistanceApart = (differenceInPosition * new Vector2(1, 1.6f)).Length();
-            var volume = Math.Max(0, 1.0f - (adjustedDistanceApart / 24.0f));
+            var relativeCloseness = (768.0f - adjustedDistanceApart) / 768.0f;
+            var volume = Math.Max(0, relativeCloseness);
             this.SoundEffectInstance.Volume = volume; 
 
             var distanceToTheSide = Math.Abs(differenceInPosition.X);
-            var panning = Math.Min(1.0f, distanceToTheSide / 10.0f) * Math.Sign(differenceInPosition.X);
+            var panning = Math.Min(1.0f, distanceToTheSide / 320.0f) * Math.Sign(differenceInPosition.X);
             this.SoundEffectInstance.Pan = panning;
             }
         }

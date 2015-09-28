@@ -106,24 +106,15 @@ namespace Labyrinth.Services.Sound
             {
             switch (gameSound)
                 {
-                case GameSound.BoulderBounces:
-                case GameSound.PlayerCollidesWithMonster:
-                case GameSound.PlayerShootsAndInjuresEgg:
-                case GameSound.MonsterDies:
-                case GameSound.MonsterEntersRoom:
-                case GameSound.EggHatches:
-                case GameSound.PlayerShootsAndInjuresMonster:
-                case GameSound.MonsterLaysEgg:
-                case GameSound.MonsterLaysMushroom:
-                case GameSound.MonsterLeavesRoom:
-                case GameSound.MonsterShoots:
-                case GameSound.ShotBounces:
-                case GameSound.MonsterShattersIntoNewLife:
-                case GameSound.StaticObjectShotAndInjured:
-                    return true;
+                case GameSound.PlayerCollectsCrystal:
+                case GameSound.PlayerFinishesWorld:
+                case GameSound.PlayerEntersNewLevel:
+                case GameSound.PlayerDies:
+                case GameSound.PlayerStartsNewLife:
+                    return false;
                 }
 
-            return false;
+            return true;
             }
         }
     }

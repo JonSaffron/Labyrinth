@@ -206,7 +206,7 @@
         PlayerCollectsCrystal,              // single instance
         PlayerCollidesWithMonster,          // position of bang
         PlayerShootsAndInjuresEgg,          // position of egg
-        PlayerEatsFruit,                    // no position
+        PlayerEatsFruit,                    // position of player
         PlayerFinishesWorld,                // single instance
         MonsterDies,                        // position of bang
         MonsterEntersRoom,                  // position of monster
@@ -218,10 +218,10 @@
         MonsterShoots,                      // position of monster
         PlayerEntersNewLevel,               // single instance
         PlayerDies,                         // single instance
-        PlayerInjured,                      // no position
-        PlayerMovesFirstFoot,               // single instance
-        PlayerMovesSecondFoot,              // single instance
-        PlayerShoots,                       // no position
+        PlayerInjured,                      // position of player
+        PlayerMovesFirstFoot,               // single instance at position of player
+        PlayerMovesSecondFoot,              // single instance at position of player
+        PlayerShoots,                       // position of player
         ShotBounces,                        // position of shot
         MonsterShattersIntoNewLife,         // position of bang
         PlayerStartsNewLife,                // single instance

@@ -110,7 +110,7 @@ namespace Labyrinth.GameObjects
                     var reverseDirection = direction.Reversed();
                     this.Move(reverseDirection, this.BounceBackSpeed);
                     byWhom.Move(reverseDirection, this.BounceBackSpeed);
-                    this.World.Game.SoundPlayer.Play(GameSound.BoulderBounces);
+                    this.PlaySound(GameSound.BoulderBounces);
                     return;
                     }
 

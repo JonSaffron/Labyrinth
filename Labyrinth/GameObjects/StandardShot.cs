@@ -140,7 +140,7 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException();
             
             this._directionOfTravel = this._directionOfTravel.Reversed();
-            this.World.Game.SoundPlayer.Play(GameSound.ShotBounces);
+            this.PlaySound(GameSound.ShotBounces);
             this.HasRebounded = true;
             ResetTimeToTravel();
             }
