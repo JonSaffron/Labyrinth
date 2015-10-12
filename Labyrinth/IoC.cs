@@ -20,6 +20,11 @@ namespace Labyrinth
             return Instance.Resolve<T>();
             }
 
+        public static void Release<T>(T instance)
+            {
+            Instance.Release(instance);
+            }
+
         public static void Dispose() 
             {
             if (Instance != null) 

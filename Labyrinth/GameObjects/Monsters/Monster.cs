@@ -41,8 +41,8 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             this._originalEnergy = energy;
             
-            this._eggAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 3);
-            this._hatchingAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 1);
+            this._eggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
+            this._hatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
             }
             
         public static Monster Create(string type, World world, Vector2 position, int energy)
@@ -100,7 +100,7 @@ namespace Labyrinth.GameObjects
         public void SetDelayBeforeHatching(int gameTicks)
             {
             this.MonsterState = MonsterState.Egg;
-            var timeSpan = TimeSpan.FromSeconds(gameTicks * AnimationPlayer.GameClockResolution);
+            var timeSpan = TimeSpan.FromSeconds(gameTicks * Constants.GameClockResolution);
             this._hatchingTimer = GameTimer.AddGameTimer(this.World.Game, timeSpan, EggIsHatching, false);
             }
 
@@ -242,9 +242,9 @@ namespace Labyrinth.GameObjects
             this._stepTime += remainingTime;
             while (remainingTime > 0)
                 {
-                if (_stepTime >= AnimationPlayer.GameClockResolution)
+                if (_stepTime >= Constants.GameClockResolution)
                     {
-                    _stepTime -= AnimationPlayer.GameClockResolution;
+                    _stepTime -= Constants.GameClockResolution;
                     DoMonsterAction(inSameRoom);
                     }
 
@@ -263,9 +263,9 @@ namespace Labyrinth.GameObjects
                 result = true;
                 }
 
-            while (_stepTime >= AnimationPlayer.GameClockResolution)
+            while (_stepTime >= Constants.GameClockResolution)
                 {
-                _stepTime -= AnimationPlayer.GameClockResolution;
+                _stepTime -= Constants.GameClockResolution;
                 DoMonsterAction(inSameRoom);
                 }
             return result;
@@ -367,7 +367,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                var result = AnimationPlayer.BaseSpeed * (this.Flitters && this._flitterFlag ? 2 : 1);
+                var result = Constants.BaseSpeed * (this.Flitters && this._flitterFlag ? 2 : 1);
                 return result;
                 }
             }

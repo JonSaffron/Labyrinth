@@ -54,12 +54,12 @@ namespace Labyrinth.GameObjects
         public Player(World world, Vector2 position, int energy) : base(world, position)
             {
             // Load animated textures.
-            this._leftRightMovingAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerLeftFacing", 1);
-            this._upMovingAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerUpFacing", 1);
-            this._downMovingAnimation = Animation.LoopingAnimation(World, "Sprites/Player/PlayerDownFacing", 1);
-            this._leftRightStaticAnimation = Animation.StaticAnimation(World, "Sprites/Player/PlayerLeftFacing");
-            this._upStaticAnimation = Animation.StaticAnimation(World, "Sprites/Player/PlayerUpFacing");
-            this._downStaticAnimation = Animation.StaticAnimation(World, "Sprites/Player/PlayerDownFacing");
+            this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 1);
+            this._upMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerUpFacing", 1);
+            this._downMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerDownFacing", 1);
+            this._leftRightStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerLeftFacing");
+            this._upStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerUpFacing");
+            this._downStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerDownFacing");
 
             Ap.NewFrame += PlayerSpriteNewFrame;
             
@@ -315,7 +315,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                return AnimationPlayer.BaseSpeed * 2;
+                return Constants.BaseSpeed * 2;
                 }
             }
         }

@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public KillerCubeRed(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "Sprites/Monsters/KillerCubeRed", 3));
+            this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/KillerCubeRed", 3));
             
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;

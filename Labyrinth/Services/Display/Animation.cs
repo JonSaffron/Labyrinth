@@ -1,6 +1,4 @@
 ﻿using System;
-using Labyrinth.Services.WorldBuilding;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
@@ -14,76 +12,89 @@ namespace Labyrinth.Services.Display
     /// </remarks>
     public class Animation : IEquatable<Animation>
         {
+        private readonly string _textureName;
+        private readonly int _baseMovementsPerFrame;
+        private readonly bool _loopAnimation;
+
         /// <summary>
-        /// All frames in the animation arranged horizontally.
+        /// The name of the texture to animate
         /// </summary>
-        public Texture2D Texture { get; private set; }
+        public string TextureName
+            {
+            get
+                {
+                return this._textureName;
+                }
+            }
 
         /// <summary>
         /// Returns the rate at which the animation moves to the next frame. 
         /// The higher the number, the longer the animation will remain on each frame.
         /// </summary>
-        public int BaseMovementsPerFrame { get; private set; }
+        public int BaseMovementsPerFrame
+            {
+            get
+                {
+                return this._baseMovementsPerFrame;
+                }
+            }
 
         /// <summary>
         /// When the end of the animation is reached, should it
         /// continue playing from the beginning?
         /// </summary>
-        public bool LoopAnimation { get; private set; }
-
-        /// <summary>
-        /// The number of frames contained in the texture
-        /// </summary>
-        public int FrameCount { get; private set; }
+        public bool LoopAnimation
+            {
+            get
+                {
+                return this._loopAnimation;
+                }
+            }
 
         /// <summary>
         /// Constructs a new animation using a static image
         /// </summary>
-        /// <param name="world">The world that will provide the graphic content</param>
         /// <param name="textureName">The name of a single framed graphic to show</param>
-        public static Animation StaticAnimation(World world, string textureName)
+        public static Animation StaticAnimation(string textureName)
             {
-            var result = new Animation(world, textureName, 0, false);
+            var result = new Animation(textureName, 0, false);
             return result;
             }
         
         /// <summary>
         /// Constructs a new animation which loops
         /// </summary>
-        /// <param name="world">The world that will provide the graphic content</param>
         /// <param name="textureName">The name of a multi-framed graphic image to show</param>
         /// <param name="baseMovementsPerFrame">The rate to switch between frames</param>
-        public static Animation LoopingAnimation(World world, string textureName, int baseMovementsPerFrame)
+        public static Animation LoopingAnimation(string textureName, int baseMovementsPerFrame)
             {
             if (baseMovementsPerFrame <= 0)
                 throw new ArgumentOutOfRangeException("baseMovementsPerFrame");
-            var result = new Animation(world, textureName, baseMovementsPerFrame, true);
+            var result = new Animation(textureName, baseMovementsPerFrame, true);
             return result;
             }
         
         /// <summary>
         /// Constructs a new animation which runs through only once
         /// </summary>
-        /// <param name="world">The world that will provide the graphic content</param>
         /// <param name="textureName">The name of a multi-framed graphic image to show</param>
         /// <param name="baseMovementsPerFrame">The rate to switch between frames</param>
-        public static Animation SingleRunAnimation(World world, string textureName, int baseMovementsPerFrame)
+        public static Animation SingleRunAnimation(string textureName, int baseMovementsPerFrame)
             {
             if (baseMovementsPerFrame <= 0)
                 throw new ArgumentOutOfRangeException("baseMovementsPerFrame");
-            var result = new Animation(world, textureName, baseMovementsPerFrame, false);
+            var result = new Animation(textureName, baseMovementsPerFrame, false);
             return result;
             }
 
         /// <summary>
         /// Constructs a new animation specifying whether it loops
         /// </summary>        
-        private Animation(World world, string textureName, int baseMovementsPerFrame, bool loopAnimation)
+        private Animation(string textureName, int baseMovementsPerFrame, bool loopAnimation)
             {
-            this.Texture = world.LoadTexture(textureName);
-            this.BaseMovementsPerFrame = baseMovementsPerFrame;
-            this.LoopAnimation = loopAnimation;
-            this.FrameCount = (baseMovementsPerFrame == 0) ? 1 : (this.Texture.Width / Tile.Width);
+            this._textureName = textureName;
+            this._baseMovementsPerFrame = baseMovementsPerFrame;
+            this._loopAnimation = loopAnimation;
             }
 
         /// <summary>
@@ -107,7 +118,7 @@ namespace Labyrinth.Services.Display
             {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            var result = Equals(Texture, other.Texture) && BaseMovementsPerFrame == other.BaseMovementsPerFrame && LoopAnimation.Equals(other.LoopAnimation);
+            var result = string.Equals(TextureName, other.TextureName) && BaseMovementsPerFrame == other.BaseMovementsPerFrame && LoopAnimation.Equals(other.LoopAnimation);
             return result;
             }
 
@@ -133,7 +144,7 @@ namespace Labyrinth.Services.Display
             {
             unchecked
                 {
-                int hashCode = (Texture != null ? Texture.GetHashCode() : 0);
+                int hashCode = (TextureName != null ? TextureName.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ BaseMovementsPerFrame;
                 hashCode = (hashCode*397) ^ LoopAnimation.GetHashCode();
                 return hashCode;

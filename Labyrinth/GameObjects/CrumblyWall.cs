@@ -10,7 +10,7 @@ namespace Labyrinth.GameObjects
 
         public CrumblyWall(World world, Vector2 position, string textureName, int energy) : base(world, position)
             {
-            var a = Animation.StaticAnimation(World, textureName);
+            var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);
             this.Energy = energy;
             this._initialEnergy = energy;
@@ -20,7 +20,7 @@ namespace Labyrinth.GameObjects
             {
             base.ReduceEnergy(energyToRemove);
 
-            int stages = this.Ap.Animation.FrameCount - 1;
+            int stages = this.Ap.FrameCount - 1;
             this.Ap.FrameIndex = stages - (int) Math.Floor(stages * this.Energy / (float) this._initialEnergy);
             }
 

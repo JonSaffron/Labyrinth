@@ -16,9 +16,9 @@ namespace Labyrinth.GameObjects
         public Mine(World world, Vector2 position) : base(world, position)
             {
             this.Energy = 240;
-            this._staticUnarmedAnimation = Animation.StaticAnimation(world, "Sprites/Shot/MineUnarmed");
-            this._movingUnarmedAnimation = Animation.SingleRunAnimation(world, "Sprites/Shot/MineUnarmed", 4);
-            this._armedAnimation = Animation.LoopingAnimation(world, "Sprites/Shot/MineArmed", 4);
+            this._staticUnarmedAnimation = Animation.StaticAnimation("Sprites/Shot/MineUnarmed");
+            this._movingUnarmedAnimation = Animation.SingleRunAnimation("Sprites/Shot/MineUnarmed", 4);
+            this._armedAnimation = Animation.LoopingAnimation("Sprites/Shot/MineArmed", 4);
             this.Ap.PlayAnimation(this._staticUnarmedAnimation);
             this._mineState = new InactiveState(this);
             }

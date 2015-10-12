@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
         {
         public FlitterbugBrown(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "Sprites/Monsters/FlitterbugBrown", 4));
+            this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/FlitterbugBrown", 4));
             
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.MovesRoom;

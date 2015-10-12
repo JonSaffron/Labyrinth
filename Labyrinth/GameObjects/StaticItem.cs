@@ -9,7 +9,7 @@ namespace Labyrinth.GameObjects
         {
         private Vector2 _position;
         private TilePos _tilePosition;
-        private AnimationPlayer _animationPlayer = new AnimationPlayer();
+        private AnimationPlayer _animationPlayer;
         private readonly World _world;
         private int _energy;
 
@@ -27,6 +27,7 @@ namespace Labyrinth.GameObjects
 
             this._world = world;
             this.Position = position;
+            this._animationPlayer = new AnimationPlayer(world.SpriteLibrary);
             }
         
         /// <summary>
@@ -115,7 +116,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         protected void ResetAnimationPlayerAfterClone()
             {
-            this._animationPlayer = new AnimationPlayer();
+            this._animationPlayer = new AnimationPlayer(this.World.SpriteLibrary);
             }
 
         /// <summary>

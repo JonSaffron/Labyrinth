@@ -24,7 +24,7 @@ namespace Labyrinth.GameObjects
         private void LoadContent()
             {
             // Load animated textures.
-            _staticImage = Animation.StaticAnimation(World, "Sprites/Boulder/Boulder");
+            _staticImage = Animation.StaticAnimation("Sprites/Boulder/Boulder");
             }
 
         public void Reset(Vector2 position)
@@ -79,7 +79,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                return AnimationPlayer.BaseSpeed * 2.5m;
+                return Constants.BaseSpeed * 2.5m;
                 }
             }
         }

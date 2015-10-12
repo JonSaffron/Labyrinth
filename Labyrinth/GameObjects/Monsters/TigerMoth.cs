@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public TigerMoth(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "Sprites/Monsters/TigerMoth", 4));
+            this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/TigerMoth", 4));
             
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.MovesRoom;

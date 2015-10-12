@@ -10,27 +10,14 @@ namespace Labyrinth.Services.Display
     /// </summary>
     public class AnimationPlayer
         {
-        // Number of base movements a sprite can make per second
-        private const int MovementsPerSecond = 20;
-
-        // Smallest move a sprite can make is a quarter of a tile
-        private const int BaseDistance = Tile.Width / 4;
-
-        // Slowest move a sprite can make is a quarter of a tile, and 20 movements take place per second.
-        // Unit of measurement is therefore pixels per second.
-        public const int BaseSpeed = BaseDistance * MovementsPerSecond;
-
-        // Speed when bouncing back
-        public const int BounceBackSpeed = BaseSpeed * 3;
-
-        // The internal game clock ticks once every movement by a sprite
-        // Unit of measurement is seconds.
-        public const float GameClockResolution = 1.0f / MovementsPerSecond;
-
         /// <summary>
-        /// Gets the animation which is currently playing.
+        /// The animation which is currently playing.
         /// </summary>
-        public Animation Animation { get; private set; }
+        private Animation _animation;
+
+        private readonly ISpriteLibrary _spriteLibrary;
+
+        private Texture2D _texture;
 
         /// <summary>
         /// What rotation to apply when drawing the sprite
@@ -46,6 +33,8 @@ namespace Labyrinth.Services.Display
         /// Records the index of the current frame in the animation.
         /// </summary>
         private int _frameIndex;
+
+        public int FrameCount {get; private set;}
 
         /// <summary>
         /// Duration of time to show each frame.
@@ -71,6 +60,13 @@ namespace Labyrinth.Services.Display
         /// Which routine to use to advance the frame index
         /// </summary>
         private Action<GameTime> _advanceRoutine;
+
+        public AnimationPlayer(ISpriteLibrary spriteLibrary)
+            {
+            if (spriteLibrary == null)
+                throw new ArgumentNullException("spriteLibrary");
+            this._spriteLibrary = spriteLibrary;
+            }
 
         private void OnNewFrame(EventArgs e)
             {
@@ -110,13 +106,15 @@ namespace Labyrinth.Services.Display
                 throw new ArgumentNullException("animation");
 
             // If this animation is already running, do not restart it.
-            if (animation.Equals(this.Animation))
+            if (animation.Equals(this._animation))
                 return;
 
             // Start the new animation.
-            this.Animation = animation;
-            this._frameTime = animation.BaseMovementsPerFrame * BaseDistance / (double)BaseSpeed;
+            this._texture = this._spriteLibrary.GetSprite(animation.TextureName);
+            this._animation = animation;
+            this._frameTime = animation.BaseMovementsPerFrame * Constants.BaseDistance / (double)Constants.BaseSpeed;
             this._frameIndex = 0;
+            this.FrameCount = (_animation.BaseMovementsPerFrame == 0) ? 1 : (this._texture.Width / Tile.Width);
             this._time = 0.0f;
 
             // setup the advance routine
@@ -139,7 +137,7 @@ namespace Labyrinth.Services.Display
                 }
             set
                 {
-                if (value < 0 || value >= Animation.FrameCount)
+                if (value < 0 || value >= this.FrameCount)
                     throw new ArgumentOutOfRangeException("value");
                 this._frameIndex = value;
                 this._time = 0;
@@ -168,7 +166,7 @@ namespace Labyrinth.Services.Display
                 OnNewFrame(new EventArgs());
 
                 this._frameIndex++;
-                this._frameIndex %= Animation.FrameCount;
+                this._frameIndex %= this.FrameCount;
                 }
             }
 
@@ -184,7 +182,7 @@ namespace Labyrinth.Services.Display
                 this._time -= this._frameTime;
                 OnNewFrame(new EventArgs());
 
-                if ((this._frameIndex + 1) == Animation.FrameCount)
+                if ((this._frameIndex + 1) == this.FrameCount)
                     {
                     OnAnimationFinished(new EventArgs());
                     this._advanceRoutine = AdvanceStaticAnimation;
@@ -203,7 +201,7 @@ namespace Labyrinth.Services.Display
         /// <param name="position">The position of the sprite</param>
         public void Draw(GameTime gameTime, ISpriteBatch spriteBatch, Vector2 position)
             {
-            if (Animation == null)
+            if (_animation == null)
                 throw new NotSupportedException("No animation is currently playing.");
             
             // Advance the frame index
@@ -213,7 +211,7 @@ namespace Labyrinth.Services.Display
             var source = new Rectangle(FrameIndex * Tile.Width, 0, Tile.Width, Tile.Height);
 
             // Draw the current frame.
-            spriteBatch.DrawTexture(Animation.Texture, position, source, this.Rotation, Origin, this.SpriteEffect);
+            spriteBatch.DrawTexture(this._texture, position, source, this.Rotation, Origin, this.SpriteEffect);
             }
         }
     }

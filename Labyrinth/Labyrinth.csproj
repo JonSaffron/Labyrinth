@@ -123,14 +123,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />
+    <Compile Include="Interfaces\ISpriteLibrary.cs" />
+    <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Services\Sound\ActiveSound.cs" />
     <Compile Include="Services\Sound\ActiveSoundForObject.cs" />
     <Compile Include="Interfaces\IActiveSound.cs" />
     <Compile Include="Interfaces\IActiveSoundService.cs" />
     <Compile Include="Interfaces\ICentrePointProvider.cs" />
     <Compile Include="Interfaces\ISoundEffectInstance.cs" />
-    <Compile Include="IoC.cs" />
     <Compile Include="Services\Display\Animation.cs" />
     <Compile Include="Services\Display\AnimationPlayer.cs" />
     <Compile Include="GameObjects\Bang.cs" />

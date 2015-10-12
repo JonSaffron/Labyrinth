@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public CrazyCrawler(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "sprites/Monsters/CrazyCrawler", 3));
+            this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/CrazyCrawler", 3));
             
             this.Mobility = MonsterMobility.Aggressive;
             this.ShotsBounceOff = true;

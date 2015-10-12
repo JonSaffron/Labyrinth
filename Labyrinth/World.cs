@@ -6,7 +6,6 @@ using Labyrinth.Annotations;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Labyrinth.GameObjects;
 
@@ -26,17 +25,16 @@ namespace Labyrinth
         [NotNull] public readonly Game1 Game;
         [NotNull] public readonly GameObjectCollection GameObjects;
         [NotNull] public readonly Player Player;
+        public ISpriteLibrary SpriteLibrary;
 
         [NotNull] private readonly IWorldLoader _wl;
-        [NotNull] private readonly ContentManager _contentManager;
         [NotNull] private readonly List<StaticItem>[] _itemsToDrawByZOrder;
 
         public World(Game1 game, IWorldLoader worldLoader)
             {
             this.Game = game;
             this._wl = worldLoader;
-            // Create a new content manager to load content used just by this World.
-            this._contentManager = new ContentManager(game.Services, "Content");
+            this.SpriteLibrary = new SpriteLibrary(game.Services);
 
             var gameItems = worldLoader.GetGameObjects(this).ToList();
             this.GameObjects = new GameObjectCollection(worldLoader.Width, worldLoader.Height, gameItems);
@@ -47,9 +45,10 @@ namespace Labyrinth
                 this._itemsToDrawByZOrder[i] = new List<StaticItem>();
             }
 
+        [Obsolete]
         public Texture2D LoadTexture(string textureName)
             {
-            var result = this._wl.LoadTexture(this._contentManager, textureName);
+            var result = this.SpriteLibrary.GetSprite(textureName);
             return result;
             }
 
@@ -75,31 +74,16 @@ namespace Labyrinth
             _doNotUpdate = false;
             }
         
-        [PublicAPIAttribute]
-        public bool IsDisposed { get; private set; }
-
         /// <summary>
         /// Unloads the World content.
         /// </summary>
         public void Dispose()
             {
-            Dispose(true);
-            }
-
-        ~World()
-            {
-            Dispose(false);
-            }
-
-        [PublicAPIAttribute]
-        protected void Dispose(bool isDisposing)
-            {
-            if (isDisposing && !this.IsDisposed)
+            if (this.SpriteLibrary != null)
                 {
-                this._contentManager.Dispose();
+                this.SpriteLibrary.Dispose();
+                this.SpriteLibrary = null;
                 }
-
-            this.IsDisposed = true;
             }
 
         /// <summary>
@@ -190,9 +174,9 @@ namespace Labyrinth
         private void UpdateGameClock(GameTime gameTime)
             {
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
-            while (this._time > AnimationPlayer.GameClockResolution)
+            while (this._time > Constants.GameClockResolution)
                 {
-                this._time -= AnimationPlayer.GameClockResolution;
+                this._time -= Constants.GameClockResolution;
                 if (this._gameClock < int.MaxValue)
                     this._gameClock++; 
 

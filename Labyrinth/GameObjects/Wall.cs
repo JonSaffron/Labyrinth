@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
         {
         public Wall(World world, Vector2 position, string textureName) : base(world, position)
             {
-            var a = Animation.StaticAnimation(World, textureName);
+            var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);
             }
 

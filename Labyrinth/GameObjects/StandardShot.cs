@@ -33,7 +33,7 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new InvalidOperationException();
                 }
-            var staticImage = Animation.StaticAnimation(World, textureName);
+            var staticImage = Animation.StaticAnimation(textureName);
             Ap.PlayAnimation(staticImage);
             ResetTimeToTravel();
             }
@@ -162,7 +162,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                return AnimationPlayer.BaseSpeed * 4;
+                return Constants.BaseSpeed * 4;
                 }
             }
         }

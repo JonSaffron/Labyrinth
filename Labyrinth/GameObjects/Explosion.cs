@@ -11,7 +11,7 @@ namespace Labyrinth.GameObjects
         public Explosion(World world, Vector2 position, int energy) : base(world, position)
             {
             this.Energy = energy;
-            var a = Animation.SingleRunAnimation(World, "Sprites/Props/LongBang", 2);
+            var a = Animation.SingleRunAnimation("Sprites/Props/LongBang", 2);
             Ap.PlayAnimation(a);
             Ap.AnimationFinished += AnimationFinished;
 

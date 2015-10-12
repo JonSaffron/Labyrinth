@@ -217,7 +217,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                return AnimationPlayer.BaseSpeed;
+                return Constants.BaseSpeed;
                 }
             }
 
@@ -225,7 +225,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                return AnimationPlayer.BounceBackSpeed;
+                return Constants.BounceBackSpeed;
                 }
             }
         }

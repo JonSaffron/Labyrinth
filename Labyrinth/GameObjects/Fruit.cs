@@ -37,7 +37,7 @@ namespace Labyrinth.GameObjects
                 }
             
             string textureName = string.Format("Sprites/Fruit/{0:G}", _fruitType);
-            var a = Animation.StaticAnimation(World, textureName);
+            var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);
             }
 

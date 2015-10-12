@@ -1,5 +1,7 @@
 using System;
 using System.Windows.Forms;
+using Castle.Windsor;
+using Castle.Windsor.Installer;
 
 namespace Labyrinth
     {
@@ -13,17 +15,16 @@ namespace Labyrinth
             int result;
             try
                 {
-                IoC.Create();
-
-                using (var game = Game1.Create())
+                using (var container = new WindsorContainer().Install(FromAssembly.This()))
                     {
+                    var game = container.Resolve<Game1>();
                     game.Run();
                     }
                 result = 0;
                 }
-            catch (ApplicationException e)
+            catch (Exception ex)
                 {
-                MessageBox.Show(e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 result = 1;
                 }
             return result;

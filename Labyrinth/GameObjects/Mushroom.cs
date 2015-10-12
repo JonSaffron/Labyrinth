@@ -9,7 +9,7 @@ namespace Labyrinth.GameObjects
 
         public Mushroom(World world, Vector2 position) : base(world, position)
             {
-            var a = Animation.StaticAnimation(World, "Sprites/Props/Mushroom");
+            var a = Animation.StaticAnimation("Sprites/Props/Mushroom");
             this.Ap.PlayAnimation(a);
             this.Energy = 40;
             }

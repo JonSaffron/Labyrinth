@@ -11,7 +11,7 @@ namespace Labyrinth.GameObjects
             {
             this._crystalRequired = crystalRequired;
 
-            var a = Animation.LoopingAnimation(World, "Sprites/Props/ForceField", 3);
+            var a = Animation.LoopingAnimation("Sprites/Props/ForceField", 3);
             this.Ap.PlayAnimation(a);
             }
 

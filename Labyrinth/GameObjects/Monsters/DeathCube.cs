@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public DeathCube(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "sprites/Monsters/DeathCube", 3));
+            this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/DeathCube", 3));
             
             this.Mobility = MonsterMobility.Static;
             this.ShotsBounceOff = true;

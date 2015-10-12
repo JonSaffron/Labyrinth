@@ -127,7 +127,7 @@ bdc				-- delay until game's main loop ends
 18d0 - 18df		-- start of table with 6845 register adjustments
 18e0 - 18e1		-- joystick input information
 
-38bb - 38c2		-- start room numbers per level
+38bb - 38c2		-- start room numbers per level: 0 34 8 1c/1c 6b 47 73
 
 -- room data
 
@@ -5856,13 +5856,16 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 3728 AD A6 0B  LDA 0BA6                 -- get world number
 372B F0 16     BEQ 3743                 -- branch if 2nd world
-372D AD C6 0B  LDA 0BC6                 -- get room number
-3730 20 06 26  JSR 2606                 -- calculate level
+
+		-- 1st world set start position
+
+372D AD C6 0B  LDA 0BC6                 -- get current room number of player
+3730 20 06 26  JSR 2606                 -- calculate corresponding level
 3733 AA        TAX                      
-3734 BD BB 38  LDA 38BB,X               -- get start room number
-3737 8D C6 0B  STA 0BC6                 -- set player room number
-373A BD 30 44  LDA 4430,X               -- get start energy
-373D 8D 0E 0C  STA 0C0E                 
+3734 BD BB 38  LDA 38BB,X               -- get start room number for level
+3737 8D C6 0B  STA 0BC6                 -- set player's room number
+373A BD 30 44  LDA 4430,X               -- get start energy for level
+373D 8D 0E 0C  STA 0C0E                 -- set player's energy level
 3740 4C 04 37  JMP 3704                 -- jump to new life
 
 		-- 2nd world initialisation

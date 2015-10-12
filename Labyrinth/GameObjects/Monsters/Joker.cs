@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public Joker(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "Sprites/Monsters/Joker", 4));
+            this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/Joker", 4));
             
             this.Flitters = true;
             this.Mobility = MonsterMobility.Cautious;

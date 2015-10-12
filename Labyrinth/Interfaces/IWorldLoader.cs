@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.WorldBuilding;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
     {
@@ -17,7 +15,6 @@ namespace Labyrinth
         int Height { get; }
         int Width { get; }
         Tile this[TilePos tp] { get; }
-        Texture2D LoadTexture(ContentManager contentManager, string textureName);
         IEnumerable<StaticItem> GetGameObjects(World world);
         }
     }

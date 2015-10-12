@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public Butterfly(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "Sprites/Monsters/Butterfly", 3));
+            this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/Butterfly", 3));
             
             this.Flitters = true;
             this.Mobility = MonsterMobility.Aggressive;

@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using System.Xml;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.WorldBuilding
@@ -63,12 +62,6 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public Texture2D LoadTexture(ContentManager contentManager, string textureName)
-            {
-            var result = contentManager.Load<Texture2D>(textureName);
-            return result;
-            }
-        
         private List<WorldArea> LoadAreas()
             {
             var areas = this._xmlDoc.SelectSingleNode("World/Areas");

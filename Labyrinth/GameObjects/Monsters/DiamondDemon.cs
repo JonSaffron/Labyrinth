@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public DiamondDemon(World world, Vector2 position, int energy) : base(world, position, energy)
             {
-            this.SetNormalAnimation(Animation.LoopingAnimation(World, "Sprites/Monsters/DiamondDemon", 4));
+            this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/DiamondDemon", 4));
             
             this.Mobility = MonsterMobility.Aggressive;
             this.Flitters = true;

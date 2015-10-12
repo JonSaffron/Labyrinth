@@ -9,7 +9,7 @@ namespace Labyrinth.GameObjects
             {
             this.Energy = 255;
             
-            var a = Animation.StaticAnimation(World, "Sprites/Props/Grave");
+            var a = Animation.StaticAnimation("Sprites/Props/Grave");
             this.Ap.PlayAnimation(a);
             }
 

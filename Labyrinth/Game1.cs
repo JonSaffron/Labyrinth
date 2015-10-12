@@ -17,6 +17,8 @@ namespace Labyrinth
         public const int RoomSizeHeight = 10 * Tile.Height;
         private const int ZoomWhilstWindowed = 2;
 
+        private readonly Vector2 _centreOfRoom = new Vector2(RoomSizeWidth / 2, RoomSizeHeight / 2);
+
         public IPlayerInput PlayerInput { get; private set; }
         public ISoundPlayer SoundPlayer { get; private set; }
         public ISpriteBatch SpriteBatch { get; private set; }
@@ -30,17 +32,6 @@ namespace Labyrinth
         private int _score;
         private int _displayedScore;
         private int _lives;
-
-        public static Game1 Current { get; private set; }
-
-        public static Game1 Create()
-            {
-            if (Current != null)
-                Current.Dispose();
-
-            Current = IoC.Resolve<Game1>();
-            return Current;
-            }
 
         public Game1(IPlayerInput playerInput, IWorldLoader worldLoader)
             {
@@ -288,8 +279,7 @@ namespace Labyrinth
             { 
             get 
                 {
-                var centreOfRoom = new Vector2(RoomSizeWidth / 2, RoomSizeHeight / 2);
-                var result = this.SpriteBatch.WindowOffset + centreOfRoom;
+                var result = this.SpriteBatch.WindowOffset + _centreOfRoom;
                 return result;
                 }
             }

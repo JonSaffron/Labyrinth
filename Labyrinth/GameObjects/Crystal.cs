@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this.Score = score;
             this.Energy = energy;
 
-            var a = Animation.LoopingAnimation(World, "Sprites/Crystal/Crystal", 4);
+            var a = Animation.LoopingAnimation("Sprites/Crystal/Crystal", 4);
             this.Ap.PlayAnimation(a);
             }
 
