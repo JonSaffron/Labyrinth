@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    sealed class Butterfly : Monster
+    sealed class Butterfly : Monster, ILayEggs
         {
         public Butterfly(World world, Vector2 position, int energy) : base(world, position, energy)
             {
@@ -26,6 +26,13 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new ArgumentOutOfRangeException();
                 }
+            }
+
+        public Monster LayAnEgg()
+            {
+            var typeOfMonster = this.GetType().Name;
+            var result = Create(typeOfMonster, this.World, this.Position, this.OriginalEnergy);
+            return result;
             }
         }
     }

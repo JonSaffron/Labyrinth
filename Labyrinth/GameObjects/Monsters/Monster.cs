@@ -18,7 +18,7 @@ namespace Labyrinth.GameObjects
         [CanBeNull] private GameTimer _hatchingTimer;
         protected bool Flitters { private get; set; }
         private bool _flitterFlag;
-        public bool LaysEggs { private get; set; }
+
         public bool LaysMushrooms { private get; set; }
         public bool SplitsOnHit { private get; set; }
         public bool IsActive { get; set; }
@@ -32,14 +32,15 @@ namespace Labyrinth.GameObjects
         private readonly Animation _eggAnimation;
         private readonly Animation _hatchingAnimation;
 
-        private readonly int _originalEnergy;
+        protected readonly int OriginalEnergy;
 
         private double _stepTime;
+        private bool _laysEggs;
 
         protected Monster(World world, Vector2 position, int energy) : base(world, position)
             {
             this.Energy = energy;
-            this._originalEnergy = energy;
+            this.OriginalEnergy = energy;
             
             this._eggAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 3);
             this._hatchingAnimation = Animation.LoopingAnimation(World, "Sprites/Monsters/Egg", 1);
@@ -149,11 +150,6 @@ namespace Labyrinth.GameObjects
                 this.Ap.PlayAnimation(animation);
                 this._monsterState = value;
                 }
-            }
-
-        protected virtual Monster Clone()
-            {
-            throw new NotImplementedException();
             }
         
         public bool IsStill
@@ -286,12 +282,17 @@ namespace Labyrinth.GameObjects
             if (this.LaysEggs && inSameRoom && this.World.Player.IsExtant && !this.IsEgg && (MonsterRandom.Next(256) & 0x1f)  == 0)
                 {
                 TilePos tp = this.TilePosition;
-                if (this.World.IsStaticItemOnTile(tp))
+                if (!this.World.IsStaticItemOnTile(tp))
                     {
                     this.PlaySound(GameSound.MonsterLaysEgg);
-                    Monster m = this.Clone();
-                    m.ResetAnimationPlayerAfterClone();
-                    m.Energy = this._originalEnergy;
+                    Monster m = ((ILayEggs) this).LayAnEgg();
+                    m.Mobility = this.Mobility;
+                    m.ChangeRooms = this.ChangeRooms;
+                    m.LaysMushrooms = this.LaysMushrooms;
+                    m.SplitsOnHit = this.SplitsOnHit;
+                    m.IsActive = true;
+                    m.ShotsBounceOff = this.ShotsBounceOff;
+                    m.MonsterShootBehaviour = this.MonsterShootBehaviour;
                     m.SetDelayBeforeHatching((MonsterRandom.Next(256) & 0x1f) + 8);
                     m.LaysEggs = false;
                     this.World.AddMonster(m);
@@ -369,6 +370,20 @@ namespace Labyrinth.GameObjects
                 {
                 var result = AnimationPlayer.BaseSpeed * (this.Flitters && this._flitterFlag ? 2 : 1);
                 return result;
+                }
+            }
+
+        public bool LaysEggs
+            {
+            private get
+                {
+                return _laysEggs;
+                }
+            set
+                {
+                if (value && !(this is ILayEggs))
+                    throw new InvalidOperationException(string.Format("Cannot set a {0} as laying eggs because the ILayEggs interface is not implemented.", this.GetType().Name));
+                this._laysEggs = value;
                 }
             }
         }

@@ -3,8 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    // sealed so that we can safely make virtual method calls from the constructor
-    abstract class Thresher : Monster
+    abstract class Thresher : Monster, ILayEggs
         {
         protected Thresher(World world, Vector2 position, int energy) : base(world, position, energy)
             {
@@ -25,9 +24,10 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        protected override Monster Clone()
+        public Monster LayAnEgg()
             {
-            var result = (Thresher)this.MemberwiseClone();
+            var typeOfMonster = this.GetType().Name;
+            var result = Create(typeOfMonster, this.World, this.Position, this.OriginalEnergy);
             return result;
             }
         }
