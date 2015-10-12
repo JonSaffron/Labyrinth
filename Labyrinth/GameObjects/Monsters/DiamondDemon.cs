@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    sealed class DiamondDemon : Monster
+    sealed class DiamondDemon : Monster, ILayEggs
         {
         public DiamondDemon(World world, Vector2 position, int energy) : base(world, position, energy)
             {
@@ -30,9 +30,10 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        protected override Monster Clone()
+        public Monster LayAnEgg()
             {
-            var result = (DiamondDemon)this.MemberwiseClone();
+            var typeOfMonster = this.GetType().Name;
+            var result = Create(typeOfMonster, this.World, this.Position, this.OriginalEnergy);
             return result;
             }
         }

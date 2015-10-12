@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    abstract class Flitterbug : Monster
+    abstract class Flitterbug : Monster, ILayEggs
         {
         protected Flitterbug(World world, Vector2 position, int energy) : base(world, position, energy)
             {
@@ -22,9 +22,10 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        protected override Monster Clone()
+        public Monster LayAnEgg()
             {
-            var result = (Flitterbug)this.MemberwiseClone();
+            var typeOfMonster = this.GetType().Name;
+            var result = Create(typeOfMonster, this.World, this.Position, this.OriginalEnergy);
             return result;
             }
         }

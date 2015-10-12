@@ -127,6 +127,7 @@
     <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
+    <Compile Include="Interfaces\ILayEggs.cs" />
     <Compile Include="Services\Sound\ActiveSound.cs" />
     <Compile Include="Services\Sound\ActiveSoundForObject.cs" />
     <Compile Include="Interfaces\IActiveSound.cs" />

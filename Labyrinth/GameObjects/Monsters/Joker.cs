@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    sealed class Joker : Monster
+    sealed class Joker : Monster, ILayEggs
         {
         public Joker(World world, Vector2 position, int energy) : base(world, position, energy)
             {
@@ -27,6 +27,13 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new ArgumentOutOfRangeException();
                 }
+            }
+
+        public Monster LayAnEgg()
+            {
+            var typeOfMonster = this.GetType().Name;
+            var result = Create(typeOfMonster, this.World, this.Position, this.OriginalEnergy);
+            return result;
             }
         }
     }

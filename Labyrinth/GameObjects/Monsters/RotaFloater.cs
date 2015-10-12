@@ -27,16 +27,10 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        protected override Monster Clone()
-            {
-            var result = (RotaFloater)this.MemberwiseClone();
-            return result;
-            }
-
         private static Direction DetermineDirectionAggressive(Monster m, World w, Func<bool> shouldMakeAnAggressiveMove)
             {
             var p = w.Player;
-            if (p == null || !p.IsExtant)
+            if (!p.IsExtant)
                 {
                 return MonsterMovement.DetermineDirectionRolling(m, w);
                 }

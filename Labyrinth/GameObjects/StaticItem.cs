@@ -112,14 +112,6 @@ namespace Labyrinth.GameObjects
             }
         
         /// <summary>
-        /// Creates a new animation player for the object
-        /// </summary>
-        protected void ResetAnimationPlayerAfterClone()
-            {
-            this._animationPlayer = new AnimationPlayer(this.World.SpriteLibrary);
-            }
-
-        /// <summary>
         /// Gets the boundaries of the game object's position for basic collision detection purposes
         /// </summary>
         public virtual Rectangle BoundingRectangle { get; protected set; }
