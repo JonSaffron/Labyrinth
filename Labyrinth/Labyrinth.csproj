@@ -124,10 +124,15 @@
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="HeadsUpDisplay.cs" />
+    <Compile Include="IHeadsUpDisplay.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />
+    <Compile Include="Interfaces\IScoreKeeper.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />
+    <Compile Include="Services\ScoreKeeper\NullScoreKeeper.cs" />
+    <Compile Include="Services\ScoreKeeper\ScoreKeeper.cs" />
     <Compile Include="Services\Sound\ActiveSound.cs" />
     <Compile Include="Services\Sound\ActiveSoundForObject.cs" />
     <Compile Include="Interfaces\IActiveSound.cs" />

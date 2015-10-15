@@ -1,6 +1,7 @@
 using System;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.ScoreKeeper;
 using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -27,11 +28,11 @@ namespace Labyrinth
         private readonly GraphicsDeviceManager _gdm;
         private readonly IWorldLoader _worldLoader;
 
-        private Texture2D _digits;
-        private Texture2D _life;
-        private int _score;
         private int _displayedScore;
         private int _lives;
+
+        private readonly HeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
+        private readonly IScoreKeeper _scoreKeeper = new ScoreKeeper();
 
         public Game1(IPlayerInput playerInput, IWorldLoader worldLoader)
             {
@@ -51,7 +52,7 @@ namespace Labyrinth
             this.Content.RootDirectory = "Content";
             //this.TargetElapsedTime = new TimeSpan(this.TargetElapsedTime.Ticks * 4);
             this._lives = 2;
-            this._score = 0;
+            this._scoreKeeper.Reset();
             this._displayedScore = 0;
             }
 
@@ -62,9 +63,6 @@ namespace Labyrinth
             {
             // Create a new SpriteBatch, which can be used to draw textures.
             this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
-
-            this._digits = Content.Load<Texture2D>("Display/Digits");
-            this._life = Content.Load<Texture2D>("Display/Life");
 
             var soundLibrary = new SoundLibrary();
             soundLibrary.LoadContent(this.Content);
@@ -89,7 +87,7 @@ namespace Labyrinth
             if (score <= 0)
                 throw new ArgumentOutOfRangeException("score");
 
-            this._score += score;
+            this._scoreKeeper.AddToScore(score);
             }
 
         /// <summary>
@@ -134,7 +132,7 @@ namespace Labyrinth
                 System.Diagnostics.Trace.WriteLine(text);
                 }
 
-            if (this._displayedScore < this._score)
+            if (this._displayedScore < this._scoreKeeper.CurrentScore)
                 this._displayedScore++;
 
             ProcessGameInput();
@@ -180,7 +178,7 @@ namespace Labyrinth
             if (this.World != null)
                 {
                 this.World.Draw(gameTime, SpriteBatch);
-                DrawStatus(SpriteBatch);
+                this._headsUpDisplay.DrawStatus(SpriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._displayedScore, this._lives);
                 }
             SpriteBatch.End();
 
@@ -193,72 +191,6 @@ namespace Labyrinth
             this._worldLoader.LoadWorld(level);
             this.World = new World(this, this._worldLoader);
             this.World.ResetLevelForStartingNewLife(this.SpriteBatch);
-            }
-        
-        private void DrawStatus(ISpriteBatch spriteBatch)
-            {
-            DrawEnergy(spriteBatch);
-            DrawScoreAndLives(spriteBatch);
-            }
-        
-        private void DrawEnergy(ISpriteBatch spriteBatch)
-            {
-            var r = new Rectangle(22, 6, 148, 20);
-            spriteBatch.DrawRectangle(r, Color.Blue);
-            
-            r.Inflate(-2, -2);
-            spriteBatch.DrawRectangle(r, Color.Black);
-            
-            r = new Rectangle(32, 12, 128, 8);
-            spriteBatch.DrawRectangle(r, Color.Blue);
-            
-            if (!this.World.Player.IsExtant)
-                return;
-            
-            bool isAboutToDie = this.World.Player.Energy < 4;
-            int barLength = isAboutToDie ? (this.World.Player.Energy + 1) << 4 : Math.Min(this.World.Player.Energy >> 2, 64);
-            Color barColour = isAboutToDie ? Color.Red : Color.Green;
-            r = new Rectangle(32, 12, barLength * 2, 8);
-            spriteBatch.DrawRectangle(r, barColour);
-
-#if DEBUG
-            r = new Rectangle(168, 8, 28, 16);
-            spriteBatch.DrawRectangle(r, Color.Black);
-            DrawValue(spriteBatch, this.World.Player.Energy, 168 + 24, 8);
-#endif
-            }
-
-        private void DrawScoreAndLives(ISpriteBatch spriteBatch)
-            {
-            var r = new Rectangle(342, 6, 148, 20);
-            spriteBatch.DrawRectangle(r, Color.Blue);
-            
-            r.Inflate(-2, -2);
-            spriteBatch.DrawRectangle(r, Color.Black);
-            
-            DrawValue(spriteBatch, this._displayedScore, 416, 8);
-
-            for (int i = 0; i < this._lives; i++)
-                {
-                Vector2 destination = new Vector2(480 - ((i + 1) * 16), 8) + spriteBatch.WindowOffset;
-                spriteBatch.DrawEntireTexture(this._life, destination);
-                }
-            }
-
-        private void DrawValue(ISpriteBatch spriteBatch, int value, int right, int top)
-            {
-            int i = 1;
-            while (true)
-                {
-                int digit = value % 10;
-                var source = new Rectangle(digit * 6, 0, 6, 16);
-                Vector2 destination = new Vector2(right - (i * 8), top) + spriteBatch.WindowOffset;
-                spriteBatch.DrawTexture(this._digits, destination, source, 0.0f, Vector2.Zero);
-                value = value / 10;
-                if (value == 0)
-                    break;
-                i++;
-                }
             }
 
         private void ToggleFullScreen()
