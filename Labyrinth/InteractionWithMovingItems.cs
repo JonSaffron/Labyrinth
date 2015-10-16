@@ -102,14 +102,11 @@ namespace Labyrinth
                     {
                     var energy = movingObject.InstantlyExpire();
                     var b = this._world.AddBang(movingObject.Position, BangType.Long);
-                    if (movingObject is Monster)
+                    var monster = movingObject as Monster;
+                    if (monster != null)
                         {
                         b.PlaySound(GameSound.MonsterDies);
-                        if (!(movingObject is DeathCube))
-                            {
-                            var score = ((energy >> 1) + 1) * 20;
-                            this._world.IncreaseScore(score);
-                            }
+                        this._world.Game.ScoreKeeper.EnemyCrushed(monster, energy);
                         }
                     return true;
                     }
@@ -196,8 +193,8 @@ namespace Labyrinth
                 return false;
                 }
 
-            var score = ((Math.Min(shot.Energy, monster.Energy) >> 1) + 1)*10;
-            world.IncreaseScore(score);
+            var energyRemoved = Math.Min(shot.Energy, monster.Energy);
+            world.Game.ScoreKeeper.EnemyShot(monster, energyRemoved);
             monster.ReduceEnergy(shot.Energy);
             var bang = world.ConvertShotToBang(shot);
             if (monster.IsAlive())

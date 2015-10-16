@@ -48,10 +48,5 @@ namespace Labyrinth.Services.ScoreKeeper
                 return result;
                 }
             }
-
-        public void AddToScore(int score)
-            {
-            this._score += score / 10;
-            }
         }
     }

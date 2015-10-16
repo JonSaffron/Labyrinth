@@ -100,11 +100,6 @@ namespace Labyrinth
             return result;
             }
 
-        public void IncreaseScore(int score)
-            {
-            this.Game.AddScore(score);
-            }
-        
         /// <summary>
         /// Tests whether the specified position can be occupied.
         /// </summary>

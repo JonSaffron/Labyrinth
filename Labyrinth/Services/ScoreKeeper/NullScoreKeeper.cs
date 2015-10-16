@@ -31,10 +31,5 @@ namespace Labyrinth.Services.ScoreKeeper
                 return 0;
                 }
             }
-
-        public void AddToScore(int score)
-            {
-            // do nothing
-            }
         }
     }

@@ -82,12 +82,12 @@ namespace Labyrinth
             this.World = null;
             }
 
-        public void AddScore(int score)
+        public IScoreKeeper ScoreKeeper
             {
-            if (score <= 0)
-                throw new ArgumentOutOfRangeException("score");
-
-            this._scoreKeeper.AddToScore(score);
+            get
+                {
+                return this._scoreKeeper;
+                }
             }
 
         /// <summary>
