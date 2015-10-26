@@ -6,14 +6,14 @@ namespace Labyrinth.Services.Sound
     class SoundPlayer : ISoundPlayer
         {
         private readonly SoundLibrary _soundLibrary;
-        private readonly Game1 _game;
+        private readonly ICentrePointProvider _centrePointProvider;
         private readonly IActiveSoundService _activeSoundService = new ActiveSoundService();
         private float _masterVolumeLevel = 1;
 
-        public SoundPlayer(SoundLibrary soundLibrary, Game1 game)
+        public SoundPlayer(SoundLibrary soundLibrary, ICentrePointProvider centrePointProvider)
             {
             this._soundLibrary = soundLibrary;
-            this._game = game;
+            this._centrePointProvider = centrePointProvider;
             SoundEffect.MasterVolume = _masterVolumeLevel;
             }
 
@@ -72,6 +72,14 @@ namespace Labyrinth.Services.Sound
             SoundEffect.MasterVolume = this._masterVolumeLevel;
             }
 
+        public SoundLibrary SoundLibrary
+            {
+            get
+                {
+                return this._soundLibrary;
+                }
+            }
+
         private void InternalPlay(GameSound gameSound)
             {
 #if DEBUG
@@ -92,14 +100,14 @@ namespace Labyrinth.Services.Sound
 #endif
 
             ISoundEffectInstance soundEffect = this._soundLibrary[gameSound];
-            var activeSound = new ActiveSoundForObject(soundEffect, gameObject, this._game);
+            var activeSound = new ActiveSoundForObject(soundEffect, gameObject, this._centrePointProvider);
             this._activeSoundService.Add(activeSound);
             }
 
         private void AddCallback(GameSound gameSound, EventHandler callback)
             {
             var duration = this._soundLibrary.GetDuration(gameSound);
-            GameTimer.AddGameTimer(this._game, duration, callback);
+            GameTimer.AddGameTimer(duration, callback);
             }
 
         private static bool DoesSoundRequirePosition(GameSound gameSound)

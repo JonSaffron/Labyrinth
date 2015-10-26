@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     sealed class CrazyCrawler : Monster
         {
-        public CrazyCrawler(World world, Vector2 position, int energy) : base(world, position, energy)
+        public CrazyCrawler(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/CrazyCrawler", 3));
             
@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
             this.ShotsBounceOff = true;
             }
 
-        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {

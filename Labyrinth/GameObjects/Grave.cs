@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Grave : StaticItem
+    public class Grave : StaticItem
         {
-        public Grave(World world, Vector2 position) : base(world, position)
+        public Grave(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             this.Energy = 255;
             

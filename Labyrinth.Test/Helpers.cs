@@ -9,7 +9,7 @@ namespace Labyrinth.Test
         {
         internal static bool IsAnythingMoving(this World world)
             {
-            var result = world.GameObjects.GetSurvivingInteractiveItems().Any(mi => mi.IsMoving);
+            var result = GlobalServices.GameState.GetSurvivingInteractiveItems().Any(mi => mi.IsMoving);
             return result;
             }
 

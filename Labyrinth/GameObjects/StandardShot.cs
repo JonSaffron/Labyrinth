@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
         private double _timeToTravel;
         private Direction _directionOfTravel;
 
-        public StandardShot(World world, Vector2 position, Direction d, int energy, ShotType shotType) : base(world, position)
+        public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, ShotType shotType) : base(animationPlayer, position)
             {
             this.Energy = energy;
             this.ShotType = shotType;

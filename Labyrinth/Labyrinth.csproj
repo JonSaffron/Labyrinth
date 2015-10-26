@@ -124,7 +124,11 @@
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="GameState.cs" />
+    <Compile Include="GlobalServices.cs" />
+    <Compile Include="IGameObjectCollection.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />
+    <Compile Include="Interfaces\IScoreKeeper.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />
@@ -172,6 +176,7 @@
     <Compile Include="GameObjects\Fruit.cs" />
     <Compile Include="Services\Sound\ActiveSoundService.cs" />
     <Compile Include="Services\Sound\InstanceCache.cs" />
+    <Compile Include="Services\Sound\NullSoundPlayer.cs" />
     <Compile Include="Services\Sound\SoundEffectInstance.cs" />
     <Compile Include="Services\Sound\SoundEffectInstanceCache.cs" />
     <Compile Include="Services\WorldBuilding\FruitDefinition.cs" />

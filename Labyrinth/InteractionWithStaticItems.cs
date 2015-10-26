@@ -100,15 +100,15 @@ namespace Labyrinth
             world.IncreaseScore(crystal.Score);
             player.CrystalCollected(crystal);
             crystal.SetTaken();
-            int howManyCrystalsRemain = world.GameObjects.DistinctItemsOfType<Crystal>().Count();
+            int howManyCrystalsRemain = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Count();
             if (howManyCrystalsRemain == 0)
                 {
-                world.Game.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
+                GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
                     (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedLevel));
                 world.SetDoNotUpdate();
                 }
             else
-                world.Game.SoundPlayer.Play(GameSound.PlayerCollectsCrystal);
+                GlobalServices.SoundPlayer.Play(GameSound.PlayerCollectsCrystal);
             }
 
         private static void InteractionInvolvesShot(World world, Shot shot, StaticItem staticItem)
@@ -124,10 +124,10 @@ namespace Labyrinth
                 staticItem.ReduceEnergy(shot.Energy);
                 Bang bang;
                 if (staticItem.IsExtant)
-                    bang = world.ConvertShotToBang(shot);
+                    bang = GlobalServices.GameState.ConvertShotToBang(shot);
                 else
                     {
-                    bang = world.AddBang(staticItem.Position, BangType.Short);
+                    bang = GlobalServices.GameState.AddBang(staticItem.Position, BangType.Short);
                     shot.InstantlyExpire();
                     }
                 bang.PlaySound(GameSound.StaticObjectShotAndInjured);

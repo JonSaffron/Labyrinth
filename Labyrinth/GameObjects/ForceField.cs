@@ -3,11 +3,11 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class ForceField : StaticItem
+    public class ForceField : StaticItem
         {
         private readonly int _crystalRequired;
 
-        public ForceField(World world, Vector2 position, int crystalRequired) : base(world, position)
+        public ForceField(AnimationPlayer animationPlayer, Vector2 position, int crystalRequired) : base(animationPlayer, position)
             {
             this._crystalRequired = crystalRequired;
 
@@ -19,7 +19,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                bool result = !this.World.Player.HasPlayerGotCrystal(this._crystalRequired);
+                bool result = !GlobalServices.GameState.Player.HasPlayerGotCrystal(this._crystalRequired);
                 return result;
                 }
             }

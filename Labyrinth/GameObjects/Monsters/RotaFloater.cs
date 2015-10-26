@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -7,11 +8,11 @@ namespace Labyrinth.GameObjects
         {
         protected int ChanceOfAggressiveMove;
 
-        protected RotaFloater(World world, Vector2 position, int energy) : base(world, position, energy)
+        protected RotaFloater(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             }
 
-        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
@@ -20,19 +21,19 @@ namespace Labyrinth.GameObjects
                 case MonsterMobility.Patrolling:
                     return MonsterMovement.DetermineDirectionStandardPatrolling;
                 case MonsterMobility.Aggressive:
-                    Func<Monster, World, Direction> result = (m, w) => DetermineDirectionAggressive(this, w, ShouldMakeAnAggressiveMove);
+                    Func<Monster, Direction> result = m => DetermineDirectionAggressive(this, ShouldMakeAnAggressiveMove);
                     return result;
                 default:
                     throw new ArgumentOutOfRangeException();
                 }
             }
 
-        private static Direction DetermineDirectionAggressive(Monster m, World w, Func<bool> shouldMakeAnAggressiveMove)
+        private static Direction DetermineDirectionAggressive(Monster m, Func<bool> shouldMakeAnAggressiveMove)
             {
-            var p = w.Player;
+            var p = GlobalServices.GameState.Player;
             if (!p.IsExtant)
                 {
-                return MonsterMovement.DetermineDirectionRolling(m, w);
+                return MonsterMovement.DetermineDirectionRolling(m);
                 }
             
             TilePos tp = m.TilePosition;
@@ -81,13 +82,13 @@ namespace Labyrinth.GameObjects
             if (newDirection != Direction.None)
                 {
                 TilePos pp = tp.GetPositionAfterOneMove(newDirection);
-                if (w.CanTileBeOccupied(pp, true))
+                if (GlobalServices.GameState.CanTileBeOccupied(pp, true))
                     {
                     return newDirection;
                     }
                 }
 
-            return MonsterMovement.DetermineDirectionRolling(m, w);
+            return MonsterMovement.DetermineDirectionRolling(m);
             }
 
         private bool ShouldMakeAnAggressiveMove()

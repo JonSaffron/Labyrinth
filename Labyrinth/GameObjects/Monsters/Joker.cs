@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     sealed class Joker : Monster, ILayEggs
         {
-        public Joker(World world, Vector2 position, int energy) : base(world, position, energy)
+        public Joker(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/Joker", 4));
             
@@ -18,7 +18,7 @@ namespace Labyrinth.GameObjects
             this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
             }
 
-        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
@@ -32,7 +32,7 @@ namespace Labyrinth.GameObjects
         public Monster LayAnEgg()
             {
             var typeOfMonster = this.GetType().Name;
-            var result = Create(typeOfMonster, this.World, this.Position, this.OriginalEnergy);
+            var result = GlobalServices.GameState.Create(typeOfMonster, this.Position, this.OriginalEnergy);
             return result;
             }
         }

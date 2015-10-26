@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Wall : StaticItem
+    public class Wall : StaticItem
         {
-        public Wall(World world, Vector2 position, string textureName) : base(world, position)
+        public Wall(AnimationPlayer animationPlayer, Vector2 position, string textureName) : base(animationPlayer, position)
             {
             var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);

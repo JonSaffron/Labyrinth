@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Boulder : MovingItem
+    public class Boulder : MovingItem
         {
         // Animations
         private Animation _staticImage;
@@ -11,7 +11,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new boulder.
         /// </summary>
-        public Boulder(World world, Vector2 position) : base(world, position)
+        public Boulder(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             LoadContent();
             Direction = Direction.None;

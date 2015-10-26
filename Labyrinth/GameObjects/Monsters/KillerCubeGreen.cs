@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     sealed class KillerCubeGreen : KillerCube
         {
-        public KillerCubeGreen(World world, Vector2 position, int energy) : base(world, position, energy)
+        public KillerCubeGreen(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/KillerCubeGreen", 3));
             
@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
             this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
             }
 
-        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             if (mobility != MonsterMobility.Static)
                 throw new ArgumentOutOfRangeException();

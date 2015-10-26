@@ -9,25 +9,23 @@ namespace Labyrinth.GameObjects
         {
         private Vector2 _position;
         private TilePos _tilePosition;
-        private AnimationPlayer _animationPlayer;
-        private readonly World _world;
+        private readonly AnimationPlayer _animationPlayer;
         private int _energy;
 
         /// <summary>
         /// Constructs a new static item object
         /// </summary>
-        /// <param name="world">A reference to the current world</param>
+        /// <param name="animationPlayer">An instance of the animation player to use for animating this object</param>
         /// <param name="position">The initial position of the object</param>
-        protected StaticItem(World world, Vector2 position)
+        protected StaticItem(AnimationPlayer animationPlayer, Vector2 position)
             {
-            if (world == null)
-                throw new ArgumentNullException("world");
+            if (animationPlayer == null)
+                throw new ArgumentNullException("animationPlayer");
             if (position == null)
                 throw new ArgumentNullException("position");
 
-            this._world = world;
+            this._animationPlayer = animationPlayer;
             this.Position = position;
-            this._animationPlayer = new AnimationPlayer(world.SpriteLibrary);
             }
         
         /// <summary>
@@ -80,18 +78,6 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        /// <summary>
-        /// Gets a reference to the current world the object inhabits
-        /// </summary>
-        protected World World 
-            { 
-            get
-                {
-                var result = this._world;
-                return result;
-                }
-            }
-        
         /// <summary>
         /// Gets or sets how much energy the object has
         /// </summary>
@@ -182,12 +168,12 @@ namespace Labyrinth.GameObjects
 
         public void PlaySound(GameSound gameSound)
             {
-            this.World.Game.SoundPlayer.PlayForObject(gameSound, this);
+            GlobalServices.SoundPlayer.PlayForObject(gameSound, this);
             }
 
         public void PlaySoundWithCallback(GameSound gameSound, EventHandler callback)
             {
-            this.World.Game.SoundPlayer.PlayForObjectWithCallback(gameSound, this, callback);
+            GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, this, callback);
             }
         }
     }

@@ -1,7 +1,6 @@
 using System;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
-using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,7 +19,6 @@ namespace Labyrinth
         private readonly Vector2 _centreOfRoom = new Vector2(RoomSizeWidth / 2, RoomSizeHeight / 2);
 
         public IPlayerInput PlayerInput { get; private set; }
-        public ISoundPlayer SoundPlayer { get; private set; }
         public ISpriteBatch SpriteBatch { get; private set; }
         internal World World { get; private set; }
         
@@ -33,7 +31,7 @@ namespace Labyrinth
         private int _displayedScore;
         private int _lives;
 
-        public Game1(IPlayerInput playerInput, IWorldLoader worldLoader)
+        public Game1(IPlayerInput playerInput, IWorldLoader worldLoader, ISoundPlayer soundPlayer)
             {
             if (playerInput == null)
                 throw new ArgumentNullException("playerInput");
@@ -42,6 +40,7 @@ namespace Labyrinth
             this.PlayerInput = playerInput;
             this.PlayerInput.GameInput = new GameInput(this);
             this._worldLoader = worldLoader;
+            GlobalServices.SetSoundPlayer(soundPlayer);
             
             this._gdm = new GraphicsDeviceManager(this)
                             {
@@ -63,12 +62,10 @@ namespace Labyrinth
             // Create a new SpriteBatch, which can be used to draw textures.
             this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
 
-            this._digits = Content.Load<Texture2D>("Display/Digits");
-            this._life = Content.Load<Texture2D>("Display/Life");
+            this._digits = this.Content.Load<Texture2D>("Display/Digits");
+            this._life = this.Content.Load<Texture2D>("Display/Life");
 
-            var soundLibrary = new SoundLibrary();
-            soundLibrary.LoadContent(this.Content);
-            this.SoundPlayer = new SoundPlayer(soundLibrary, this);
+            GlobalServices.SoundPlayer.SoundLibrary.LoadContent(this.Content);
             }
 
         /// <summary>
@@ -151,15 +148,15 @@ namespace Labyrinth
                 
             int changeToEnabled = (gameInput.HasSoundOnBeenTriggered ? 1 : 0) + (gameInput.HasSoundOffBeenTriggered ? -1 : 0);
             if (changeToEnabled < 0)
-                this.SoundPlayer.Disable();
+                GlobalServices.SoundPlayer.Disable();
             else if (changeToEnabled > 0)
-                SoundPlayer.Enable();
+                GlobalServices.SoundPlayer.Enable();
 
             int changeToVolume = (gameInput.HasSoundIncreaseBeenTriggered ? 1 : 0) + (gameInput.HasSoundDecreaseBeenTriggered  ? -1 : 0);
             if (changeToVolume < 0)
-                this.SoundPlayer.TurnItDown();
+                GlobalServices.SoundPlayer.TurnItDown();
             else if (changeToVolume > 0)
-                this.SoundPlayer.TurnItUp();
+                GlobalServices.SoundPlayer.TurnItUp();
 
             if (gameInput.HasMoveToNextLevelBeenTriggered && this.World != null)
                 {

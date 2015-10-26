@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Labyrinth.GameObjects;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -9,11 +9,15 @@ namespace Labyrinth
     /// <summary>
     /// Keeps track of the objects in the game
     /// </summary>
-    public class GameObjectCollection
+    public class GameObjectCollection : IGameObjectCollection
         {
         private readonly List<StaticItem>[] _allGameItems;
         private readonly LinkedList<MovingItem> _interactiveGameItems; 
-        private int _countOfShots;
+
+        private readonly int _width;
+        private readonly int _height;
+
+        public int CountOfShots { get; private set; }
 
         /// <summary>
         /// Initialises the collection
@@ -28,11 +32,29 @@ namespace Labyrinth
             if (height <= 0)
                 throw new ArgumentOutOfRangeException("height");
 
+            this._width = width;
+            this._height = height;
             var maxTilePosition = new TilePos(width, height);
             this._allGameItems = new List<StaticItem>[maxTilePosition.MortonCode];
             this._interactiveGameItems = new LinkedList<MovingItem>();
             if (initialItems != null)
                 this.AddRange(initialItems);
+            }
+
+        public int Width
+            {
+            get
+                {
+                return this._width;
+                }
+            }
+
+        public int Height
+            {
+            get
+                {
+                return this._height;
+                }
             }
 
         private void AddRange(IEnumerable<StaticItem> objects)
@@ -59,24 +81,31 @@ namespace Labyrinth
                 {
                 this._interactiveGameItems.AddLast(mi);
                 if (mi is Shot)
-                    this._countOfShots++;
+                    this.CountOfShots++;
                 }
             }
 
-        private void Remove(LinkedListNode<MovingItem> gameObject)
+        public void Remove(StaticItem gameObject)
             {
             if (gameObject == null)
                 throw new ArgumentNullException("gameObject");
 
-            if (gameObject.Value is Shot)
-                this._countOfShots--;
-            this._interactiveGameItems.Remove(gameObject);
+            var movingItem = gameObject as MovingItem;
+            if (movingItem != null)
+                {
+                bool wasItemRemoved = this._interactiveGameItems.Remove(movingItem);
+                if (!wasItemRemoved)
+                    throw new ArgumentOutOfRangeException("gameObject");
+                }
 
-            int mortonPosition = gameObject.Value.TilePosition.MortonCode;
+            if (gameObject is Shot)
+                this.CountOfShots--;
+
+            int mortonPosition = gameObject.TilePosition.MortonCode;
             List<StaticItem> listOfStaticItem = this._allGameItems[mortonPosition];
             if (listOfStaticItem == null || listOfStaticItem.Count == 0)
                 throw new InvalidOperationException("The allGameItems collection where the gameObject was expected to be was null.");
-            if (!listOfStaticItem.Remove(gameObject.Value))
+            if (!listOfStaticItem.Remove(gameObject))
                 throw new InvalidOperationException("The gameObject could not be found in the allGameItems list, or could not be removed.");
             }
 
@@ -92,75 +121,38 @@ namespace Labyrinth
             listOfStaticItem.Add(gameObject);
             }
 
-        /// <summary>
-        /// Retrieves all game objects within the specified rectangle
-        /// </summary>
-        /// <param name="r">The area to return items for</param>
-        /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<StaticItem> AllItemsInRectangle(Rectangle r)
-            {
-            var start = TilePos.TilePosFromPosition(new Vector2(r.X, r.Y)).MortonCode;
-            var end = TilePos.TilePosFromPosition(new Vector2(r.Right, r.Bottom)).MortonCode;
-            for (int i = start; i <= end; i++)
-                {
-                // for performance reasons we get the each item in turn from the array to allow for CPU caching
-                if (i >= this._allGameItems.GetLength(0))
-                    continue;
-                var listOfItems = this._allGameItems[i];
-                if (listOfItems == null)
-                    continue;
-                var tp = TilePos.FromMortonCode(i);
-                var rect = tp.ToRectangle();
-                if (!r.Intersects(rect))
-                    continue;
 
-                var copyOfList = listOfItems.ToArray();
-                foreach (var item in copyOfList)
-                    yield return item;
+        public IEnumerable<MovingItem> InteractiveGameItems
+            {
+            get
+                {
+                var result = this._interactiveGameItems;
+                return result;
                 }
             }
 
-        /// <summary>
-        /// Returns a list of all extant game objects that could interact with other game objects
-        /// </summary>
-        /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<MovingItem> GetSurvivingInteractiveItems()
+        public IEnumerable<StaticItem> ItemsAtPosition(TilePos tp)
             {
-            var item = this._interactiveGameItems.First;
-            while (item != null)
-                {
-                var currentNode = item;
-                var gameObject = item.Value;
-                item = item.Next;
-
-                if (!gameObject.IsExtant && !(gameObject is Player))
-                    {
-                    this.Remove(currentNode);
-                    continue;
-                    }
-
-                yield return gameObject;
-                }
+            if (tp.X < 0 || tp.Y < 0 || tp.X >= this.Width || tp.Y >= this.Height)
+                throw new ArgumentOutOfRangeException("tp");
+            var mortonIndex = tp.MortonCode;
+            var result = this._allGameItems[mortonIndex];
+            return result;
             }
 
-        /// <summary>
-        /// Returns a list of all game objects of the specified type
-        /// </summary>
-        /// <typeparam name="T">The type of object to return</typeparam>
-        /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<T> DistinctItemsOfType<T>() where T: StaticItem
+        public IEnumerable<StaticItem> DistinctItems()
             {
-            var set = new HashSet<T>();
+            var set = new HashSet<StaticItem>();
             // ReSharper disable once LoopCanBeConvertedToQuery (leads to slow delegate)
             foreach (var list in this._allGameItems.WhereNotNull())
                 {
-                foreach (var item in list.OfType<T>())
+                foreach (var item in list)
                     {
                     if (set.Add(item))
                         yield return item;
                     }
                 }
-            }
+            } 
 
         /// <summary>
         /// Allows the collection to update its knowledge of where the specified game object is located
@@ -204,46 +196,6 @@ namespace Labyrinth
                 {
                 newList.Add(item);
                 }
-            }
-
-        /// <summary>
-        /// Returns a list of all extant game objects that are located on the specified tile
-        /// </summary>
-        /// <param name="tp">Specifes the tile position to inspect</param>
-        /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<StaticItem> GetItemsOnTile(TilePos tp)
-            {
-            var mortonPosition = tp.MortonCode;
-            var listOfItems = this._allGameItems[mortonPosition] ?? new List<StaticItem>();
-            var result = listOfItems.Where(gi => gi.IsExtant && gi.TilePosition == tp);
-            return result;
-            } 
-
-        /// <summary>
-        /// Removes all bangs and shots from the game object collection
-        /// </summary>
-        public void RemoveBangsAndShots()
-            {
-            foreach (var list in this._allGameItems.WhereNotNull())
-                {
-                foreach (var item in list)
-                    {
-                    if (item is Bang || item is Shot)
-                        {
-                        item.InstantlyExpire();
-                        }
-                    }
-                }
-            }
-
-        /// <summary>
-        /// Returns whether there are any shots currently in the collection
-        /// </summary>
-        /// <returns>True if a shot exits in the collection, otherwise False.</returns>
-        public bool DoesShotExist()
-            {
-            var result = (this._countOfShots > 0);
-            return result;
             }
         }
     }

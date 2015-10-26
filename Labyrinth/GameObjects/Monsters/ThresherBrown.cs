@@ -5,7 +5,7 @@ namespace Labyrinth.GameObjects
     {
     sealed class ThresherBrown : Thresher
         {
-        public ThresherBrown(World world, Vector2 position, int energy) : base(world, position, energy)
+        public ThresherBrown(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/ThresherBrown", 3));
             

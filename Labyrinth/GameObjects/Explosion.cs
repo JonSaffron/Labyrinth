@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         private bool _isExtant;
 
-        public Explosion(World world, Vector2 position, int energy) : base(world, position)
+        public Explosion(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
             this.Energy = energy;
             var a = Animation.SingleRunAnimation("Sprites/Props/LongBang", 2);

@@ -5,7 +5,7 @@ namespace Labyrinth.GameObjects
     {
     sealed class FlitterbugCyan : Flitterbug
         {
-        public FlitterbugCyan(World world, Vector2 position, int energy) : base(world, position, energy)
+        public FlitterbugCyan(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/FlitterbugCyan", 4));
             

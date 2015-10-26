@@ -5,7 +5,7 @@ namespace Labyrinth.GameObjects
     {
     sealed class RotaFloaterCyan : RotaFloater
         {
-        public RotaFloaterCyan(World world, Vector2 position, int energy) : base(world, position, energy)
+        public RotaFloaterCyan(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/RotaFloaterCyan", 2));
             

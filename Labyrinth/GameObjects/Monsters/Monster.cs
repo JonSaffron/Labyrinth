@@ -10,8 +10,8 @@ namespace Labyrinth.GameObjects
         protected static readonly Random MonsterRandom = new Random();
         
         private MonsterMobility _mobility;
-        protected abstract Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility);
-        private Func<Monster, World, Direction> _determineDirection;
+        protected abstract Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility);
+        private Func<Monster, Direction> _determineDirection;
 
         public ChangeRooms ChangeRooms { get; set; }
         private MonsterState _monsterState = MonsterState.Normal;
@@ -37,7 +37,7 @@ namespace Labyrinth.GameObjects
         private double _stepTime;
         private bool _laysEggs;
 
-        protected Monster(World world, Vector2 position, int energy) : base(world, position)
+        protected Monster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
             this.Energy = energy;
             this.OriginalEnergy = energy;
@@ -46,29 +46,6 @@ namespace Labyrinth.GameObjects
             this._hatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
             }
             
-        public static Monster Create(string type, World world, Vector2 position, int energy)
-            {
-            switch (type)
-                {
-                case "ThresherBrown": return new ThresherBrown(world, position, energy);
-                case "RotaFloaterBrown": return new RotaFloaterBrown(world, position, energy);
-                case "DeathCube": return new DeathCube(world, position, energy);
-                case "RotaFloaterCyan": return new RotaFloaterCyan(world, position, energy);
-                case "FlitterbugRed": return new FlitterbugRed(world, position, energy);
-                case "KillerCubeGreen": return new KillerCubeGreen(world, position, energy);
-                case "ThresherCyan": return new ThresherCyan(world, position, energy);
-                case "Butterfly": return new Butterfly(world, position, energy);
-                case "KillerCubeRed": return new KillerCubeRed(world, position, energy);
-                case "FlitterbugCyan": return new FlitterbugCyan(world, position, energy);
-                case "DiamondDemon": return new DiamondDemon(world, position, energy);
-                case "FlitterbugBrown": return new FlitterbugBrown(world, position, energy);
-                case "CrazyCrawler": return new CrazyCrawler(world, position, energy);
-                case "TigerMoth": return new TigerMoth(world, position, energy);
-                case "Joker": return new Joker(world, position, energy);
-                default: throw new InvalidOperationException("No handler exists for creating monster " + type);
-                }
-            }
-
         public MonsterMobility Mobility
             {
             get
@@ -102,7 +79,7 @@ namespace Labyrinth.GameObjects
             {
             this.MonsterState = MonsterState.Egg;
             var timeSpan = TimeSpan.FromSeconds(gameTicks * Constants.GameClockResolution);
-            this._hatchingTimer = GameTimer.AddGameTimer(this.World.Game, timeSpan, EggIsHatching, false);
+            this._hatchingTimer = GameTimer.AddGameTimer(timeSpan, EggIsHatching, false);
             }
 
         private void EggIsHatching(object sender, EventArgs args)
@@ -171,11 +148,11 @@ namespace Labyrinth.GameObjects
                 }
 
             this.PlaySound(GameSound.MonsterDies);
-            this.World.AddBang(this.Position, BangType.Long);
+            GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             if (this.SplitsOnHit)
                 {
                 for (int i = 1; i <= 2; i++)
-                    this.World.AddDiamondDemon(this);
+                    GlobalServices.GameState.AddDiamondDemon(this.Position);
                 this.PlaySound(GameSound.MonsterShattersIntoNewLife);
                 }
             }
@@ -189,7 +166,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private bool SetDirectionAndDestination(World w)
+        private bool SetDirectionAndDestination()
             {
             if (this.Mobility == MonsterMobility.Static || this.IsEgg)
                 {
@@ -199,11 +176,11 @@ namespace Labyrinth.GameObjects
 
             if (this._determineDirection == null)
                 throw new InvalidOperationException("Direction function not set.");
-            Direction d = this._determineDirection(this, this.World);
+            Direction d = this._determineDirection(this);
             if (d == Direction.None)
                 throw new InvalidOperationException("The monster's DetermineDirection routine should not return None.");
             
-            d = MonsterMovement.UpdateDirectionWhereMovementBlocked(this, w, d);
+            d = MonsterMovement.UpdateDirectionWhereMovementBlocked(this, d);
             if (d == Direction.None)
                 {
                 this.StandStill();
@@ -221,7 +198,7 @@ namespace Labyrinth.GameObjects
             {
             this.OriginalPosition = this.Position;
 
-            bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this, this.World);
+            bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this);
             
             if (this.IsEgg && this._hatchingTimer != null)
                 this._hatchingTimer.Enabled = inSameRoom;
@@ -246,7 +223,7 @@ namespace Labyrinth.GameObjects
 
                 if (!this.IsMoving)
                     {
-                    if (!this.SetDirectionAndDestination(this.World))
+                    if (!this.SetDirectionAndDestination())
                         break;
 
                     if (this.Flitters)
@@ -269,20 +246,22 @@ namespace Labyrinth.GameObjects
 
         private void DoMonsterAction(bool inSameRoom)
             {
-            if (this.LaysMushrooms && !this.IsEgg && this.World.GameObjects.DoesShotExist() && inSameRoom && (MonsterRandom.Next(256) & 1) == 0 && IsDirectionCompatible(this.World.Player.Direction, this.Direction))
+            var player = GlobalServices.GameState.Player;
+
+            if (this.LaysMushrooms && !this.IsEgg && GlobalServices.GameState.DoesShotExist() && inSameRoom && (MonsterRandom.Next(256) & 1) == 0 && IsDirectionCompatible(player.Direction, this.Direction))
                 {
                 TilePos tp = this.TilePosition;
-                if (!this.World.IsStaticItemOnTile(tp))
+                if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
                     {
                     this.PlaySound(GameSound.MonsterLaysMushroom);
-                    this.World.AddMushroom(tp);
+                    GlobalServices.GameState.AddMushroom(tp);
                     }
                 }
 
-            if (this.LaysEggs && inSameRoom && this.World.Player.IsExtant && !this.IsEgg && (MonsterRandom.Next(256) & 0x1f)  == 0)
+            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && (MonsterRandom.Next(256) & 0x1f)  == 0)
                 {
                 TilePos tp = this.TilePosition;
-                if (!this.World.IsStaticItemOnTile(tp))
+                if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
                     {
                     this.PlaySound(GameSound.MonsterLaysEgg);
                     Monster m = ((ILayEggs) this).LayAnEgg();
@@ -295,13 +274,13 @@ namespace Labyrinth.GameObjects
                     m.MonsterShootBehaviour = this.MonsterShootBehaviour;
                     m.SetDelayBeforeHatching((MonsterRandom.Next(256) & 0x1f) + 8);
                     m.LaysEggs = false;
-                    this.World.AddMonster(m);
+                    GlobalServices.GameState.AddMonster(m);
                     }
                 }
 
-            if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && (MonsterRandom.Next(256) & 3) != 0 && this.Energy >= 4 && this.World.Player.IsExtant && MonsterMovement.IsPlayerInSight(this, this.World))
+            if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && (MonsterRandom.Next(256) & 3) != 0 && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInSight(this))
                 {
-                this._weapon.FireIfYouLike(this, this.World);
+                this._weapon.FireIfYouLike(this);
                 }
             }
 
@@ -343,7 +322,7 @@ namespace Labyrinth.GameObjects
             Rectangle newRoom = World.GetContainingRoom(this.Position);
             if (currentRoom != newRoom)
                 {
-                Rectangle playerRoom = World.GetContainingRoom(World.Player.Position);
+                Rectangle playerRoom = World.GetContainingRoom(GlobalServices.GameState.Player.Position);
                 if (currentRoom == playerRoom)
                     this.PlaySound(GameSound.MonsterLeavesRoom);
                 else if (newRoom == playerRoom)

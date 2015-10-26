@@ -79,7 +79,7 @@ namespace Labyrinth.Services.WorldBuilding
             return null;
             }
 
-        public IEnumerable<StaticItem> GetGameObjects(World world)
+        public void GetGameObjects(GameState gameState)
             {
             var result = new List<StaticItem>();
             var lines = this._layout.Split(new [] { "\r\n" }, StringSplitOptions.None);
@@ -87,7 +87,8 @@ namespace Labyrinth.Services.WorldBuilding
                 {
                 for (int x = 0; x < lines[y].Length; x++)
                     {
-                    var position = new TilePos(x, y).ToPosition();
+                    var tp = new TilePos(x, y);
+                    var position = tp.ToPosition();
                     var c = lines[y][x];
                     switch (c)
                         {
@@ -95,23 +96,22 @@ namespace Labyrinth.Services.WorldBuilding
                             break;
                         case '#':
                             Trace.WriteLine(System.IO.Directory.GetCurrentDirectory());
-                            result.Add(new Wall(world, position, "Tiles/Floor1"));
+                            GlobalServices.GameState.AddWall(position, "Tiles/Floor1");
                             break;
                         case 'p':
-                            result.Add(new Player(world, position, 255));
+                            GlobalServices.GameState.AddPlayer(position, 255);
                             break;
                         case 'b':
-                            result.Add(new Boulder(world, position));
+                            GlobalServices.GameState.AddBoulder(position);
                             break;
                         case 'g':
-                            result.Add(new Grave(world, position));
+                            GlobalServices.GameState.AddGrave(tp);
                             break;
                         default:
                             throw new InvalidOperationException();
                         }
                     }
                 }
-            return result;
             }
         }
     }

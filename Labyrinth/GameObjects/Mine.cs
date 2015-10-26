@@ -13,7 +13,7 @@ namespace Labyrinth.GameObjects
         private readonly Animation _movingUnarmedAnimation;
         private readonly Animation _armedAnimation;
 
-        public Mine(World world, Vector2 position) : base(world, position)
+        public Mine(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             this.Energy = 240;
             this._staticUnarmedAnimation = Animation.StaticAnimation("Sprites/Shot/MineUnarmed");
@@ -219,7 +219,7 @@ namespace Labyrinth.GameObjects
                 this.Mine._countdown += gameTime.ElapsedGameTime;
                 if (this._spreadPosition == 0)
                     {
-                    this.Mine.World.AddExplosion(this.Mine.TilePosition.ToPosition(), this._energyEffects[0]);
+                    GlobalServices.GameState.AddExplosion(this.Mine.TilePosition.ToPosition(), this._energyEffects[0]);
                     this._spreadPosition++;
                     return false;
                     }
@@ -245,7 +245,7 @@ namespace Labyrinth.GameObjects
                     
                     int energy = this._energyEffects[this._spreadPosition];
                     for (int j = 0; j < 4; j++)
-                        this.Mine.World.AddExplosion(positions[j].ToPosition(), energy);
+                        GlobalServices.GameState.AddExplosion(positions[j].ToPosition(), energy);
                     }
                 this._spreadPosition++;
                 return false;

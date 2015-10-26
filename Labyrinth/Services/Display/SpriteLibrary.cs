@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,10 +9,9 @@ namespace Labyrinth.Services.Display
         {
         private ContentManager _contentManager;
 
-        public SpriteLibrary(IServiceProvider serviceProvider)
+        public SpriteLibrary()
             {
-            if (serviceProvider == null)
-                throw new ArgumentNullException("serviceProvider");
+            var serviceProvider = new GameServiceContainer();
             this._contentManager = new ContentManager(serviceProvider, "Content");
             }
 

@@ -4,12 +4,12 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Fruit : StaticItem
+    public class Fruit : StaticItem
         {
         private readonly FruitType _fruitType;
         private bool _isTaken;
 
-        public Fruit(World world, Vector2 position, FruitType fruitType) : base(world, position)
+        public Fruit(AnimationPlayer animationPlayer, Vector2 position, FruitType fruitType) : base(animationPlayer, position)
             {
             this._fruitType = fruitType;
             switch (fruitType)

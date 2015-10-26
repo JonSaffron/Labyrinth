@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
         {
         private bool _isTaken;
 
-        public Mushroom(World world, Vector2 position) : base(world, position)
+        public Mushroom(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             var a = Animation.StaticAnimation("Sprites/Props/Mushroom");
             this.Ap.PlayAnimation(a);

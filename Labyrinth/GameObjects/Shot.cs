@@ -1,10 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Labyrinth.Services.Display;
+using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
     public abstract class Shot : MovingItem
         {
-        protected Shot(World world, Vector2 position) : base(world, position)
+        protected Shot(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             }
         }

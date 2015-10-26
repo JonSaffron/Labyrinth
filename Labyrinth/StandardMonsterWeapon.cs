@@ -7,17 +7,16 @@ namespace Labyrinth
     {
     class StandardMonsterWeapon : IMonsterWeapon
         {
-        public void FireIfYouLike(StaticItem source, World world)
+        public void FireIfYouLike(StaticItem source)
             {
-            Direction firingDirection = DetermineFiringDirection(source.TilePosition, world.Player.TilePosition);
+            Direction firingDirection = DetermineFiringDirection(source.TilePosition, GlobalServices.GameState.Player.TilePosition);
             if (firingDirection == Direction.None)
                 return;
-            if (!DoesMonsterHaveClearShotAtPlayer(world, source.TilePosition, firingDirection))
+            if (!DoesMonsterHaveClearShotAtPlayer(source.TilePosition, firingDirection))
                 return;
 
             var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * new Vector2(Tile.Width, Tile.Height) / 2;
-            var shot = new StandardShot(world, startPos, firingDirection, source.Energy >> 2, ShotType.Monster);
-            world.AddShot(shot);
+            GlobalServices.GameState.AddStandardShot(startPos, firingDirection, source.Energy >> 2, ShotType.Monster);
             source.PlaySound(GameSound.MonsterShoots);
             }
 
@@ -44,14 +43,14 @@ namespace Labyrinth
             return Direction.None;
             }
 
-        private static bool DoesMonsterHaveClearShotAtPlayer(World world, TilePos monsterTilePos, Direction firingDirection)
+        private static bool DoesMonsterHaveClearShotAtPlayer(TilePos monsterTilePos, Direction firingDirection)
             {
             int i = 0;
             var testPos = monsterTilePos;
-            var playerTilePos = world.Player.TilePosition;
+            var playerTilePos = GlobalServices.GameState.Player.TilePosition;
             for ( ; testPos != playerTilePos && i < 20; testPos = testPos.GetPositionAfterOneMove(firingDirection), i++)
                 {
-                bool isClear = world.CanTileBeOccupied(testPos, false);
+                bool isClear = GlobalServices.GameState.CanTileBeOccupied(testPos, false);
                 if (!isClear)
                     return false;
                 }

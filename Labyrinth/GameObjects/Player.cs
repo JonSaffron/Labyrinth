@@ -51,7 +51,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new player.
         /// </summary>
-        public Player(World world, Vector2 position, int energy) : base(world, position)
+        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
             // Load animated textures.
             this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 1);
@@ -199,8 +199,8 @@ namespace Labyrinth.GameObjects
             IPlayerInput playerInput = this.World.Game.PlayerInput;
             playerInput.ProcessInput(gameTime);
 
-            this._weapon1.Fire(this, this.World, playerInput.FireStatus1, this._currentDirectionFaced);
-            this._weapon2.Fire(this, this.World, playerInput.FireStatus2, this._currentDirectionFaced);
+            this._weapon1.Fire(this, playerInput.FireStatus1, this._currentDirectionFaced);
+            this._weapon2.Fire(this, playerInput.FireStatus2, this._currentDirectionFaced);
             var requestedDirection = playerInput.Direction;
             if (requestedDirection == Direction.None)
                 return false;
@@ -266,8 +266,8 @@ namespace Labyrinth.GameObjects
             this._countBeforeDecrementingEnergy = 0;
 
             PlaySoundWithCallback(GameSound.PlayerDies, SoundEffectFinished);
-            this.World.AddBang(this.Position, BangType.Long);
-            this.World.AddGrave(this.TilePosition);
+            GlobalServices.GameState.AddBang(this.Position, BangType.Long);
+            GlobalServices.GameState.AddGrave(this.TilePosition);
             }
 
         private void SoundEffectFinished(object sender, EventArgs args)

@@ -9,7 +9,7 @@ namespace Labyrinth.GameObjects
         public int Score { get; private set; }
         private bool _isTaken;
 
-        public Crystal(World world, Vector2 position, int id, int score, int energy) : base(world, position)
+        public Crystal(AnimationPlayer animationPlayer, Vector2 position, int id, int score, int energy) : base(animationPlayer, position)
             {
             this.CrystalId = id;
             this.Score = score;

@@ -2,6 +2,7 @@
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
@@ -13,6 +14,8 @@ namespace Labyrinth
             container.Register(Component.For<Game1>());
             container.Register(Component.For<IPlayerInput>().ImplementedBy<PlayerInput>());
             container.Register(Component.For<IWorldLoader>().ImplementedBy<WorldLoader>());
+            container.Register(Component.For<ISoundPlayer>().ImplementedBy<SoundPlayer>());
+            container.Register(Component.For<SoundLibrary>());
             }
         }
     }

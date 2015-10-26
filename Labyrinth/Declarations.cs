@@ -126,8 +126,8 @@
         No,
         Bounce
         }
-    
-    enum FruitType
+
+    public enum FruitType
         {
         Apple = 1,
         Watermelon = 2,

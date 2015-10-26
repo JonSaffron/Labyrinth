@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     sealed class KillerCubeRed : KillerCube
         {
-        public KillerCubeRed(World world, Vector2 position, int energy) : base(world, position, energy)
+        public KillerCubeRed(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/KillerCubeRed", 3));
             
@@ -20,7 +20,7 @@ namespace Labyrinth.GameObjects
             }
 
 
-        protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
@@ -35,7 +35,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private static Direction DetermineDirectionAggressive(Monster m, World w)
+        private static Direction DetermineDirectionAggressive(Monster m)
             {
             TilePos tp = m.TilePosition;
             bool isCurrentlyMovingTowardsFreeSpace;
@@ -44,7 +44,7 @@ namespace Labyrinth.GameObjects
             else
                 {
                 TilePos pp = tp.GetPositionAfterOneMove(m.Direction);
-                isCurrentlyMovingTowardsFreeSpace = w.CanTileBeOccupied(pp, true);
+                isCurrentlyMovingTowardsFreeSpace = GlobalServices.GameState.CanTileBeOccupied(pp, true);
                 
                 if (isCurrentlyMovingTowardsFreeSpace)
                     {
@@ -55,9 +55,10 @@ namespace Labyrinth.GameObjects
                 }
                 
             Direction newDirection = Direction.None;
-            if (w.Player != null)
+            Player p = GlobalServices.GameState.Player;
+            if (p != null)
                 {
-                TilePos playerPosition = w.Player.TilePosition;
+                TilePos playerPosition = p.TilePosition;
                 int yDiff = tp.Y - playerPosition.Y;
                 int xDiff = tp.X - playerPosition.X;
                 
@@ -94,7 +95,7 @@ namespace Labyrinth.GameObjects
                 if (newDirection != Direction.None)
                     {
                     TilePos pp = tp.GetPositionAfterOneMove(newDirection);
-                    if (!w.CanTileBeOccupied(pp, true))
+                    if (!GlobalServices.GameState.CanTileBeOccupied(pp, true))
                         newDirection = Direction.None;
                     }
                 }
@@ -103,7 +104,7 @@ namespace Labyrinth.GameObjects
                 {                    
                 if (m.Direction == Direction.None)
                     {
-                    newDirection = MonsterMovement.RandomDirection(m, w);
+                    newDirection = MonsterMovement.RandomDirection(m);
                     }
                 else if (!isCurrentlyMovingTowardsFreeSpace)
                     {

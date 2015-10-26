@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.Services.Sound;
 
 namespace Labyrinth
     {
@@ -13,5 +14,7 @@ namespace Labyrinth
         void Disable();
         void TurnItUp();
         void TurnItDown();
+
+        SoundLibrary SoundLibrary { get; }
         }
     }

@@ -11,16 +11,16 @@ namespace Labyrinth
             this._countOfMinesRemaining = 10;
             }
 
-        public void Fire(StaticItem source, World world, FiringState firingState, Direction direction)
+        public void Fire(StaticItem source, FiringState firingState, Direction direction)
             {
             if (firingState != FiringState.Pulse || this._countOfMinesRemaining < 1)
                 return;
 
             TilePos tp = source.TilePosition;
-            if (world.IsStaticItemOnTile(tp))
+            if (GlobalServices.GameState.IsStaticItemOnTile(tp))
                 return;
 
-            world.AddMine(tp.ToPosition());
+            GlobalServices.GameState.AddMine(tp.ToPosition());
             this._countOfMinesRemaining--;
             }
         }

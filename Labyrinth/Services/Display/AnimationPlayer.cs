@@ -213,5 +213,14 @@ namespace Labyrinth.Services.Display
             // Draw the current frame.
             spriteBatch.DrawTexture(this._texture, position, source, this.Rotation, Origin, this.SpriteEffect);
             }
+
+        #warning this should be eliminated when possible
+        public ISpriteLibrary SpriteLibrary
+            {
+            get
+                {
+                return this._spriteLibrary;
+                }
+            }
         }
     }

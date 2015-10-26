@@ -13,7 +13,7 @@ namespace Labyrinth
             this._countOfShotsBeforeCostingEnergy = 0;    // first shot will cost energy
             }
 
-        public void Fire(StaticItem source, World world, FiringState firingState, Direction direction)
+        public void Fire(StaticItem source, FiringState firingState, Direction direction)
             {
             if (direction == Direction.None)
                 throw new ArgumentOutOfRangeException("direction");
@@ -21,13 +21,15 @@ namespace Labyrinth
             if (firingState != FiringState.Pulse || source.Energy < 4)
                 return;
             var startPos = source.TilePosition.ToPosition();
-            var shot = new StandardShot(world, startPos, direction, source.Energy >> 2, ShotType.Player);
+            var shot = GlobalServices.GameState.AddStandardShot(startPos, direction, source.Energy >> 2, ShotType.Player);
             if (!shot.CanMoveInDirection(direction))
+                {
+                shot.InstantlyExpire();
                 return;
+                }
             startPos += direction.ToVector() * Tile.Size / 2;
             shot.SetPosition(startPos);
 
-            world.AddShot(shot);
             source.PlaySound(GameSound.PlayerShoots);
             _countOfShotsBeforeCostingEnergy--;
             if (_countOfShotsBeforeCostingEnergy < 0)

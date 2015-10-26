@@ -4,11 +4,11 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class CrumblyWall : StaticItem
+    public class CrumblyWall : StaticItem
         {
         private readonly int _initialEnergy;
 
-        public CrumblyWall(World world, Vector2 position, string textureName, int energy) : base(world, position)
+        public CrumblyWall(AnimationPlayer animationPlayer, Vector2 position, string textureName, int energy) : base(animationPlayer, position)
             {
             var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);

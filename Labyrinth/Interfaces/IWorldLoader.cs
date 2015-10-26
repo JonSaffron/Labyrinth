@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Labyrinth.GameObjects;
 using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
@@ -15,6 +13,6 @@ namespace Labyrinth
         int Height { get; }
         int Width { get; }
         Tile this[TilePos tp] { get; }
-        IEnumerable<StaticItem> GetGameObjects(World world);
+        void GetGameObjects(GameState gameState);
         }
     }

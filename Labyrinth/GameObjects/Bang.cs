@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         private bool _isExtant;
         
-        public Bang(World world, Vector2 position, BangType bangType) : base(world, position)
+        public Bang(AnimationPlayer animationPlayer, Vector2 position, BangType bangType) : base(animationPlayer, position)
             {
             Animation a;
             switch (bangType)

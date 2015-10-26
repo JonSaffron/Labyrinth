@@ -13,7 +13,7 @@ namespace Labyrinth.GameObjects
 
         public abstract bool Update(GameTime gameTime);
 
-        protected MovingItem(World world, Vector2 position) : base(world, position)
+        protected MovingItem(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             this.MovingTowards = position;
             }
@@ -130,9 +130,9 @@ namespace Labyrinth.GameObjects
         private bool CanMoveInDirection(Direction direction, bool isBounceBackPossible)
             {
             TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
-            if (!this.World.IsTileWithinWorld(proposedDestination))
+            if (!GlobalServices.GameState.IsTileWithinWorld(proposedDestination))
                 return false;
-            var objectsOnTile = this.World.GameObjects.GetItemsOnTile(proposedDestination);
+            var objectsOnTile = GlobalServices.GameState.GetItemsOnTile(proposedDestination);
             foreach (var item in objectsOnTile)
                 {
                 switch (item.Solidity)
