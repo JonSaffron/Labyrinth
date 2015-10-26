@@ -84,11 +84,6 @@ namespace Labyrinth
                 }
             }
 
-        public void IncreaseScore(int score)
-            {
-            this.Game.AddScore(score);
-            }
-        
         public void SetLevelReturnType(LevelReturnType levelReturnType)
             {
             this._levelReturnType = levelReturnType;

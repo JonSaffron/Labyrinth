@@ -9,17 +9,17 @@ namespace Labyrinth.Services.ScoreKeeper
             // do nothing
             }
 
-        public void EnemyShot(Monster monster, int energyRemoved)
+        public void EnemyShot(IMonster monster, int energyRemoved)
             {
             // do nothing
             }
 
-        public void EnemyCrushed(Monster monster, int energyRemoved)
+        public void EnemyCrushed(IMonster monster, int energyRemoved)
             {
             // do nothing
             }
 
-        public void CrystalTaken(Crystal crystal)
+        public void CrystalTaken(IValuable crystal)
             {
             // do nothing
             }

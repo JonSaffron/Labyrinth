@@ -261,13 +261,13 @@ O              OO              OO              OO              OO              O
     <!-- Crystals -->
     <!-- scores: 50, 500, 1000, 2000, 4000, 6000, 8000 -->
     <!-- energy: 19,32,4b,64,c8,ff,ff -->
-    <Crystal Left="2" Top="47" Id="1" Score="500" Energy="25" />
-    <Crystal Left="125" Top="42" Id="2" Score="5000" Energy="50" />
-    <Crystal Left="168" Top="78" Id="3" Score="10000" Energy="75" />
-    <Crystal Left="226" Top="7" Id="4" Score="20000" Energy="100" />
-    <Crystal Left="189" Top="34" Id="5" Score="40000" Energy="200" />
-    <Crystal Left="119" Top="5" Id="6" Score="60000" Energy="255" />
-    <Crystal Left="6" Top="36" Id="7" Score="80000" Energy="255" />
+    <Crystal Left="2" Top="47" Id="1" Score="50" Energy="25" />
+    <Crystal Left="125" Top="42" Id="2" Score="500" Energy="50" />
+    <Crystal Left="168" Top="78" Id="3" Score="1000" Energy="75" />
+    <Crystal Left="226" Top="7" Id="4" Score="2000" Energy="100" />
+    <Crystal Left="189" Top="34" Id="5" Score="4000" Energy="200" />
+    <Crystal Left="119" Top="5" Id="6" Score="6000" Energy="255" />
+    <Crystal Left="6" Top="36" Id="7" Score="8000" Energy="255" />
 
     <!-- ForceFields -->
     <ForceField Left="62" Top="44" Width="1" Height="2" CrystalRequired="1" />
