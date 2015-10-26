@@ -1,14 +1,11 @@
-﻿using System;
-using Labyrinth.GameObjects;
-
-namespace Labyrinth
+﻿namespace Labyrinth
     {
     public interface IScoreKeeper
         {
         void Reset();
-        void EnemyShot(Monster monster, int energyRemoved);
-        void EnemyCrushed(Monster monster, int energyRemoved);
-        void CrystalTaken(Crystal crystal);
+        void EnemyShot(IMonster monster, int energyRemoved);
+        void EnemyCrushed(IMonster monster, int energyRemoved);
+        void CrystalTaken(IValuable valuable);
 
         decimal CurrentScore { get; }
         }

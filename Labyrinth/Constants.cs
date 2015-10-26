@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Labyrinth.Services.WorldBuilding;
+﻿using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
     {
-    class Constants
+    static class Constants
         {
         // Number of base movements a sprite can make per second
         private const int MovementsPerSecond = 20;

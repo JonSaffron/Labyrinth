@@ -68,6 +68,7 @@
     <Compile Include="TestActiveSoundService.cs" />
     <Compile Include="TestMortonCode.cs" />
     <Compile Include="TestInstanceCache.cs" />
+    <Compile Include="TestScoreKeeper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

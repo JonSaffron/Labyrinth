@@ -3,13 +3,13 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public class Crystal : StaticItem
+    public class Crystal : StaticItem, IValuable
         {
         public int CrystalId { get; private set; }
-        public int Score { get; private set; }
+        public decimal Score { get; private set; }
         private bool _isTaken;
 
-        public Crystal(World world, Vector2 position, int id, int score, int energy) : base(world, position)
+        public Crystal(World world, Vector2 position, int id, decimal score, int energy) : base(world, position)
             {
             this.CrystalId = id;
             this.Score = score;

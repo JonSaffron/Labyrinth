@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public abstract class Monster : MovingItem
+    public abstract class Monster : MovingItem, IMonster
         {
         protected static readonly Random MonsterRandom = new Random();
         
@@ -23,7 +23,7 @@ namespace Labyrinth.GameObjects
         public bool SplitsOnHit { private get; set; }
         public bool IsActive { get; set; }
         public bool ShotsBounceOff { get; protected set; }
-        public MonsterShootBehaviour MonsterShootBehaviour { private get; set;}
+        public MonsterShootBehaviour MonsterShootBehaviour { get; set; }
         
         [NotNull]
         private IMonsterWeapon _weapon = new StandardMonsterWeapon();

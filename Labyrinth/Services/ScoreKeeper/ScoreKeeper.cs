@@ -1,5 +1,4 @@
 ﻿using System;
-using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
@@ -12,7 +11,7 @@ namespace Labyrinth.Services.ScoreKeeper
             this._score = 0;
             }
 
-        public void EnemyShot(Monster monster, int energyRemoved)
+        public void EnemyShot(IMonster monster, int energyRemoved)
             {
             if (monster == null)
                 throw new ArgumentNullException("monster");
@@ -21,19 +20,29 @@ namespace Labyrinth.Services.ScoreKeeper
             this._score += increaseToScore;
             }
 
-        public void EnemyCrushed(Monster monster, int energyRemoved)
+        public void EnemyCrushed(IMonster monster, int energyRemoved)
             {
             if (monster == null)
                 throw new ArgumentNullException("monster");
 
-            // todo: perhaps monsters that are not moving and don't shoot and are not eggs
-            if (monster is DeathCube)
+            if (!IsMonsterDangerous(monster))
                 return;
             var increaseToScore = ((energyRemoved >> 1) + 1) << 1;
             this._score += increaseToScore;
             }
 
-        public void CrystalTaken(Crystal crystal)
+        private static bool IsMonsterDangerous(IMonster monster)
+            {
+            if (monster.MonsterShootBehaviour != MonsterShootBehaviour.None)
+                return true;
+            if (!monster.IsStill)
+                return true;
+            if (monster.IsEgg)
+                return true;
+            return false;
+            }
+
+        public void CrystalTaken(IValuable crystal)
             {
             if (crystal == null)
                 throw new ArgumentNullException("crystal");
