@@ -127,7 +127,6 @@
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
     <Compile Include="IGameObjectCollection.cs" />
-    <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="HeadsUpDisplay.cs" />
     <Compile Include="IHeadsUpDisplay.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />

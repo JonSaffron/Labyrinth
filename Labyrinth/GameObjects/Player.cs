@@ -196,7 +196,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         private bool SetDirectionAndDestination(GameTime gameTime)
             {
-            IPlayerInput playerInput = this.World.Game.PlayerInput;
+            IPlayerInput playerInput = GlobalServices.PlayerInput;
             playerInput.ProcessInput(gameTime);
 
             this._weapon1.Fire(this, playerInput.FireStatus1, this._currentDirectionFaced);
@@ -224,7 +224,7 @@ namespace Labyrinth.GameObjects
 
         private bool CheckIfEnteredNewWorldArea()
             {
-            int worldAreaId = this.World.GetWorldAreaIdForTilePos(this.TilePosition);
+            int worldAreaId = GlobalServices.WorldLoader.GetWorldAreaIdForTilePos(this.TilePosition);
             if (this._listOfWorldAreaIdsVisited.Contains(worldAreaId))
                 return false;
 
@@ -272,7 +272,7 @@ namespace Labyrinth.GameObjects
 
         private void SoundEffectFinished(object sender, EventArgs args)
             {
-            this.World.SetLevelReturnType(LevelReturnType.LostLife);
+            GlobalServices.World.SetLevelReturnType(LevelReturnType.LostLife);
             }
 
         public void CrystalCollected(Crystal c)
@@ -286,23 +286,6 @@ namespace Labyrinth.GameObjects
             return result;
             }
         
-        /// <summary>
-        /// Draws the animated player.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="spriteBatch"></param>
-        public override void Draw(GameTime gameTime, ISpriteBatch spriteBatch)
-            {
-            if (!IsExtant)
-                return;
-            
-            // Flip the sprite to face the way we are moving.
-            Ap.SpriteEffect = _currentDirectionFaced == Direction.Right ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-
-            // Draw that sprite.
-            Ap.Draw(gameTime, spriteBatch, Position);
-            }
-
         public override ObjectCapability Capability
             {
             get

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 using NUnit.Framework;
 
@@ -52,7 +53,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("p ");
             var w = g.World;
@@ -62,8 +63,8 @@ namespace Labyrinth.Test
                 g.Tick();
                 }
 
-            Assert.IsEmpty(w.GameObjects.GetItemsOnTile(new TilePos(0, 0)));
-            var list = w.GameObjects.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            Assert.IsEmpty(GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)));
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.IsNotEmpty(list);
             Assert.IsTrue(list.SequenceEqual(new List<StaticItem> {w.Player}));
             }
@@ -79,7 +80,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("pg");
             var w = g.World;
@@ -89,8 +90,8 @@ namespace Labyrinth.Test
                 g.Tick();
                 }
             
-            Assert.IsEmpty(w.GameObjects.GetItemsOnTile(new TilePos(0, 0)));
-            var list = w.GameObjects.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            Assert.IsEmpty(GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)));
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.NotNull(list);
             Assert.AreEqual(2, list.Count);
             Assert.IsTrue(list[0] is Grave);
@@ -108,23 +109,23 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("p ");
             var w = g.World;
-            w.AddGrave(new TilePos(0, 0));
+            GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
             while (!pc.HasFinishedQueue || w.IsAnythingMoving())
                 {
                 g.Tick();
                 }
 
-            var list = w.GameObjects.GetItemsOnTile(new TilePos(0, 0)).ToList();
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)).ToList();
             Assert.IsNotNull(list);
             Assert.AreEqual(1, list.Count);
             Assert.IsTrue(list[0] is Grave);
 
-            list = w.GameObjects.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.NotNull(list);
             Assert.AreEqual(1, list.Count);
             Assert.IsTrue(list[0] is Player);
@@ -141,23 +142,23 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("pg");
             var w = g.World;
-            w.AddGrave(new TilePos(0, 0));
+            GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
             while (!pc.HasFinishedQueue || w.IsAnythingMoving())
                 {
                 g.Tick();
                 }
 
-            var list = w.GameObjects.GetItemsOnTile(new TilePos(0, 0)).ToList();
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)).ToList();
             Assert.IsNotNull(list);
             Assert.AreEqual(1, list.Count);
             Assert.IsTrue(list[0] is Grave);
 
-            list = w.GameObjects.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.NotNull(list);
             Assert.AreEqual(2, list.Count);
             Assert.IsTrue(list[0] is Grave);

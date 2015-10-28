@@ -28,6 +28,7 @@ namespace Labyrinth.Services.WorldBuilding
             this._xmlDoc = new XmlDocument();
             this._xmlDoc.Load(levelPath);
             this._worldAreas = LoadAreas();
+            this._tiles = GetTileArray();
             }
         
         /// <summary>
@@ -159,18 +160,16 @@ namespace Labyrinth.Services.WorldBuilding
 
         public void GetGameObjects(GameState gameState)
             {
-            var exceptions = new List<TileException>();
-            Tile[,] tiles;
-
-            GetLayout(gameState, out tiles);
+            SetWallAndFloorLayout(gameState);
 
             int initialWorldId = GetStartingWorldAreaId();
             StartState ss = GetStartStateForWorldAreaId(initialWorldId);
 
             gameState.AddPlayer(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             
+            var exceptions = new List<TileException>();
             var playerStartPositions = this._worldAreas.Where(wa => wa.StartState != null).Select(wa => new StartPositionReservation(wa.StartState.PlayerPosition));
-            exceptions.AddRange(SetTileOccupation(ref tiles, playerStartPositions, false));
+            exceptions.AddRange(SetTileOccupation(playerStartPositions, t => t.SetOccupationByStaticItem() ));
 
             var objects = this._xmlDoc.SelectNodes("World/Objects/*");
             if (objects == null)
@@ -220,14 +219,14 @@ namespace Labyrinth.Services.WorldBuilding
                         throw new InvalidOperationException("Unknown object " + definition.LocalName);
                     }
 
-                exceptions.AddRange(SetTileOccupation(ref tiles, newItems, false));
+                exceptions.AddRange(SetTileOccupation(newItems, t => t.SetOccupationByStaticItem()));
                 }
 
-            GetListOfFruit(gameState, ref tiles);
+            GetListOfFruit(gameState);
 
-            exceptions.AddRange(SetTileOccupation(ref tiles, movingMonsters, true));
+            exceptions.AddRange(SetTileOccupation(movingMonsters, t => t.SetOccupationByMovingMonster()));
             
-            ReviewPotentiallyOccupiedTiles(ref tiles, exceptions);
+            ReviewPotentiallyOccupiedTiles(exceptions);
             
             if (exceptions.Count != 0)
                 {
@@ -258,8 +257,6 @@ namespace Labyrinth.Services.WorldBuilding
                 if (dr == DialogResult.Cancel)
                     throw new InvalidOperationException(message);
                 }
-
-            this._tiles = tiles;
             }
 
         private static Monster GetMonster(GameState gameState, XmlElement mdef)
@@ -345,7 +342,7 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        private IEnumerable<Fruit> GetListOfFruit(GameState gameState, ref Tile[,] tiles)
+        private void GetListOfFruit(GameState gameState)
             {
             var result = new List<Fruit>();
             foreach (WorldArea wa in this._worldAreas)
@@ -355,10 +352,10 @@ namespace Labyrinth.Services.WorldBuilding
                     for (int i = 0; i < fd.FruitQuantity; )
                         {
                         var tilePos = new TilePos(wa.Area.X + Rnd.Next(wa.Area.Width), wa.Area.Y + Rnd.Next(wa.Area.Height));
-                        Tile t = tiles[tilePos.X, tilePos.Y];
+                        Tile t = this._tiles[tilePos.X, tilePos.Y];
                         if (!t.IsFree)
                             continue;
-                        tiles[tilePos.X, tilePos.Y].SetOccupationByFruit();
+                        this._tiles[tilePos.X, tilePos.Y].SetOccupationByFruit();
                         Vector2 position = tilePos.ToPosition();
                         var f = gameState.AddFruit(position, fd.FruitType);
                         result.Add(f);
@@ -366,29 +363,33 @@ namespace Labyrinth.Services.WorldBuilding
                         }
                     }
                 }
-            return result;
             }
 
-        private IEnumerable<Wall> GetLayout(GameState gameState, out Tile[,] tiles)
+        private Tile[,] GetTileArray()
             {
             var worldDef = (XmlElement)this._xmlDoc.SelectSingleNode("World");
             if (worldDef == null)
                 throw new InvalidOperationException("No World element found.");
             int width = int.Parse(worldDef.GetAttribute("Width"));
             int height = int.Parse(worldDef.GetAttribute("Height"));
+            var result = new Tile[width, height];
+            return result;
+            }
+
+        private void SetWallAndFloorLayout(GameState gameState)
+            {
             var layout = (XmlElement) this._xmlDoc.SelectSingleNode("World/Layout");
             if (layout == null)
                 throw new InvalidOperationException("No Layout element found.");
-            tiles = new Tile[width, height];            
             
             var lines = layout.InnerText.Trim().Replace("\r\n", "\t").Split('\t');
-            if (lines.GetLength(0) != height)
+            if (lines.GetLength(0) != this.Height)
                 throw new InvalidOperationException();
             
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < this.Height; y++)
                 {
                 lines[y] = lines[y].Trim();
-                if (lines[y].Length != width)
+                if (lines[y].Length != this.Width)
                     throw new InvalidOperationException();
                 }
                
@@ -414,35 +415,27 @@ namespace Labyrinth.Services.WorldBuilding
                         {
                         case TileTypeByMap.Wall:
                             floor = spriteLibrary.GetSprite("Tiles/" + defaultFloorName);
-                            tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Wall);
+                            this._tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Wall);
                             var wall = gameState.AddWall(p.ToPosition(), "Tiles/" + td.TextureName);
                             result.Add(wall);
                             break;
                         case TileTypeByMap.Floor:
                             floor = spriteLibrary.GetSprite("Tiles/" + td.TextureName);
-                            tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Floor);
+                            this._tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Floor);
                             break;
                         case TileTypeByMap.PotentiallyOccupied:
                             floor = spriteLibrary.GetSprite("Tiles/" + defaultFloorName);
-                            tiles[p.X, p.Y] = new Tile(floor, symbol);  
+                            this._tiles[p.X, p.Y] = new Tile(floor, symbol);  
                             break;
                         default:
                             throw new InvalidOperationException();
                         }
                     }
                 }
-            
-            return result;
             }
 
-        private static IEnumerable<TileException> SetTileOccupation(ref Tile[,] tiles, IEnumerable<IGameObject> gameObjects, bool isMoving)
+        private IEnumerable<TileException> SetTileOccupation(IEnumerable<IGameObject> gameObjects, Action<Tile> action)
             {
-            Action<Tile> action;
-            if (isMoving)
-                action = t => t.SetOccupationByMovingMonster();
-            else
-                action = t => t.SetOccupationByStaticItem();
-
             var result = new List<TileException>();
             foreach (var item in gameObjects)
                 {
@@ -450,26 +443,26 @@ namespace Labyrinth.Services.WorldBuilding
 
                 try
                     {
-                    action(tiles[tp.X, tp.Y]);
+                    action(this._tiles[tp.X, tp.Y]);
                     }
                 catch (TileException te)
                     {
-                    var nte = new TileException(te, string.Format("{0} at tile {1},{2} for {3} occupation", item.GetType().Name, tp.X, tp.Y, isMoving ? "moving" : "static"));
+                    var nte = new TileException(te, string.Format("{0} at tile {1},{2} for {3}", item.GetType().Name, tp.X, tp.Y, action.Method.Name));
                     result.Add(nte);
                     }
                 }
             return result;
             }
 
-        private static void ReviewPotentiallyOccupiedTiles(ref Tile[,] tiles, ICollection<TileException> exceptions)
+        private void ReviewPotentiallyOccupiedTiles(ICollection<TileException> exceptions)
             {
-            var cy = tiles.GetLength(1);
-            var cx = tiles.GetLength(0);
+            var cy = this.Height;
+            var cx = this.Width;
             for (int y = 0; y < cy; y++)
                 {
                 for (int x = 0; x < cx; x++)
                     {
-                    Tile t = tiles[x, y];
+                    Tile t = this._tiles[x, y];
                     try
                         {
                         t.CheckIfIncorrectlyPotentiallyOccupied();

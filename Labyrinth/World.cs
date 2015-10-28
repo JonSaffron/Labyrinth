@@ -35,19 +35,14 @@ namespace Labyrinth
             this._wl = worldLoader;
             this.SpriteLibrary = new SpriteLibrary();
 
-            var gameItems = worldLoader.GetGameObjects(this).ToList();
-            this.Player = gameItems.OfType<Player>().Single();
+            var gameObjectCollection = new GameObjectCollection(worldLoader.Width, worldLoader.Height);
+            var gameState = new GameState(gameObjectCollection);
+            worldLoader.GetGameObjects(gameState);
+            this.Player = gameState.Player;
 
             this._itemsToDrawByZOrder = new List<StaticItem>[10];
             for (int i = 0; i < this._itemsToDrawByZOrder.GetLength(0); i++)
                 this._itemsToDrawByZOrder[i] = new List<StaticItem>();
-            }
-
-        [Obsolete]
-        public Texture2D LoadTexture(string textureName)
-            {
-            var result = this.SpriteLibrary.GetSprite(textureName);
-            return result;
             }
 
         public void ResetLevelAfterLosingLife(ISpriteBatch spw)
@@ -57,6 +52,7 @@ namespace Labyrinth
             StartState ss = this._wl.GetStartStateForWorldAreaId(worldAreaId);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             GlobalServices.GameState.UpdatePosition(this.Player);
+
             ResetLevelForStartingNewLife(spw);
             }
         
@@ -93,12 +89,6 @@ namespace Labyrinth
         public void SetDoNotUpdate()
             {
             this._doNotUpdate = true;
-            }
-
-        public int GetWorldAreaIdForTilePos(TilePos tp)
-            {
-            var result = this._wl.GetWorldAreaIdForTilePos(tp);
-            return result;
             }
 
         /// <summary>

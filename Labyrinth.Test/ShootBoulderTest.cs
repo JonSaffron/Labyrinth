@@ -2,6 +2,7 @@
 using System.Linq;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 using NUnit.Framework;
 
@@ -21,7 +22,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("# b p");
             var w = g.World;
@@ -31,7 +32,7 @@ namespace Labyrinth.Test
                 g.Tick();
                 }
 
-            var list = w.GameObjects.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.IsNotEmpty(list);
             Assert.AreEqual(1, list.Count);
             Assert.IsTrue(list[0] is Boulder);
@@ -48,7 +49,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("# bp ");
             var w = g.World;
@@ -58,7 +59,7 @@ namespace Labyrinth.Test
                 g.Tick();
                 }
 
-            var list = w.GameObjects.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.IsNotEmpty(list);
             Assert.AreEqual(1, list.Count);
             Assert.IsTrue(list[0] is Boulder);
@@ -75,7 +76,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("#bp ");
             var w = g.World;
@@ -85,7 +86,7 @@ namespace Labyrinth.Test
                 g.Tick();
                 }
 
-            Assert.IsFalse(w.GameObjects.DoesShotExist());
+            Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
             }
 
         [Test]
@@ -99,7 +100,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl);
+            var g = new Game1(pc, wl, new NullSoundPlayer());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("# bbp ");
             var w = g.World;
@@ -109,7 +110,7 @@ namespace Labyrinth.Test
                 g.Tick();
                 }
 
-            Assert.IsFalse(w.GameObjects.DoesShotExist());
+            Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
             }
         }
     }

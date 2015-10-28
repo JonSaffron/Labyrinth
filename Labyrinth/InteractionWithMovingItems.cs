@@ -102,7 +102,7 @@ namespace Labyrinth
                     if (monster != null)
                         {
                         b.PlaySound(GameSound.MonsterDies);
-                        this._world.Game.ScoreKeeper.EnemyCrushed(monster, energy);
+                        GlobalServices.ScoreKeeper.EnemyCrushed(monster, energy);
                         }
                     return true;
                     }

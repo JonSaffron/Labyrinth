@@ -8,14 +8,6 @@ namespace Labyrinth
         private static ISoundPlayer _soundPlayer;
         private static readonly ISoundPlayer NullSoundPlayer = new NullSoundPlayer();
 
-        private static ISpriteLibrary _spriteLibrary;
-
-        private static GameState _gameState;
-
-        private static IScoreKeeper _scoreKeeper;
-
-        private static GameComponentCollection _gameComponentCollection;
-
         public static ISoundPlayer SoundPlayer
             {
             get { return _soundPlayer ?? NullSoundPlayer; }
@@ -26,44 +18,53 @@ namespace Labyrinth
             _soundPlayer = soundPlayer;
             }
 
-        public static ISpriteLibrary SpriteLibrary
-            {
-            get { return _spriteLibrary; }
-            }
+        public static ISpriteLibrary SpriteLibrary { get; private set; }
 
         public static void SetSpriteLibrary(ISpriteLibrary spriteLibrary)
             {
-            _spriteLibrary = spriteLibrary;
+            SpriteLibrary = spriteLibrary;
             }
 
-        public static GameState GameState
-            {
-            get { return _gameState; }
-            }
+        public static GameState GameState { get; private set; }
 
         public static void SetGameState(GameState gameState)
             {
-            _gameState = gameState;
+            GameState = gameState;
             }
 
-        public static IScoreKeeper ScoreKeeper
-            {
-            get { return _scoreKeeper; }
-            }
+        public static IScoreKeeper ScoreKeeper { get; private set; }
 
         public static void SetScoreKeeper(IScoreKeeper scoreKeeper)
             {
-            _scoreKeeper = scoreKeeper;
+            ScoreKeeper = scoreKeeper;
             }
 
-        public static GameComponentCollection GameComponentCollection
-            {
-            get { return _gameComponentCollection; }
-            }
+        public static GameComponentCollection GameComponentCollection { get; private set; }
 
         public static void SetGameComponentCollection(GameComponentCollection gameComponentCollection)
             {
-            _gameComponentCollection = gameComponentCollection;
+            GameComponentCollection = gameComponentCollection;
+            }
+
+        public static IWorldLoader WorldLoader { get; private set; }
+
+        public static void SetWorldLoader(IWorldLoader worldLoader)
+            {
+            WorldLoader = worldLoader;
+            }
+
+        public static World World { get; private set; }
+        
+        public static void SetWorld(World world)
+            {
+            World = world;
+            }
+
+        public static IPlayerInput PlayerInput { get; private set; }
+
+        public static void SetPlayerInput(IPlayerInput playerInput)
+            {
+            PlayerInput = playerInput;
             }
         }
     }
