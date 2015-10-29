@@ -7,8 +7,8 @@ namespace Labyrinth
         {
         void Play(GameSound gameSound);
         void PlayWithCallback(GameSound gameSound, EventHandler callback);
-        void PlayForObject(GameSound gameSound, IGameObject gameObject);
-        void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, EventHandler callback);
+        void PlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider);
+        void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider, EventHandler callback);
 
         void Enable();
         void Disable();

@@ -14,12 +14,12 @@ namespace Labyrinth.Services.Sound
             // nothing to do
             }
 
-        public void PlayForObject(GameSound gameSound, IGameObject gameObject)
+        public void PlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
             {
             // nothing to do
             }
 
-        public void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, EventHandler callback)
+        public void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider, EventHandler callback)
             {
             // nothing to do
             }

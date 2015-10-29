@@ -66,5 +66,12 @@ namespace Labyrinth
             {
             PlayerInput = playerInput;
             }
+
+        public static ICentrePointProvider CentrePointProvider { get; private set; }
+
+        public static void SetCentrePointProvider(ICentrePointProvider centrePointProvider)
+            {
+            CentrePointProvider = centrePointProvider;
+            }
         }
     }

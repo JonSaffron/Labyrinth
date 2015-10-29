@@ -168,12 +168,12 @@ namespace Labyrinth.GameObjects
 
         public void PlaySound(GameSound gameSound)
             {
-            GlobalServices.SoundPlayer.PlayForObject(gameSound, this);
+            GlobalServices.SoundPlayer.PlayForObject(gameSound, this, GlobalServices.CentrePointProvider);
             }
 
         public void PlaySoundWithCallback(GameSound gameSound, EventHandler callback)
             {
-            GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, this, callback);
+            GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, this, GlobalServices.CentrePointProvider, callback);
             }
         }
     }

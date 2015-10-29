@@ -6,15 +6,12 @@ namespace Labyrinth.Services.Sound
     class SoundPlayer : ISoundPlayer
         {
         private readonly SoundLibrary _soundLibrary;
-        private readonly ICentrePointProvider _centrePointProvider;
         private readonly IActiveSoundService _activeSoundService = new ActiveSoundService();
         private float _masterVolumeLevel = 1;
 
-        public SoundPlayer(SoundLibrary soundLibrary, ICentrePointProvider centrePointProvider)
+        public SoundPlayer(SoundLibrary soundLibrary)
             {
             this._soundLibrary = soundLibrary;
-            this._centrePointProvider = centrePointProvider;
-            SoundEffect.MasterVolume = _masterVolumeLevel;
             }
 
         public void Play(GameSound gameSound)
@@ -31,22 +28,26 @@ namespace Labyrinth.Services.Sound
             AddCallback(gameSound, callback);
             }
 
-        public void PlayForObject(GameSound gameSound, IGameObject gameObject)
+        public void PlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
             {
             if (gameObject == null)
                 throw new ArgumentNullException("gameObject");
+            if (centrePointProvider == null)
+                throw new ArgumentNullException("centrePointProvider");
 
-            InternalPlay(gameSound, gameObject);
+            InternalPlay(gameSound, gameObject, centrePointProvider);
             }
 
-        public void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, EventHandler callback)
+        public void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider, EventHandler callback)
             {
             if (gameObject == null)
                 throw new ArgumentNullException("gameObject");
+            if (centrePointProvider == null)
+                throw new ArgumentNullException("centrePointProvider");
             if (callback == null)
                 throw new ArgumentNullException("callback");
 
-            InternalPlay(gameSound, gameObject);
+            InternalPlay(gameSound, gameObject, centrePointProvider);
             AddCallback(gameSound, callback);
             }
 
@@ -92,7 +93,7 @@ namespace Labyrinth.Services.Sound
             this._activeSoundService.Add(activeSound);
             }
 
-        private void InternalPlay(GameSound gameSound, IGameObject gameObject)
+        private void InternalPlay(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
             {
 #if DEBUG
             if (!DoesSoundRequirePosition(gameSound))
@@ -100,7 +101,7 @@ namespace Labyrinth.Services.Sound
 #endif
 
             ISoundEffectInstance soundEffect = this._soundLibrary[gameSound];
-            var activeSound = new ActiveSoundForObject(soundEffect, gameObject, this._centrePointProvider);
+            var activeSound = new ActiveSoundForObject(soundEffect, gameObject, centrePointProvider);
             this._activeSoundService.Add(activeSound);
             }
 

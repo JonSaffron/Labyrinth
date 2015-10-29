@@ -11,7 +11,7 @@ namespace Labyrinth
         {
         public void Install(IWindsorContainer container, IConfigurationStore store)
             {
-            container.Register(Component.For<Game1>());
+            container.Register(Component.For<Game1, ICentrePointProvider>().ImplementedBy<Game1>());
             container.Register(Component.For<IPlayerInput>().ImplementedBy<PlayerInput>());
             container.Register(Component.For<IWorldLoader>().ImplementedBy<WorldLoader>());
             container.Register(Component.For<ISoundPlayer>().ImplementedBy<SoundPlayer>());
