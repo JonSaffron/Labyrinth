@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,12 +8,6 @@ namespace Labyrinth.Services.Display
         {
         private ContentManager _contentManager;
 
-        public SpriteLibrary()
-            {
-            var serviceProvider = new GameServiceContainer();
-            this._contentManager = new ContentManager(serviceProvider, "Content");
-            }
-
         public Texture2D GetSprite(string textureName)
             {
             if (textureName == null)
@@ -22,6 +15,8 @@ namespace Labyrinth.Services.Display
             if (string.IsNullOrWhiteSpace(textureName))
                 throw new ArgumentException("textureName");
 
+            if (this._contentManager == null)
+                this._contentManager = new ContentManager(GlobalServices.ServiceProvider, "Content");
             var result = this._contentManager.Load<Texture2D>(textureName);
             return result;
             }

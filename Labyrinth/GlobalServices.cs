@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.Sound;
+﻿using System;
+using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -72,6 +73,13 @@ namespace Labyrinth
         public static void SetCentrePointProvider(ICentrePointProvider centrePointProvider)
             {
             CentrePointProvider = centrePointProvider;
+            }
+
+        public static IServiceProvider ServiceProvider { get; private set; }
+
+        public static void SetServiceProvider(IServiceProvider serviceProvider)
+            {
+            ServiceProvider = serviceProvider;
             }
         }
     }

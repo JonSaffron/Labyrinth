@@ -32,7 +32,7 @@ namespace Labyrinth
         private readonly HeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
         private readonly IScoreKeeper _scoreKeeper = new ScoreKeeper();
 
-        public Game1(IPlayerInput playerInput, IWorldLoader worldLoader, ISoundPlayer soundPlayer)
+        public Game1(IPlayerInput playerInput, IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
             {
             if (playerInput == null)
                 throw new ArgumentNullException("playerInput");
@@ -42,12 +42,17 @@ namespace Labyrinth
             this.PlayerInput.GameInput = new GameInput(this);
             this._worldLoader = worldLoader;
             GlobalServices.SetSoundPlayer(soundPlayer);
+            GlobalServices.SetSpriteLibrary(spriteLibrary);
+            GlobalServices.SetServiceProvider(this.Services);
+            GlobalServices.SetWorldLoader(worldLoader);
+            GlobalServices.SetGameComponentCollection(this.Components);
             
             this._gdm = new GraphicsDeviceManager(this)
                             {
                                 PreferredBackBufferWidth = RoomSizeWidth * ZoomWhilstWindowed,
                                 PreferredBackBufferHeight = RoomSizeHeight * ZoomWhilstWindowed
                             };
+
             this.Content.RootDirectory = "Content";
             //this.TargetElapsedTime = new TimeSpan(this.TargetElapsedTime.Ticks * 4);
             this._lives = 2;
