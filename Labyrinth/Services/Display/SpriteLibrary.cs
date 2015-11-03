@@ -17,7 +17,6 @@ namespace Labyrinth.Services.Display
 
             if (this._contentManager == null)
                 this._contentManager = new ContentManager(GlobalServices.ServiceProvider, "Content");
-
             var result = this._contentManager.Load<Texture2D>(textureName);
             return result;
             }
