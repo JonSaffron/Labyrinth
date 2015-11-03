@@ -39,6 +39,7 @@ namespace Labyrinth
             var gameState = new GameState(gameObjectCollection);
             worldLoader.GetGameObjects(gameState);
             this.Player = gameState.Player;
+            GlobalServices.SetGameState(gameState);
 
             this._itemsToDrawByZOrder = new List<StaticItem>[10];
             for (int i = 0; i < this._itemsToDrawByZOrder.GetLength(0); i++)
@@ -155,13 +156,13 @@ namespace Labyrinth
                 countOfGameItemsThatMoved++;
 
                 Rectangle? bounds = null;
-                var currentItemPosition = currentItem.Position;
-                foreach (var si in GlobalServices.GameState.AllItemsInRectangle(currentItem.BoundingRectangle))
+                var tileRect = new TileRect(currentItem.TilePosition, 1, 1);
+                foreach (var si in GlobalServices.GameState.AllItemsInRectangle(tileRect))
                     {
                     if (currentItem == si)
                         continue;   
 
-                    if (Math.Abs(Vector2.DistanceSquared(currentItemPosition, si.Position)) <= minimumDistance)
+                    if (Math.Abs(Vector2.DistanceSquared(currentItem.Position, si.Position)) <= minimumDistance)
                         {
                         if (bounds == null)
                             {
@@ -250,11 +251,10 @@ namespace Labyrinth
             {
             RecalculateWindow(gameTime, spriteBatch);
             
-            var viewPort = GetRectangleEnclosingTilesThatAreCurrentlyInView(spriteBatch.WindowOffset);
-            DrawFloorTiles(spriteBatch, viewPort);
+            var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(spriteBatch.WindowOffset);
+            DrawFloorTiles(spriteBatch, tileRect);
             
-            var r = new Rectangle(viewPort.Left * Tile.Width, viewPort.Top * Tile.Height, viewPort.Width * Tile.Width, viewPort.Height * Tile.Height);
-            var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(r);
+            var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(tileRect);
             foreach (var item in itemsToDraw)
                 {
                 int zOrder = item.DrawOrder;
@@ -269,7 +269,7 @@ namespace Labyrinth
                 }
             }
 
-        private static Rectangle GetRectangleEnclosingTilesThatAreCurrentlyInView(Vector2 windowOffset)
+        private static TileRect GetRectangleEnclosingTilesThatAreCurrentlyInView(Vector2 windowOffset)
             {
             var roomStartX = (int)Math.Floor(windowOffset.X / Tile.Width);
             var roomStartY = (int)Math.Floor(windowOffset.Y / Tile.Height);
@@ -280,7 +280,7 @@ namespace Labyrinth
             var roomEndX = (int)Math.Ceiling((windowOffset.X + windowWidth) / Tile.Width);
             var roomEndY = (int)Math.Ceiling((windowOffset.Y + windowHeight) / Tile.Height);
 
-            var result = new Rectangle(roomStartX, roomStartY, roomEndX - roomStartX, roomEndY - roomStartY);
+            var result = new TileRect(new TilePos(roomStartX, roomStartY), roomEndX - roomStartX, roomEndY - roomStartY);
             Debug.Assert(result.Width == WindowSizeX || result.Width == (WindowSizeX + 1));
             Debug.Assert(result.Height == WindowSizeY || result.Height == (WindowSizeY + 1));
             return result;
@@ -289,13 +289,16 @@ namespace Labyrinth
         /// <summary>
         /// Draws the floor of the current view
         /// </summary>
-        private void DrawFloorTiles(ISpriteBatch spriteBatch, Rectangle r)
+        private void DrawFloorTiles(ISpriteBatch spriteBatch, TileRect tr)
             {
-            // draw the floor
-            for (int y = r.Top; y < r.Bottom; y++)
+            for (int j = 0; j < tr.Height; j++)
                 {
-                for (int x = r.Left; x < r.Right; x++)
+                int y = tr.TopLeft.Y + j;
+
+                for (int i = 0; i < tr.Width; i++)
                     {
+                    int x = tr.TopLeft.X + i;
+
                     var tp = new TilePos(x, y);
                     Texture2D texture = this._wl[tp].Floor;
                     if (texture != null)

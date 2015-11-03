@@ -72,21 +72,25 @@ namespace Labyrinth
             var listOfItems = this._gameObjectCollection.ItemsAtPosition(tp) ?? new List<StaticItem>();
             var result = listOfItems.Where(gi => gi.IsExtant && gi.TilePosition == tp);
             return result;
-            } 
+            }
 
-       /// <summary>
+        /// <summary>
         /// Retrieves all game objects within the specified rectangle
         /// </summary>
-        /// <param name="r">The area to return items for</param>
+        /// <param name="tr">Top left starting point for the rectangle</param>
         /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<StaticItem> AllItemsInRectangle(Rectangle r)
+        public IEnumerable<StaticItem> AllItemsInRectangle(TileRect tr)
             {
-            var topLeft = TilePos.TilePosFromPosition(new Vector2(r.X, r.Y));
-            var bottomRight = TilePos.TilePosFromPosition(new Vector2(r.Right, r.Bottom));
-            for (int y = topLeft.Y; y <= bottomRight.Y; y++)
+            if (!IsTileWithinWorld(tr.TopLeft) || tr.Width <= 0 || tr.Height <= 0 || !IsTileWithinWorld(new TilePos(tr.TopLeft.X + tr.Width - 1, tr.TopLeft.Y + tr.Height - 1)))
+                throw new ArgumentOutOfRangeException("tr");
+
+            for (int j = 0; j < tr.Height; j++)
                 {
-                for (int x = topLeft.X; x <= bottomRight.X; x++)
+                int y = tr.TopLeft.Y + j;
+                for (int i = 0; i <= tr.Width; i++)
                     {
+                    int x = tr.TopLeft.X + i;
+
                     var listOfItems = this.GetItemsOnTile(new TilePos(x, y));
                     if (listOfItems == null)
                         continue;

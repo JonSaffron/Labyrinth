@@ -46,7 +46,9 @@ namespace Labyrinth
             GlobalServices.SetServiceProvider(this.Services);
             GlobalServices.SetWorldLoader(worldLoader);
             GlobalServices.SetGameComponentCollection(this.Components);
-            
+            GlobalServices.SetPlayerInput(this.PlayerInput);
+            GlobalServices.SetCentrePointProvider(this);
+
             this._gdm = new GraphicsDeviceManager(this)
                             {
                                 PreferredBackBufferWidth = RoomSizeWidth * ZoomWhilstWindowed,
@@ -69,6 +71,7 @@ namespace Labyrinth
             this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
 
             GlobalServices.SoundPlayer.SoundLibrary.LoadContent(this.Content);
+            this._headsUpDisplay.LoadContent(this.Content);
             }
 
         /// <summary>

@@ -199,6 +199,7 @@
     <Compile Include="StandardMonsterWeapon.cs" />
     <Compile Include="StandardPlayerWeapon.cs" />
     <Compile Include="GameObjects\Wall.cs" />
+    <Compile Include="TileRect.cs" />
     <Compile Include="World.cs" />
     <Compile Include="GameObjects\Monsters\Monster.cs" />
     <Compile Include="GameObjects\Monsters\MonsterMovement.cs" />
