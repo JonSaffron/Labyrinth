@@ -170,16 +170,17 @@ namespace Labyrinth.GameObjects
         /// <param name="speed">The speed to move at</param>
         protected void Move(Direction direction, decimal speed)
             {
-            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1}", this.GetType().Name, direction));
             this.Direction = direction;
             this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();
             this.CurrentVelocity = speed;
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} to {2}", this.GetType().Name, direction, this.MovingTowards));
             }
 
         protected void StandStill()
             {
             this.Direction = Direction.None;
             this.CurrentVelocity = 0;
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Standing still at {1}", this.GetType().Name, this.TilePosition));
             }
 
         public bool IsMoving

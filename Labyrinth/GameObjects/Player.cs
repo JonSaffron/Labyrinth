@@ -265,7 +265,7 @@ namespace Labyrinth.GameObjects
             this.Energy = 0;
             this._countBeforeDecrementingEnergy = 0;
 
-            PlaySoundWithCallback(GameSound.PlayerDies, SoundEffectFinished);
+            GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, SoundEffectFinished);
             GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             GlobalServices.GameState.AddGrave(this.TilePosition);
             }
