@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Labyrinth.GameObjects;
-using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
@@ -23,7 +22,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new SpriteLibrary());
+            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("# b p");
             var w = g.World;
@@ -50,7 +49,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new SpriteLibrary());
+            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("# bp ");
             var w = g.World;
@@ -77,7 +76,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new SpriteLibrary());
+            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("#bp ");
 
@@ -100,7 +99,7 @@ namespace Labyrinth.Test
 
             var pc = new PlayerController(instructions);
             var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new SpriteLibrary());
+            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("# bbp ");
 

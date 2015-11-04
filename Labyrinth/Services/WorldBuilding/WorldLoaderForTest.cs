@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Labyrinth.GameObjects;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.WorldBuilding
     {
@@ -74,14 +72,8 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public Texture2D LoadTexture(ContentManager contentManager, string textureName)
-            {
-            return null;
-            }
-
         public void GetGameObjects(GameState gameState)
             {
-            var result = new List<StaticItem>();
             var lines = this._layout.Split(new [] { "\r\n" }, StringSplitOptions.None);
             for (int y = 0; y < lines.Count(); y++)
                 {
@@ -96,16 +88,16 @@ namespace Labyrinth.Services.WorldBuilding
                             break;
                         case '#':
                             Trace.WriteLine(System.IO.Directory.GetCurrentDirectory());
-                            GlobalServices.GameState.AddWall(position, "Tiles/Floor1");
+                            gameState.AddWall(position, "Tiles/Floor1");
                             break;
                         case 'p':
-                            GlobalServices.GameState.AddPlayer(position, 255);
+                            gameState.AddPlayer(position, 255);
                             break;
                         case 'b':
-                            GlobalServices.GameState.AddBoulder(position);
+                            gameState.AddBoulder(position);
                             break;
                         case 'g':
-                            GlobalServices.GameState.AddGrave(tp);
+                            gameState.AddGrave(tp);
                             break;
                         default:
                             throw new InvalidOperationException();
