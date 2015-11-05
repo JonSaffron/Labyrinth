@@ -19,7 +19,7 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             this.ShotType = shotType;
             this._directionOfTravel = d;
-            TrySetDirectionAndDestination();
+            SetDirectionAndDestination();
 
             string textureName;
             switch (this.ShotType)
@@ -98,24 +98,28 @@ namespace Labyrinth.GameObjects
                 }
             }
 
+        public override bool IsExtant
+            {
+            get
+                {
+                var result = base.IsExtant && this._timeToTravel > 0;
+                return result;
+                }
+            }
+
         /// <summary>
         /// Handles moving the shot along
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
             this.OriginalPosition = this.Position;
-            if (this._timeToTravel <= 0)
-                {
-                this.InstantlyExpire();
-                return false;
-                }
 
             bool result = false;
             var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
             while (timeRemaining > 0 && this._timeToTravel > 0)
                 {
-                if (!this.IsMoving && !TrySetDirectionAndDestination())
-                    break;
+                if (!base.IsMoving)
+                    SetDirectionAndDestination();
 
                 result = true;
                 var timeBeforeMove = timeRemaining;
@@ -128,10 +132,9 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private bool TrySetDirectionAndDestination()
+        private void SetDirectionAndDestination()
             {
             this.Move(this._directionOfTravel, this.StandardSpeed);
-            return true;
             }
 
         public void Reverse()
@@ -143,6 +146,14 @@ namespace Labyrinth.GameObjects
             this.PlaySound(GameSound.ShotBounces);
             this.HasRebounded = true;
             ResetTimeToTravel();
+            }
+
+        public override bool IsMoving
+            {
+            get
+                {
+                return true;
+                }
             }
 
         public void SetPosition(Vector2 newPosition)

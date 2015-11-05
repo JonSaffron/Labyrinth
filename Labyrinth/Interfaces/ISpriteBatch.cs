@@ -7,35 +7,49 @@ namespace Labyrinth
     public interface ISpriteBatch : IDisposable  
         {
         /// <summary>
-        /// Sets or returns the top-left co-ordinates of the game window's view upon the world
-        /// </summary>
-        Vector2 WindowOffset { get; set; }
-
-        /// <summary>
         /// Begins a drawing batch
         /// </summary>
-        void Begin();
+        /// <param name="windowPosition">Sets the top-left co-ordinates of the game window's view upon the world</param>
+        void Begin(Vector2 windowPosition);
+
         /// <summary>
         /// Signals the end of a drawing batch
         /// </summary>
         void End();
 
         /// <summary>
-        /// Draws the specified texture at the specified co-ordinates
+        /// Draws the specified texture at the specified co-ordinates relative to the window position
         /// </summary>
         /// <param name="texture">Specifies the texture to draw</param>
-        /// <param name="position">Specifies the top-left corner co-ordinate to draw the texture</param>
-        void DrawEntireTexture(Texture2D texture, Vector2 position);
+        /// <param name="relativePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
+        void DrawEntireTextureInWindow(Texture2D texture, Vector2 relativePosition);
+
         /// <summary>
-        /// Draws the specified texture at the specified co-ordinates, specifying a source rectangle, rotation, origin and effectS
+        /// Draws the specified texture at the absolute co-ordinates specified
         /// </summary>
         /// <param name="texture">Specifies the texture to draw</param>
-        /// <param name="position">Specifies the co-ordinate to draw the texture</param>
+        /// <param name="absolutePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
+        void DrawEntireTexture(Texture2D texture, Vector2 absolutePosition);
+
+        /// <summary>
+        /// Draws the specified texture at the specified co-ordinates relative to the window position, specifying a source rectangle, rotation, origin and effectS
+        /// </summary>
+        /// <param name="texture">Specifies the texture to draw</param>
+        /// <param name="relativePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
         /// <param name="sourceRectangle">Specifies the section of the texture to draw</param>
         /// <param name="rotation">Specifies the angle (in radians) to rotate around the origin</param>
         /// <param name="origin">Specifies the origin point of the texture</param>
-        /// <param name="effects">Optionally specifies what effect(s) to apply to the texture</param>
-        void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None);
+        /// <param name="effects">Specifies what effect(s) to apply to the texture</param>
+        void DrawTextureInWindow(Texture2D texture, Vector2 relativePosition, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects);
+
+        /// <summary>
+        /// Draws the specified texture at the sbsolute co-ordinates specified, specifying a source rectangle
+        /// </summary>
+        /// <param name="texture">Specifies the texture to draw</param>
+        /// <param name="absolutePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
+        /// <param name="sourceRectangle">Specifies the section of the texture to draw</param>
+        void DrawTexture(Texture2D texture, Vector2 absolutePosition, Rectangle? sourceRectangle);
+
         /// <summary>
         /// Draws a solid rectangle at the specified co-ordinates in the specified colour
         /// </summary>

@@ -27,7 +27,7 @@ namespace Labyrinth.Test
             g.LoadLevel("# bp#");
             var w = g.World;
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -59,7 +59,7 @@ namespace Labyrinth.Test
             g.LoadLevel("#bp #");
             var w = g.World;
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -114,7 +114,7 @@ namespace Labyrinth.Test
             g.LoadLevel("#bpb #");
             var w = g.World;
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -174,7 +174,7 @@ namespace Labyrinth.Test
             g.LoadLevel("# bbp #");
             var w = g.World;
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }

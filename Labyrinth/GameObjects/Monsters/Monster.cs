@@ -144,11 +144,18 @@ namespace Labyrinth.GameObjects
                 {
                 var gs = this.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
                 this.PlaySound(gs);
+
+                if (!this.IsActive)
+                    this.IsActive = true;
+
+                if (this.Mobility == MonsterMobility.Patrolling)
+                    this.Mobility = MonsterMobility.Placid;
                 return;
                 }
 
             this.PlaySound(GameSound.MonsterDies);
             GlobalServices.GameState.AddBang(this.Position, BangType.Long);
+            
             if (this.SplitsOnHit)
                 {
                 for (int i = 1; i <= 2; i++)

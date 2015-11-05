@@ -211,7 +211,7 @@ namespace Labyrinth.Services.Display
             var source = new Rectangle(FrameIndex * Tile.Width, 0, Tile.Width, Tile.Height);
 
             // Draw the current frame.
-            spriteBatch.DrawTexture(this._texture, position, source, this.Rotation, Origin, this.SpriteEffect);
+            spriteBatch.DrawTextureInWindow(this._texture, position, source, this.Rotation, Origin, this.SpriteEffect);
             }
         }
     }

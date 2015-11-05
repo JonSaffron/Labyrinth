@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Explosion : Shot
+    class Explosion : MovingItem
         {
         private bool _isExtant;
 

@@ -39,10 +39,17 @@ namespace Labyrinth
                 return;
                 }
 
+            var explosion = this._movingItem as Explosion;
+            if (explosion != null)
+                {
+                InteractionInvolvesExplosion(explosion, this._staticItem);
+                return;
+                }
+
             var shot = this._movingItem as Shot;
             if (shot != null)
                 {
-                InteractionInvolvesShot(this._world, shot, this._staticItem);
+                InteractionInvolvesShot(shot, this._staticItem);
                 // return;
                 }
             }
@@ -66,19 +73,19 @@ namespace Labyrinth
             var fruit = staticItem as Fruit;
             if (fruit != null)
                 {
-                PlayerEatsFruit(world, player, fruit);
+                PlayerEatsFruit(player, fruit);
                 return;
                 }
 
             var mushroom = staticItem as Mushroom;
             if (mushroom != null)
                 {
-                PlayerPoisonedByMushroom(world, mushroom, player);
+                PlayerPoisonedByMushroom(mushroom, player);
                 // return;
                 }
             }
 
-        private static void PlayerPoisonedByMushroom(World world, Mushroom mushroom, Player player)
+        private static void PlayerPoisonedByMushroom(Mushroom mushroom, Player player)
             {
             player.PlaySound(GameSound.PlayerInjured);
             int r = mushroom.CalculateEnergyToRemove(player);
@@ -87,7 +94,7 @@ namespace Labyrinth
             mushroom.SetTaken();
             }
 
-        private static void PlayerEatsFruit(World world, Player player, Fruit fruit)
+        private static void PlayerEatsFruit(Player player, Fruit fruit)
             {
             player.PlaySound(GameSound.PlayerEatsFruit);
             player.AddEnergy(fruit.Energy);
@@ -111,7 +118,7 @@ namespace Labyrinth
                 GlobalServices.SoundPlayer.Play(GameSound.PlayerCollectsCrystal);
             }
 
-        private static void InteractionInvolvesShot(World world, Shot shot, StaticItem staticItem)
+        private static void InteractionInvolvesShot(Shot shot, StaticItem staticItem)
             {
             if (staticItem is Wall)
                 {
@@ -141,9 +148,30 @@ namespace Labyrinth
                 {
                 if (!standardShot.HasRebounded)
                     standardShot.Reverse();
+                //return;
+                }
+
+            }
+
+        private static void InteractionInvolvesExplosion(Explosion explosion, StaticItem staticItem)
+            {
+            if (staticItem is Wall)
+                {
+                explosion.InstantlyExpire();
                 return;
                 }
 
+            if (staticItem is Fruit || staticItem is Grave || staticItem is Mushroom || staticItem is CrumblyWall)
+                {
+                staticItem.ReduceEnergy(explosion.Energy);
+                if (!staticItem.IsExtant)
+                    {
+                    var bang = GlobalServices.GameState.AddBang(staticItem.Position, BangType.Short);
+                    explosion.InstantlyExpire();
+                    bang.PlaySound(GameSound.StaticObjectShotAndInjured);
+                    }
+                //return;
+                }
             }
         }
     }

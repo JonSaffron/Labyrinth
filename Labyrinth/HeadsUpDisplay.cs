@@ -72,7 +72,7 @@ namespace Labyrinth
             {
             for (int i = 0; i < livesLeft; i++)
                 {
-                var destination = new Vector2(480 - ((i + 1) * 16), 8) + spriteBatch.WindowOffset;
+                var destination = new Vector2(480 - ((i + 1) * 16), 8);
                 spriteBatch.DrawEntireTexture(this._life, destination);
                 }
             }
@@ -84,8 +84,8 @@ namespace Labyrinth
                 {
                 int digit = value % 10;
                 var source = new Rectangle(digit * 6, 0, 6, 16);
-                var destination = new Vector2(right - (i * 8), top) + spriteBatch.WindowOffset;
-                spriteBatch.DrawTexture(this._digits, destination, source, 0.0f, Vector2.Zero);
+                var destination = new Vector2(right - (i * 8), top);
+                spriteBatch.DrawTexture(this._digits, destination, source);
                 value = value / 10;
                 if (value == 0)
                     break;

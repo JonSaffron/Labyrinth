@@ -56,20 +56,28 @@ namespace Labyrinth
             return this.X % 1000 + (this.Y % 1000) * 1000;
             }
         
-        internal TilePos GetPositionAfterOneMove(Direction d)
+        internal TilePos GetPositionAfterOneMove(Direction direction)
             {
-            switch (d)
+            return GetPositionAfterMoving(direction, 1);
+            }
+
+        internal TilePos GetPositionAfterMoving(Direction direction, int countOfMoves)
+            {
+            if (countOfMoves <= 0)
+                throw new ArgumentOutOfRangeException("countOfMoves");
+
+            switch (direction)
                 {
                 case Direction.Left:
-                    return new TilePos(X - 1, Y);
+                    return new TilePos(X - countOfMoves, Y);
                 case Direction.Right:
-                    return new TilePos(X + 1, Y);
+                    return new TilePos(X + countOfMoves, Y);
                 case Direction.Up:
-                    return new TilePos(X, Y - 1);
+                    return new TilePos(X, Y - countOfMoves);
                 case Direction.Down:
-                    return new TilePos(X, Y + 1);
+                    return new TilePos(X, Y + countOfMoves);
                 default:
-                    throw new InvalidOperationException();
+                    throw new ArgumentOutOfRangeException("direction");
                 }
             }
 

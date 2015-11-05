@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Labyrinth.GameObjects;
-using Labyrinth.Services.Display;
-using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
@@ -126,7 +125,8 @@ namespace Labyrinth
             {
             get
                 {
-                var result = this._interactiveGameItems;
+                var result = new MovingItem[this._interactiveGameItems.Count];
+                this._interactiveGameItems.CopyTo(result, 0);
                 return result;
                 }
             }
@@ -136,7 +136,7 @@ namespace Labyrinth
             if (tp.X < 0 || tp.Y < 0 || tp.X >= this.Width || tp.Y >= this.Height)
                 throw new ArgumentOutOfRangeException("tp");
             var mortonIndex = tp.MortonCode;
-            var result = this._allGameItems[mortonIndex];
+            var result = this._allGameItems[mortonIndex] ?? Enumerable.Empty<StaticItem>();
             return result;
             }
 

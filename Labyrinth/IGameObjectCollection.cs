@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Labyrinth.Annotations;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth
@@ -15,7 +14,6 @@ namespace Labyrinth
 
         IEnumerable<MovingItem> InteractiveGameItems { get; }
 
-        [CanBeNull]
         IEnumerable<StaticItem> ItemsAtPosition(TilePos tp);
 
         IEnumerable<StaticItem> DistinctItems();

@@ -109,7 +109,7 @@ namespace Labyrinth.GameObjects
                     System.Diagnostics.Trace.WriteLine(string.Format("{0} is bouncing {1}", byWhom.GetType().Name, this.GetType().Name));
                     var reverseDirection = direction.Reversed();
                     this.Move(reverseDirection, this.BounceBackSpeed);
-                    byWhom.Move(reverseDirection, this.BounceBackSpeed);
+                    byWhom.BounceBack(reverseDirection, this.BounceBackSpeed);
                     this.PlaySound(GameSound.BoulderBounces);
                     return;
                     }
@@ -171,9 +171,10 @@ namespace Labyrinth.GameObjects
         protected void Move(Direction direction, decimal speed)
             {
             this.Direction = direction;
-            this.MovingTowards = this.TilePosition.GetPositionAfterOneMove(direction).ToPosition();
+            var movingTowardsTilePos = this.TilePosition.GetPositionAfterOneMove(direction);
+            this.MovingTowards = movingTowardsTilePos.ToPosition();
             this.CurrentVelocity = speed;
-            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} to {2}", this.GetType().Name, direction, this.MovingTowards));
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} to {2}", this.GetType().Name, direction, movingTowardsTilePos));
             }
 
         protected void StandStill()
@@ -183,7 +184,17 @@ namespace Labyrinth.GameObjects
             System.Diagnostics.Trace.WriteLine(string.Format("{0}: Standing still at {1}", this.GetType().Name, this.TilePosition));
             }
 
-        public bool IsMoving
+        protected void BounceBack(Direction direction, decimal speed)
+            {
+            this.Direction = direction;
+            var originallyMovingTowards = TilePos.TilePosFromPosition(this.MovingTowards);
+            var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);
+            this.MovingTowards = movingTowardsTilePos.ToPosition();
+            this.CurrentVelocity = speed;
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Bouncing back {1} to {2}", this.GetType().Name, direction, movingTowardsTilePos));
+            }
+
+        public virtual bool IsMoving
             {
             get
                 {

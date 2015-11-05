@@ -29,6 +29,8 @@ namespace Labyrinth
         [NotNull] private readonly IWorldLoader _wl;
         [NotNull] private readonly List<StaticItem>[] _itemsToDrawByZOrder;
 
+        public Vector2 WindowPosition { get; private set; }
+
         public World(Game1 game, IWorldLoader worldLoader)
             {
             this.Game = game;
@@ -62,7 +64,7 @@ namespace Labyrinth
             if (spw != null)
                 {
                 Point roomStart = GetContainingRoom(this.Player.Position).Location;
-                spw.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
+                this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
                 }
             GlobalServices.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
             this._levelReturnType = LevelReturnType.Normal;
@@ -217,13 +219,13 @@ namespace Labyrinth
             return r;
             }
         
-        private void RecalculateWindow(GameTime gameTime, ISpriteBatch spriteBatchWindowed)
+        private void RecalculateWindow(GameTime gameTime)
             {
             const float currentVelocity = 750;
             
             var roomRectangle = GetContainingRoom(this.Player.Position);
             var movingTowards = new Vector2(roomRectangle.Left, roomRectangle.Top);
-            Vector2 position = spriteBatchWindowed.WindowOffset;
+            Vector2 position = this.WindowPosition;
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             float remainingMovement = currentVelocity * elapsed;
 
@@ -241,7 +243,7 @@ namespace Labyrinth
                 position += displacement;
                 }
             
-            spriteBatchWindowed.WindowOffset = position;
+            this.WindowPosition = position;
             }
 
         /// <summary>
@@ -249,9 +251,9 @@ namespace Labyrinth
         /// </summary>
         public void Draw(GameTime gameTime, ISpriteBatch spriteBatch)
             {
-            RecalculateWindow(gameTime, spriteBatch);
+            RecalculateWindow(gameTime);
             
-            var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(spriteBatch.WindowOffset);
+            var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(this.WindowPosition);
             DrawFloorTiles(spriteBatch, tileRect);
             
             var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(tileRect);
@@ -304,7 +306,7 @@ namespace Labyrinth
                     if (texture != null)
                         {
                         Vector2 position = new Vector2(x, y) * Tile.Size;
-                        spriteBatch.DrawEntireTexture(texture, position);
+                        spriteBatch.DrawEntireTextureInWindow(texture, position);
                         }
                     }
                 }
@@ -350,7 +352,7 @@ namespace Labyrinth
                     }
                 }
             Point roomStart = GetContainingRoom(this.Player.Position).Location;
-            this.Game.SpriteBatch.WindowOffset = new Vector2(roomStart.X, roomStart.Y);
+            this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
             }
         }
     }

@@ -58,7 +58,7 @@ namespace Labyrinth.Test
             g.LoadLevel("p ");
             var w = g.World;
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -85,7 +85,7 @@ namespace Labyrinth.Test
             g.LoadLevel("pg");
             var w = g.World;
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -115,7 +115,7 @@ namespace Labyrinth.Test
             var w = g.World;
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -148,7 +148,7 @@ namespace Labyrinth.Test
             var w = g.World;
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
-            while (!pc.HasFinishedQueue || w.IsAnythingMoving())
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }

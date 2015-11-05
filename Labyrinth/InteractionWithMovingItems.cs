@@ -27,7 +27,16 @@ namespace Labyrinth
                 return;
 
             var items = new[] { this._movingItem1, this._movingItem2 };
-            var shot = items.OfType<Shot>().FirstOrDefault();
+
+            var explosion = items.OfType<Explosion>().FirstOrDefault();
+            if (explosion != null)
+                {
+                var otherItem = items.Single(item => item != explosion);
+                InteractionInvolvesExplosion(explosion, otherItem);
+                return;
+                }
+                
+            var shot = items.OfType<StandardShot>().FirstOrDefault();
             if (shot != null)
                 {
                 var otherItem = items.Single(item => item != shot);
@@ -65,7 +74,7 @@ namespace Labyrinth
                 }
             }
 
-        private bool PushOrBounceObject(MovingItem moveableObject, MovingItem movingObject)
+        private static bool PushOrBounceObject(MovingItem moveableObject, MovingItem movingObject)
             {
             // test whether moveable object can be pushed or bounced
             if (moveableObject.Direction == Direction.None && movingObject.Direction != Direction.None)
@@ -110,14 +119,46 @@ namespace Labyrinth
             return false;
             }
 
-        private static bool InteractionInvolvingShot(Shot shot, MovingItem movingItem)
+        private static void InteractionInvolvesExplosion(Explosion explosion, MovingItem movingItem)
             {
-            if (movingItem is Player)
+            var shot = movingItem as Shot;
+            if (shot != null)
                 {
-                var bang = GlobalServices.GameState.ConvertShotToBang(shot);
-                movingItem.ReduceEnergy(shot.Energy);
+                shot.ReduceEnergy(explosion.Energy);
+                explosion.InstantlyExpire();
+                }
+
+            var monster = movingItem as Monster;
+            if (monster != null)
+                {
+                var energyRemoved = Math.Min(explosion.Energy, monster.Energy);
+                GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemoved);
+                monster.ReduceEnergy(explosion.Energy);
+                explosion.InstantlyExpire();
+                return;
+                }
+
+            var player = movingItem as Player;
+            if (player != null)
+                {
+                var explosionEnergy = explosion.Energy;
+                explosion.InstantlyExpire();
+                player.ReduceEnergy(explosionEnergy);
                 if (movingItem.IsAlive())
-                    bang.PlaySound(GameSound.PlayerInjured);
+                    player.PlaySound(GameSound.PlayerInjured);
+                return;
+                }
+            }
+
+        private static bool InteractionInvolvingShot(StandardShot shot, MovingItem movingItem)
+            {
+            if (movingItem is Player && shot.HasRebounded)
+                {
+                var shotEnergy = shot.Energy;
+                GlobalServices.GameState.ConvertShotToBang(shot);
+                movingItem.ReduceEnergy(shotEnergy);
+                if (movingItem.IsAlive())
+                    movingItem.PlaySound(GameSound.PlayerInjured);
                 return true;
                 }
 
@@ -128,23 +169,10 @@ namespace Labyrinth
                 return result;
                 }
 
-            var items = new[] { shot, movingItem };
-            var explosion = items.OfType<Explosion>().FirstOrDefault();
-            if (explosion != null)
-                {
-                var otherItem = items.Single(item => item != explosion);
-                if (otherItem is Shot)
-                    {
-                    shot.ReduceEnergy(explosion.Energy);
-                    return true;
-                    }
-                }
-
-            var standardShot1 = shot as StandardShot;
             var standardShot2 = movingItem as StandardShot;
-            if (standardShot1 != null && standardShot2 != null)
+            if (standardShot2 != null)
                 {
-                var result = ShotHitsShot(standardShot1, standardShot2);
+                var result = ShotHitsShot(shot, standardShot2);
                 return result;
                 }
 
@@ -173,31 +201,19 @@ namespace Labyrinth
             return true;
             }
 
-        private static bool ShotHitsMonster(Shot shot, Monster monster)
+        private static bool ShotHitsMonster(StandardShot shot, Monster monster)
             {
-            if (!monster.IsActive)
-                monster.IsActive = true;
-
-            if (monster.Mobility == MonsterMobility.Patrolling)
-                monster.Mobility = MonsterMobility.Placid;
-
-            var standardShot = shot as StandardShot;
-            if (standardShot != null && monster.ShotsBounceOff)
+            if (monster.ShotsBounceOff)
                 {
-                if (!standardShot.HasRebounded)
-                    standardShot.Reverse();
+                if (!shot.HasRebounded)
+                    shot.Reverse();
                 return false;
                 }
 
             var energyRemoved = Math.Min(shot.Energy, monster.Energy);
             GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemoved);
             monster.ReduceEnergy(shot.Energy);
-            var bang = GlobalServices.GameState.ConvertShotToBang(shot);
-            if (monster.IsAlive())
-                {
-                var sound = monster.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
-                bang.PlaySound(sound);
-                }
+            GlobalServices.GameState.ConvertShotToBang(shot);
             return true;
             }
         }

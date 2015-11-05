@@ -179,7 +179,7 @@ namespace Labyrinth
             GraphicsDevice.Clear(Color.Black);
 
             // Draw the sprite.
-            SpriteBatch.Begin();
+            SpriteBatch.Begin(this.World.WindowPosition);
             if (this.World != null)
                 {
                 this.World.Draw(gameTime, SpriteBatch);
@@ -201,9 +201,7 @@ namespace Labyrinth
         private void ToggleFullScreen()
             {
             this._gdm.ToggleFullScreen();
-            var windowOffset = this.SpriteBatch.WindowOffset;
             this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
-            SpriteBatch.WindowOffset = windowOffset;
             }
 
         private static ISpriteBatch GetSpriteBatch(GraphicsDevice graphicsDevice, bool isFullScreen)
@@ -216,7 +214,7 @@ namespace Labyrinth
             { 
             get 
                 {
-                var result = this.SpriteBatch.WindowOffset + _centreOfRoom;
+                var result = this.World.WindowPosition + _centreOfRoom;
                 return result;
                 }
             }

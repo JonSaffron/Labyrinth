@@ -9,7 +9,7 @@ namespace Labyrinth.Services.Display
         private readonly float _zoom;
         private readonly Texture2D _rectangleTexture;
 
-        public Vector2 WindowOffset { get; set; }
+        private Vector2 _windowPosition;
 
         public SpriteBatchWindowed(GraphicsDevice graphicsDevice, float zoom)
             {
@@ -20,8 +20,9 @@ namespace Labyrinth.Services.Display
             this._rectangleTexture.SetData(new [] { Color.White });
             }
         
-        public void Begin()
+        public void Begin(Vector2 windowPosition)
             {
+            this._windowPosition = windowPosition;
             this._spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             }
 
@@ -43,14 +44,31 @@ namespace Labyrinth.Services.Display
                 }
             }
 
+        public void DrawEntireTextureInWindow(Texture2D texture, Vector2 relativePosition)
+            {
+            var absolutePosition = relativePosition - this._windowPosition;
+            this.DrawTexture(texture, absolutePosition, null, 0.0f, Vector2.Zero, SpriteEffects.None);
+            }
+
         public void DrawEntireTexture(Texture2D texture, Vector2 position)
             {
-            this.DrawTexture(texture, position, null, 0.0f, Vector2.Zero);
+            this.DrawTexture(texture, position, null, 0.0f, Vector2.Zero, SpriteEffects.None);
             }
-        
-        public void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None)
+
+        public void DrawTextureInWindow(Texture2D texture, Vector2 relativePosition, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects)
             {
-            Vector2 destination = (position - WindowOffset) * _zoom;
+            var absolutePosition = relativePosition - this._windowPosition;
+            this.DrawTexture(texture, absolutePosition, sourceRectangle, rotation, origin, effects);
+            }
+
+        public void DrawTexture(Texture2D texture, Vector2 absolutePosition, Rectangle? sourceRectangle)
+            {
+            this.DrawTexture(texture, absolutePosition, sourceRectangle, 0.0f, Vector2.Zero, SpriteEffects.None);
+            }
+
+        private void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects)
+            {
+            Vector2 destination = position * _zoom;
             this._spriteBatch.Draw(texture, destination, sourceRectangle, Color.White, rotation, origin, _zoom, effects, 0);
             }
         

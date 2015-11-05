@@ -69,7 +69,7 @@ namespace Labyrinth
         /// <returns>A lazy enumeration of all the matching game objects</returns>
         public IEnumerable<StaticItem> GetItemsOnTile(TilePos tp)
             {
-            var listOfItems = this._gameObjectCollection.ItemsAtPosition(tp) ?? new List<StaticItem>();
+            var listOfItems = this._gameObjectCollection.ItemsAtPosition(tp);
             var result = listOfItems.Where(gi => gi.IsExtant && gi.TilePosition == tp);
             return result;
             }
@@ -87,7 +87,7 @@ namespace Labyrinth
             for (int j = 0; j < tr.Height; j++)
                 {
                 int y = tr.TopLeft.Y + j;
-                for (int i = 0; i <= tr.Width; i++)
+                for (int i = 0; i < tr.Width; i++)
                     {
                     int x = tr.TopLeft.X + i;
 
