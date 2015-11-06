@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.Annotations;
 using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 
@@ -68,7 +69,7 @@ namespace Labyrinth
             PlayerInput = playerInput;
             }
 
-        public static ICentrePointProvider CentrePointProvider { get; private set; }
+        public static ICentrePointProvider CentrePointProvider { [CanBeNull] get; private set; }
 
         public static void SetCentrePointProvider(ICentrePointProvider centrePointProvider)
             {

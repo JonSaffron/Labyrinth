@@ -2,7 +2,6 @@ using System;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.ScoreKeeper;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,18 +10,11 @@ namespace Labyrinth
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Game, ICentrePointProvider
+    public class Game1 : Game
         {
-        public const int RoomSizeWidth = 16 * Tile.Width;
-        public const int RoomSizeHeight = 10 * Tile.Height;
-        private const int ZoomWhilstWindowed = 2;
-
-        private readonly Vector2 _centreOfRoom = new Vector2(RoomSizeWidth / 2, RoomSizeHeight / 2);
-
         public IPlayerInput PlayerInput { get; private set; }
         public ISpriteBatch SpriteBatch { get; private set; }
-        internal World World { get; private set; }
-        
+
         private readonly GraphicsDeviceManager _gdm;
         private readonly IWorldLoader _worldLoader;
 
@@ -31,6 +23,7 @@ namespace Labyrinth
 
         private readonly HeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
         private readonly IScoreKeeper _scoreKeeper = new ScoreKeeper();
+        private World _world;
 
         public Game1(IPlayerInput playerInput, IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
             {
@@ -47,12 +40,11 @@ namespace Labyrinth
             GlobalServices.SetWorldLoader(worldLoader);
             GlobalServices.SetGameComponentCollection(this.Components);
             GlobalServices.SetPlayerInput(this.PlayerInput);
-            GlobalServices.SetCentrePointProvider(this);
 
             this._gdm = new GraphicsDeviceManager(this)
                             {
-                                PreferredBackBufferWidth = RoomSizeWidth * ZoomWhilstWindowed,
-                                PreferredBackBufferHeight = RoomSizeHeight * ZoomWhilstWindowed
+                                PreferredBackBufferWidth = Constants.RoomWidthInPixels * Constants.ZoomWhilstWindowed,
+                                PreferredBackBufferHeight = Constants.RoomHeightInPixels * Constants.ZoomWhilstWindowed
                             };
 
             this.Content.RootDirectory = "Content";
@@ -87,11 +79,17 @@ namespace Labyrinth
             this.World = null;
             }
 
-        public IScoreKeeper ScoreKeeper
+        internal World World
             {
             get
                 {
-                return this._scoreKeeper;
+                return _world;
+                }
+
+            private set
+                {
+                _world = value;
+                GlobalServices.SetCentrePointProvider(value);
                 }
             }
 
@@ -194,7 +192,7 @@ namespace Labyrinth
             {
             // Load the World.
             this._worldLoader.LoadWorld(level);
-            this.World = new World(this, this._worldLoader);
+            this.World = new World(this._worldLoader);
             this.World.ResetLevelForStartingNewLife(this.SpriteBatch);
             }
 
@@ -206,17 +204,8 @@ namespace Labyrinth
 
         private static ISpriteBatch GetSpriteBatch(GraphicsDevice graphicsDevice, bool isFullScreen)
             {
-            var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, ZoomWhilstWindowed);
+            var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, Constants.ZoomWhilstWindowed);
             return result;
-            }
-
-        public Vector2 CentrePoint 
-            { 
-            get 
-                {
-                var result = this.World.WindowPosition + _centreOfRoom;
-                return result;
-                }
             }
         }
     }

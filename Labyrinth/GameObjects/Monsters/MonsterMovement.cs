@@ -172,12 +172,12 @@ namespace Labyrinth.GameObjects
             if (Math.Abs(diff.X) >= Math.Abs(diff.Y))
                 {
                 float tilesDistance = Math.Abs(diff.X) / Tile.Width;
-                result = tilesDistance <= World.WindowSizeX * 2;
+                result = tilesDistance <= Constants.RoomWidthInPixels * 2;
                 }
             else
                 {
                 float tilesDistance = Math.Abs(diff.Y) / Tile.Height;
-                result = tilesDistance <= World.WindowSizeY * 2;
+                result = tilesDistance <= Constants.RoomHeightInPixels * 2;
                 }
             return result;
             }

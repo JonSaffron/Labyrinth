@@ -11,10 +11,9 @@ using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
-    public class World : IDisposable
+    public class World : IDisposable, ICentrePointProvider
         {
-        public const int WindowSizeX = 16;
-        public const int WindowSizeY = 10;
+        private readonly Vector2 _centreOfRoom = new Vector2(Constants.RoomWidthInPixels / 2, Constants.RoomHeightInPixels / 2);
 
         private int _gameClock;
         private double _time;
@@ -22,7 +21,6 @@ namespace Labyrinth
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
         private bool _doNotUpdate;
         
-        [NotNull] public readonly Game1 Game;
         [NotNull] public readonly Player Player;
         public ISpriteLibrary SpriteLibrary;
 
@@ -31,9 +29,8 @@ namespace Labyrinth
 
         public Vector2 WindowPosition { get; private set; }
 
-        public World(Game1 game, IWorldLoader worldLoader)
+        public World(IWorldLoader worldLoader)
             {
-            this.Game = game;
             this._wl = worldLoader;
             this.SpriteLibrary = new SpriteLibrary();
 
@@ -210,12 +207,9 @@ namespace Labyrinth
 
         public static Rectangle GetContainingRoom(Vector2 position)
             {
-            const int roomWidth = WindowSizeX * Tile.Width;
-            const int roomHeight = WindowSizeY * Tile.Height;
-
-            var roomx = (int) (position.X / roomWidth);
-            var roomy = (int) (position.Y / roomHeight);
-            var r = new Rectangle(roomx * roomWidth, roomy * roomHeight, roomWidth, roomHeight);
+            var roomx = (int) (position.X / Constants.RoomWidthInPixels);
+            var roomy = (int) (position.Y / Constants.RoomHeightInPixels);
+            var r = new Rectangle(roomx * Constants.RoomWidthInPixels, roomy * Constants.RoomHeightInPixels, Constants.RoomWidthInPixels, Constants.RoomHeightInPixels);
             return r;
             }
         
@@ -276,15 +270,12 @@ namespace Labyrinth
             var roomStartX = (int)Math.Floor(windowOffset.X / Tile.Width);
             var roomStartY = (int)Math.Floor(windowOffset.Y / Tile.Height);
             
-            const int windowWidth = WindowSizeX * Tile.Width;
-            const int windowHeight = WindowSizeY * Tile.Height;
-            
-            var roomEndX = (int)Math.Ceiling((windowOffset.X + windowWidth) / Tile.Width);
-            var roomEndY = (int)Math.Ceiling((windowOffset.Y + windowHeight) / Tile.Height);
+            var roomEndX = (int)Math.Ceiling((windowOffset.X + Constants.RoomWidthInPixels) / Tile.Width);
+            var roomEndY = (int)Math.Ceiling((windowOffset.Y + Constants.RoomHeightInPixels) / Tile.Height);
 
             var result = new TileRect(new TilePos(roomStartX, roomStartY), roomEndX - roomStartX, roomEndY - roomStartY);
-            Debug.Assert(result.Width == WindowSizeX || result.Width == (WindowSizeX + 1));
-            Debug.Assert(result.Height == WindowSizeY || result.Height == (WindowSizeY + 1));
+            Debug.Assert(result.Width == Constants.RoomWidthInPixels || result.Width == (Constants.RoomWidthInPixels + 1));
+            Debug.Assert(result.Height == Constants.RoomHeightInPixels || result.Height == (Constants.RoomHeightInPixels + 1));
             return result;
             }
 
@@ -309,6 +300,15 @@ namespace Labyrinth
                         spriteBatch.DrawEntireTextureInWindow(texture, position);
                         }
                     }
+                }
+            }
+
+        public Vector2 CentrePoint
+            {
+            get
+                {
+                var result = this.WindowPosition + _centreOfRoom;
+                return result;
                 }
             }
 

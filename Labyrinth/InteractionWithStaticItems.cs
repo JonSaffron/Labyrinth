@@ -104,7 +104,7 @@ namespace Labyrinth
         private static void PlayerTakesCrystal(World world, Player player, Crystal crystal)
             {
             player.AddEnergy(crystal.Energy);
-            world.Game.ScoreKeeper.CrystalTaken(crystal);
+            GlobalServices.ScoreKeeper.CrystalTaken(crystal);
             player.CrystalCollected(crystal);
             crystal.SetTaken();
             int howManyCrystalsRemain = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Count();

@@ -21,5 +21,13 @@ namespace Labyrinth
         // Unit of measurement is seconds.
         public const float GameClockResolution = 1.0f / MovementsPerSecond;
 
+        private const int RoomWidthInTiles = 16;
+        private const int RoomHeightInTiles = 10;
+
+        public const int RoomWidthInPixels = RoomWidthInTiles * Tile.Width;
+        public const int RoomHeightInPixels = RoomHeightInTiles * Tile.Height;
+        public const int ZoomWhilstWindowed = 2;
+
+
         }
     }
