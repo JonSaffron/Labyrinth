@@ -274,8 +274,8 @@ namespace Labyrinth
             var roomEndY = (int)Math.Ceiling((windowOffset.Y + Constants.RoomHeightInPixels) / Tile.Height);
 
             var result = new TileRect(new TilePos(roomStartX, roomStartY), roomEndX - roomStartX, roomEndY - roomStartY);
-            Debug.Assert(result.Width == Constants.RoomWidthInPixels || result.Width == (Constants.RoomWidthInPixels + 1));
-            Debug.Assert(result.Height == Constants.RoomHeightInPixels || result.Height == (Constants.RoomHeightInPixels + 1));
+            Debug.Assert(result.Width == Constants.RoomWidthInTiles || result.Width == (Constants.RoomWidthInTiles + 1));
+            Debug.Assert(result.Height == Constants.RoomHeightInTiles || result.Height == (Constants.RoomHeightInTiles + 1));
             return result;
             }
 

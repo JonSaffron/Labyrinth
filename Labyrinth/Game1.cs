@@ -40,6 +40,7 @@ namespace Labyrinth
             GlobalServices.SetWorldLoader(worldLoader);
             GlobalServices.SetGameComponentCollection(this.Components);
             GlobalServices.SetPlayerInput(this.PlayerInput);
+            GlobalServices.SetScoreKeeper(this._scoreKeeper);
 
             this._gdm = new GraphicsDeviceManager(this)
                             {

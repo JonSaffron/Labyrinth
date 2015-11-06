@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Labyrinth.GameObjects;
 
@@ -195,6 +196,23 @@ namespace Labyrinth
             else
                 {
                 newList.Add(item);
+                }
+            }
+
+        public void FindItem(StaticItem itemToFind)
+            {
+            int max = this._allGameItems.GetLength(0);
+            for (int i = 0; i < max; i++)
+                {
+                var list = this._allGameItems[i];
+                if (list == null)
+                    continue;
+
+                foreach (var item in list)
+                    {
+                    if (item == itemToFind)
+                        System.Diagnostics.Trace.WriteLine(i.ToString(CultureInfo.InvariantCulture));
+                    }
                 }
             }
         }
