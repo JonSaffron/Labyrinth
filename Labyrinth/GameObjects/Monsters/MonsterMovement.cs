@@ -3,11 +3,12 @@ using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
-{
-    static class MonsterMovement
     {
-        private static readonly Random MonsterRandom = new Random();
+    static class MonsterMovement
+        {
+        public static readonly Random MonsterRandom = new Random();
 
+        [Obsolete]
         public static Direction DetermineDirectionStandardPatrolling(Monster m)
             {
             if (m.Direction == Direction.None)
@@ -24,6 +25,7 @@ namespace Labyrinth.GameObjects
             return result;
             }
         
+        [Obsolete]
         public static Direction DetermineDirectionRolling(Monster m)
             {
             if (m.Direction == Direction.None)
@@ -51,7 +53,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private static Direction AlterDirection(Direction d)
+        public static Direction AlterDirection(Direction d)
             {
             switch (d)
                 {
@@ -68,7 +70,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private static Direction RandomDirection()
+        public static Direction RandomDirection()
             {
             int d = MonsterRandom.Next(256) & 3;
             switch (d)
@@ -182,7 +184,7 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private static Direction DetermineDirectionTowardsPlayer(Monster m)
+        public static Direction DetermineDirectionTowardsPlayer(Monster m)
             {
             Vector2 diff = (m.Position - GlobalServices.GameState.Player.Position);
             double hMove = MonsterRandom.NextDouble() * Math.Abs(diff.X);

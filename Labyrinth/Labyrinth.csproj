@@ -131,9 +131,11 @@
     <Compile Include="IHeadsUpDisplay.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="Interfaces\IMonster.cs" />
+    <Compile Include="Interfaces\IMonsterMovement.cs" />
     <Compile Include="Interfaces\IScoreKeeper.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Interfaces\IValuable.cs" />
+    <Compile Include="MonsterMovementFactory.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />
@@ -198,8 +200,10 @@
     <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoaderForTest.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
+    <Compile Include="StandardPatrolling.cs" />
     <Compile Include="StandardPlayerWeapon.cs" />
     <Compile Include="GameObjects\Wall.cs" />
+    <Compile Include="StandardRolling.cs" />
     <Compile Include="TileRect.cs" />
     <Compile Include="World.cs" />
     <Compile Include="GameObjects\Monsters\Monster.cs" />
