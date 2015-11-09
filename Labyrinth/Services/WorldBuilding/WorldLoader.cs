@@ -266,9 +266,9 @@ namespace Labyrinth.Services.WorldBuilding
             Vector2 position = tilePos.ToPosition();
             int e = int.Parse(mdef.GetAttribute("Energy"));
             Monster result = gameState.Create(type, position, e);
-            string direction = mdef.GetAttribute("Direction");
-            if (!string.IsNullOrEmpty(direction))
-                result.Direction = (Direction)Enum.Parse(typeof(Direction), direction);
+            string initialDirection = mdef.GetAttribute("InitialDirection");
+            if (!string.IsNullOrEmpty(initialDirection))
+                result.InitialDirection = (Direction)Enum.Parse(typeof(Direction), initialDirection);
             string mobility = mdef.GetAttribute("Mobility");
             if (!String.IsNullOrEmpty(mobility))
                 result.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);

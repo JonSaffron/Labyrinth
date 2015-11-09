@@ -55,12 +55,4 @@
             return result;
             }
         }
-
-    class RotaFloatCyanMovement : IMonsterMovement
-        {
-        public Direction DetermineDirection(GameObjects.Monster monster)
-            {
-                throw new System.NotImplementedException();
-            }
-        }
     }

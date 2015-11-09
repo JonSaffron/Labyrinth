@@ -9,7 +9,6 @@ namespace Labyrinth.GameObjects
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/RotaFloaterCyan", 2));
             
-            this.ChanceOfAggressiveMove = 3;
             this.Mobility = MonsterMobility.Placid;
             }
 

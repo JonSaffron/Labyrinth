@@ -19,9 +19,9 @@ namespace Labyrinth.GameObjects
             switch (mobility)
                 {
                 case MonsterMobility.Patrolling:
-                    return GlobalServices.MonsterMovementFactory.StandardPatrolling();
+                    return GlobalServices.MonsterMovementFactory.StandardPatrolling(this.InitialDirection);
                 case MonsterMobility.Placid:
-                    return GlobalServices.MonsterMovementFactory.StandardRolling();
+                    return GlobalServices.MonsterMovementFactory.StandardRolling(this.InitialDirection);
                 case MonsterMobility.Aggressive:
                     return GlobalServices.MonsterMovementFactory.KillerCubeRedMovement();
                 default:

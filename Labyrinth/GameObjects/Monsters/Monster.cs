@@ -12,6 +12,7 @@ namespace Labyrinth.GameObjects
         private MonsterMobility _mobility;
         protected abstract IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility);
         private IMonsterMovement _determineDirection;
+        public Direction InitialDirection;
 
         public ChangeRooms ChangeRooms { get; set; }
         private MonsterState _monsterState = MonsterState.Normal;

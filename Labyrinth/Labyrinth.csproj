@@ -141,6 +141,7 @@
     <Compile Include="KillerCubeRedMovement.cs" />
     <Compile Include="MonsterMovementFactory.cs" />
     <Compile Include="Placid.cs" />
+    <Compile Include="RotaFloatCyanMovement.cs" />
     <Compile Include="SemiAggressive.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />

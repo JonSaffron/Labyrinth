@@ -8,6 +8,10 @@ namespace Labyrinth
             {
             }
 
+        protected StandardRolling() : base(MonsterMovement.RandomDirection())
+            {
+            }
+
         public override Direction DetermineDirection(Monster monster)
             {
             if (monster.Direction == Direction.None)

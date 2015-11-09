@@ -343,8 +343,8 @@ O              OO              OO              OO              OO              O
     <!-- top line, 3rd from left -->
     <Monster Type="RotaFloaterBrown" Left="99" Top="43" Energy="40" ChangeRooms="StaysWithinRoom" />
     <Monster Type="RotaFloaterBrown" Left="98" Top="45" Energy="40" />
-    <Monster Type="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" Direction="Up" />
-    <Monster Type="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" Direction="Right" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" InitialDirection="Up" />
+    <Monster Type="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" InitialDirection="Right" ChangeRooms="StaysWithinRoom" />
     <Monster Type="DeathCube" Left="110" Top="44" Energy="255" />
     <Monster Type="DeathCube" Left="110" Top="45" Energy="255" />
 
@@ -354,7 +354,7 @@ O              OO              OO              OO              OO              O
     <Monster Type="RotaFloaterBrown" Left="125" Top="45" Energy="40" ChangeRooms="StaysWithinRoom" />
 
     <!-- 2nd from top, right side -->
-    <Monster Type="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" Direction="Up" />
+    <Monster Type="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" InitialDirection="Up" />
 
     <!-- 3rd from top, right side -->
     <Monster Type="ThresherBrown" Left="119" Top="68" Energy="55" IsEgg="true" TimeBeforeHatching="20" />
@@ -402,8 +402,8 @@ O              OO              OO              OO              OO              O
     <Monster Type="FlitterbugRed" Left="174" Top="73" Energy="60" />
     <Monster Type="DeathCube" Left="161" Top="76" Energy="80" />
     <Monster Type="DeathCube" Left="174" Top="76" Energy="80" />
-    <Monster Type="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" ChangeRooms="StaysWithinRoom" />
     <Monster Type="FlitterbugRed" Left="167" Top="78" Energy="90" IsEgg="true" TimeBeforeHatching="127" />
 
     <!-- right, 3 down -->
@@ -415,7 +415,7 @@ O              OO              OO              OO              OO              O
     <!-- =-=-=-= -->
 
     <!-- bottom left corner -->
-    <Monster Type="RotaFloaterCyan" Left="200" Top="74" Energy="48" Direction="Left"  />
+    <Monster Type="RotaFloaterCyan" Left="200" Top="74" Energy="48" InitialDirection="Left"  />
 
     <!-- bottom, 2nd from left -->
     <Monster Type="FlitterbugRed" Left="216" Top="74" Energy="48" />
@@ -430,8 +430,8 @@ O              OO              OO              OO              OO              O
     <Monster Type="ThresherCyan" Left="248" Top="66" Energy="48" Mobility="Cautious" />
 
     <!-- right, 3rd from bottom -->
-    <Monster Type="RotaFloaterCyan" Left="247" Top="52" Energy="64" Direction="Right" />
-    <Monster Type="RotaFloaterCyan" Left="249" Top="52" Energy="48" Direction="Right" />
+    <Monster Type="RotaFloaterCyan" Left="247" Top="52" Energy="64" InitialDirection="Right" />
+    <Monster Type="RotaFloaterCyan" Left="249" Top="52" Energy="48" InitialDirection="Right" />
     <Monster Type="ThresherCyan" Left="248" Top="54" Energy="48" Mobility="Cautious" />
 
     <!-- 2nd from right, 3rd from bottom -->
@@ -447,7 +447,7 @@ O              OO              OO              OO              OO              O
     <Monster Type="FlitterbugRed" Left="216" Top="54" Energy="48" />
 
     <!-- left, 3rd from bottom -->
-    <Monster Type="RotaFloaterCyan" Left="198" Top="54" Energy="48" Direction="Right" />
+    <Monster Type="RotaFloaterCyan" Left="198" Top="54" Energy="48" InitialDirection="Right" />
 
     <!-- right, 5th from top -->
     <Monster Type="FlitterbugRed" Left="248" Top="42" Energy="48" LaysEggs="true"  />
@@ -506,8 +506,8 @@ O              OO              OO              OO              OO              O
     <Monster Type="ThresherCyan" Left="216" Top="25" Energy="72" LaysEggs="true" />
 
     <!-- 2nd from top, 2nd from left -->
-    <Monster Type="RotaFloaterCyan" Left="215" Top="12" Energy="48" Direction="Right" />
-    <Monster Type="RotaFloaterCyan" Left="216" Top="13" Energy="48" Direction="Left" />
+    <Monster Type="RotaFloaterCyan" Left="215" Top="12" Energy="48" InitialDirection="Right" />
+    <Monster Type="RotaFloaterCyan" Left="216" Top="13" Energy="48" InitialDirection="Left" />
 
     <!-- top, 2nd from left -->
     <Monster Type="CrazyCrawler" Left="209" Top="4" Energy="40" />
@@ -564,9 +564,9 @@ O              OO              OO              OO              OO              O
 
     <!-- treasure room, bottom right -->
     <Monster Type="KillerCubeGreen" Left="177" Top="31" Energy="100" />
-    <Monster Type="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" Direction="Left" />
+    <Monster Type="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" InitialDirection="Left" />
     <Monster Type="KillerCubeGreen" Left="184" Top="38" Energy="100" />
-    <Monster Type="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" Direction="Left" />
+    <Monster Type="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" InitialDirection="Left" />
     <Monster Type="CrazyCrawler" Left="182" Top="33" Energy="80" />
     <Monster Type="CrazyCrawler" Left="182" Top="35" Energy="80" />
     <Monster Type="CrazyCrawler" Left="185" Top="34" Energy="80" Mobility="Placid" />
@@ -612,8 +612,8 @@ O              OO              OO              OO              OO              O
 
     <!-- Treasure room, top right-->
     <Monster Type="TigerMoth" Left="120" Top="5" Energy="96" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" Direction="Down" ChangeRoom="StaysWithinRoom" />
-    <Monster Type="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" Direction="Right" ChangeRoom="StaysWithinRoom" />
+    <Monster Type="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" InitialDirection="Down" ChangeRoom="StaysWithinRoom" />
+    <Monster Type="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" InitialDirection="Right" ChangeRoom="StaysWithinRoom" />
     <Monster Type="CrazyCrawler" Left="118" Top="3" Energy="72" ChangeRooms="StaysWithinRoom" />
     <Monster Type="CrazyCrawler" Left="121" Top="3" Energy="72" />
     <Monster Type="FlitterbugBrown" Left="125" Top="5" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />

@@ -191,15 +191,11 @@ namespace Labyrinth
         
         public void AddDiamondDemon(Vector2 p)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var dd = new DiamondDemon(ap, p, 30)
-                         {
-                             Mobility = MonsterMobility.Aggressive,
-                             LaysEggs = true,
-                             ChangeRooms = ChangeRooms.FollowsPlayer,
-                             MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately
-                         };
-            this._gameObjectCollection.Add(dd);
+            var dd = Create("DiamondDemon", p, 30);
+            dd.Mobility = MonsterMobility.Aggressive;
+            dd.LaysEggs = true;
+            dd.ChangeRooms = ChangeRooms.FollowsPlayer;
+            dd.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
             }
 
         /// <summary>
