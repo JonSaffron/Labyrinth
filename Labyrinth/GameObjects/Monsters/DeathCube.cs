@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
             this.ShotsBounceOff = true;
             }
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             if (mobility != MonsterMobility.Static)
                 throw new ArgumentOutOfRangeException();

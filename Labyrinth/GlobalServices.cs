@@ -82,5 +82,12 @@ namespace Labyrinth
             {
             ServiceProvider = serviceProvider;
             }
+
+        public static IMonsterMovementFactory MonsterMovementFactory { get; private set; }
+
+        public static void SetMonsterMovementFactory(IMonsterMovementFactory monsterMovementFactory)
+            {
+            MonsterMovementFactory = monsterMovementFactory;
+            }
         }
     }

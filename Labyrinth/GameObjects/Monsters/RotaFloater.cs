@@ -12,14 +12,14 @@ namespace Labyrinth.GameObjects
             {
             }
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
                 case MonsterMobility.Placid:
-                    return MonsterMovement.DetermineDirectionRolling;
+                    return GlobalServices.MonsterMovementFactory.StandardRolling();
                 case MonsterMobility.Patrolling:
-                    return MonsterMovement.DetermineDirectionStandardPatrolling;
+                    return GlobalServices.MonsterMovementFactory.StandardPatrolling();
                 case MonsterMobility.Aggressive:
                     Func<Monster, Direction> result = m => DetermineDirectionAggressive(this, ShouldMakeAnAggressiveMove);
                     return result;

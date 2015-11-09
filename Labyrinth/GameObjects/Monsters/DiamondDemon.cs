@@ -17,14 +17,14 @@ namespace Labyrinth.GameObjects
             this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
             }
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
                 case MonsterMobility.Placid:
-                    return MonsterMovement.RandomDirection;
+                    return GlobalServices.MonsterMovementFactory.Placid();
                 case MonsterMobility.Aggressive:
-                    return MonsterMovement.DetermineDirectionSemiAggressive;
+                    return GlobalServices.MonsterMovementFactory.SemiAggressive();
                 default:
                     throw new ArgumentOutOfRangeException();
                 }

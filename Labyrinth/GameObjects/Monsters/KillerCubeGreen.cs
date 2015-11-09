@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
             this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
             }
 
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             if (mobility != MonsterMobility.Static)
                 throw new ArgumentOutOfRangeException();

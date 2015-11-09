@@ -14,113 +14,19 @@ namespace Labyrinth.GameObjects
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
             }
         
-        private static bool ShouldMakeMove()
-            {
-            return MonsterRandom.Next(8) == 0; 
-            }
-
-
-        protected override Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
                 case MonsterMobility.Patrolling:
-                    return MonsterMovement.DetermineDirectionStandardPatrolling;
+                    return GlobalServices.MonsterMovementFactory.StandardPatrolling();
                 case MonsterMobility.Placid:
-                    return MonsterMovement.DetermineDirectionRolling;
+                    return GlobalServices.MonsterMovementFactory.StandardRolling();
                 case MonsterMobility.Aggressive:
-                    return DetermineDirectionAggressive;
+                    return GlobalServices.MonsterMovementFactory.KillerCubeRedMovement();
                 default:
                     throw new ArgumentOutOfRangeException();
                 }
-            }
-
-        private static Direction DetermineDirectionAggressive(Monster m)
-            {
-            TilePos tp = m.TilePosition;
-            bool isCurrentlyMovingTowardsFreeSpace;
-            if (m.Direction == Direction.None) 
-                isCurrentlyMovingTowardsFreeSpace = false;
-            else
-                {
-                TilePos pp = tp.GetPositionAfterOneMove(m.Direction);
-                isCurrentlyMovingTowardsFreeSpace = GlobalServices.GameState.CanTileBeOccupied(pp, true);
-                
-                if (isCurrentlyMovingTowardsFreeSpace)
-                    {
-                    Vector2 newPos = pp.ToPosition();
-                    if (!MonsterMovement.IsInSameRoom(m.Position, newPos) && MonsterRandom.Next(4) != 0)
-                        isCurrentlyMovingTowardsFreeSpace = false;
-                    }
-                }
-                
-            Direction newDirection = Direction.None;
-            Player p = GlobalServices.GameState.Player;
-            if (p != null)
-                {
-                TilePos playerPosition = p.TilePosition;
-                int yDiff = tp.Y - playerPosition.Y;
-                int xDiff = tp.X - playerPosition.X;
-                
-                if (xDiff > 16 || yDiff > 16)
-                    {
-                    // player is out of sight
-                    }
-                else if (m.Direction == Direction.Left || m.Direction == Direction.Right)
-                    {
-                    // Check if travelling on same row as player
-                    if (yDiff == 0 && ShouldMakeMove())
-                        {
-                        // Move aside
-                        newDirection = MonsterRandom.Next(2) == 0 ? Direction.Up : Direction.Down;
-                        }
-                    else if ((m.Direction == Direction.Left && xDiff <= -5) || (m.Direction == Direction.Right && xDiff >= 5))
-                        {
-                        newDirection = yDiff > 0 ? Direction.Up : Direction.Down;
-                        }
-                    }
-                else if (m.Direction == Direction.Up || m.Direction == Direction.Down)
-                    {
-                    if (xDiff == 0 && ShouldMakeMove())
-                        {
-                        // Move aside
-                        newDirection = MonsterRandom.Next(2) == 0 ? Direction.Left : Direction.Right;
-                        }
-                    else if ((m.Direction == Direction.Up && yDiff <= -5) || (m.Direction == Direction.Down && yDiff >= 5))
-                        {
-                        newDirection = xDiff > 0 ? Direction.Left : Direction.Right;
-                        }
-                    }
-
-                if (newDirection != Direction.None)
-                    {
-                    TilePos pp = tp.GetPositionAfterOneMove(newDirection);
-                    if (!GlobalServices.GameState.CanTileBeOccupied(pp, true))
-                        newDirection = Direction.None;
-                    }
-                }
-
-            if (newDirection == Direction.None)
-                {                    
-                if (m.Direction == Direction.None)
-                    {
-                    newDirection = MonsterMovement.RandomDirection(m);
-                    }
-                else if (!isCurrentlyMovingTowardsFreeSpace)
-                    {
-                    // tend to bounce backwards
-                    newDirection = MonsterRandom.Next(5) == 0 ? MonsterMovement.GetRandomPerpendicularDirection(m.Direction) : m.Direction.Reversed();
-                    }
-                else if (MonsterRandom.Next(16) == 0)
-                    {
-                    newDirection = MonsterMovement.GetRandomPerpendicularDirection(m.Direction);
-                    }
-                else
-                    {
-                    newDirection = m.Direction;
-                    }
-                }
-            return newDirection;
             }
         }
     }

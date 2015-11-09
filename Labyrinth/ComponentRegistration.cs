@@ -18,6 +18,7 @@ namespace Labyrinth
             container.Register(Component.For<ISoundPlayer>().ImplementedBy<SoundPlayer>());
             container.Register(Component.For<SoundLibrary>());
             container.Register(Component.For<ISpriteLibrary>().ImplementedBy<SpriteLibrary>());
+            container.Register(Component.For<IMonsterMovementFactory>().ImplementedBy<MonsterMovementFactory>());
             }
         }
     }

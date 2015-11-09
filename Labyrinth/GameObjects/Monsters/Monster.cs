@@ -10,8 +10,8 @@ namespace Labyrinth.GameObjects
         protected static readonly Random MonsterRandom = new Random();
         
         private MonsterMobility _mobility;
-        protected abstract Func<Monster, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility);
-        private Func<Monster, Direction> _determineDirection;
+        protected abstract IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility);
+        private IMonsterMovement _determineDirection;
 
         public ChangeRooms ChangeRooms { get; set; }
         private MonsterState _monsterState = MonsterState.Normal;
@@ -183,7 +183,7 @@ namespace Labyrinth.GameObjects
 
             if (this._determineDirection == null)
                 throw new InvalidOperationException("Direction function not set.");
-            Direction d = this._determineDirection(this);
+            Direction d = this._determineDirection.DetermineDirection(this);
             if (d == Direction.None)
                 throw new InvalidOperationException("The monster's DetermineDirection routine should not return None.");
             

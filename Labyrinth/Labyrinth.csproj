@@ -122,20 +122,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CautiousPursuit.cs" />
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="FullPursuit.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
     <Compile Include="IGameObjectCollection.cs" />
     <Compile Include="HeadsUpDisplay.cs" />
     <Compile Include="IHeadsUpDisplay.cs" />
+    <Compile Include="IMonsterMovementFactory.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="Interfaces\IMonster.cs" />
     <Compile Include="Interfaces\IMonsterMovement.cs" />
     <Compile Include="Interfaces\IScoreKeeper.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Interfaces\IValuable.cs" />
+    <Compile Include="KillerCubeRedMovement.cs" />
     <Compile Include="MonsterMovementFactory.cs" />
+    <Compile Include="Placid.cs" />
+    <Compile Include="SemiAggressive.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />

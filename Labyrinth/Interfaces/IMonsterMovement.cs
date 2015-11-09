@@ -2,7 +2,7 @@
 
 namespace Labyrinth
     {
-    interface IMonsterMovement
+    public interface IMonsterMovement
         {
         Direction DetermineDirection(Monster monster);
         }
