@@ -13,9 +13,9 @@
             return result;
             }
 
-        public IMonsterMovement StandardRolling(Direction inititalDirection)
+        public IMonsterMovement StandardRolling(Direction initialDirection)
             {
-            var result = new StandardRolling(inititalDirection);
+            var result = new StandardRolling(initialDirection);
             return result;
             }
 

@@ -3,7 +3,7 @@ using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
-    class RotaFloatCyanMovement : StandardRolling, IMonsterMovement
+    class RotaFloatCyanMovement : StandardRolling
         {
         public override Direction DetermineDirection(Monster monster)
             {

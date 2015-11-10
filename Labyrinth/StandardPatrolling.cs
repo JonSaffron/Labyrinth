@@ -6,7 +6,7 @@ namespace Labyrinth
     {
     class StandardPatrolling : IMonsterMovement
         {
-        public Direction CurrentDirection { get; private set; }
+        public Direction CurrentDirection { get; protected set; }
 
         public StandardPatrolling(Direction initialDirection)
             {
@@ -15,8 +15,16 @@ namespace Labyrinth
             this.CurrentDirection = initialDirection;
             }
 
+        protected StandardPatrolling()
+            {
+            this.CurrentDirection = Direction.None;
+            }
+
         public virtual Direction DetermineDirection(Monster monster)
             {
+            if (this.CurrentDirection == Direction.None)
+                throw new InvalidOperationException("Don't know which direction to patrol in!");
+
             TilePos tp = monster.TilePosition;
             TilePos pp = tp.GetPositionAfterOneMove(this.CurrentDirection);
             bool isCurrentlyMovingTowardsFreeSpace = GlobalServices.GameState.CanTileBeOccupied(pp, true);
