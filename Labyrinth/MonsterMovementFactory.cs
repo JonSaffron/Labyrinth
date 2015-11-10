@@ -15,7 +15,7 @@
 
         public IMonsterMovement StandardRolling(Direction initialDirection)
             {
-            var result = new StandardRolling(initialDirection);
+            var result = initialDirection != Direction.None ? new StandardRolling(initialDirection) : new StandardRolling();
             return result;
             }
 

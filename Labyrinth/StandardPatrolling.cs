@@ -31,7 +31,7 @@ namespace Labyrinth
             Vector2 potentiallyMovingTowards = pp.ToPosition();
             bool isInSameRoom = MonsterMovement.IsInSameRoom(monster.Position, potentiallyMovingTowards);
             bool canContinueMovingInTheSameDirection = isCurrentlyMovingTowardsFreeSpace && isInSameRoom;
-            var result = canContinueMovingInTheSameDirection ? monster.Direction : monster.Direction.Reversed();
+            var result = canContinueMovingInTheSameDirection ? this.CurrentDirection : this.CurrentDirection.Reversed();
             System.Diagnostics.Trace.WriteLine(string.Format("{0} {1} {2} {3} {4}", tp, pp, isCurrentlyMovingTowardsFreeSpace, isInSameRoom, result));
             this.CurrentDirection = result;
             return result;

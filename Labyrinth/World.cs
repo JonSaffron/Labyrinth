@@ -50,6 +50,7 @@ namespace Labyrinth
             GlobalServices.GameState.RemoveBangsAndShots();
             var worldAreaId = this._wl.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             StartState ss = this._wl.GetStartStateForWorldAreaId(worldAreaId);
+            GlobalServices.GameState.UpdatePosition(this.Player);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             GlobalServices.GameState.UpdatePosition(this.Player);
 

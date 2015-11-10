@@ -8,20 +8,21 @@ namespace Labyrinth
             {
             }
 
-        protected StandardRolling()
+        public StandardRolling()
             {
             }
 
         public override Direction DetermineDirection(Monster monster)
             {
-            if (monster.Direction == Direction.None)
+            if (this.CurrentDirection == Direction.None)
                 {
                 this.CurrentDirection = MonsterMovement.RandomDirection();
                 return this.CurrentDirection;
                 }
 
             bool changeDirection = (MonsterMovement.MonsterRandom.Next(256) & 7) == 0;
-            var result = changeDirection ? MonsterMovement.AlterDirection(monster.Direction) : base.DetermineDirection(monster);
+            var result = changeDirection ? MonsterMovement.AlterDirection(this.CurrentDirection) : base.DetermineDirection(monster);
+            this.CurrentDirection = result;
             return result;
             }
         }

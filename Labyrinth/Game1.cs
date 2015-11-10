@@ -91,6 +91,7 @@ namespace Labyrinth
                 {
                 _world = value;
                 GlobalServices.SetCentrePointProvider(value);
+                GlobalServices.SetWorld(value);
                 }
             }
 
