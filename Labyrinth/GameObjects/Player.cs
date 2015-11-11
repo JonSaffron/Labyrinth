@@ -119,7 +119,6 @@ namespace Labyrinth.GameObjects
             {
             bool result = false;
             var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
-            this.OriginalPosition = this.Position;
             while (timeRemaining > 0)
                 {
                 if (!this.IsMoving && !this.SetDirectionAndDestination(gameTime))

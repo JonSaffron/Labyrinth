@@ -204,8 +204,6 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            this.OriginalPosition = this.Position;
-
             bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this);
             
             if (this.IsEgg && this._hatchingTimer != null)

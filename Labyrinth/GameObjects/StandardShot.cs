@@ -112,8 +112,6 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            this.OriginalPosition = this.Position;
-
             bool result = false;
             var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
             while (timeRemaining > 0 && this._timeToTravel > 0)
@@ -158,7 +156,6 @@ namespace Labyrinth.GameObjects
 
         public void SetPosition(Vector2 newPosition)
             {
-            this.OriginalPosition = this.Position;
             this.Position = newPosition;
             GlobalServices.GameState.UpdatePosition(this);
             }

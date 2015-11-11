@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Labyrinth.GameObjects;
 
@@ -79,6 +78,7 @@ namespace Labyrinth
             var mi = gameObject as MovingItem;
             if (mi != null)
                 {
+                mi.OriginalPosition = mi.Position;
                 this._interactiveGameItems.AddLast(mi);
                 if (mi is Shot)
                     this.CountOfShots++;
@@ -197,10 +197,13 @@ namespace Labyrinth
                 {
                 newList.Add(item);
                 }
+
+            item.OriginalPosition = item.Position;
             }
 
-        public void FindItem(StaticItem itemToFind)
+        public void FindItem(MovingItem itemToFind)
             {
+            System.Diagnostics.Trace.WriteLine(string.Format("Previous {0}    Actual {1}", TilePos.TilePosFromPosition(itemToFind.OriginalPosition), TilePos.TilePosFromPosition(itemToFind.Position)));
             int max = this._allGameItems.GetLength(0);
             for (int i = 0; i < max; i++)
                 {
@@ -211,7 +214,7 @@ namespace Labyrinth
                 foreach (var item in list)
                     {
                     if (item == itemToFind)
-                        System.Diagnostics.Trace.WriteLine(i.ToString(CultureInfo.InvariantCulture));
+                        System.Diagnostics.Trace.WriteLine(string.Format("{0} {1}", i, TilePos.FromMortonCode(i)));
                     }
                 }
             }

@@ -30,16 +30,19 @@ namespace Labyrinth
 
             foreach (var item in this._gameObjectCollection.InteractiveGameItems)
                 {
-                if (!item.IsExtant && !(item is Player))
+                if (item.IsExtant)
                     {
-                    if (itemsToRemove == null)
-                        itemsToRemove = new List<MovingItem> { item };
-                    else
-                        itemsToRemove.Add(item);
+                    yield return item;
                     continue;
                     }
 
-                yield return item;
+                if (item is Player) 
+                    continue;
+
+                if (itemsToRemove == null)
+                    itemsToRemove = new List<MovingItem> {item};
+                else
+                    itemsToRemove.Add(item);
                 }
 
             if (itemsToRemove == null)

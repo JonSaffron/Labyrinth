@@ -48,7 +48,6 @@ namespace Labyrinth.GameObjects
         public override bool Update(GameTime gameTime)
             {
             var elapsed = gameTime.ElapsedGameTime.TotalSeconds;
-            this.OriginalPosition = this.Position;
 
             bool result = false;
             if (this.IsMoving)

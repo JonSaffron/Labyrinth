@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         public Direction Direction { get; set;}
         public Vector2 MovingTowards { get; protected set; }
-        public Vector2 OriginalPosition { get; protected set; }
+        public Vector2 OriginalPosition { get; set; }
         protected decimal CurrentVelocity { get; set; }
 
         public abstract bool Update(GameTime gameTime);
