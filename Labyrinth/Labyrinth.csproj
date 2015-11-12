@@ -143,6 +143,7 @@
     <Compile Include="GameObjects\Monsters\Movement\Placid.cs" />
     <Compile Include="GameObjects\Monsters\Movement\RotaFloatCyanMovement.cs" />
     <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
+    <Compile Include="Movement.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />

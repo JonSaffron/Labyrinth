@@ -8,74 +8,38 @@ namespace Labyrinth.GameObjects.Movement
         {
         public override Direction DetermineDirection(Monster monster)
             {
-            if (!IsPlayerInSight(monster))
+            if (!IsPlayerInSight(monster) || this.CurrentDirection == Direction.None)
                 return base.DetermineDirection(monster);
 
             TilePos tp = monster.TilePosition;
                 
-            Direction newDirection = Direction.None;
+            Direction newDirection;
             Player p = GlobalServices.GameState.Player;
-            if (true)
-                {
-                TilePos playerPosition = p.TilePosition;
-                int yDiff = tp.Y - playerPosition.Y;
-                int xDiff = tp.X - playerPosition.X;
+            TilePos playerPosition = p.TilePosition;
+            int yDiff = tp.Y - playerPosition.Y;    // +ve and the player is above, -ve and the player is below
+            int xDiff = tp.X - playerPosition.X;    // +ve and the player is to the left, -ve and the player is to the right
                 
-                if (this.CurrentDirection.IsHorizontal())
-                    {
-                    // Check if travelling on same row as player
-                    if (yDiff == 0 && ShouldMakeMove())
-                        {
-                        // Move aside
-                        newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
-                        }
-                    else if ((monster.Direction == Direction.Left && xDiff <= -5) || (monster.Direction == Direction.Right && xDiff >= 5))
-                        {
-                        newDirection = yDiff > 0 ? Direction.Up : Direction.Down;
-                        }
-                    }
-                else if (this.CurrentDirection.IsVertical())
-                    {
-                    if (xDiff == 0 && ShouldMakeMove())
-                        {
-                        // Move aside
-                        newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
-                        }
-                    else if ((monster.Direction == Direction.Up && yDiff <= -5) || (monster.Direction == Direction.Down && yDiff >= 5))
-                        {
-                        newDirection = xDiff > 0 ? Direction.Left : Direction.Right;
-                        }
-                    }
-
-                if (newDirection != Direction.None)
-                    {
-                    TilePos pp = tp.GetPositionAfterOneMove(newDirection);
-                    if (!GlobalServices.GameState.CanTileBeOccupied(pp, true))
-                        newDirection = Direction.None;
-                    }
+            // if on the same row or column as the player then will be at risk of being shot
+            if ((xDiff == 0 || yDiff == 0) && ShouldMakeMove())
+                newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
+            else if ((this.CurrentDirection == Direction.Left && xDiff <= -5) || (this.CurrentDirection == Direction.Right && xDiff >= 5))
+                {
+                newDirection = yDiff > 0 ? Direction.Up : Direction.Down;
                 }
-
-            if (newDirection == Direction.None)
-                {                    
-                if (monster.Direction == Direction.None)
-                    {
-                    newDirection = MonsterMovement.RandomDirection();
-                    }
-                else if (!isCurrentlyMovingTowardsFreeSpace)
-                    {
-                    // tend to bounce backwards
-                    newDirection = MonsterMovement.MonsterRandom.Next(5) == 0 ? GetRandomPerpendicularDirection(monster.Direction) : monster.Direction.Reversed();
-                    }
-                else if (MonsterMovement.MonsterRandom.Next(16) == 0)
-                    {
-                    newDirection = GetRandomPerpendicularDirection(monster.Direction);
-                    }
-                else
-                    {
-                    newDirection = monster.Direction;
-                    }
+            else if ((this.CurrentDirection == Direction.Up && yDiff <= -5) || (this.CurrentDirection == Direction.Down && yDiff >= 5))
+                {
+                newDirection = xDiff > 0 ? Direction.Left : Direction.Right;
                 }
-            return newDirection;
+            else if (MonsterMovement.MonsterRandom.Next(16) == 0)
+                {
+                newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
+                }
+            else
+                newDirection = this.CurrentDirection;
+
+            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, newDirection);
+
+            return result;
             }
 
         private static bool IsPlayerInSight(Monster monster)
