@@ -122,27 +122,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CautiousPursuit.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="FullPursuit.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\FullPursuit.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
-    <Compile Include="IGameObjectCollection.cs" />
+    <Compile Include="Interfaces\IGameObjectCollection.cs" />
     <Compile Include="HeadsUpDisplay.cs" />
-    <Compile Include="IHeadsUpDisplay.cs" />
-    <Compile Include="IMonsterMovementFactory.cs" />
+    <Compile Include="Interfaces\IHeadsUpDisplay.cs" />
+    <Compile Include="Interfaces\IMonsterMovementFactory.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="Interfaces\IMonster.cs" />
     <Compile Include="Interfaces\IMonsterMovement.cs" />
     <Compile Include="Interfaces\IScoreKeeper.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Interfaces\IValuable.cs" />
-    <Compile Include="KillerCubeRedMovement.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\KillerCubeRedMovement.cs" />
     <Compile Include="MonsterMovementFactory.cs" />
-    <Compile Include="Placid.cs" />
-    <Compile Include="RotaFloatCyanMovement.cs" />
-    <Compile Include="SemiAggressive.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\Placid.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\RotaFloatCyanMovement.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />
@@ -207,10 +207,10 @@
     <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoaderForTest.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
-    <Compile Include="StandardPatrolling.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\StandardPatrolling.cs" />
     <Compile Include="StandardPlayerWeapon.cs" />
     <Compile Include="GameObjects\Wall.cs" />
-    <Compile Include="StandardRolling.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\StandardRolling.cs" />
     <Compile Include="TileRect.cs" />
     <Compile Include="World.cs" />
     <Compile Include="GameObjects\Monsters\Monster.cs" />

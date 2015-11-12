@@ -1,8 +1,7 @@
 ﻿using System;
-using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth
+namespace Labyrinth.GameObjects.Movement
     {
     class StandardPatrolling : IMonsterMovement
         {
@@ -32,8 +31,10 @@ namespace Labyrinth
             bool isInSameRoom = MonsterMovement.IsInSameRoom(monster.Position, potentiallyMovingTowards);
             bool canContinueMovingInTheSameDirection = isCurrentlyMovingTowardsFreeSpace && isInSameRoom;
             var result = canContinueMovingInTheSameDirection ? this.CurrentDirection : this.CurrentDirection.Reversed();
-            System.Diagnostics.Trace.WriteLine(string.Format("{0} {1} {2} {3} {4}", tp, pp, isCurrentlyMovingTowardsFreeSpace, isInSameRoom, result));
             this.CurrentDirection = result;
+
+            result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
+
             return result;
             }
         }

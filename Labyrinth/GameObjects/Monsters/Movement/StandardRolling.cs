@@ -1,6 +1,4 @@
-﻿using Labyrinth.GameObjects;
-
-namespace Labyrinth
+﻿namespace Labyrinth.GameObjects.Movement
     {
     class StandardRolling : StandardPatrolling
         {
@@ -23,6 +21,9 @@ namespace Labyrinth
             bool changeDirection = (MonsterMovement.MonsterRandom.Next(256) & 7) == 0;
             var result = changeDirection ? MonsterMovement.AlterDirection(this.CurrentDirection) : base.DetermineDirection(monster);
             this.CurrentDirection = result;
+
+            result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
+
             return result;
             }
         }

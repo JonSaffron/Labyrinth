@@ -1,4 +1,6 @@
-﻿namespace Labyrinth
+﻿using Labyrinth.GameObjects.Movement;
+
+namespace Labyrinth
     {
     class MonsterMovementFactory : IMonsterMovementFactory
         {

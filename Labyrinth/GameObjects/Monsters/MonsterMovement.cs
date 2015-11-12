@@ -25,23 +25,6 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public static Direction AlterDirection(Direction d)
-            {
-            switch (d)
-                {
-                case Direction.Left:
-                    return Direction.Up;
-                case Direction.Right:
-                    return Direction.Down;
-                case Direction.Up:
-                    return Direction.Left;
-                case Direction.Down:
-                    return Direction.Right;
-                default:
-                    throw new InvalidOperationException();
-                }
-            }
-
         public static Direction RandomDirection()
             {
             int d = MonsterRandom.Next(256) & 3;
@@ -59,21 +42,6 @@ namespace Labyrinth.GameObjects
                     throw new InvalidOperationException();
                 }
             
-            }
-
-        public static Direction GetRandomPerpendicularDirection(Direction d)
-            {
-            switch (d)
-                {
-                case Direction.Left:
-                case Direction.Right:
-                    return MonsterRandom.Next(2) == 0 ? Direction.Up : Direction.Down;
-                case Direction.Up:
-                case Direction.Down:
-                    return MonsterRandom.Next(2) == 0 ? Direction.Left : Direction.Right;
-                default:
-                    throw new InvalidOperationException();
-                }
             }
 
         public static bool IsPlayerInSight(Monster m)
@@ -103,38 +71,46 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        public static Direction UpdateDirectionWhereMovementBlocked(Monster m, Direction d)
-            {
-            Direction intendedDirection = d;
-            
-            TilePos tp = m.TilePosition;
-            do
-                {
-                TilePos potentiallyMovingTowardsTile = tp.GetPositionAfterOneMove(d);
-                Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
-                
-                if (m.ChangeRooms == ChangeRooms.StaysWithinRoom && !IsInSameRoom(m.Position, potentiallyMovingTowards))
-                    {
-                    d = GetNextDirection(d);
-                    continue;
-                    }
-                
-                if (GlobalServices.GameState.CanTileBeOccupied(potentiallyMovingTowardsTile, true))
-                    {
-                    return d;
-                    }                
-                
-                d = GetNextDirection(d);
-                } while (d != intendedDirection);
-            
-            return Direction.None;
-            }
-        
         public static bool IsInSameRoom(Vector2 p1, Vector2 p2)
             {
             Rectangle room1 = World.GetContainingRoom(p1);
             bool result = room1.ContainsPosition(p2);
             return result;
+            }
+
+        public static Direction UpdateDirectionWhereMovementBlocked(Monster m, Direction intendedDirection)
+            {
+            TilePos tp = m.TilePosition;
+            for (int i = 0; i < 3; i++, intendedDirection = GetNextDirection(intendedDirection))
+                {
+                TilePos potentiallyMovingTowardsTile = tp.GetPositionAfterOneMove(intendedDirection);
+                Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
+                
+                if (m.ChangeRooms == ChangeRooms.StaysWithinRoom && !IsInSameRoom(m.Position, potentiallyMovingTowards))
+                    continue;
+                
+                if (GlobalServices.GameState.CanTileBeOccupied(potentiallyMovingTowardsTile, true))
+                    return intendedDirection;
+                }
+            
+            return Direction.None;
+            }
+        
+        public static Direction AlterDirection(Direction d)
+            {
+            switch (d)
+                {
+                case Direction.Left:
+                    return Direction.Up;
+                case Direction.Right:
+                    return Direction.Down;
+                case Direction.Up:
+                    return Direction.Left;
+                case Direction.Down:
+                    return Direction.Right;
+                default:
+                    throw new InvalidOperationException();
+                }
             }
         }
     }

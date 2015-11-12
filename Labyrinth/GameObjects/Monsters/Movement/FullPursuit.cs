@@ -1,26 +1,22 @@
 using System;
-using Labyrinth.GameObjects;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth
+namespace Labyrinth.GameObjects.Movement
     {
     class FullPursuit : IMonsterMovement
         {
         public virtual Direction DetermineDirection(Monster monster)
             {
             Direction result = DetermineDirectionTowardsPlayer(monster);
-            if (result == Direction.None)
-                result = MonsterMovement.RandomDirection();
-            
             result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
+            if (result == Direction.None)
+                return result;
 
-            Vector2 potentiallyMovingTowards = monster.TilePosition.GetPositionAfterOneMove(result).ToPosition();
-            Vector2 diff = (potentiallyMovingTowards - GlobalServices.GameState.Player.Position) / Tile.Size;
-            float tilesToPlayer = Math.Min(Math.Abs(diff.X), Math.Abs(diff.Y));
-            if (tilesToPlayer <= 2)
+            TilePos potentiallyMovingTowards = monster.TilePosition.GetPositionAfterOneMove(result);
+            if (potentiallyMovingTowards == GlobalServices.GameState.Player.TilePosition)
                 result = MonsterMovement.AlterDirection(result);
 
+            result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
             return result;
             }
 

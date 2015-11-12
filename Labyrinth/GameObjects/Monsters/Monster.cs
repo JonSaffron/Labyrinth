@@ -183,12 +183,9 @@ namespace Labyrinth.GameObjects
                 }   
 
             if (this._determineDirection == null)
-                throw new InvalidOperationException("Direction function not set.");
+                throw new InvalidOperationException("Determine Direction object reference not set.");
             Direction d = this._determineDirection.DetermineDirection(this);
-            if (d == Direction.None)
-                throw new InvalidOperationException("The monster's DetermineDirection routine should not return None.");
-            
-            d = MonsterMovement.UpdateDirectionWhereMovementBlocked(this, d);
+
             if (d == Direction.None)
                 {
                 this.StandStill();

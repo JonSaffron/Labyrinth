@@ -18,7 +18,29 @@ namespace Labyrinth
                 default: throw new InvalidOperationException();
                 }
             }
-        
+
+        public static bool IsHorizontal(this Direction d)
+            {
+            switch (d)
+                {
+                case Direction.Left:
+                case Direction.Right:
+                        return true;
+                }
+            return false;
+            }
+
+        public static bool IsVertical(this Direction d)
+            {
+            switch (d)
+                {
+                case Direction.Up:
+                case Direction.Down:
+                        return true;
+                }
+            return false;
+            }
+
         internal static Vector2 ToVector(this Direction d)
             {
             switch (d)

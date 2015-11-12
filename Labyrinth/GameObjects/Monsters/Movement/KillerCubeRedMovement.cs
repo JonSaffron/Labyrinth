@@ -1,60 +1,45 @@
-using Labyrinth.GameObjects;
+using System;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth
+namespace Labyrinth.GameObjects.Movement
     {
-    class KillerCubeRedMovement : IMonsterMovement
+    class KillerCubeRedMovement : StandardRolling
         {
-        public Direction DetermineDirection(Monster monster)
+        public override Direction DetermineDirection(Monster monster)
             {
+            if (!IsPlayerInSight(monster))
+                return base.DetermineDirection(monster);
+
             TilePos tp = monster.TilePosition;
-            bool isCurrentlyMovingTowardsFreeSpace;
-            if (monster.Direction == Direction.None) 
-                isCurrentlyMovingTowardsFreeSpace = false;
-            else
-                {
-                TilePos pp = tp.GetPositionAfterOneMove(monster.Direction);
-                isCurrentlyMovingTowardsFreeSpace = GlobalServices.GameState.CanTileBeOccupied(pp, true);
-                
-                if (isCurrentlyMovingTowardsFreeSpace)
-                    {
-                    Vector2 newPos = pp.ToPosition();
-                    if (!MonsterMovement.IsInSameRoom(monster.Position, newPos) && MonsterMovement.MonsterRandom.Next(4) != 0)
-                        isCurrentlyMovingTowardsFreeSpace = false;
-                    }
-                }
                 
             Direction newDirection = Direction.None;
             Player p = GlobalServices.GameState.Player;
-            if (p != null)
+            if (true)
                 {
                 TilePos playerPosition = p.TilePosition;
                 int yDiff = tp.Y - playerPosition.Y;
                 int xDiff = tp.X - playerPosition.X;
                 
-                if (xDiff > 16 || yDiff > 16)
-                    {
-                    // player is out of sight
-                    }
-                else if (monster.Direction == Direction.Left || monster.Direction == Direction.Right)
+                if (this.CurrentDirection.IsHorizontal())
                     {
                     // Check if travelling on same row as player
                     if (yDiff == 0 && ShouldMakeMove())
                         {
                         // Move aside
-                        newDirection = MonsterMovement.MonsterRandom.Next(2) == 0 ? Direction.Up : Direction.Down;
+                        newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
                         }
                     else if ((monster.Direction == Direction.Left && xDiff <= -5) || (monster.Direction == Direction.Right && xDiff >= 5))
                         {
                         newDirection = yDiff > 0 ? Direction.Up : Direction.Down;
                         }
                     }
-                else if (monster.Direction == Direction.Up || monster.Direction == Direction.Down)
+                else if (this.CurrentDirection.IsVertical())
                     {
                     if (xDiff == 0 && ShouldMakeMove())
                         {
                         // Move aside
-                        newDirection = MonsterMovement.MonsterRandom.Next(2) == 0 ? Direction.Left : Direction.Right;
+                        newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
                         }
                     else if ((monster.Direction == Direction.Up && yDiff <= -5) || (monster.Direction == Direction.Down && yDiff >= 5))
                         {
@@ -79,11 +64,11 @@ namespace Labyrinth
                 else if (!isCurrentlyMovingTowardsFreeSpace)
                     {
                     // tend to bounce backwards
-                    newDirection = MonsterMovement.MonsterRandom.Next(5) == 0 ? MonsterMovement.GetRandomPerpendicularDirection(monster.Direction) : monster.Direction.Reversed();
+                    newDirection = MonsterMovement.MonsterRandom.Next(5) == 0 ? GetRandomPerpendicularDirection(monster.Direction) : monster.Direction.Reversed();
                     }
                 else if (MonsterMovement.MonsterRandom.Next(16) == 0)
                     {
-                    newDirection = MonsterMovement.GetRandomPerpendicularDirection(monster.Direction);
+                    newDirection = GetRandomPerpendicularDirection(monster.Direction);
                     }
                 else
                     {
@@ -93,9 +78,25 @@ namespace Labyrinth
             return newDirection;
             }
 
+        private static bool IsPlayerInSight(Monster monster)
+            {
+            var distance = Vector2.Distance(monster.Position, GlobalServices.GameState.Player.Position) / Tile.Width;
+            var result = distance <= 16;
+            return result;
+            }
+
         private static bool ShouldMakeMove()
             {
             return MonsterMovement.MonsterRandom.Next(8) == 0; 
+            }
+
+        private static Direction GetRandomPerpendicularDirection(Direction currentDirection)
+            {
+            if (currentDirection.IsHorizontal())
+                return MonsterMovement.MonsterRandom.Next(2) == 0 ? Direction.Up : Direction.Down;
+            if (currentDirection.IsVertical())
+                return MonsterMovement.MonsterRandom.Next(2) == 0 ? Direction.Left : Direction.Right;
+            throw new ArgumentOutOfRangeException("currentDirection");
             }
         }
     }
