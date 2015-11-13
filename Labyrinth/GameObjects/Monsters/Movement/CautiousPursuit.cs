@@ -19,16 +19,17 @@
 
         private static Direction MoveAwayFromPlayer(Monster monster)
             {
-            bool alterDirection = monster.Direction != Direction.None && (MonsterMovement.MonsterRandom.Next(256) & 3) == 0;
+            var towardsPlayer = DetermineDirectionTowardsPlayer(monster);
+            bool alterDirection = GlobalServices.Randomess.Test(3);
             Direction result = alterDirection 
-                ? MonsterMovement.AlterDirection(monster.Direction) 
-                : DetermineDirectionTowardsPlayer(monster).Reversed();
+                ?  MonsterMovement.AlterDirection(towardsPlayer) 
+                : towardsPlayer.Reversed();
             return result;
             }
 
         private static Direction MoveTowardsPlayer(Monster monster)
             {
-            bool alterDirection = (MonsterMovement.MonsterRandom.Next(256) & 7) == 0;
+            bool alterDirection = GlobalServices.Randomess.Test(7);
             Direction result = alterDirection 
                 ? MonsterMovement.RandomDirection() 
                 : DetermineDirectionTowardsPlayer(monster);

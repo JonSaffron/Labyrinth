@@ -7,8 +7,6 @@ namespace Labyrinth.GameObjects
     {
     public abstract class Monster : MovingItem, IMonster
         {
-        protected static readonly Random MonsterRandom = new Random();
-        
         private MonsterMobility _mobility;
         protected abstract IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility);
         private IMonsterMovement _determineDirection;
@@ -250,8 +248,9 @@ namespace Labyrinth.GameObjects
         private void DoMonsterAction(bool inSameRoom)
             {
             var player = GlobalServices.GameState.Player;
+            var monsterRandom = GlobalServices.Randomess;
 
-            if (this.LaysMushrooms && !this.IsEgg && GlobalServices.GameState.DoesShotExist() && inSameRoom && (MonsterRandom.Next(256) & 1) == 0 && IsDirectionCompatible(player.Direction, this.Direction))
+            if (this.LaysMushrooms && !this.IsEgg && GlobalServices.GameState.DoesShotExist() && inSameRoom && monsterRandom.Test(1) && IsDirectionCompatible(player.CurrentMovement.Direction, this.CurrentMovement.Direction))
                 {
                 TilePos tp = this.TilePosition;
                 if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
@@ -261,7 +260,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && (MonsterRandom.Next(256) & 0x1f)  == 0)
+            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && monsterRandom.Test(0x1f))
                 {
                 TilePos tp = this.TilePosition;
                 if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
@@ -275,13 +274,13 @@ namespace Labyrinth.GameObjects
                     m.IsActive = true;
                     m.ShotsBounceOff = this.ShotsBounceOff;
                     m.MonsterShootBehaviour = this.MonsterShootBehaviour;
-                    m.SetDelayBeforeHatching((MonsterRandom.Next(256) & 0x1f) + 8);
+                    m.SetDelayBeforeHatching((monsterRandom.Next(256) & 0x1f) + 8);
                     m.LaysEggs = false;
                     GlobalServices.GameState.AddMonster(m);
                     }
                 }
 
-            if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && (MonsterRandom.Next(256) & 3) != 0 && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInSight(this))
+            if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInSight(this))
                 {
                 this._weapon.FireIfYouLike(this);
                 }

@@ -144,35 +144,22 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Tests whether the specified position can be occupied.
-        /// </summary>
-        /// <remarks>This is only to be used to determine whether moving objects can (temporarily) occupy the tile</remarks>
-        /// <param name="tp">The tile position to test</param>
-        /// <param name="treatMoveableItemsAsImpassable">If true then an item such as the boulder will be treated as impassable</param>
-        /// <returns>True if the specified tile can be occupied</returns>
-        public bool CanTileBeOccupied(TilePos tp, bool treatMoveableItemsAsImpassable)
-            {
-            if (!IsTileWithinWorld(tp))
-                return false;
-
-            var objectsAtPosition = this.GetItemsOnTile(tp);
-            var isTileAlreadyOccupied = treatMoveableItemsAsImpassable
-                ? objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable || gi.Solidity == ObjectSolidity.Moveable)
-                : objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable);
-            var result = !isTileAlreadyOccupied;
-            return result;
-            }
-
-        /// <summary>
         /// Tests whether any non-moving items are currently occupying the specified position
         /// </summary>
-        /// <remarks>This is only to be used when looking to place non-moving items</remarks>
+        /// <remarks>This is to be used when looking to place another non-moving item</remarks>
         /// <param name="tp">The tile position to test</param>
         /// <returns>True if there is already a static item occupying the specified position</returns>
         public bool IsStaticItemOnTile(TilePos tp)
             {
             var objectsAtPosition = this.GetItemsOnTile(tp);
             var result = objectsAtPosition.Any(gi => gi.Solidity != ObjectSolidity.Insubstantial);
+            return result;
+            }
+
+        public bool IsImpassableItemOnTile(TilePos tp)
+            {
+            var objectsAtPosition = this.GetItemsOnTile(tp);
+            var result = objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable);
             return result;
             }
 
@@ -194,7 +181,7 @@ namespace Labyrinth
         
         public void AddDiamondDemon(Vector2 p)
             {
-            var dd = Create("DiamondDemon", p, 30);
+            var dd = CreateMonster(typeof(DiamondDemon), p, 30);
             dd.Mobility = MonsterMobility.Aggressive;
             dd.LaysEggs = true;
             dd.ChangeRooms = ChangeRooms.FollowsPlayer;
@@ -242,11 +229,6 @@ namespace Labyrinth
             {
             this._gameObjectCollection.Add(m);
             }
-        
-        public void AddShot(StandardShot s)
-            {
-            this._gameObjectCollection.Add(s);
-            }
 
         public Crystal AddCrystal(Vector2 position, int id, int score, int energy)
             {
@@ -270,31 +252,24 @@ namespace Labyrinth
             this._gameObjectCollection.Add(m);
             }
 
-        public Monster Create(string type, Vector2 position, int energy)
+        public Monster CreateMonster(string type, Vector2 position, int energy)
+            {
+            string typeName = "Labyrinth.GameObjects." + type;
+            Type monsterType = Type.GetType(typeName);
+            var result = CreateMonster(monsterType, position, energy);
+            return result;
+            }
+
+        public Monster CreateMonster(Type monsterType, Vector2 position, int energy)
             {
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            Monster monster;
-            switch (type)
-                {
-                case "ThresherBrown": monster = new ThresherBrown(animationPlayer, position, energy); break;
-                case "RotaFloaterBrown": monster = new RotaFloaterBrown(animationPlayer, position, energy); break;
-                case "DeathCube": monster = new DeathCube(animationPlayer, position, energy); break;
-                case "RotaFloaterCyan": monster = new RotaFloaterCyan(animationPlayer, position, energy); break;
-                case "FlitterbugRed": monster = new FlitterbugRed(animationPlayer, position, energy); break;
-                case "KillerCubeGreen": monster = new KillerCubeGreen(animationPlayer, position, energy); break;
-                case "ThresherCyan": monster = new ThresherCyan(animationPlayer, position, energy); break;
-                case "Butterfly": monster = new Butterfly(animationPlayer, position, energy); break;
-                case "KillerCubeRed": monster = new KillerCubeRed(animationPlayer, position, energy); break;
-                case "FlitterbugCyan": monster = new FlitterbugCyan(animationPlayer, position, energy); break;
-                case "DiamondDemon": monster = new DiamondDemon(animationPlayer, position, energy); break;
-                case "FlitterbugBrown": monster = new FlitterbugBrown(animationPlayer, position, energy); break;
-                case "CrazyCrawler": monster = new CrazyCrawler(animationPlayer, position, energy); break;
-                case "TigerMoth": monster = new TigerMoth(animationPlayer, position, energy); break;
-                case "Joker": monster = new Joker(animationPlayer, position, energy); break;
-                default: throw new InvalidOperationException("No handler exists for creating monster " + type);
-                }
-            this._gameObjectCollection.Add(monster);
-            return monster;
+            var constructorInfo = monsterType.GetConstructor(new[] {typeof (AnimationPlayer), typeof (Vector2), typeof (int)});
+            if (constructorInfo == null)
+                throw new InvalidOperationException("Failed to get matching constructor information for " + monsterType.Name + " object.");
+            var constructorArguments = new object[] {animationPlayer, position, energy};
+            var result = (Monster) constructorInfo.Invoke(constructorArguments);
+            this._gameObjectCollection.Add(result);
+            return result;
             }
 
         public StandardShot AddStandardShot(Vector2 startPos, Direction direction, int energy, ShotType shotType)

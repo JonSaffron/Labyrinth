@@ -58,6 +58,17 @@ namespace Labyrinth
                 }
             }
 
+        public static bool CanMoveAnother(this ObjectCapability oc)
+            {
+            switch (oc)
+                {
+                case ObjectCapability.CanPushOthers:
+                case ObjectCapability.CanPushOrCauseBounceBack:
+                    return true;
+                }
+            return false;
+            }
+
         internal static bool IsAlive(this MovingItem mi)
             {
             var result = mi.IsExtant;

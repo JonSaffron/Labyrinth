@@ -94,8 +94,8 @@ namespace Labyrinth.Test
             var boulder = (Boulder) GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ElementAt(0);
             boulder.PushOrBounce(w.Player, Direction.Left);
 
-            Assert.AreEqual(Direction.None, w.Player.Direction);
-            Assert.AreEqual(Direction.None, boulder.Direction);
+            Assert.AreEqual(Direction.None, w.Player.CurrentMovement.Direction);
+            Assert.AreEqual(Direction.None, boulder.CurrentMovement.Direction);
             }
 
         [Test]
@@ -153,9 +153,9 @@ namespace Labyrinth.Test
 
             var boulder1 = (Boulder) GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ElementAt(0);
             boulder1.PushOrBounce(w.Player, Direction.Left);
-            Assert.AreEqual(Direction.None, w.Player.Direction);
+            Assert.AreEqual(Direction.None, w.Player.CurrentMovement.Direction);
 
-            Assert.AreEqual(Direction.None, boulder1.Direction);
+            Assert.AreEqual(Direction.None, boulder1.CurrentMovement.Direction);
             }
 
         [Test]

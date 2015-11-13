@@ -29,8 +29,7 @@ namespace Labyrinth.GameObjects
 
         public Monster LayAnEgg()
             {
-            var typeOfMonster = this.GetType().Name;
-            var result = GlobalServices.GameState.Create(typeOfMonster, this.Position, this.OriginalEnergy);
+            var result = GlobalServices.GameState.CreateMonster(this.GetType(), this.Position, this.OriginalEnergy);
             return result;
             }
         }

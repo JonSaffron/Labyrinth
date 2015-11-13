@@ -17,8 +17,6 @@ namespace Labyrinth.Services.WorldBuilding
         private List<WorldArea> _worldAreas;
         private Tile[,] _tiles;
         
-        private static readonly Random Rnd = new Random();
-        
         public void LoadWorld(string levelName)
             {
             string levelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Levels/", levelName);
@@ -265,7 +263,7 @@ namespace Labyrinth.Services.WorldBuilding
             var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
             Vector2 position = tilePos.ToPosition();
             int e = int.Parse(mdef.GetAttribute("Energy"));
-            Monster result = gameState.Create(type, position, e);
+            Monster result = gameState.CreateMonster(type, position, e);
             string initialDirection = mdef.GetAttribute("InitialDirection");
             if (!string.IsNullOrEmpty(initialDirection))
                 result.InitialDirection = (Direction)Enum.Parse(typeof(Direction), initialDirection);
@@ -344,6 +342,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         private void GetListOfFruit(GameState gameState)
             {
+            var rnd = GlobalServices.Randomess;
             var result = new List<Fruit>();
             foreach (WorldArea wa in this._worldAreas)
                 {
@@ -351,7 +350,7 @@ namespace Labyrinth.Services.WorldBuilding
                     {
                     for (int i = 0; i < fd.FruitQuantity; )
                         {
-                        var tilePos = new TilePos(wa.Area.X + Rnd.Next(wa.Area.Width), wa.Area.Y + Rnd.Next(wa.Area.Height));
+                        var tilePos = new TilePos(wa.Area.X + rnd.Next(wa.Area.Width), wa.Area.Y + rnd.Next(wa.Area.Height));
                         Tile t = this._tiles[tilePos.X, tilePos.Y];
                         if (!t.IsFree)
                             continue;

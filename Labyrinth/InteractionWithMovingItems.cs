@@ -66,7 +66,7 @@ namespace Labyrinth
                 }
             
             var moveableObject = items.FirstOrDefault(item => item.Solidity == ObjectSolidity.Moveable);
-            var movingObject = items.FirstOrDefault(item => item != moveableObject && (item.Capability == ObjectCapability.CanPushOthers || item.Capability == ObjectCapability.CanPushOrCauseBounceBack));
+            var movingObject = items.FirstOrDefault(item => item != moveableObject && item.Capability.CanMoveAnother());
             if (moveableObject != null && movingObject != null)
                 {
                 if (PushOrBounceObject(moveableObject, movingObject))
@@ -77,18 +77,18 @@ namespace Labyrinth
         private static bool PushOrBounceObject(MovingItem moveableObject, MovingItem movingObject)
             {
             // test whether moveable object can be pushed or bounced
-            if (moveableObject.Direction == Direction.None && movingObject.Direction != Direction.None)
+            if (!moveableObject.CurrentMovement.IsMoving && movingObject.CurrentMovement.IsMoving)
                 {
                 Vector2 currentDifference = movingObject.Position - moveableObject.Position;
                 float currentDistanceApart = Math.Abs(currentDifference.Length());
                 if (currentDistanceApart < 40)
                     {
-                    Vector2 positionWithMovement = movingObject.Position + movingObject.Direction.ToVector();
+                    Vector2 positionWithMovement = movingObject.Position + movingObject.CurrentMovement.Direction.ToVector();
                     Vector2 potentialDifference = positionWithMovement - moveableObject.Position;
                     float potentialDistanceApart = Math.Abs(potentialDifference.Length());
                     if (potentialDistanceApart < currentDistanceApart)
                         {
-                        moveableObject.PushOrBounce(movingObject, movingObject.Direction);
+                        moveableObject.PushOrBounce(movingObject, movingObject.CurrentMovement.Direction);
                         var standardShot = movingObject as StandardShot;
                         if (standardShot != null)
                             GlobalServices.GameState.ConvertShotToBang(standardShot);
@@ -98,11 +98,11 @@ namespace Labyrinth
                 }
 
             // test whether the moveable object crushing the insubstantial object
-            if (moveableObject.Direction != Direction.None && moveableObject.Direction != movingObject.Direction)
+            if (moveableObject.CurrentMovement.IsMoving && moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction)
                 {
-                var insubstantialObjectPosition = movingObject.Direction == Direction.None ? movingObject.Position : movingObject.MovingTowards;
+                var insubstantialObjectPosition = movingObject.CurrentMovement.Direction == Direction.None ? movingObject.Position : movingObject.CurrentMovement.MovingTowards;
                 var insubtantialObjectTile = TilePos.TilePosFromPosition(insubstantialObjectPosition);
-                var moveableObjectTile = TilePos.TilePosFromPosition(moveableObject.MovingTowards);
+                var moveableObjectTile = TilePos.TilePosFromPosition(moveableObject.CurrentMovement.MovingTowards);
                 if (insubtantialObjectTile == moveableObjectTile)
                     {
                     var energy = movingObject.InstantlyExpire();
@@ -182,7 +182,7 @@ namespace Labyrinth
         private static bool ShotHitsShot(StandardShot standardShot1, StandardShot standardShot2)
             {
             if (standardShot2.ShotType == standardShot1.ShotType ||
-                standardShot2.Direction != standardShot1.Direction.Reversed())
+                standardShot2.DirectionOfTravel != standardShot1.DirectionOfTravel.Reversed())
                 {
                 return false;
                 }

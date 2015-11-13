@@ -6,71 +6,14 @@ namespace Labyrinth.GameObjects
     {
     public abstract class MovingItem : StaticItem
         {
-        public Direction Direction { get; set;}
-        public Vector2 MovingTowards { get; protected set; }
+        public Labyrinth.Movement CurrentMovement { get; protected set; }
         public Vector2 OriginalPosition { get; set; }
-        protected decimal CurrentVelocity { get; set; }
 
         public abstract bool Update(GameTime gameTime);
 
         protected MovingItem(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
-            this.MovingTowards = position;
-            }
-
-        /// <summary>
-        /// Moves a sprite from its current position towards its destination
-        /// </summary>
-        /// <param name="timeRemaining">On entry: specifies the amount of time that the sprite can use to travel. On exit: specifies how much of that time remains</param>
-        /// <returns>True if the object has been able to complete a move to the tile at MovingTowards, or False if it ran out of time during the movement.</returns>
-        /// <remarks>On exit, when returning True, the timeRemaining parameter will return a positive value, 
-        /// otherwise timeRemaining will return 0.</remarks>
-        protected virtual bool TryToCompleteMoveToTarget(ref double timeRemaining)
-            {
-            if (timeRemaining <= 0)
-                throw new ArgumentOutOfRangeException("timeRemaining");
-            if (this.CurrentVelocity == 0)
-                throw new InvalidOperationException("Object has no velocity.");
-
-            var timeToReachDestination = Vector2.Distance(this.Position, this.MovingTowards) / (double) this.CurrentVelocity;
-            bool hasArrivedAtDestination = (timeToReachDestination <= timeRemaining);
-            if (hasArrivedAtDestination)
-                {
-                timeRemaining -= timeToReachDestination;
-                this.Position = this.MovingTowards;
-                StandStill();
-                }
-            else
-                {
-                var vectorBetweenPoints = this.MovingTowards - this.Position;
-                var unitVectorOfTravel = Vector2.Normalize(vectorBetweenPoints);
-                var distanceToTravel = (float) (timeRemaining * (float) this.CurrentVelocity);
-                var displacement = unitVectorOfTravel * distanceToTravel;
-                this.Position += displacement;
-                timeRemaining = 0;
-                }
-            return hasArrivedAtDestination;
-            }
-
-        private PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction, bool isBounceBackPossible)
-            {
-            if (this.Solidity != ObjectSolidity.Moveable)
-                return PushStatus.No;
-
-            bool isPushable = byWhom.Capability == ObjectCapability.CanPushOthers || byWhom.Capability == ObjectCapability.CanPushOrCauseBounceBack;
-            if (!isPushable)
-                return PushStatus.No;
-
-            // first check if the object can be pushed
-            if (this.CanMoveInDirection(direction, isBounceBackPossible))
-                return PushStatus.Yes;
-
-            // is bounce back possible?
-            if (byWhom.Capability != ObjectCapability.CanPushOrCauseBounceBack || !isBounceBackPossible)
-                return PushStatus.No;
-
-            var result = byWhom.CanMoveInDirection(direction.Reversed(), false) ? PushStatus.Bounce : PushStatus.No;
-            return result;
+            // nothing to do
             }
 
         /// <summary>
@@ -78,7 +21,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <param name="direction">The direction to test for</param>
         /// <returns>True if the object is able to begin a movement in the specified direction, even if it might then bounce backwards</returns>
-        internal bool CanMoveInDirection(Direction direction)
+        public bool CanMoveInDirection(Direction direction)
             {
             var result = this.CanMoveInDirection(direction, true);
             return result;
@@ -163,6 +106,26 @@ namespace Labyrinth.GameObjects
             return true;
             }
 
+        private PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction, bool isBounceBackPossible)
+            {
+            if (this.Solidity != ObjectSolidity.Moveable)
+                return PushStatus.No;
+
+            if (!byWhom.Capability.CanMoveAnother())
+                return PushStatus.No;
+
+            // first check if the object can be pushed
+            if (this.CanMoveInDirection(direction, isBounceBackPossible))
+                return PushStatus.Yes;
+
+            // is bounce back possible?
+            if (byWhom.Capability != ObjectCapability.CanPushOrCauseBounceBack || !isBounceBackPossible)
+                return PushStatus.No;
+
+            var result = byWhom.CanMoveInDirection(direction.Reversed(), false) ? PushStatus.Bounce : PushStatus.No;
+            return result;
+            }
+
         /// <summary>
         /// Starts the object moving
         /// </summary>
@@ -170,35 +133,66 @@ namespace Labyrinth.GameObjects
         /// <param name="speed">The speed to move at</param>
         protected void Move(Direction direction, decimal speed)
             {
-            this.Direction = direction;
             var movingTowardsTilePos = this.TilePosition.GetPositionAfterOneMove(direction);
-            this.MovingTowards = movingTowardsTilePos.ToPosition();
-            this.CurrentVelocity = speed;
+            var movingTowards = movingTowardsTilePos.ToPosition();
+            this.CurrentMovement = new Labyrinth.Movement(direction, movingTowards, speed);
             System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} to {2}", this.GetType().Name, direction, movingTowardsTilePos));
             }
 
         protected void StandStill()
             {
-            this.Direction = Direction.None;
-            this.CurrentVelocity = 0;
+            this.CurrentMovement = Labyrinth.Movement.Still;
             System.Diagnostics.Trace.WriteLine(string.Format("{0}: Standing still at {1}", this.GetType().Name, this.TilePosition));
             }
 
         protected void BounceBack(Direction direction, decimal speed)
             {
-            this.Direction = direction;
-            var originallyMovingTowards = TilePos.TilePosFromPosition(this.MovingTowards);
+            var originallyMovingTowards = TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards);
             var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);
-            this.MovingTowards = movingTowardsTilePos.ToPosition();
-            this.CurrentVelocity = speed;
+            var movingTowards = movingTowardsTilePos.ToPosition();
+            this.CurrentMovement = new Labyrinth.Movement(direction, movingTowards, speed);
             System.Diagnostics.Trace.WriteLine(string.Format("{0}: Bouncing back {1} to {2}", this.GetType().Name, direction, movingTowardsTilePos));
+            }
+
+        /// <summary>
+        /// Moves a sprite from its current position towards its destination
+        /// </summary>
+        /// <param name="timeRemaining">On entry: specifies the amount of time that the sprite can use to travel. On exit: specifies how much of that time remains</param>
+        /// <returns>True if the object has been able to complete a move to the tile at MovingTowards, or False if it ran out of time during the movement.</returns>
+        /// <remarks>On exit, when returning True, the timeRemaining parameter will return a positive value, 
+        /// otherwise timeRemaining will return 0.</remarks>
+        protected virtual bool TryToCompleteMoveToTarget(ref double timeRemaining)
+            {
+            if (timeRemaining <= 0)
+                throw new ArgumentOutOfRangeException("timeRemaining");
+            if (!this.CurrentMovement.IsMoving)
+                throw new InvalidOperationException("Not currently moving.");
+
+            var timeToReachDestination = Vector2.Distance(this.Position, this.CurrentMovement.MovingTowards) / (double) this.CurrentMovement.Velocity;
+            bool hasArrivedAtDestination = (timeToReachDestination <= timeRemaining);
+            if (hasArrivedAtDestination)
+                {
+                timeRemaining -= timeToReachDestination;
+                this.Position = this.CurrentMovement.MovingTowards;
+                StandStill();
+                }
+            else
+                {
+                var vectorBetweenPoints = this.CurrentMovement.MovingTowards - this.Position;
+                var unitVectorOfTravel = Vector2.Normalize(vectorBetweenPoints);
+                var distanceToTravel = (float) (timeRemaining * (float) this.CurrentMovement.Velocity);
+                var displacement = unitVectorOfTravel * distanceToTravel;
+                this.Position += displacement;
+                timeRemaining = 0;
+                }
+            return hasArrivedAtDestination;
             }
 
         public virtual bool IsMoving
             {
             get
                 {
-                var result = this.Direction != Direction.None && this.CurrentVelocity != 0 && this.MovingTowards != this.Position;
+                var result = this.CurrentMovement.IsMoving;
                 return result;
                 }
             }

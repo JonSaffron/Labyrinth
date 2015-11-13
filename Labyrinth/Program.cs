@@ -18,6 +18,7 @@ namespace Labyrinth
                 using (var container = new WindsorContainer().Install(FromAssembly.This()))
                     {
                     GlobalServices.SetMonsterMovementFactory(container.Resolve<IMonsterMovementFactory>());
+                    GlobalServices.SetRandomness(container.Resolve<IRandomess>());
 
                     var game = container.Resolve<Game1>();
                     game.Run();

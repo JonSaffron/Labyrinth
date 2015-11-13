@@ -1,6 +1,4 @@
 using System;
-using Labyrinth.Services.WorldBuilding;
-using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects.Movement
     {
@@ -11,11 +9,18 @@ namespace Labyrinth.GameObjects.Movement
             if (!IsPlayerInSight(monster) || this.CurrentDirection == Direction.None)
                 return base.DetermineDirection(monster);
 
+            var intendedDirection = GetIntendedDirection(monster);
+            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
+            this.CurrentDirection = result;
+            return result;
+            }
+
+        private Direction GetIntendedDirection(Monster monster)
+            {
             TilePos tp = monster.TilePosition;
                 
             Direction newDirection;
-            Player p = GlobalServices.GameState.Player;
-            TilePos playerPosition = p.TilePosition;
+            TilePos playerPosition = GlobalServices.GameState.Player.TilePosition;
             int yDiff = tp.Y - playerPosition.Y;    // +ve and the player is above, -ve and the player is below
             int xDiff = tp.X - playerPosition.X;    // +ve and the player is to the left, -ve and the player is to the right
                 
@@ -30,36 +35,27 @@ namespace Labyrinth.GameObjects.Movement
                 {
                 newDirection = xDiff > 0 ? Direction.Left : Direction.Right;
                 }
-            else if (MonsterMovement.MonsterRandom.Next(16) == 0)
+            else if (GlobalServices.Randomess.Next(16) == 0)
                 {
                 newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
                 }
             else
                 newDirection = this.CurrentDirection;
-
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, newDirection);
-
-            return result;
-            }
-
-        private static bool IsPlayerInSight(Monster monster)
-            {
-            var distance = Vector2.Distance(monster.Position, GlobalServices.GameState.Player.Position) / Tile.Width;
-            var result = distance <= 16;
-            return result;
+                
+            return newDirection;
             }
 
         private static bool ShouldMakeMove()
             {
-            return MonsterMovement.MonsterRandom.Next(8) == 0; 
+            return GlobalServices.Randomess.Next(8) == 0; 
             }
 
         private static Direction GetRandomPerpendicularDirection(Direction currentDirection)
             {
             if (currentDirection.IsHorizontal())
-                return MonsterMovement.MonsterRandom.Next(2) == 0 ? Direction.Up : Direction.Down;
+                return GlobalServices.Randomess.Next(2) == 0 ? Direction.Up : Direction.Down;
             if (currentDirection.IsVertical())
-                return MonsterMovement.MonsterRandom.Next(2) == 0 ? Direction.Left : Direction.Right;
+                return GlobalServices.Randomess.Next(2) == 0 ? Direction.Left : Direction.Right;
             throw new ArgumentOutOfRangeException("currentDirection");
             }
         }

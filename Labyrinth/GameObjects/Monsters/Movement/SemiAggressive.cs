@@ -4,7 +4,7 @@
         {
         public override Direction DetermineDirection(Monster monster)
             {
-            bool makeAggressiveMove = (MonsterMovement.MonsterRandom.Next(256) & 1) == 0;
+            bool makeAggressiveMove = GlobalServices.Randomess.Test(1);
             if (monster.ChangeRooms != ChangeRooms.FollowsPlayer)
                 makeAggressiveMove &= MonsterMovement.IsPlayerInSameRoomAsMonster(monster);
             var shouldFollowPlayer = makeAggressiveMove && MonsterMovement.IsPlayerInSight(monster);

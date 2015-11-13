@@ -89,5 +89,12 @@ namespace Labyrinth
             {
             MonsterMovementFactory = monsterMovementFactory;
             }
+
+        public static IRandomess Randomess { get; private set; }
+
+        public static void SetRandomness(IRandomess randomess)
+            {
+            Randomess = randomess;
+            }
         }
     }

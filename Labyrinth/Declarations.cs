@@ -1,7 +1,5 @@
 ﻿namespace Labyrinth
     {
-    public delegate void SoundEffectFinished(object sender, SoundEffectFinishedEventArgs args);
-
     /// <summary>
     /// How the map describes each tile's usage
     /// </summary>
@@ -79,7 +77,7 @@
     public enum ObjectSolidity
         {
         /// <summary>
-        /// An object that does not move such as a crystal. Only a single stationary object can occupy a given space. Insubstatial objects can move into the same space though.
+        /// An object that does not move such as a crystal or grave. Only a single stationary object can occupy a given space. Insubstatial objects can move into the same space though.
         /// </summary>
         Stationary,
 

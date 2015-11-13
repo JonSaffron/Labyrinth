@@ -50,8 +50,8 @@ namespace Labyrinth
             var playerTilePos = GlobalServices.GameState.Player.TilePosition;
             for ( ; testPos != playerTilePos && i < 20; testPos = testPos.GetPositionAfterOneMove(firingDirection), i++)
                 {
-                bool isClear = GlobalServices.GameState.CanTileBeOccupied(testPos, false);
-                if (!isClear)
+                bool isBlocked = GlobalServices.GameState.IsImpassableItemOnTile(testPos);
+                if (isBlocked)
                     return false;
                 }
             return true;

@@ -85,7 +85,7 @@ namespace Labyrinth.GameObjects
             Position = position;
             Energy = energy;
             this._currentDirectionFaced = Direction.Left;
-            Direction = Direction.None;
+            this.CurrentMovement = Labyrinth.Movement.Still;
             Ap.PlayAnimation(_leftRightStaticAnimation);
             this._time = 0;
             this._countBeforeDecrementingEnergy = 0;

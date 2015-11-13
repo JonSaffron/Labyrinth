@@ -10,15 +10,15 @@ namespace Labyrinth.GameObjects
         // Movement
         public ShotType ShotType { get; private set; }
         public bool HasRebounded { get; private set; }
+        public Direction DirectionOfTravel { get; private set; }
 
         private double _timeToTravel;
-        private Direction _directionOfTravel;
 
         public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, ShotType shotType) : base(animationPlayer, position)
             {
             this.Energy = energy;
             this.ShotType = shotType;
-            this._directionOfTravel = d;
+            this.DirectionOfTravel = d;
             SetDirectionAndDestination();
 
             string textureName;
@@ -41,7 +41,7 @@ namespace Labyrinth.GameObjects
         private void ResetTimeToTravel()
             {
             decimal distanceToTravel;
-            switch (this.Direction)
+            switch (this.DirectionOfTravel)
                 {
                 case Direction.Left:
                 case Direction.Right:
@@ -67,7 +67,7 @@ namespace Labyrinth.GameObjects
             get
                 {
                 int w, h;
-                switch (this._directionOfTravel)
+                switch (this.DirectionOfTravel)
                     {
                     case Direction.Up:
                     case Direction.Down:
@@ -132,7 +132,7 @@ namespace Labyrinth.GameObjects
 
         private void SetDirectionAndDestination()
             {
-            this.Move(this._directionOfTravel, this.StandardSpeed);
+            this.Move(this.DirectionOfTravel, this.StandardSpeed);
             }
 
         public void Reverse()
@@ -140,7 +140,7 @@ namespace Labyrinth.GameObjects
             if (this.HasRebounded)
                 throw new InvalidOperationException();
             
-            this._directionOfTravel = this._directionOfTravel.Reversed();
+            this.DirectionOfTravel = this.DirectionOfTravel.Reversed();
             this.PlaySound(GameSound.ShotBounces);
             this.HasRebounded = true;
             ResetTimeToTravel();
@@ -175,5 +175,6 @@ namespace Labyrinth.GameObjects
                 return Constants.BaseSpeed * 4;
                 }
             }
+
         }
     }

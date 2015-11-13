@@ -14,7 +14,6 @@ namespace Labyrinth.GameObjects
         public Boulder(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             LoadContent();
-            Direction = Direction.None;
             Ap.PlayAnimation(_staticImage);
             }
         
@@ -30,8 +29,7 @@ namespace Labyrinth.GameObjects
         public void Reset(Vector2 position)
             {
             this.Position = position;
-            this.MovingTowards = position;
-            this.Direction = Direction.None;
+            this.CurrentMovement = Labyrinth.Movement.Still;
             }
 
         public override bool IsExtant

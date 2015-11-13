@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
-    struct Movement
+    public struct Movement
         {
-        private static readonly Movement _standingStill;
+        private static readonly Movement StandingStillMovement;
 
         private readonly Direction _direction;
         private readonly Vector2? _movingTowards;
@@ -13,7 +13,7 @@ namespace Labyrinth
 
         static Movement()
             {
-            _standingStill = new Movement();
+            StandingStillMovement = new Movement();
             }
 
         public Movement(Direction direction, Vector2 movingTowards, decimal velocity)
@@ -32,7 +32,7 @@ namespace Labyrinth
             {
             get
                 {
-                return _standingStill;
+                return StandingStillMovement;
                 }
             }
 
@@ -59,6 +59,15 @@ namespace Labyrinth
             get
                 {
                 return _velocity;
+                }
+            }
+
+        public bool IsMoving
+            {
+            get
+                {
+                var result = this._direction != Direction.None && this._velocity != 0 && this._movingTowards.HasValue;
+                return result;
                 }
             }
         }

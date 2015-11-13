@@ -6,8 +6,6 @@ namespace Labyrinth.GameObjects
     {
     static class MonsterMovement
         {
-        public static readonly Random MonsterRandom = new Random();
-
         private static Direction GetNextDirection(Direction d)
             {
             switch (d)
@@ -27,7 +25,7 @@ namespace Labyrinth.GameObjects
 
         public static Direction RandomDirection()
             {
-            int d = MonsterRandom.Next(256) & 3;
+            int d = GlobalServices.Randomess.Next(256) & 3;
             switch (d)
                 {
                 case 0: 
@@ -89,7 +87,7 @@ namespace Labyrinth.GameObjects
                 if (m.ChangeRooms == ChangeRooms.StaysWithinRoom && !IsInSameRoom(m.Position, potentiallyMovingTowards))
                     continue;
                 
-                if (GlobalServices.GameState.CanTileBeOccupied(potentiallyMovingTowardsTile, true))
+                if (m.CanMoveInDirection(intendedDirection))
                     return intendedDirection;
                 }
             

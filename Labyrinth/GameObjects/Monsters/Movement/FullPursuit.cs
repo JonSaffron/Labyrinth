@@ -23,8 +23,8 @@ namespace Labyrinth.GameObjects.Movement
         protected static Direction DetermineDirectionTowardsPlayer(Monster m)
             {
             Vector2 diff = (m.Position - GlobalServices.GameState.Player.Position);
-            double hMove = MonsterMovement.MonsterRandom.NextDouble() * Math.Abs(diff.X);
-            double vMove = MonsterMovement.MonsterRandom.NextDouble() * Math.Abs(diff.Y);
+            var hMove = Math.Abs(diff.X);
+            var vMove = Math.Abs(diff.Y);
             Direction result;
             if (hMove > vMove)
                 {
