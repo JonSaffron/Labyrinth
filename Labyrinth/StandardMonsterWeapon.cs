@@ -1,7 +1,5 @@
 ﻿using System;
 using Labyrinth.GameObjects;
-using Labyrinth.Services.WorldBuilding;
-using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
@@ -15,7 +13,7 @@ namespace Labyrinth
             if (!DoesMonsterHaveClearShotAtPlayer(source.TilePosition, firingDirection))
                 return;
 
-            var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * new Vector2(Tile.Width, Tile.Height) / 2;
+            var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * (Constants.TileSize / 2);
             GlobalServices.GameState.AddStandardShot(startPos, firingDirection, source.Energy >> 2, ShotType.Monster);
             source.PlaySound(GameSound.MonsterShoots);
             }

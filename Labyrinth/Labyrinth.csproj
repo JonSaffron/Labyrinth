@@ -208,6 +208,7 @@
     <Compile Include="GameObjects\Shot.cs" />
     <Compile Include="Services\Sound\SoundPlayer.cs" />
     <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
+    <Compile Include="Services\WorldBuilding\TileUsage.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoaderForTest.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
     <Compile Include="GameObjects\Monsters\Movement\StandardPatrolling.cs" />

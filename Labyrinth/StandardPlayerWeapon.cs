@@ -1,6 +1,5 @@
 ﻿using System;
 using Labyrinth.GameObjects;
-using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
     {
@@ -27,7 +26,7 @@ namespace Labyrinth
                 shot.InstantlyExpire();
                 return;
                 }
-            startPos += direction.ToVector() * Tile.Size / 2;
+            startPos += direction.ToVector() * (Constants.TileSize / 2);
             shot.SetPosition(startPos);
 
             source.PlaySound(GameSound.PlayerShoots);

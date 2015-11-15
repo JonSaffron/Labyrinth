@@ -15,7 +15,7 @@ namespace Labyrinth.Services.WorldBuilding
         {
         private XmlDocument _xmlDoc;
         private List<WorldArea> _worldAreas;
-        private Tile[,] _tiles;
+        private TileUsage[,] _tiles;
         
         public void LoadWorld(string levelName)
             {
@@ -57,7 +57,7 @@ namespace Labyrinth.Services.WorldBuilding
             {
             get
                 {
-                return this._tiles[tp.X, tp.Y];
+                return this._tiles[tp.X, tp.Y].Tile;
                 }
             }
 
@@ -351,7 +351,7 @@ namespace Labyrinth.Services.WorldBuilding
                     for (int i = 0; i < fd.FruitQuantity; )
                         {
                         var tilePos = new TilePos(wa.Area.X + rnd.Next(wa.Area.Width), wa.Area.Y + rnd.Next(wa.Area.Height));
-                        Tile t = this._tiles[tilePos.X, tilePos.Y];
+                        TileUsage t = this._tiles[tilePos.X, tilePos.Y];
                         if (!t.IsFree)
                             continue;
                         this._tiles[tilePos.X, tilePos.Y].SetOccupationByFruit();
@@ -364,14 +364,14 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        private Tile[,] GetTileArray()
+        private TileUsage[,] GetTileArray()
             {
             var worldDef = (XmlElement)this._xmlDoc.SelectSingleNode("World");
             if (worldDef == null)
                 throw new InvalidOperationException("No World element found.");
             int width = int.Parse(worldDef.GetAttribute("Width"));
             int height = int.Parse(worldDef.GetAttribute("Height"));
-            var result = new Tile[width, height];
+            var result = new TileUsage[width, height];
             return result;
             }
 
@@ -414,17 +414,17 @@ namespace Labyrinth.Services.WorldBuilding
                         {
                         case TileTypeByMap.Wall:
                             floor = spriteLibrary.GetSprite("Tiles/" + defaultFloorName);
-                            this._tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Wall);
+                            this._tiles[p.X, p.Y] = new TileUsage(floor, TileTypeByMap.Wall);
                             var wall = gameState.AddWall(p.ToPosition(), "Tiles/" + td.TextureName);
                             result.Add(wall);
                             break;
                         case TileTypeByMap.Floor:
                             floor = spriteLibrary.GetSprite("Tiles/" + td.TextureName);
-                            this._tiles[p.X, p.Y] = new Tile(floor, TileTypeByMap.Floor);
+                            this._tiles[p.X, p.Y] = new TileUsage(floor, TileTypeByMap.Floor);
                             break;
                         case TileTypeByMap.PotentiallyOccupied:
                             floor = spriteLibrary.GetSprite("Tiles/" + defaultFloorName);
-                            this._tiles[p.X, p.Y] = new Tile(floor, symbol);  
+                            this._tiles[p.X, p.Y] = new TileUsage(floor, symbol);  
                             break;
                         default:
                             throw new InvalidOperationException();
@@ -433,7 +433,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        private IEnumerable<TileException> SetTileOccupation(IEnumerable<IGameObject> gameObjects, Action<Tile> action)
+        private IEnumerable<TileException> SetTileOccupation(IEnumerable<IGameObject> gameObjects, Action<TileUsage> action)
             {
             var result = new List<TileException>();
             foreach (var item in gameObjects)
@@ -461,7 +461,7 @@ namespace Labyrinth.Services.WorldBuilding
                 {
                 for (int x = 0; x < cx; x++)
                     {
-                    Tile t = this._tiles[x, y];
+                    TileUsage t = this._tiles[x, y];
                     try
                         {
                         t.CheckIfIncorrectlyPotentiallyOccupied();

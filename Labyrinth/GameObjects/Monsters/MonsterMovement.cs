@@ -44,16 +44,16 @@ namespace Labyrinth.GameObjects
 
         public static bool IsPlayerInSight(Monster m)
             {
-            Vector2 diff = (m.Position - GlobalServices.GameState.Player.Position) / Tile.Size;
+            Vector2 diff = (m.Position - GlobalServices.GameState.Player.Position) / Constants.TileLength;
             bool result;
             if (Math.Abs(diff.X) >= Math.Abs(diff.Y))
                 {
-                float tilesDistance = Math.Abs(diff.X) / Tile.Width;
+                float tilesDistance = Math.Abs(diff.X) / Constants.TileLength;
                 result = tilesDistance <= Constants.RoomWidthInPixels * 2;
                 }
             else
                 {
-                float tilesDistance = Math.Abs(diff.Y) / Tile.Height;
+                float tilesDistance = Math.Abs(diff.Y) / Constants.TileLength;
                 result = tilesDistance <= Constants.RoomHeightInPixels * 2;
                 }
             return result;

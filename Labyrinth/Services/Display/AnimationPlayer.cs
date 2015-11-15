@@ -92,7 +92,7 @@ namespace Labyrinth.Services.Display
             {
             get
                 {
-                var result = Tile.Size / 2;
+                var result = Constants.TileSize / 2;
                 return result;
                 }
             }
@@ -114,7 +114,7 @@ namespace Labyrinth.Services.Display
             this._animation = animation;
             this._frameTime = animation.BaseMovementsPerFrame * Constants.BaseDistance / (double)Constants.BaseSpeed;
             this._frameIndex = 0;
-            this.FrameCount = (_animation.BaseMovementsPerFrame == 0) ? 1 : (this._texture.Width / Tile.Width);
+            this.FrameCount = (_animation.BaseMovementsPerFrame == 0) ? 1 : (this._texture.Width / Constants.TileLength);
             this._time = 0.0f;
 
             // setup the advance routine
@@ -208,7 +208,7 @@ namespace Labyrinth.Services.Display
             this._advanceRoutine(gameTime);
 
             // Calculate the source rectangle of the current frame.
-            var source = new Rectangle(FrameIndex * Tile.Width, 0, Tile.Width, Tile.Height);
+            var source = new Rectangle(FrameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
 
             // Draw the current frame.
             spriteBatch.DrawTextureInWindow(this._texture, position, source, this.Rotation, Origin, this.SpriteEffect);

@@ -34,7 +34,7 @@ namespace Labyrinth.GameObjects.Movement
             {
             if (!GlobalServices.GameState.Player.IsAlive())
                 return false;
-            var distance = Vector2.Distance(monster.Position, GlobalServices.GameState.Player.Position) / Tile.Width;
+            var distance = Vector2.Distance(monster.Position, GlobalServices.GameState.Player.Position) / Constants.TileLength;
             var result = distance <= 20;
             return result;
             }

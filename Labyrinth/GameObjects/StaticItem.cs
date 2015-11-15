@@ -48,8 +48,8 @@ namespace Labyrinth.GameObjects
 
         private void SetBoundingRectangle(Vector2 position)
             {
-            const int width = Tile.Width;
-            const int height = Tile.Height;
+            const int width = Constants.TileLength;
+            const int height = Constants.TileLength;
             var left = (int)Math.Round(position.X - (width / 2.0));
             var top = (int)Math.Round(position.Y - (height / 2.0));
             this.BoundingRectangle = new Rectangle(left, top, width, height);

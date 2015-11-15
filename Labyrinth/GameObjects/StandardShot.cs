@@ -1,6 +1,5 @@
 ﻿using System;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -13,6 +12,8 @@ namespace Labyrinth.GameObjects
         public Direction DirectionOfTravel { get; private set; }
 
         private double _timeToTravel;
+        private readonly Rectangle _boundsForHorizontalMovement;
+        private readonly Rectangle _boundsForVerticalMovement;
 
         public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, ShotType shotType) : base(animationPlayer, position)
             {
@@ -36,6 +37,11 @@ namespace Labyrinth.GameObjects
             var staticImage = Animation.StaticAnimation(textureName);
             Ap.PlayAnimation(staticImage);
             ResetTimeToTravel();
+
+            const int shortSideLength = Constants.TileLength / 8; // 4 pixels
+            const int longSideLength = Constants.TileLength / 2; // 16 pixels
+            this._boundsForHorizontalMovement = new Rectangle(-(longSideLength / 2), -(shortSideLength / 2), longSideLength, shortSideLength);
+            this._boundsForVerticalMovement = new Rectangle(-(shortSideLength / 2), -(longSideLength / 2), shortSideLength, longSideLength);
             }
 
         private void ResetTimeToTravel()
@@ -45,12 +51,12 @@ namespace Labyrinth.GameObjects
                 {
                 case Direction.Left:
                 case Direction.Right:
-                    distanceToTravel = Constants.RoomWidthInPixels * 1.25m * Tile.Width;
+                    distanceToTravel = Constants.RoomWidthInPixels * 1.25m * Constants.TileLength;
                     Ap.Rotation = 0.0f;
                     break;
                 case Direction.Up:
                 case Direction.Down:
-                    distanceToTravel = Constants.RoomWidthInPixels * 1.25m * Tile.Height;
+                    distanceToTravel = Constants.RoomWidthInPixels * 1.25m * Constants.TileLength;
                     Ap.Rotation = (float)(Math.PI * 90.0f / 180f);
                     break;
                 default:
@@ -66,27 +72,16 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                int w, h;
-                switch (this.DirectionOfTravel)
-                    {
-                    case Direction.Up:
-                    case Direction.Down:
-                        w = Tile.Width / 8;
-                        h = Tile.Height / 2;
-                        break;
-                    
-                    case Direction.Left:
-                    case Direction.Right:
-                        w = Tile.Width / 2;
-                        h = Tile.Height / 8;
-                        break;
-                    
-                    default:
-                       throw new InvalidOperationException();
-                    }
-                var x = (int) Math.Round(this.Position.X - (w / 2.0));
-                var y = (int) Math.Round(this.Position.Y - (h / 2.0));
-                return new Rectangle(x, y, w, h);
+                Rectangle result;
+                if (this.DirectionOfTravel.IsHorizontal())
+                    result = this._boundsForHorizontalMovement;
+                else if (this.DirectionOfTravel.IsVertical())
+                    result = this._boundsForVerticalMovement;
+                else
+                    throw new InvalidOperationException();
+
+                result.Offset((int) this.Position.X, (int) this.Position.Y);
+                return result;
                 }
             }
 
