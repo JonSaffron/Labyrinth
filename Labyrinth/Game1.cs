@@ -37,7 +37,6 @@ namespace Labyrinth
             GlobalServices.SetSoundPlayer(soundPlayer);
             GlobalServices.SetSpriteLibrary(spriteLibrary);
             GlobalServices.SetServiceProvider(this.Services);
-            GlobalServices.SetWorldLoader(worldLoader);
             GlobalServices.SetGameComponentCollection(this.Components);
             GlobalServices.SetPlayerInput(this.PlayerInput);
             GlobalServices.SetScoreKeeper(this._scoreKeeper);

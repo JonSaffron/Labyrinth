@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using Labyrinth.GameObjects;
@@ -121,16 +122,6 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        public int GetWorldAreaIdForTilePos(TilePos tp)
-            {
-            var areaContainingPoint =
-                (from WorldArea wa in this._worldAreas
-                where wa.HasId && wa.StartState != null && wa.Area.Contains(tp.X, tp.Y)
-                select wa).Single();
-            var result = areaContainingPoint.Id;
-            return result;
-            }
-        
         class StartPositionReservation : IGameObject
             {
             private readonly TilePos _tilePosition;
@@ -226,36 +217,42 @@ namespace Labyrinth.Services.WorldBuilding
             
             ReviewPotentiallyOccupiedTiles(exceptions);
             
-            if (exceptions.Count != 0)
-                {
-                string message = string.Empty;
-                var errors = exceptions.Where(te=>te.Type == TileExceptionType.Error).ToList();
-                var warnings = exceptions.Where(te=>te.Type == TileExceptionType.Warning).ToList();
-                foreach (TileException te in errors)
-                    {
-                    if (message.Length != 0)
-                        message += "\r\n";
-                    message += string.Format("{0} - {1}", te.Type, te.Message);
-                    }
-                if (warnings.Any())
-                    {
-                    if (message.Length != 0)
-                        message += "\r\n";
-                    foreach (TileException te in warnings)
-                        {
-                        if (message.Length != 0)
-                            message += "\r\n";
-                        message += string.Format("{0} - {1}", te.Type, te.Message);
-                        }
-                    }
-                if (errors.Any())
-                    throw new InvalidOperationException(message);
-                Trace.WriteLine(message);
-                var dr = MessageBox.Show(message, "Warnings", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                if (dr == DialogResult.Cancel)
-                    throw new InvalidOperationException(message);
-                }
+            ReviewExceptionList(exceptions);
             }
+
+        private void ReviewExceptionList(List<TileException> exceptions)
+            {
+            if (!exceptions.Any())
+                return;
+
+            var message = new StringBuilder();
+            var errors = exceptions.Where(te=>te.Type == TileExceptionType.Error).ToList();
+            var warnings = exceptions.Where(te=>te.Type == TileExceptionType.Warning).ToList();
+            foreach (TileException te in errors)
+                {
+                if (message.Length != 0)
+                    message.AppendLine();
+                message.AppendFormat("{0} - {1}", te.Type, te.Message);
+                }
+            if (warnings.Any())
+                {
+                if (message.Length != 0)
+                    message.AppendLine();
+                foreach (TileException te in warnings)
+                    {
+                    if (message.Length != 0)
+                        message.AppendLine();
+                    message.AppendFormat("{0} - {1}", te.Type, te.Message);
+                    }
+                }
+            if (errors.Any())
+                throw new InvalidOperationException(message.ToString());
+
+            Trace.WriteLine(message);
+            var dr = MessageBox.Show(message.ToString(), "Warnings", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            if (dr == DialogResult.Cancel)
+                throw new InvalidOperationException(message.ToString());
+            } 
 
         private static Monster GetMonster(GameState gameState, XmlElement mdef)
             {
@@ -413,19 +410,28 @@ namespace Labyrinth.Services.WorldBuilding
                     switch (td.TileTypeByMap)
                         {
                         case TileTypeByMap.Wall:
+                            {
                             floor = spriteLibrary.GetSprite("Tiles/" + defaultFloorName);
-                            this._tiles[p.X, p.Y] = new TileUsage(floor, TileTypeByMap.Wall);
+                            var floorTile = new Tile(floor, wa.Id);
+                            this._tiles[p.X, p.Y] = new TileUsage(floorTile, TileTypeByMap.Wall);
                             var wall = gameState.AddWall(p.ToPosition(), "Tiles/" + td.TextureName);
                             result.Add(wall);
                             break;
+                            }
                         case TileTypeByMap.Floor:
+                            {
                             floor = spriteLibrary.GetSprite("Tiles/" + td.TextureName);
-                            this._tiles[p.X, p.Y] = new TileUsage(floor, TileTypeByMap.Floor);
+                            var floorTile = new Tile(floor, wa.Id);
+                            this._tiles[p.X, p.Y] = new TileUsage(floorTile, TileTypeByMap.Floor);
                             break;
+                            }
                         case TileTypeByMap.PotentiallyOccupied:
+                            {
                             floor = spriteLibrary.GetSprite("Tiles/" + defaultFloorName);
-                            this._tiles[p.X, p.Y] = new TileUsage(floor, symbol);  
+                            var floorTile = new Tile(floor, wa.Id);
+                            this._tiles[p.X, p.Y] = new TileUsage(floorTile, symbol);  
                             break;
+                            }
                         default:
                             throw new InvalidOperationException();
                         }

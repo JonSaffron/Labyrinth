@@ -223,7 +223,7 @@ namespace Labyrinth.GameObjects
 
         private bool CheckIfEnteredNewWorldArea()
             {
-            int worldAreaId = GlobalServices.WorldLoader.GetWorldAreaIdForTilePos(this.TilePosition);
+            int worldAreaId = GlobalServices.World.GetWorldAreaIdForTilePos(this.TilePosition);
             if (this._listOfWorldAreaIdsVisited.Contains(worldAreaId))
                 return false;
 

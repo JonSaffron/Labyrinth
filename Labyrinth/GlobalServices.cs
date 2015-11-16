@@ -48,13 +48,6 @@ namespace Labyrinth
             GameComponentCollection = gameComponentCollection;
             }
 
-        public static IWorldLoader WorldLoader { get; private set; }
-
-        public static void SetWorldLoader(IWorldLoader worldLoader)
-            {
-            WorldLoader = worldLoader;
-            }
-
         public static World World { get; private set; }
         
         public static void SetWorld(World world)

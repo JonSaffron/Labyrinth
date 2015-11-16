@@ -8,7 +8,6 @@ namespace Labyrinth
 
         int GetMaximumWorldAreaId();
         StartState GetStartStateForWorldAreaId(int id);
-        int GetWorldAreaIdForTilePos(TilePos tp);
 
         int Height { get; }
         int Width { get; }

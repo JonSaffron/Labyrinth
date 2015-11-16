@@ -24,6 +24,7 @@ namespace Labyrinth
         [NotNull] public readonly Player Player;
         public ISpriteLibrary SpriteLibrary;
 
+        [NotNull] private readonly Tile[,] _tiles;
         [NotNull] private readonly IWorldLoader _wl;
         [NotNull] private readonly List<StaticItem>[] _itemsToDrawByZOrder;
 
@@ -48,7 +49,7 @@ namespace Labyrinth
         public void ResetLevelAfterLosingLife(ISpriteBatch spw)
             {
             GlobalServices.GameState.RemoveBangsAndShots();
-            var worldAreaId = this._wl.GetWorldAreaIdForTilePos(this.Player.TilePosition);
+            var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             StartState ss = this._wl.GetStartStateForWorldAreaId(worldAreaId);
             GlobalServices.GameState.UpdatePosition(this.Player);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
@@ -133,7 +134,7 @@ namespace Labyrinth
                 if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
                 
-                int worldAreaId = this._wl.GetWorldAreaIdForTilePos(m.TilePosition);
+                int worldAreaId = this.GetWorldAreaIdForTilePos(m.TilePosition);
                 if (worldAreaId < levelThatPlayerShouldHaveReached)
                     m.IsActive = true;
                 }
@@ -141,7 +142,7 @@ namespace Labyrinth
 
         private void UpdateGameItems(GameTime gameTime)
             {
-            const float minimumDistance = Tile.Height * Tile.Height;
+            const float minimumDistance = Constants.TileLength * 2;
 
             int countOfGameItemsThatMoved = 0;
             int countOfGameItems = 0;
@@ -268,11 +269,11 @@ namespace Labyrinth
 
         private static TileRect GetRectangleEnclosingTilesThatAreCurrentlyInView(Vector2 windowOffset)
             {
-            var roomStartX = (int)Math.Floor(windowOffset.X / Tile.Width);
-            var roomStartY = (int)Math.Floor(windowOffset.Y / Tile.Height);
+            var roomStartX = (int)Math.Floor(windowOffset.X / Constants.TileLength);
+            var roomStartY = (int)Math.Floor(windowOffset.Y / Constants.TileLength);
             
-            var roomEndX = (int)Math.Ceiling((windowOffset.X + Constants.RoomWidthInPixels) / Tile.Width);
-            var roomEndY = (int)Math.Ceiling((windowOffset.Y + Constants.RoomHeightInPixels) / Tile.Height);
+            var roomEndX = (int)Math.Ceiling((windowOffset.X + Constants.RoomWidthInPixels) / Constants.TileLength);
+            var roomEndY = (int)Math.Ceiling((windowOffset.Y + Constants.RoomHeightInPixels) / Constants.TileLength);
 
             var result = new TileRect(new TilePos(roomStartX, roomStartY), roomEndX - roomStartX, roomEndY - roomStartY);
             Debug.Assert(result.Width == Constants.RoomWidthInTiles || result.Width == (Constants.RoomWidthInTiles + 1));
@@ -294,10 +295,10 @@ namespace Labyrinth
                     int x = tr.TopLeft.X + i;
 
                     var tp = new TilePos(x, y);
-                    Texture2D texture = this._wl[tp].Floor;
+                    Texture2D texture = this._tiles[tp.X, tp.Y].Floor;
                     if (texture != null)
                         {
-                        Vector2 position = new Vector2(x, y) * Tile.Size;
+                        Vector2 position = new Vector2(x, y) * Constants.TileSize;
                         spriteBatch.DrawEntireTextureInWindow(texture, position);
                         }
                     }
@@ -318,13 +319,13 @@ namespace Labyrinth
             if (!this.Player.IsAlive())
                 return;
 
-            int currentWorldAreaId = this._wl.GetWorldAreaIdForTilePos(this.Player.TilePosition);
+            int currentWorldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             int maxId = this._wl.GetMaximumWorldAreaId();
             var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._wl.GetStartStateForWorldAreaId(i)).FirstOrDefault(startState => startState != null);
             if (newState == null)
                 return;
 
-            var crystals = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Where(c => this._wl.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
+            var crystals = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Where(c => this.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
             foreach (var c in crystals)
                 {
                 var i = new InteractionWithStaticItems(this, c, this.Player);
@@ -354,6 +355,12 @@ namespace Labyrinth
                 }
             Point roomStart = GetContainingRoom(this.Player.Position).Location;
             this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
+            }
+
+        public int GetWorldAreaIdForTilePos(TilePos tp)
+            {
+            var result = this._tiles[tp.X, tp.Y].WorldAreaId;
+            return result;
             }
         }
     }
