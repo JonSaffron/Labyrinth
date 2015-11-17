@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Labyrinth.Annotations;
-using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,7 +10,7 @@ using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
-    public class World : IDisposable, ICentrePointProvider
+    public class World : ICentrePointProvider
         {
         private readonly Vector2 _centreOfRoom = new Vector2(Constants.RoomWidthInPixels / 2, Constants.RoomHeightInPixels / 2);
 
@@ -22,20 +21,20 @@ namespace Labyrinth
         private bool _doNotUpdate;
         
         [NotNull] public readonly Player Player;
-        public ISpriteLibrary SpriteLibrary;
 
         [NotNull] private readonly Tile[,] _tiles;
-        [NotNull] private readonly IWorldLoader _wl;
+        [NotNull] private readonly Dictionary<int, StartState> _startStates;
         [NotNull] private readonly List<StaticItem>[] _itemsToDrawByZOrder;
 
         public Vector2 WindowPosition { get; private set; }
 
         public World(IWorldLoader worldLoader)
             {
-            this._wl = worldLoader;
-            this.SpriteLibrary = new SpriteLibrary();
-
-            var gameObjectCollection = new GameObjectCollection(worldLoader.Width, worldLoader.Height);
+            this._tiles = worldLoader.GetFloorTiles();
+            var worldWidth = this._tiles.GetLength(0);
+            var worldHeight = this._tiles.GetLength(1);
+            var gameObjectCollection = new GameObjectCollection(worldWidth, worldHeight);
+            this._startStates = worldLoader.GetStartStates();
             var gameState = new GameState(gameObjectCollection);
             worldLoader.GetGameObjects(gameState);
             this.Player = gameState.Player;
@@ -50,7 +49,7 @@ namespace Labyrinth
             {
             GlobalServices.GameState.RemoveBangsAndShots();
             var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
-            StartState ss = this._wl.GetStartStateForWorldAreaId(worldAreaId);
+            StartState ss = this._startStates[worldAreaId];
             GlobalServices.GameState.UpdatePosition(this.Player);
             this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             GlobalServices.GameState.UpdatePosition(this.Player);
@@ -70,18 +69,6 @@ namespace Labyrinth
             _doNotUpdate = false;
             }
         
-        /// <summary>
-        /// Unloads the World content.
-        /// </summary>
-        public void Dispose()
-            {
-            if (this.SpriteLibrary != null)
-                {
-                this.SpriteLibrary.Dispose();
-                this.SpriteLibrary = null;
-                }
-            }
-
         public void SetLevelReturnType(LevelReturnType levelReturnType)
             {
             this._levelReturnType = levelReturnType;
@@ -320,8 +307,8 @@ namespace Labyrinth
                 return;
 
             int currentWorldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
-            int maxId = this._wl.GetMaximumWorldAreaId();
-            var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._wl.GetStartStateForWorldAreaId(i)).FirstOrDefault(startState => startState != null);
+            int maxId = this._startStates.Max(item => item.Key);
+            var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._startStates[i]).FirstOrDefault(startState => startState != null);
             if (newState == null)
                 return;
 

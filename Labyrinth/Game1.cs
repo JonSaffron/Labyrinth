@@ -74,7 +74,6 @@ namespace Labyrinth
             if (this.World == null) 
                 return;
             
-            this.World.Dispose();
             this.SpriteBatch.Dispose();
             this.World = null;
             }
@@ -114,7 +113,6 @@ namespace Labyrinth
             switch (lrt)
                 {
                 case LevelReturnType.FinishedLevel:
-                    this.World.Dispose();
                     this.World = null;
                     this._lives++;
                     break;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
@@ -5,13 +6,8 @@ namespace Labyrinth
     public interface IWorldLoader
         {
         void LoadWorld(string levelName);
-
-        int GetMaximumWorldAreaId();
-        StartState GetStartStateForWorldAreaId(int id);
-
-        int Height { get; }
-        int Width { get; }
-        Tile this[TilePos tp] { get; }
+        Tile[,] GetFloorTiles();
         void GetGameObjects(GameState gameState);
+        Dictionary<int, StartState> GetStartStates(); 
         }
     }

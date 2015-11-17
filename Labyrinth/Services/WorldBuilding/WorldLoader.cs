@@ -26,14 +26,29 @@ namespace Labyrinth.Services.WorldBuilding
             
             this._xmlDoc = new XmlDocument();
             this._xmlDoc.Load(levelPath);
-            this._worldAreas = LoadAreas();
-            this._tiles = GetTileArray();
+            this._worldAreas = LoadAreas(this._xmlDoc);
+            this._tiles = GetTileArray(this._xmlDoc);
             }
         
+        public Tile[,] GetFloorTiles()
+            {
+            int cx =  this.Width;
+            int cy = this.Height;
+            var result = new Tile[cx, cy];
+            for (int y = 0; y < cy; y++)
+                {
+                for (int x = 0; x < cx; x++)
+                    {
+                    result[x, y] = this._tiles[x, y].Tile;
+                    }
+                }
+            return result;
+            }
+
         /// <summary>
         /// Width of World measured in tiles.
         /// </summary>
-        public int Width
+        private int Width
             {
             get 
                 { 
@@ -45,7 +60,7 @@ namespace Labyrinth.Services.WorldBuilding
         /// <summary>
         /// Height of the World measured in tiles.
         /// </summary>
-        public int Height
+        private int Height
             {
             get 
                 { 
@@ -53,18 +68,10 @@ namespace Labyrinth.Services.WorldBuilding
                 return result;
                 }
             }
-        
-        public Tile this[TilePos tp]
-            {
-            get
-                {
-                return this._tiles[tp.X, tp.Y].Tile;
-                }
-            }
 
-        private List<WorldArea> LoadAreas()
+        private static List<WorldArea> LoadAreas(XmlDocument xmlDoc)
             {
-            var areas = this._xmlDoc.SelectSingleNode("World/Areas");
+            var areas = xmlDoc.SelectSingleNode("World/Areas");
             if (areas == null)
                 throw new InvalidOperationException();
             var result = new List<WorldArea>();
@@ -89,40 +96,7 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        private int GetStartingWorldAreaId()
-            {
-            WorldArea startingWorldArea;
-            try
-                {
-                startingWorldArea = this._worldAreas.Single(wa => wa.IsInitialArea);
-                }
-            catch (InvalidOperationException)
-                {
-                throw new InvalidOperationException("There is not a single worldarea marked as the initial area.");
-                }
-            var result = startingWorldArea.Id;
-            return result;
-            }
-
-        public int GetMaximumWorldAreaId()
-            {
-            var worldAreasWithIds = this._worldAreas.Where(wa => wa.HasId).ToList();
-            if (!worldAreasWithIds.Any())
-                throw new InvalidOperationException();
-            var result = worldAreasWithIds.Max(wa => wa.Id);
-            return result;
-            }
-
-        public StartState GetStartStateForWorldAreaId(int id)
-            {
-            var worldArea = this._worldAreas.SingleOrDefault(wa => wa.HasId && wa.Id == id);
-            if (worldArea == null)
-                return null;
-            var result = worldArea.StartState;
-            return result;
-            }
-
-        class StartPositionReservation : IGameObject
+        private class StartPositionReservation : IGameObject
             {
             private readonly TilePos _tilePosition;
 
@@ -147,12 +121,17 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
+        public Dictionary<int, StartState> GetStartStates()
+            {
+            var result = this._worldAreas.Where(item => item.HasId).ToDictionary(key => key.Id, value => value.StartState);
+            return result;
+            }
+
         public void GetGameObjects(GameState gameState)
             {
             SetWallAndFloorLayout(gameState);
 
-            int initialWorldId = GetStartingWorldAreaId();
-            StartState ss = GetStartStateForWorldAreaId(initialWorldId);
+            StartState ss = GetStartingWorldAreaId();
 
             gameState.AddPlayer(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             
@@ -220,7 +199,22 @@ namespace Labyrinth.Services.WorldBuilding
             ReviewExceptionList(exceptions);
             }
 
-        private void ReviewExceptionList(List<TileException> exceptions)
+        private StartState GetStartingWorldAreaId()
+            {
+            WorldArea startingWorldArea;
+            try
+                {
+                startingWorldArea = this._worldAreas.Single(wa => wa.IsInitialArea);
+                }
+            catch (InvalidOperationException)
+                {
+                throw new InvalidOperationException("There is not a single worldarea marked as the initial area.");
+                }
+            var result = startingWorldArea.StartState;
+            return result;
+            }
+
+        private static void ReviewExceptionList(List<TileException> exceptions)
             {
             if (!exceptions.Any())
                 return;
@@ -361,9 +355,9 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        private TileUsage[,] GetTileArray()
+        private static TileUsage[,] GetTileArray(XmlDocument xmlDoc)
             {
-            var worldDef = (XmlElement)this._xmlDoc.SelectSingleNode("World");
+            var worldDef = (XmlElement) xmlDoc.SelectSingleNode("World");
             if (worldDef == null)
                 throw new InvalidOperationException("No World element found.");
             int width = int.Parse(worldDef.GetAttribute("Width"));

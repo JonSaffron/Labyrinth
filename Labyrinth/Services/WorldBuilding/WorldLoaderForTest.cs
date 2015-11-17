@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.WorldBuilding
     {
@@ -13,35 +12,6 @@ namespace Labyrinth.Services.WorldBuilding
         public void LoadWorld(string worldLayout)
             {
             this._layout = worldLayout;
-            }
-
-        public int GetMaximumWorldAreaId()
-            {
-            return 0;
-            }
-
-        public StartState GetStartStateForWorldAreaId(int id)
-            {
-            var lines = this._layout.Split(new [] { "\r\n" }, StringSplitOptions.None);
-            TilePos? tp = null;
-            for (int y = 0; y < lines.Count(); y++)
-                {
-                int x = lines[y].IndexOf('p');
-                if (x != -1)
-                    {
-                    tp = new TilePos(x, y); 
-                    break;
-                    }
-                }
-            if (!tp.HasValue)
-                throw new InvalidOperationException();
-            var result = new StartState(tp.Value, 255);
-            return result;
-            }
-
-        public int GetWorldAreaIdForTilePos(TilePos tp)
-            {
-            return 0;
             }
 
         public int Height 
@@ -64,12 +34,14 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public Tile this[TilePos tp]
+        public Tile[,] GetFloorTiles()
             {
-            get
-                {
-                return null;
-                }
+            throw new NotImplementedException();
+            }
+
+        public Dictionary<int, StartState> GetStartStates()
+            {
+            throw new NotImplementedException();
             }
 
         public void GetGameObjects(GameState gameState)
