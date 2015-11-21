@@ -5,9 +5,6 @@ namespace Labyrinth
     {
     public interface IGameObjectCollection
         {
-        int Width { get; }
-        int Height {get; }
-
         int CountOfShots { get; }
 
         void Remove(StaticItem gameObject);

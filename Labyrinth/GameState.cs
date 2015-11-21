@@ -84,9 +84,6 @@ namespace Labyrinth
         /// <returns>A lazy enumeration of all the matching game objects</returns>
         public IEnumerable<StaticItem> AllItemsInRectangle(TileRect tr)
             {
-            if (!IsTileWithinWorld(tr.TopLeft) || tr.Width <= 0 || tr.Height <= 0 || !IsTileWithinWorld(new TilePos(tr.TopLeft.X + tr.Width - 1, tr.TopLeft.Y + tr.Height - 1)))
-                throw new ArgumentOutOfRangeException("tr");
-
             for (int j = 0; j < tr.Height; j++)
                 {
                 int y = tr.TopLeft.Y + j;
@@ -126,20 +123,6 @@ namespace Labyrinth
         public bool DoesShotExist()
             {
             var result = (this._gameObjectCollection.CountOfShots > 0);
-            return result;
-            }
-
-        /// <summary>
-        /// Gets the collision mode of the tile at a particular location.
-        /// This method handles tiles outside of the levels boundries by making it
-        /// impossible to escape past the left or right edges, but allowing things
-        /// to jump beyond the top of the World and fall off the bottom.
-        /// </summary>
-        public bool IsTileWithinWorld(TilePos tp)
-            {
-            var x = tp.X;
-            var y = tp.Y;
-            var result = !(x < 0 || x >= this._gameObjectCollection.Width || y < 0 || y >= this._gameObjectCollection.Height);
             return result;
             }
 

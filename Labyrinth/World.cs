@@ -31,9 +31,7 @@ namespace Labyrinth
         public World(IWorldLoader worldLoader)
             {
             this._tiles = worldLoader.GetFloorTiles();
-            var worldWidth = this._tiles.GetLength(0);
-            var worldHeight = this._tiles.GetLength(1);
-            var gameObjectCollection = new GameObjectCollection(worldWidth, worldHeight);
+            var gameObjectCollection = new GameObjectCollection();
             this._startStates = worldLoader.GetStartStates();
             var gameState = new GameState(gameObjectCollection);
             worldLoader.GetGameObjects(gameState);
@@ -192,6 +190,20 @@ namespace Labyrinth
                 }
 
             return null;
+            }
+
+        /// <summary>
+        /// Gets the collision mode of the tile at a particular location.
+        /// This method handles tiles outside of the levels boundries by making it
+        /// impossible to escape past the left or right edges, but allowing things
+        /// to jump beyond the top of the World and fall off the bottom.
+        /// </summary>
+        public bool IsTileWithinWorld(TilePos tp)
+            {
+            var x = tp.X;
+            var y = tp.Y;
+            var result = !(x < 0 || x >= this._tiles.GetLength(0) || y < 0 || y >= this._tiles.GetLength(1));
+            return result;
             }
 
         public static Rectangle GetContainingRoom(Vector2 position)

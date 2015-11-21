@@ -73,7 +73,7 @@ namespace Labyrinth.GameObjects
         private bool CanMoveInDirection(Direction direction, bool isBounceBackPossible)
             {
             TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
-            if (!GlobalServices.GameState.IsTileWithinWorld(proposedDestination))
+            if (!GlobalServices.World.IsTileWithinWorld(proposedDestination))
                 return false;
             var objectsOnTile = GlobalServices.GameState.GetItemsOnTile(proposedDestination);
             foreach (var item in objectsOnTile)

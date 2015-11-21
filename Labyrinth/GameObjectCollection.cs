@@ -10,59 +10,21 @@ namespace Labyrinth
     /// </summary>
     public class GameObjectCollection : IGameObjectCollection
         {
-        private readonly List<StaticItem>[] _allGameItems;
+        private List<StaticItem>[] _allGameItems;
         private readonly LinkedList<MovingItem> _interactiveGameItems; 
-
-        private readonly int _width;
-        private readonly int _height;
+        private static readonly IEnumerable<StaticItem> EmptyItemList = Enumerable.Empty<StaticItem>();
+        private int _maxWidth;
+        private int _maxHeight;
 
         public int CountOfShots { get; private set; }
 
         /// <summary>
         /// Initialises the collection
         /// </summary>
-        /// <param name="width">The width of the game world in tiles</param>
-        /// <param name="height">The height of the game world in tiles</param>
-        /// <param name="initialItems">An optional initial list of items to add to the collection</param>
-        public GameObjectCollection(int width, int height, IEnumerable<StaticItem> initialItems = null)
+        public GameObjectCollection()
             {
-            if (width <= 0)
-                throw new ArgumentOutOfRangeException("width");
-            if (height <= 0)
-                throw new ArgumentOutOfRangeException("height");
-
-            this._width = width;
-            this._height = height;
-            var maxTilePosition = new TilePos(width, height);
-            this._allGameItems = new List<StaticItem>[maxTilePosition.MortonCode];
+            this._allGameItems = new List<StaticItem>[0];
             this._interactiveGameItems = new LinkedList<MovingItem>();
-            if (initialItems != null)
-                this.AddRange(initialItems);
-            }
-
-        public int Width
-            {
-            get
-                {
-                return this._width;
-                }
-            }
-
-        public int Height
-            {
-            get
-                {
-                return this._height;
-                }
-            }
-
-        private void AddRange(IEnumerable<StaticItem> objects)
-            {
-            if (objects == null)
-                throw new ArgumentNullException("objects");
-                
-            foreach (var item in objects)
-                Add(item);
             }
 
         /// <summary>
@@ -76,13 +38,13 @@ namespace Labyrinth
 
             InsertIntoAllGameItemsArray(gameObject);
             var mi = gameObject as MovingItem;
-            if (mi != null)
-                {
-                mi.OriginalPosition = mi.Position;
-                this._interactiveGameItems.AddLast(mi);
-                if (mi is Shot)
-                    this.CountOfShots++;
-                }
+            if (mi == null) 
+                return;
+
+            mi.OriginalPosition = mi.Position;
+            this._interactiveGameItems.AddLast(mi);
+            if (mi is Shot)
+                this.CountOfShots++;
             }
 
         public void Remove(StaticItem gameObject)
@@ -111,6 +73,8 @@ namespace Labyrinth
 
         private void InsertIntoAllGameItemsArray(StaticItem gameObject)
             {
+            EnsureArrayIsLargeEnough(gameObject.TilePosition);
+
             int mortonPosition = gameObject.TilePosition.MortonCode;
             List<StaticItem> listOfStaticItem = this._allGameItems[mortonPosition];
             if (listOfStaticItem == null)
@@ -121,6 +85,19 @@ namespace Labyrinth
             listOfStaticItem.Add(gameObject);
             }
 
+        private void EnsureArrayIsLargeEnough(TilePos tp)
+            {
+            if (tp.X < 0 || tp.Y < 0)
+                throw new ArgumentOutOfRangeException("tp", "TilePosition cannot have an X or Y component that is less than zero.");
+            if (tp.X <= this._maxWidth || tp.Y <= this._maxHeight)
+                return;
+
+            this._maxWidth = Math.Max(tp.X, this._maxWidth);
+            this._maxHeight = Math.Max(tp.Y, this._maxHeight);
+            var maxTilePos = new TilePos(this._maxWidth, this._maxHeight);
+            int maxMortonCode = maxTilePos.MortonCode;
+            Array.Resize(ref this._allGameItems, maxMortonCode);
+            }
 
         public IEnumerable<MovingItem> InteractiveGameItems
             {
@@ -134,10 +111,12 @@ namespace Labyrinth
 
         public IEnumerable<StaticItem> ItemsAtPosition(TilePos tp)
             {
-            if (tp.X < 0 || tp.Y < 0 || tp.X >= this.Width || tp.Y >= this.Height)
+            if (tp.X < 0 || tp.Y < 0)
                 throw new ArgumentOutOfRangeException("tp");
             var mortonIndex = tp.MortonCode;
-            var result = this._allGameItems[mortonIndex] ?? Enumerable.Empty<StaticItem>();
+            if (mortonIndex > this._allGameItems.GetLength(0))
+                return EmptyItemList;
+            var result = this._allGameItems[mortonIndex] ?? EmptyItemList;
             return result;
             }
 
