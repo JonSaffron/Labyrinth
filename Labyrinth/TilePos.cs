@@ -1,5 +1,4 @@
 ﻿using System;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -8,8 +7,6 @@ namespace Labyrinth
         {
         public readonly int X;
         public readonly int Y;
-        private const int HalfTileWidth = Tile.Width / 2;
-        private const int HalfTileHeight = Tile.Height / 2;
         
         public TilePos(int x, int y)
             {
@@ -24,8 +21,8 @@ namespace Labyrinth
         /// <returns>A TilePos that contains the specified co-ordinate</returns>
         public static TilePos TilePosFromPosition(Vector2 position)
             {
-            var intx = (int)position.X / Tile.Width;
-            var inty = (int)position.Y / Tile.Height;
+            var intx = (int)position.X / Constants.TileLength;
+            var inty = (int)position.Y / Constants.TileLength;
 
             var result = new TilePos(intx, inty);
             return result;
@@ -84,16 +81,12 @@ namespace Labyrinth
 #warning does this need to be refactored? not every object will have its origin in the middle of tile.
         public Vector2 ToPosition()
             {
-            int x = this.X * Tile.Width + HalfTileWidth;
-            int y = this.Y * Tile.Height + HalfTileHeight;
+            const int halfTileLength = Constants.TileLength / 2;
+
+            int x = this.X * Constants.TileLength + halfTileLength;
+            int y = this.Y * Constants.TileLength + halfTileLength;
             var result = new Vector2(x, y);
             return result;
-            }
-            
-        public Rectangle ToRectangle()
-            {
-            var r = new Rectangle(this.X * Tile.Width, this.Y * Tile.Height, Tile.Width, Tile.Height);
-            return r;
             }
 
         public int MortonCode
