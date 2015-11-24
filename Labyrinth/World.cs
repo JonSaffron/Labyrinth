@@ -12,7 +12,7 @@ namespace Labyrinth
     {
     public class World : ICentrePointProvider
         {
-        private readonly Vector2 _centreOfRoom = new Vector2(Constants.RoomWidthInPixels / 2, Constants.RoomHeightInPixels / 2);
+        private readonly Vector2 _centreOfRoom = Constants.RoomSizeInPixels / 2;
 
         private int _gameClock;
         private double _time;
@@ -208,9 +208,9 @@ namespace Labyrinth
 
         public static Rectangle GetContainingRoom(Vector2 position)
             {
-            var roomx = (int) (position.X / Constants.RoomWidthInPixels);
-            var roomy = (int) (position.Y / Constants.RoomHeightInPixels);
-            var r = new Rectangle(roomx * Constants.RoomWidthInPixels, roomy * Constants.RoomHeightInPixels, Constants.RoomWidthInPixels, Constants.RoomHeightInPixels);
+            var roomx = (int) (position.X / Constants.RoomSizeInPixels.X);
+            var roomy = (int) (position.Y / Constants.RoomSizeInPixels.Y);
+            var r = new Rectangle(roomx * (int) Constants.RoomSizeInPixels.X, roomy * (int) Constants.RoomSizeInPixels.Y, (int) Constants.RoomSizeInPixels.X, (int) Constants.RoomSizeInPixels.Y);
             return r;
             }
         
@@ -271,12 +271,12 @@ namespace Labyrinth
             var roomStartX = (int)Math.Floor(windowOffset.X / Constants.TileLength);
             var roomStartY = (int)Math.Floor(windowOffset.Y / Constants.TileLength);
             
-            var roomEndX = (int)Math.Ceiling((windowOffset.X + Constants.RoomWidthInPixels) / Constants.TileLength);
-            var roomEndY = (int)Math.Ceiling((windowOffset.Y + Constants.RoomHeightInPixels) / Constants.TileLength);
+            var roomEndX = (int)Math.Ceiling((windowOffset.X + Constants.RoomSizeInPixels.X) / Constants.TileLength);
+            var roomEndY = (int)Math.Ceiling((windowOffset.Y + Constants.RoomSizeInPixels.Y) / Constants.TileLength);
 
             var result = new TileRect(new TilePos(roomStartX, roomStartY), roomEndX - roomStartX, roomEndY - roomStartY);
-            Debug.Assert(result.Width == Constants.RoomWidthInTiles || result.Width == (Constants.RoomWidthInTiles + 1));
-            Debug.Assert(result.Height == Constants.RoomHeightInTiles || result.Height == (Constants.RoomHeightInTiles + 1));
+            Debug.Assert(result.Width == (int) Constants.RoomSizeInTiles.X || result.Width == ((int) Constants.RoomSizeInTiles.X + 1));
+            Debug.Assert(result.Height == (int) Constants.RoomSizeInTiles.Y || result.Height == ((int) Constants.RoomSizeInTiles.Y + 1));
             return result;
             }
 

@@ -51,12 +51,12 @@ namespace Labyrinth.GameObjects
                 {
                 case Direction.Left:
                 case Direction.Right:
-                    distanceToTravel = Constants.RoomWidthInPixels * 1.25m * Constants.TileLength;
+                    distanceToTravel = (decimal) (Constants.RoomSizeInPixels.X * 1.25);
                     Ap.Rotation = 0.0f;
                     break;
                 case Direction.Up:
                 case Direction.Down:
-                    distanceToTravel = Constants.RoomWidthInPixels * 1.25m * Constants.TileLength;
+                    distanceToTravel = (decimal) (Constants.RoomSizeInPixels.Y * 1.25);
                     Ap.Rotation = (float)(Math.PI * 90.0f / 180f);
                     break;
                 default:

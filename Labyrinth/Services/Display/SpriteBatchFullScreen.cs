@@ -35,16 +35,16 @@ namespace Labyrinth.Services.Display
 
         private static float GetFullScreenZoom(Viewport viewport)
             {
-            float zoomHeight = (float) viewport.Height / Constants.RoomHeightInPixels;
-            float zoomWidth = (float) viewport.Width / Constants.RoomWidthInPixels;
+            float zoomHeight = viewport.Height / Constants.RoomSizeInPixels.Y;
+            float zoomWidth = viewport.Width / Constants.RoomSizeInPixels.X;
             var result = Math.Min(zoomHeight, zoomWidth);
             return result;
             }
 
         private static Point GetFullScreenOffset(Viewport viewport, float zoom)
             {
-            var viewx = Constants.RoomWidthInPixels * zoom;
-            var viewy = Constants.RoomHeightInPixels * zoom;
+            var viewx = Constants.RoomSizeInPixels.X * zoom;
+            var viewy = Constants.RoomSizeInPixels.Y * zoom;
             var offsetx = (viewport.Width - viewx) / 2;
             var offsety = (viewport.Height - viewy) / 2;
             var result = new Point((int) offsetx, (int) offsety);

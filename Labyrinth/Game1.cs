@@ -43,8 +43,8 @@ namespace Labyrinth
 
             this._gdm = new GraphicsDeviceManager(this)
                             {
-                                PreferredBackBufferWidth = Constants.RoomWidthInPixels * Constants.ZoomWhilstWindowed,
-                                PreferredBackBufferHeight = Constants.RoomHeightInPixels * Constants.ZoomWhilstWindowed
+                                PreferredBackBufferWidth = (int) Constants.RoomSizeInPixels.X * Constants.ZoomWhilstWindowed,
+                                PreferredBackBufferHeight = (int) Constants.RoomSizeInPixels.Y * Constants.ZoomWhilstWindowed
                             };
 
             this.Content.RootDirectory = "Content";

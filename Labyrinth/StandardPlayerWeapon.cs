@@ -26,7 +26,7 @@ namespace Labyrinth
                 shot.InstantlyExpire();
                 return;
                 }
-            startPos += direction.ToVector() * (Constants.TileSize / 2);
+            startPos += direction.ToVector() * (Constants.CentreOfTile);
             shot.SetPosition(startPos);
 
             source.PlaySound(GameSound.PlayerShoots);

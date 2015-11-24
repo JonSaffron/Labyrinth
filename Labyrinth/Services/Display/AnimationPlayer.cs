@@ -92,8 +92,7 @@ namespace Labyrinth.Services.Display
             {
             get
                 {
-                var result = Constants.TileSize / 2;
-                return result;
+                return Constants.CentreOfTile;
                 }
             }
 

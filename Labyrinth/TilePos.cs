@@ -86,10 +86,8 @@ namespace Labyrinth
 #warning does this need to be refactored? not every object will have its origin in the middle of tile.
         public Vector2 ToPosition()
             {
-            const int halfTileLength = Constants.TileLength / 2;
-
-            int x = this.X * Constants.TileLength + halfTileLength;
-            int y = this.Y * Constants.TileLength + halfTileLength;
+            int x = this.X * Constants.TileLength + Constants.HalfTileLength;
+            int y = this.Y * Constants.TileLength + Constants.HalfTileLength;
             var result = new Vector2(x, y);
             return result;
             }

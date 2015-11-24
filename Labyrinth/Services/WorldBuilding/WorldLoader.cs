@@ -32,6 +32,8 @@ namespace Labyrinth.Services.WorldBuilding
         
         public Tile[,] GetFloorTiles()
             {
+            SetWallAndFloorLayout(gameState);
+
             int cx =  this.Width;
             int cy = this.Height;
             var result = new Tile[cx, cy];
@@ -129,8 +131,6 @@ namespace Labyrinth.Services.WorldBuilding
 
         public void GetGameObjects(GameState gameState)
             {
-            SetWallAndFloorLayout(gameState);
-
             StartState ss = GetStartingWorldAreaId();
 
             gameState.AddPlayer(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);

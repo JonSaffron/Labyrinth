@@ -1,6 +1,5 @@
 ﻿using System;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -48,11 +47,11 @@ namespace Labyrinth.GameObjects
 
         private void SetBoundingRectangle(Vector2 position)
             {
-            const int width = Constants.TileLength;
-            const int height = Constants.TileLength;
-            var left = (int)Math.Round(position.X - (width / 2.0));
-            var top = (int)Math.Round(position.Y - (height / 2.0));
-            this.BoundingRectangle = new Rectangle(left, top, width, height);
+            var r = Constants.TileRectangle;
+            var offsetX = (int) position.X - Constants.HalfTileLength;
+            var offsetY = (int) position.Y - Constants.HalfTileLength;
+            r.Offset(offsetX, offsetY);
+            this.BoundingRectangle = r;
             }
 
         /// <summary>
@@ -171,7 +170,7 @@ namespace Labyrinth.GameObjects
             GlobalServices.SoundPlayer.PlayForObject(gameSound, this, GlobalServices.CentrePointProvider);
             }
 
-        public void PlaySoundWithCallback(GameSound gameSound, EventHandler callback)
+        protected void PlaySoundWithCallback(GameSound gameSound, EventHandler callback)
             {
             GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, this, GlobalServices.CentrePointProvider, callback);
             }
