@@ -51,7 +51,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new player.
         /// </summary>
-        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
+        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy, int initialWorldAreaId) : base(animationPlayer, position)
             {
             // Load animated textures.
             this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 1);
@@ -65,7 +65,9 @@ namespace Labyrinth.GameObjects
             
             this._weapon1 = new StandardPlayerWeapon();
             this._weapon2 = new MineLayer();
-            Reset(position, energy);
+            this.Energy = energy;
+            this._listOfWorldAreaIdsVisited.Add(initialWorldAreaId);
+            Reset();
             }
 
         private void PlayerSpriteNewFrame(object sender, EventArgs e)
@@ -78,21 +80,27 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Resets the player to life.
         /// </summary>
-        /// <param name="position">The position to come to life at.</param>
-        /// <param name="energy">Initial energy</param>
-        public void Reset(Vector2 position, int energy)
+        public void Reset()
             {
-            Position = position;
-            Energy = energy;
             this._currentDirectionFaced = Direction.Left;
             this.CurrentMovement = Labyrinth.Movement.Still;
             Ap.PlayAnimation(_leftRightStaticAnimation);
             this._time = 0;
-            this._countBeforeDecrementingEnergy = 0;
 
             this._weapon1.Reset();
             this._weapon2.Reset();
-            CheckIfEnteredNewWorldArea();
+            }
+
+        /// <summary>
+        /// Resets the player's position and energy level to life.
+        /// </summary>
+        /// <param name="position">The position to come to life at.</param>
+        /// <param name="energy">Initial energy</param>
+        public void ResetPositionAndEnergy(Vector2 position, int energy)
+            {
+            this.Position = position;
+            this.Energy = energy;
+            this._countBeforeDecrementingEnergy = 0;
             }
 
         public override bool IsExtant
@@ -117,6 +125,8 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
+            System.Diagnostics.Trace.WriteLine(string.Format("Player update starts at {0}", this.Position));
+
             bool result = false;
             var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
             while (timeRemaining > 0)
@@ -129,6 +139,9 @@ namespace Labyrinth.GameObjects
                 if (CheckIfEnteredNewWorldArea())
                     this.PlaySound(GameSound.PlayerEntersNewLevel);
                 }
+
+            if (result)
+                System.Diagnostics.Trace.WriteLine(string.Format("Player update finishes at {0}", this.Position));
 
             if (!IsExtant)
                 return false;

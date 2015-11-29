@@ -46,10 +46,10 @@ namespace Labyrinth
         public void ResetLevelAfterLosingLife(ISpriteBatch spw)
             {
             GlobalServices.GameState.RemoveBangsAndShots();
+
             var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             StartState ss = this._startStates[worldAreaId];
-            GlobalServices.GameState.UpdatePosition(this.Player);
-            this.Player.Reset(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
+            this.Player.ResetPositionAndEnergy(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
             GlobalServices.GameState.UpdatePosition(this.Player);
 
             ResetLevelForStartingNewLife(spw);
@@ -62,6 +62,7 @@ namespace Labyrinth
                 Point roomStart = GetContainingRoom(this.Player.Position).Location;
                 this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
                 }
+            this.Player.Reset();
             GlobalServices.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
             this._levelReturnType = LevelReturnType.Normal;
             _doNotUpdate = false;
@@ -127,7 +128,7 @@ namespace Labyrinth
 
         private void UpdateGameItems(GameTime gameTime)
             {
-            const float minimumDistance = Constants.TileLength * 2;
+            //const float minimumDistance = (Constants.TileLength * 2;
 
             int countOfGameItemsThatMoved = 0;
             int countOfGameItems = 0;
@@ -142,13 +143,13 @@ namespace Labyrinth
                 countOfGameItemsThatMoved++;
 
                 Rectangle? bounds = null;
-                var tileRect = new TileRect(currentItem.TilePosition, 1, 1);
+                var tileRect = currentItem.TilePosition.GetRectAroundPosition(1);
                 foreach (var si in GlobalServices.GameState.AllItemsInRectangle(tileRect))
                     {
                     if (currentItem == si)
                         continue;   
 
-                    if (Math.Abs(Vector2.DistanceSquared(currentItem.Position, si.Position)) <= minimumDistance)
+                    //if (Math.Abs(Vector2.DistanceSquared(currentItem.Position, si.Position)) <= minimumDistance)
                         {
                         if (bounds == null)
                             {
@@ -330,7 +331,7 @@ namespace Labyrinth
                 var i = new InteractionWithStaticItems(this, c, this.Player);
                 i.Collide();
                 }
-            this.Player.Reset(newState.PlayerPosition.ToPosition(), newState.PlayerEnergy);
+            this.Player.ResetPositionAndEnergy(newState.PlayerPosition.ToPosition(), newState.PlayerEnergy);
             GlobalServices.GameState.UpdatePosition(this.Player);
             var boulder = GlobalServices.GameState.DistinctItemsOfType<Boulder>().FirstOrDefault();
             if (boulder != null)

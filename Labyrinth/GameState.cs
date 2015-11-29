@@ -263,12 +263,12 @@ namespace Labyrinth
             return shot;
             }
 
-        public Player AddPlayer(Vector2 position, int energy)
+        public Player AddPlayer(Vector2 position, int energy, int initialWorldAreaId)
             {
             if (this.Player != null)
                 throw new InvalidOperationException("Cannot add more than one Player.");
             var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new Player(ap, position, energy);
+            var result = new Player(ap, position, energy, initialWorldAreaId);
             this._gameObjectCollection.Add(result);
             this.Player = result;
             return result;

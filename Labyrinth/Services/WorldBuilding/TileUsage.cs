@@ -2,21 +2,18 @@
     {
     class TileUsage
         {
-        public readonly Tile Tile;
-
         private TileTypeByMap _tileTypeByMap;
         private TileTypeByData _tileTypeByData;
         private readonly char _symbol;
 
-        public TileUsage(Tile tile, TileTypeByMap tileTypeByMap)
+        public TileUsage(TileTypeByMap tileTypeByMap)
             {
-            this.Tile = tile;
             this._tileTypeByMap = tileTypeByMap;
             this._tileTypeByData = TileTypeByData.Free;
             this._symbol = ' ';
             }
         
-        public TileUsage(Tile tile, char symbol) : this(tile, TileTypeByMap.PotentiallyOccupied)
+        public TileUsage(char symbol) : this(TileTypeByMap.PotentiallyOccupied)
             {
             this._symbol = symbol;
             }

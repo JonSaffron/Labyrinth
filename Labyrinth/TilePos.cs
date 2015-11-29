@@ -92,6 +92,16 @@ namespace Labyrinth
             return result;
             }
 
+        public TileRect GetRectAroundPosition(int radius)
+            {
+            if (radius < 0)
+                throw new ArgumentOutOfRangeException("radius");
+            var topLeft = new TilePos(this.X - radius, this.Y - radius);
+            var diameter = radius * 2 + 1;
+            var result = new TileRect(topLeft, diameter, diameter);
+            return result;
+            }
+
         public int MortonCode
             {
             get

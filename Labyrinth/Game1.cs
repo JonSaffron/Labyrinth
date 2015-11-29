@@ -100,11 +100,13 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Update</param>
         protected override void Update(GameTime gameTime)
             {
+            if (!this.IsActive)
+                return;
+
             if (this.World == null)
                 {
                 LoadLevel("World1.xml");
                 }
-            
 
             base.Update(gameTime);
 

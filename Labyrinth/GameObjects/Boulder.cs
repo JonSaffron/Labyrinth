@@ -50,7 +50,9 @@ namespace Labyrinth.GameObjects
             bool result = false;
             if (this.IsMoving)
                 {
+                System.Diagnostics.Trace.WriteLine(string.Format("Boulder update starts at {0}", this.Position));
                 this.TryToCompleteMoveToTarget(ref elapsed);
+                System.Diagnostics.Trace.WriteLine(string.Format("Boulder update finishes at {0}", this.Position));
                 result = true;
                 }
             return result;

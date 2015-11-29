@@ -89,14 +89,14 @@ namespace Labyrinth
             {
             if (tp.X < 0 || tp.Y < 0)
                 throw new ArgumentOutOfRangeException("tp", "TilePosition cannot have an X or Y component that is less than zero.");
-            if (tp.X <= this._maxWidth || tp.Y <= this._maxHeight)
+            if (tp.X <= this._maxWidth && tp.Y <= this._maxHeight)
                 return;
 
             this._maxWidth = Math.Max(tp.X, this._maxWidth);
             this._maxHeight = Math.Max(tp.Y, this._maxHeight);
             var maxTilePos = new TilePos(this._maxWidth, this._maxHeight);
             int maxMortonCode = maxTilePos.MortonCode;
-            Array.Resize(ref this._allGameItems, maxMortonCode);
+            Array.Resize(ref this._allGameItems, maxMortonCode + 1);
             }
 
         public IEnumerable<MovingItem> InteractiveGameItems
@@ -112,7 +112,7 @@ namespace Labyrinth
         public IEnumerable<StaticItem> ItemsAtPosition(TilePos tp)
             {
             if (tp.X < 0 || tp.Y < 0)
-                throw new ArgumentOutOfRangeException("tp");
+                return EmptyItemList;
             var mortonIndex = tp.MortonCode;
             if (mortonIndex > this._allGameItems.GetLength(0))
                 return EmptyItemList;

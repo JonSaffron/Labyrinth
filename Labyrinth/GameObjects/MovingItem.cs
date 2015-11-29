@@ -136,7 +136,7 @@ namespace Labyrinth.GameObjects
             var movingTowardsTilePos = this.TilePosition.GetPositionAfterOneMove(direction);
             var movingTowards = movingTowardsTilePos.ToPosition();
             this.CurrentMovement = new Labyrinth.Movement(direction, movingTowards, speed);
-            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} to {2}", this.GetType().Name, direction, movingTowardsTilePos));
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} from {2} to {3} ({4}) at {5}p/s", this.GetType().Name, direction, this.Position, movingTowards, movingTowardsTilePos, speed));
             }
 
         protected void StandStill()
@@ -151,7 +151,7 @@ namespace Labyrinth.GameObjects
             var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);
             var movingTowards = movingTowardsTilePos.ToPosition();
             this.CurrentMovement = new Labyrinth.Movement(direction, movingTowards, speed);
-            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Bouncing back {1} to {2}", this.GetType().Name, direction, movingTowardsTilePos));
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}: Bouncing back {1} from {2} to {3} ({4}) at {5}p/s", this.GetType().Name, direction, this.Position, movingTowards, movingTowardsTilePos, speed));
             }
 
         /// <summary>

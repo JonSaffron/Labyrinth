@@ -74,27 +74,32 @@ namespace Labyrinth
                 }
             }
 
+        private static bool ShouldStartPushOrBounce(MovingItem moveableObject, MovingItem movingObject)
+            {
+            bool isMoveableObjectAlreadyInMotion = moveableObject.CurrentMovement.IsMoving;
+            bool isMovingObjectMotionless = !movingObject.CurrentMovement.IsMoving;
+            if (isMoveableObjectAlreadyInMotion || isMovingObjectMotionless) 
+                return false;
+
+            float currentDistanceApart = Vector2.Distance(movingObject.Position, moveableObject.Position);
+            if (!(currentDistanceApart < 40)) 
+                return false;
+
+            Vector2 positionWithMovement = movingObject.Position + movingObject.CurrentMovement.Direction.ToVector();
+            float potentialDistanceApart = Vector2.Distance(positionWithMovement, moveableObject.Position);
+            bool isGettingCloser = (potentialDistanceApart < currentDistanceApart);
+            return isGettingCloser;
+            }
+
         private static bool PushOrBounceObject(MovingItem moveableObject, MovingItem movingObject)
             {
-            // test whether moveable object can be pushed or bounced
-            if (!moveableObject.CurrentMovement.IsMoving && movingObject.CurrentMovement.IsMoving)
+            if (ShouldStartPushOrBounce(moveableObject, movingObject))
                 {
-                Vector2 currentDifference = movingObject.Position - moveableObject.Position;
-                float currentDistanceApart = Math.Abs(currentDifference.Length());
-                if (currentDistanceApart < 40)
-                    {
-                    Vector2 positionWithMovement = movingObject.Position + movingObject.CurrentMovement.Direction.ToVector();
-                    Vector2 potentialDifference = positionWithMovement - moveableObject.Position;
-                    float potentialDistanceApart = Math.Abs(potentialDifference.Length());
-                    if (potentialDistanceApart < currentDistanceApart)
-                        {
-                        moveableObject.PushOrBounce(movingObject, movingObject.CurrentMovement.Direction);
-                        var standardShot = movingObject as StandardShot;
-                        if (standardShot != null)
-                            GlobalServices.GameState.ConvertShotToBang(standardShot);
-                        return true;
-                        }
-                    }
+                moveableObject.PushOrBounce(movingObject, movingObject.CurrentMovement.Direction);
+                var standardShot = movingObject as StandardShot;
+                if (standardShot != null)
+                    GlobalServices.GameState.ConvertShotToBang(standardShot);
+                return true;
                 }
 
             // test whether the moveable object crushing the insubstantial object

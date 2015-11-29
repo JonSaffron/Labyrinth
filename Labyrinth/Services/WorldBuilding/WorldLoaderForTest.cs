@@ -63,7 +63,7 @@ namespace Labyrinth.Services.WorldBuilding
                             gameState.AddWall(position, "Tiles/Floor1");
                             break;
                         case 'p':
-                            gameState.AddPlayer(position, 255);
+                            gameState.AddPlayer(position, 255, 0);
                             break;
                         case 'b':
                             gameState.AddBoulder(position);
