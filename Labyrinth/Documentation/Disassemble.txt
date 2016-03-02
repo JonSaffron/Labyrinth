@@ -113,8 +113,8 @@ bdc				-- delay until game's main loop ends
 
 	-- static object data
 
-0e00 to 0e7f	-- room containing static object
-0e80 to 0eff	-- tile number of static object
+0e00 to 0e7f	-- room containing static object (0e7f is for boulder)
+0e80 to 0eff	-- tile number of static object (0eff is for boulder)
 0f00 to 0f7f	-- type of object (12 wall, 20 free tile, 5a apple, 13 block)
 0f80 to 0fff	-- energy of static object
 
@@ -5811,7 +5811,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 36C9 CA        DEX                      
 36CA D0 F7     BNE 36C3                 
 36CC 8A        TXA                      
-36CD 20 E0 2A  JSR 2AE0                 -- load fruit for level
+36CD 20 E0 2A  JSR 2AE0                 -- load fruit for level 0
 36D0 A9 00     LDA #00                  
 36D2 8D 7F 0E  STA 0E7F                 -- set block room number to 0
 36D5 A9 5A     LDA #5A                  
@@ -5856,6 +5856,9 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 3728 AD A6 0B  LDA 0BA6                 -- get world number
 372B F0 16     BEQ 3743                 -- branch if 2nd world
+
+		-- 1st world initialisation
+
 372D AD C6 0B  LDA 0BC6                 -- get room number
 3730 20 06 26  JSR 2606                 -- calculate level
 3733 AA        TAX                      
@@ -5870,6 +5873,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3743 A9 FF     LDA #FF                  -- set energy to maximum
 3745 8D 0E 0C  STA 0C0E                 
 3748 4C 04 37  JMP 3704                 -- jump to new life
+
+
 
 374B A9 00     LDA #00                  -- set score to 0
 374D 8D D6 0B  STA 0BD6                 
@@ -5892,7 +5897,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3770 8D FE 0B  STA 0BFE                 -- set crystal room in crystal list
 3773 A9 5A     LDA #5A                  
 3775 8D FF 0B  STA 0BFF                 -- set tile number in crystal list
-3778 8D FF 0E  STA 0EFF                 -- set tile number in static object list
+3778 8D FF 0E  STA 0EFF                 -- set tile number for block in static object list
 
 377B A0 BF     LDY #BF                  -- initialise loop counter (C0 being the number of monsters)
 377D C0 16     CPY #16                  
@@ -5926,7 +5931,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 37AC 99 00 07  STA 0700,Y               -- set monster type
 
 37AF AD A6 0B  LDA 0BA6                 -- get world number
-37B2 F0 06     BEQ 37BA                 -- branch ovver setting energy if already on world 2
+37B2 F0 06     BEQ 37BA                 -- branch over setting energy if already on world 2
 37B4 BD C2 57  LDA 57C2,X               
 37B7 99 40 06  STA 0640,Y               -- set monster energy
 
