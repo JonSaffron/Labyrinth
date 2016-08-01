@@ -10,7 +10,6 @@ namespace Labyrinth.Monster
             this.SetNormalAnimation(Animation.LoopingAnimation(World, "sprites/Monsters/KillerCubeGreen", 3));
             
             this.Mobility = MonsterMobility.Static;
-            this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
             }
 
         protected override Func<Monster, World, Direction> GetMethodForDeterminingDirection(MonsterMobility mobility)

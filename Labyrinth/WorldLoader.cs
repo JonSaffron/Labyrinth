@@ -286,6 +286,8 @@ namespace Labyrinth
                 result.SplitsOnHit = Boolean.Parse(splitsOnHit);
                 }
             
+            // todo: add MonsterShootBehaviour, ShotsBounceOff, IsActive
+
             return result;
             }
 
