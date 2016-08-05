@@ -16,5 +16,6 @@ namespace Labyrinth
         void TurnItDown();
 
         SoundLibrary SoundLibrary { get; }
+        IActiveSoundService ActiveSoundService { get; }
         }
     }

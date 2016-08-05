@@ -1,6 +1,4 @@
-﻿using System;
-using Labyrinth.GameObjects;
-
+﻿
 namespace Labyrinth
     {
     public interface IScoreKeeper

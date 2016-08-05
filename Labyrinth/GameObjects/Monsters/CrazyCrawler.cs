@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    sealed class CrazyCrawler : Monster
+    class CrazyCrawler : Monster
         {
         public CrazyCrawler(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {

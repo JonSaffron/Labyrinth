@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth
     {
-    interface IActiveSoundService
+    public interface IActiveSoundService
         {
         void Add(IActiveSound activeSound);
         void Clear();

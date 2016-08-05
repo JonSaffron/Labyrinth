@@ -436,6 +436,8 @@ namespace Labyrinth.Services.WorldBuilding
                     result.SplitsOnHit = Boolean.Parse(splitsOnHit);
                     }
             
+                // todo: add MonsterShootBehaviour, ShotsBounceOff, IsActive
+
                 return result;
                 }
 
@@ -479,7 +481,6 @@ namespace Labyrinth.Services.WorldBuilding
             private void GetListOfFruit(GameState gameState)
                 {
                 var rnd = GlobalServices.Randomess;
-                var result = new List<Fruit>();
                 foreach (WorldArea wa in this._worldAreas)
                     {
                     foreach (FruitDefinition fd in wa.FruitDefinitions.Values)
@@ -492,8 +493,7 @@ namespace Labyrinth.Services.WorldBuilding
                                 continue;
                             this._tileUsage[tilePos.X, tilePos.Y].SetOccupationByFruit();
                             Vector2 position = tilePos.ToPosition();
-                            var f = gameState.AddFruit(position, fd.FruitType);
-                            result.Add(f);
+                            gameState.AddFruit(position, fd.FruitType);
                             i++;
                             }
                         }

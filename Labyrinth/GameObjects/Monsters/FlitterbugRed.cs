@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    sealed class FlitterbugRed : Flitterbug
+    class FlitterbugRed : Flitterbug
         {
         public FlitterbugRed(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {

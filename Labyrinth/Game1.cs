@@ -12,8 +12,8 @@ namespace Labyrinth
     /// </summary>
     public class Game1 : Game
         {
-        public IPlayerInput PlayerInput { get; private set; }
-        public ISpriteBatch SpriteBatch { get; private set; }
+        private readonly IPlayerInput PlayerInput;
+        private ISpriteBatch SpriteBatch;
 
         private readonly GraphicsDeviceManager _gdm;
         private readonly IWorldLoader _worldLoader;
@@ -21,7 +21,7 @@ namespace Labyrinth
         private int _displayedScore;
         private int _lives;
 
-        private readonly HeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
+        private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
         private readonly IScoreKeeper _scoreKeeper = new ScoreKeeper();
         private World _world;
 
@@ -120,6 +120,7 @@ namespace Labyrinth
                     break;
                 
                 case LevelReturnType.LostLife:
+                    GlobalServices.SoundPlayer.ActiveSoundService.Clear();
                     if (this._lives == 0)
                         {
                         this.Exit();
@@ -140,6 +141,7 @@ namespace Labyrinth
                 this._displayedScore++;
 
             ProcessGameInput();
+            GlobalServices.SoundPlayer.ActiveSoundService.Update();
             }
 
         private void ProcessGameInput()

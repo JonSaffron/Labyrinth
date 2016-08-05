@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth
     {
-    interface IActiveSound
+    public interface IActiveSound
         {
         ISoundEffectInstance SoundEffectInstance { get; }
         bool CanBeRemoved { get; }

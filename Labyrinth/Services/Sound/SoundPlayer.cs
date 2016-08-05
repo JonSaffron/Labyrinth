@@ -6,12 +6,13 @@ namespace Labyrinth.Services.Sound
     class SoundPlayer : ISoundPlayer
         {
         private readonly SoundLibrary _soundLibrary;
-        private readonly IActiveSoundService _activeSoundService = new ActiveSoundService();
+        private readonly IActiveSoundService _activeSoundService;
         private float _masterVolumeLevel = 1;
 
-        public SoundPlayer(SoundLibrary soundLibrary)
+        public SoundPlayer(SoundLibrary soundLibrary, IActiveSoundService activeSoundService)
             {
             this._soundLibrary = soundLibrary;
+            this._activeSoundService = activeSoundService;
             }
 
         public void Play(GameSound gameSound)
@@ -78,6 +79,14 @@ namespace Labyrinth.Services.Sound
             get
                 {
                 return this._soundLibrary;
+                }
+            }
+
+        public IActiveSoundService ActiveSoundService
+            {
+            get 
+                {
+                return this._activeSoundService;
                 }
             }
 

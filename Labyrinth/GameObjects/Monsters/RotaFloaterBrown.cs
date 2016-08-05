@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    sealed class RotaFloaterBrown : RotaFloater
+    class RotaFloaterBrown : RotaFloater
         {
         public RotaFloaterBrown(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {

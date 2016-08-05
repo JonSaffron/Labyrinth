@@ -51,5 +51,13 @@ namespace Labyrinth.Services.Sound
                 return new SoundLibrary();
                 }
             }
+
+        public IActiveSoundService ActiveSoundService
+            {
+            get 
+                {
+                return null;
+                }
+            }
         }
     }

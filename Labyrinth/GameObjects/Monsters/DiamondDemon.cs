@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    sealed class DiamondDemon : Monster, ILayEggs
+    class DiamondDemon : Monster, ILayEggs
         {
         public DiamondDemon(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
