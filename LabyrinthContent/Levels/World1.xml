@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<World Name="Original" Height="80" Width="256">
+<World Name="Original" Height="80" Width="256" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
   <Layout>
 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓╚╝╚╝╚╝╚╝╚╝╚╝╚╝▓▓╚╝▓▓╚╝╚╝╚╝▓▓╚╝▓▓╚╝▓▓╚╝╚╝╚╝▓▓╚╝▓▓╚╝╚╝╚╝╚╝╚╝╚╝╚╝▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□
 ▓▓ ▓▓      ▓▓ ▓▓▓▓ ▓▓      ▓▓ ▓▓▓▓c▓▓      ▓▓ ▓▓▓▓ ▓▓      ▓▓ ▓▓╝              ╚╝  └┘      └┘  ╚╝  └┘      └┘  ╚╝     k      k ╚╝              ╚╝              ╚╝              ╚╝              ╚□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□
@@ -104,7 +104,7 @@ O              OO              OO              OO              OO              O
 
     <!-- Level 2 -->
     <Area Id="2" Top="40" Left="64" Width="64" Height="40">
-      <StartPos PlayerLeft="72" PlayerTop="45" StartEnergy="100" BlockLeft="74" BlockTop="45" WorldStart="false" />
+      <StartPos PlayerLeft="72" PlayerTop="45" StartEnergy="100" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor2" />
         <TileDef Symbol="O" Type="Wall" Tile="Wall2" />
@@ -123,7 +123,7 @@ O              OO              OO              OO              OO              O
 
     <!-- Level 3 -->
     <Area Id="3" Top="40" Left="128" Width="64" Height="40">
-      <StartPos PlayerLeft="136" PlayerTop="77" StartEnergy="150" BlockLeft="138" BlockTop="77" WorldStart="false" />
+      <StartPos PlayerLeft="136" PlayerTop="77" StartEnergy="150" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor3" />
         <TileDef Symbol="▓" Type="Wall" Tile="Wall3Full" />
@@ -150,7 +150,7 @@ O              OO              OO              OO              OO              O
 
     <!-- Level 4 -->
     <Area Id="5" Top="0" Left="192" Width="64" Height="80">
-      <StartPos PlayerLeft="200" PlayerTop="65" StartEnergy="200" BlockLeft="202" BlockTop="65" WorldStart="false" />
+      <StartPos PlayerLeft="200" PlayerTop="65" StartEnergy="200" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor4" />
         <TileDef Symbol="□" Type="Wall" Tile="Wall4" />
@@ -182,7 +182,7 @@ O              OO              OO              OO              OO              O
 
     <!-- Level 5 -->
     <Area Id="6" Top="0" Left="128" Width="64" Height="40">
-      <StartPos PlayerLeft="183" PlayerTop="15" StartEnergy="200" BlockLeft="185" BlockTop="15" WorldStart="false" />
+      <StartPos PlayerLeft="183" PlayerTop="15" StartEnergy="200" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor5" />
         <TileDef Symbol="▓" Type="Wall" Tile="Wall5Full" />
@@ -208,7 +208,7 @@ O              OO              OO              OO              OO              O
 
     <!-- Level 6 -->
     <Area Id="7" Top="0" Left="64" Width="64" Height="40">
-      <StartPos PlayerLeft="119" PlayerTop="35" StartEnergy="255" BlockLeft="117" BlockTop="35" WorldStart="false" />
+      <StartPos PlayerLeft="119" PlayerTop="35" StartEnergy="255" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor6" />
         <TileDef Symbol="▓" Type="Wall" Tile="Wall6Full" />
@@ -238,10 +238,10 @@ O              OO              OO              OO              OO              O
 
     <!-- Level 7 -->
     <Area Id="8" Top="0" Left="0" Width="64" Height="40">
-      <StartPos PlayerLeft="56" PlayerTop="5" StartEnergy="255" BlockLeft="54" BlockTop="5" />
+      <StartPos PlayerLeft="56" PlayerTop="5" StartEnergy="255" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor4" />
-        <TileDef Symbol="▓" Type="Wall" Tile="Wall7" />
+        <TileDef Symbol="▓" Type="Wall" Tile="Wall7Full" />
         <TileDef Symbol="S" Type="PotentiallyOccupied" />
         <TileDef Symbol="C" Type="PotentiallyOccupied" />
         <TileDef Symbol="c" Type="PotentiallyOccupied" />
@@ -249,10 +249,10 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="m" Type="PotentiallyOccupied" />
         <TileDef Symbol="j" Type="PotentiallyOccupied" />
       </TileDefinitions>
+      <FruitDefinitions>
+        <FruitDef Type="Acorn" Quantity="64" />
+      </FruitDefinitions>
     </Area>
-    <FruitDefinitions>
-      <FruitDef Type="Acorn" Quantity="64" />
-    </FruitDefinitions>
   </Areas>
 
   <Objects>
@@ -343,8 +343,8 @@ O              OO              OO              OO              OO              O
     <!-- top line, 3rd from left -->
     <Monster Type="RotaFloaterBrown" Left="99" Top="43" Energy="40" ChangeRooms="StaysWithinRoom" />
     <Monster Type="RotaFloaterBrown" Left="98" Top="45" Energy="40" />
-    <Monster Type="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" InitialDirection="Up" />
-    <Monster Type="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" InitialDirection="Right" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" Direction="Up" />
+    <Monster Type="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" Direction="Right" ChangeRooms="StaysWithinRoom" />
     <Monster Type="DeathCube" Left="110" Top="44" Energy="255" />
     <Monster Type="DeathCube" Left="110" Top="45" Energy="255" />
 
@@ -354,7 +354,7 @@ O              OO              OO              OO              OO              O
     <Monster Type="RotaFloaterBrown" Left="125" Top="45" Energy="40" ChangeRooms="StaysWithinRoom" />
 
     <!-- 2nd from top, right side -->
-    <Monster Type="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" InitialDirection="Up" />
+    <Monster Type="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" Direction="Up" />
 
     <!-- 3rd from top, right side -->
     <Monster Type="ThresherBrown" Left="119" Top="68" Energy="55" IsEgg="true" TimeBeforeHatching="20" />
@@ -402,8 +402,8 @@ O              OO              OO              OO              OO              O
     <Monster Type="FlitterbugRed" Left="174" Top="73" Energy="60" />
     <Monster Type="DeathCube" Left="161" Top="76" Energy="80" />
     <Monster Type="DeathCube" Left="174" Top="76" Energy="80" />
-    <Monster Type="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
     <Monster Type="FlitterbugRed" Left="167" Top="78" Energy="90" IsEgg="true" TimeBeforeHatching="127" />
 
     <!-- right, 3 down -->
@@ -415,7 +415,7 @@ O              OO              OO              OO              OO              O
     <!-- =-=-=-= -->
 
     <!-- bottom left corner -->
-    <Monster Type="RotaFloaterCyan" Left="200" Top="74" Energy="48" InitialDirection="Left"  />
+    <Monster Type="RotaFloaterCyan" Left="200" Top="74" Energy="48" Direction="Left"  />
 
     <!-- bottom, 2nd from left -->
     <Monster Type="FlitterbugRed" Left="216" Top="74" Energy="48" />
@@ -430,8 +430,8 @@ O              OO              OO              OO              OO              O
     <Monster Type="ThresherCyan" Left="248" Top="66" Energy="48" Mobility="Cautious" />
 
     <!-- right, 3rd from bottom -->
-    <Monster Type="RotaFloaterCyan" Left="247" Top="52" Energy="64" InitialDirection="Right" />
-    <Monster Type="RotaFloaterCyan" Left="249" Top="52" Energy="48" InitialDirection="Right" />
+    <Monster Type="RotaFloaterCyan" Left="247" Top="52" Energy="64" Direction="Right" />
+    <Monster Type="RotaFloaterCyan" Left="249" Top="52" Energy="48" Direction="Right" />
     <Monster Type="ThresherCyan" Left="248" Top="54" Energy="48" Mobility="Cautious" />
 
     <!-- 2nd from right, 3rd from bottom -->
@@ -447,7 +447,7 @@ O              OO              OO              OO              OO              O
     <Monster Type="FlitterbugRed" Left="216" Top="54" Energy="48" />
 
     <!-- left, 3rd from bottom -->
-    <Monster Type="RotaFloaterCyan" Left="198" Top="54" Energy="48" InitialDirection="Right" />
+    <Monster Type="RotaFloaterCyan" Left="198" Top="54" Energy="48" Direction="Right" />
 
     <!-- right, 5th from top -->
     <Monster Type="FlitterbugRed" Left="248" Top="42" Energy="48" LaysEggs="true"  />
@@ -506,8 +506,8 @@ O              OO              OO              OO              OO              O
     <Monster Type="ThresherCyan" Left="216" Top="25" Energy="72" LaysEggs="true" />
 
     <!-- 2nd from top, 2nd from left -->
-    <Monster Type="RotaFloaterCyan" Left="215" Top="12" Energy="48" InitialDirection="Right" />
-    <Monster Type="RotaFloaterCyan" Left="216" Top="13" Energy="48" InitialDirection="Left" />
+    <Monster Type="RotaFloaterCyan" Left="215" Top="12" Energy="48" Direction="Right" />
+    <Monster Type="RotaFloaterCyan" Left="216" Top="13" Energy="48" Direction="Left" />
 
     <!-- top, 2nd from left -->
     <Monster Type="CrazyCrawler" Left="209" Top="4" Energy="40" />
@@ -564,9 +564,9 @@ O              OO              OO              OO              OO              O
 
     <!-- treasure room, bottom right -->
     <Monster Type="KillerCubeGreen" Left="177" Top="31" Energy="100" />
-    <Monster Type="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" InitialDirection="Left" />
+    <Monster Type="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" Direction="Left" />
     <Monster Type="KillerCubeGreen" Left="184" Top="38" Energy="100" />
-    <Monster Type="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" InitialDirection="Left" />
+    <Monster Type="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" Direction="Left" />
     <Monster Type="CrazyCrawler" Left="182" Top="33" Energy="80" />
     <Monster Type="CrazyCrawler" Left="182" Top="35" Energy="80" />
     <Monster Type="CrazyCrawler" Left="185" Top="34" Energy="80" Mobility="Placid" />
@@ -580,7 +580,7 @@ O              OO              OO              OO              OO              O
 
     <!-- Bottom right -->
     <Monster Type="DiamondDemon" Left="117" Top="32" Energy="32" Mobility="Placid" LaysEggs="false" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="DiamondDemon" Left="115" Top="33" Energy="24" Mobility="Placid" ChangeRoom="StaysWithinRoom" />
+    <Monster Type="DiamondDemon" Left="115" Top="33" Energy="24" Mobility="Placid" ChangeRooms="StaysWithinRoom" />
     <Monster Type="DiamondDemon" Left="114" Top="36" Energy="24" Mobility="Placid" />
 
     <!-- Bottom, 2nd from right -->
@@ -612,8 +612,8 @@ O              OO              OO              OO              OO              O
 
     <!-- Treasure room, top right-->
     <Monster Type="TigerMoth" Left="120" Top="5" Energy="96" ChangeRooms="StaysWithinRoom" />
-    <Monster Type="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" InitialDirection="Down" ChangeRoom="StaysWithinRoom" />
-    <Monster Type="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" InitialDirection="Right" ChangeRoom="StaysWithinRoom" />
+    <Monster Type="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" Direction="Down" ChangeRooms="StaysWithinRoom" />
+    <Monster Type="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" Direction="Right" ChangeRooms="StaysWithinRoom" />
     <Monster Type="CrazyCrawler" Left="118" Top="3" Energy="72" ChangeRooms="StaysWithinRoom" />
     <Monster Type="CrazyCrawler" Left="121" Top="3" Energy="72" />
     <Monster Type="FlitterbugBrown" Left="125" Top="5" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />

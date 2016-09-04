@@ -340,6 +340,10 @@
       <Processor>PassThroughProcessor</Processor>
       <SubType>Designer</SubType>
     </None>
+    <Compile Include="Levels\WorldSchema.xsd">
+      <Name>WorldSchema</Name>
+      <SubType>Designer</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tiles\Floor5.png">
@@ -504,13 +508,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tiles\Wall7.png">
-      <Name>Wall7</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Tiles\Wall2.png">
       <Name>Wall2</Name>
       <Importer>TextureImporter</Importer>
@@ -650,6 +647,92 @@
   <ItemGroup>
     <Compile Include="Sprites\Shot\MineUnarmed.png">
       <Name>MineUnarmed</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Levels\World2.xml">
+      <Name>World2</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="NewTiles\Borgen.png">
+      <Name>Borgen</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="NewTiles\Jagged.png">
+      <Name>Jagged</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="NewTiles\RedAndBlueLarge.png">
+      <Name>RedAndBlueLarge</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="NewTiles\RedAndBlueSmall.png">
+      <Name>RedAndBlueSmall</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="NewTiles\SquareInSquare.png">
+      <Name>SquareInSquare</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="NewTiles\Web.png">
+      <Name>Web</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Tiles\Wall7BottomLeftRound.png">
+      <Name>Wall7BottomLeftRound</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7BottomLeftStraight.png">
+      <Name>Wall7BottomLeftStraight</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7BottomRightRound.png">
+      <Name>Wall7BottomRightRound</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7BottomRightStraight.png">
+      <Name>Wall7BottomRightStraight</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7Full.png">
+      <Name>Wall7Full</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7TopLeftRound.png">
+      <Name>Wall7TopLeftRound</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7TopLeftStraight.png">
+      <Name>Wall7TopLeftStraight</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7TopRightRound.png">
+      <Name>Wall7TopRightRound</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Tiles\Wall7TopRightStraight.png">
+      <Name>Wall7TopRightStraight</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
