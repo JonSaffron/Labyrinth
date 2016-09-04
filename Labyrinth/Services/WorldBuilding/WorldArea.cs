@@ -66,7 +66,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public WorldArea(XmlElement area)
+        public WorldArea(XmlElement area, XmlNamespaceManager xnm)
             {
             string id = area.GetAttribute("Id");
             if (!string.IsNullOrEmpty(id))
@@ -77,22 +77,22 @@ namespace Labyrinth.Services.WorldBuilding
             if (area.GetAttribute("WorldStart") == "true")
                 this.IsInitialArea = true;
 
-            var tileDefinitions = (XmlElement) area.SelectSingleNode("TileDefinitions");
+            var tileDefinitions = (XmlElement) area.SelectSingleNode("ns:TileDefinitions", xnm);
             if (tileDefinitions != null)
-                LoadTileDefs(tileDefinitions);
+                LoadTileDefs(tileDefinitions, xnm);
             
-            var fruitPopulation = (XmlElement) area.SelectSingleNode("FruitDefinitions");
+            var fruitPopulation = (XmlElement) area.SelectSingleNode("ns:FruitDefinitions", xnm);
             if (fruitPopulation != null)
-                LoadFruitPopulation(fruitPopulation);
+                LoadFruitPopulation(fruitPopulation, xnm);
             
-            var startPos = (XmlElement) area.SelectSingleNode("StartPos");
+            var startPos = (XmlElement) area.SelectSingleNode("ns:StartPos", xnm);
             if (startPos != null)
                 LoadStartPos(startPos);
             }
 
-        private void LoadTileDefs(XmlElement tileDefinitions)
+        private void LoadTileDefs(XmlElement tileDefinitions, XmlNamespaceManager xnm)
             {
-            XmlNodeList tiledefs = tileDefinitions.SelectNodes("TileDef");
+            XmlNodeList tiledefs = tileDefinitions.SelectNodes("ns:TileDef", xnm);
             if (tiledefs == null)
                 throw new InvalidOperationException();
             foreach (XmlElement tiledef in tiledefs)
@@ -105,9 +105,9 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
         
-        private void LoadFruitPopulation(XmlElement fruitPopulation)
+        private void LoadFruitPopulation(XmlElement fruitPopulation, XmlNamespaceManager xnm)
             {
-            XmlNodeList fruitDefs = fruitPopulation.SelectNodes("FruitDef");
+            XmlNodeList fruitDefs = fruitPopulation.SelectNodes("ns:FruitDef", xnm);
             if (fruitDefs == null)
                 throw new InvalidOperationException();
             foreach (XmlElement fruitDef in fruitDefs)

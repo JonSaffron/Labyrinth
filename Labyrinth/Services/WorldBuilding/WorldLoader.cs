@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,8 @@ namespace Labyrinth.Services.WorldBuilding
     {
     class WorldLoader : IWorldLoader
         {
-        private XmlDocument _xmlDoc;
+        private XmlElement _xmlRoot;
+        private XmlNamespaceManager _xnm;
         private List<WorldArea> _worldAreas;
         
         public void LoadWorld(string levelName)
@@ -23,9 +25,12 @@ namespace Labyrinth.Services.WorldBuilding
             if (!File.Exists(levelPath))
                 throw new ArgumentOutOfRangeException(levelPath);
             
-            this._xmlDoc = new XmlDocument();
-            this._xmlDoc.Load(levelPath);
-            this._worldAreas = LoadAreas(this._xmlDoc);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(levelPath);
+            this._xmlRoot = xmlDoc.DocumentElement;
+            this._xnm = new XmlNamespaceManager(xmlDoc.NameTable);
+            this._xnm.AddNamespace("ns", "http://JonSaffron/Labyrinth");
+            this._worldAreas = LoadAreas();
             }
         
         public Tile[,] GetFloorTiles()
@@ -34,61 +39,39 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public void GetGameObjects(GameState gameState)
             {
-            var x = new ProcessGameObjects(this.Width, this.Height, this._worldAreas);
-            var layoutDef = (XmlElement) this._xmlDoc.SelectSingleNode("World/Layout");
-            if (layoutDef == null)
-                throw new InvalidOperationException("No Layout element found.");
-            var layout = layoutDef.InnerText;
-            var objectsDef = (XmlElement) this._xmlDoc.SelectSingleNode("World/Objects");
-            if (objectsDef == null)
-                throw new InvalidOperationException("No objects element found.");
-            x.GetGameObjects(gameState, layout, objectsDef.SelectNodes("*"));
+            var x = new ProcessGameObjects(this, gameState);
+            x.GetGameObjects();
             }
 
         /// <summary>
-        /// Width of World measured in tiles.
+        /// Size of World measured in tiles.
         /// </summary>
-        private int Width
+        private TilePos Size
             {
             get 
                 { 
-                var worldDef = (XmlElement) this._xmlDoc.SelectSingleNode("World");
-                if (worldDef == null)
-                    throw new InvalidOperationException("No World element found.");
-                int result = int.Parse(worldDef.GetAttribute("Width"));
+                int width = int.Parse(this._xmlRoot.GetAttribute("Width"));
+                int height = int.Parse(this._xmlRoot.GetAttribute("Height"));
+                var result = new TilePos(width, height);
                 return result;
                 }
             }
 
-        /// <summary>
-        /// Height of the World measured in tiles.
-        /// </summary>
-        private int Height
+        private List<WorldArea> LoadAreas()
             {
-            get 
-                { 
-                var worldDef = (XmlElement) this._xmlDoc.SelectSingleNode("World");
-                if (worldDef == null)
-                    throw new InvalidOperationException("No World element found.");
-                int result = int.Parse(worldDef.GetAttribute("Height"));
-                return result;
-                }
-            }
-
-        private static List<WorldArea> LoadAreas(XmlDocument xmlDoc)
-            {
-            var areas = xmlDoc.SelectSingleNode("World/Areas");
+            var areas = this._xmlRoot.SelectSingleNode("ns:Areas", this._xnm);
             if (areas == null)
                 throw new InvalidOperationException();
             var result = new List<WorldArea>();
-            XmlNodeList areaList = areas.SelectNodes("Area");
+            XmlNodeList areaList = areas.SelectNodes("ns:Area", this._xnm);
             if (areaList == null)
                 throw new InvalidOperationException();
             foreach (XmlElement a in areaList)
                 {
-                var wa = new WorldArea(a);
+                var wa = new WorldArea(a, this._xnm);
                 if (wa.TileDefinitions.Count != 0)
                     {
                     WorldArea intersectingArea =
@@ -112,14 +95,15 @@ namespace Labyrinth.Services.WorldBuilding
 
         private Tile[,] GetFloorLayout()
             {
-            var layout = (XmlElement) this._xmlDoc.SelectSingleNode("World/Layout");
+            var layout = (XmlElement) this._xmlRoot.SelectSingleNode("ns:Layout", this._xnm);
             if (layout == null)
                 throw new InvalidOperationException("No Layout element found.");
             
             var lines = layout.InnerText.Trim().Replace("\r\n", "\t").Split('\t').Select(line => line.Trim()).ToArray();
             ValidateLayout(lines);
                
-            var result = new Tile[this.Width, this.Height];
+            var size = this.Size;
+            var result = new Tile[size.X, size.Y];
             var spriteLibrary = GlobalServices.SpriteLibrary;
             foreach (WorldArea wa in this._worldAreas)
                 {
@@ -161,50 +145,55 @@ namespace Labyrinth.Services.WorldBuilding
 
         private void ValidateLayout(string[] lines)
             {
+            TilePos size = this.Size;
             int countOfLines = lines.GetLength(0);
-            if (countOfLines != this.Height)
-                throw new InvalidOperationException(string.Format("The world layout has {0} lines whilst the Height property equals {1}. The two should match.", countOfLines, this.Height));
+            if (countOfLines != size.Y)
+                throw new InvalidOperationException(string.Format("The world layout has {0} lines whilst the Height property equals {1}. The two should match.", countOfLines, size.Y));
             
-            for (int y = 0; y < this.Height; y++)
+            for (int y = 0; y < size.Y; y++)
                 {
                 var lineLength = lines[y].Length;
-                if (lineLength != this.Width)
-                    throw new InvalidOperationException(string.Format("Line {0} has {1} characters, whilst the Width property equals {2}. The two should match.", y, lineLength, this.Width));
+                if (lineLength != size.X)
+                    throw new InvalidOperationException(string.Format("Line {0} has {1} characters, whilst the Width property equals {2}. The two should match.", y, lineLength, size.X));
                 }
             }
 
-        class ProcessGameObjects
+        private class ProcessGameObjects
             {
-            readonly TileUsage[,] _tileUsage;
-            readonly IEnumerable<WorldArea> _worldAreas;
+            private readonly WorldLoader _wl;
+            private readonly GameState _gameState;
+            private readonly TileUsage[,] _tileUsage;
+            private readonly string _layout;
 
-            public ProcessGameObjects(int width, int height, IEnumerable<WorldArea> worldAreas)
+            public ProcessGameObjects(WorldLoader wl, GameState gameState)
                 {
-                this._tileUsage = new TileUsage[width, height];
-                this._worldAreas = worldAreas;
+                this._wl = wl;
+                this._gameState = gameState;
+                this._tileUsage = new TileUsage[wl.Size.X, wl.Size.Y];
+
+                var layoutDef = (XmlElement) wl._xmlRoot.SelectSingleNode("ns:Layout", wl._xnm);
+                if (layoutDef == null)
+                    throw new InvalidOperationException("No Layout element found.");
+                this._layout = layoutDef.InnerText;
                 }
 
-            public void GetGameObjects(GameState gameState, string layout, XmlNodeList objects)
+            public void GetGameObjects()
                 {
-                if (gameState == null)
-                    throw new ArgumentNullException("gameState");
-                if (layout == null)
-                    throw new ArgumentNullException("layout");
-                if (objects == null)
-                    throw new ArgumentNullException("objects");
+                var objects = this._wl._xmlRoot.SelectNodes(@"ns:Objects/ns:*", this._wl._xnm);
+                var objectList = objects != null ? objects.Cast<XmlElement>() : Enumerable.Empty<XmlElement>();
 
-                this.AddWalls(gameState, layout);
+                this.AddWalls();
 
                 WorldArea initialWorldArea = this.GetInitialWorldArea();
                 StartState ss = initialWorldArea.StartState;
-                gameState.AddPlayer(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy, initialWorldArea.Id);
+                this._gameState.AddPlayer(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy, initialWorldArea.Id);
             
                 var exceptions = new List<TileException>();
-                var playerStartPositions = this._worldAreas.Where(wa => wa.StartState != null).Select(wa => new StartPositionReservation(wa.StartState.PlayerPosition));
+                var playerStartPositions = this._wl._worldAreas.Where(wa => wa.StartState != null).Select(wa => new StartPositionReservation(wa.StartState.PlayerPosition));
                 exceptions.AddRange(SetTileOccupation(playerStartPositions, t => t.SetOccupationByStaticItem() ));
 
                 var movingMonsters = new List<IGameObject>();
-                foreach (XmlElement definition in objects)
+                foreach (XmlElement definition in objectList)
                     {
                     StaticItem[] newItems = {}; 
 
@@ -212,13 +201,13 @@ namespace Labyrinth.Services.WorldBuilding
                         {
                         case "Boulder":
                             {
-                            newItems = new StaticItem[] { GetBoulder(gameState, definition) };
+                            newItems = new StaticItem[] { GetBoulder(definition) };
                             break;
                             }
 
                         case "Monster":
                             {
-                            var monster = GetMonster(gameState, definition);
+                            var monster = GetMonster(definition);
                             if (monster.IsStill)
                                 newItems = new StaticItem[] { monster };
                             else
@@ -228,19 +217,19 @@ namespace Labyrinth.Services.WorldBuilding
 
                         case "Crystal":
                             {
-                            newItems = new StaticItem[] { GetCrystal(gameState, definition) };
+                            newItems = new StaticItem[] { GetCrystal(definition) };
                             break;
                             }
 
                         case "ForceField":
                             {
-                            newItems = GetForceFields(gameState, definition).Cast<StaticItem>().ToArray();
+                            newItems = GetForceFields(definition).Cast<StaticItem>().ToArray();
                             break;
                             }
 
                         case "CrumblyWall":
                             {
-                            newItems = new StaticItem[] { GetCrumblyWall(gameState, definition) };
+                            newItems = new StaticItem[] { GetCrumblyWall(definition) };
                             break;
                             }
 
@@ -251,7 +240,7 @@ namespace Labyrinth.Services.WorldBuilding
                     exceptions.AddRange(SetTileOccupation(newItems, t => t.SetOccupationByStaticItem()));
                     }
 
-                GetListOfFruit(gameState);
+                GetListOfFruit();
 
                 exceptions.AddRange(SetTileOccupation(movingMonsters, t => t.SetOccupationByMovingMonster()));
             
@@ -265,7 +254,7 @@ namespace Labyrinth.Services.WorldBuilding
                 WorldArea result;
                 try
                     {
-                    result = this._worldAreas.Single(wa => wa.IsInitialArea);
+                    result = this._wl._worldAreas.Single(wa => wa.IsInitialArea);
                     }
                 catch (InvalidOperationException)
                     {
@@ -274,11 +263,11 @@ namespace Labyrinth.Services.WorldBuilding
                 return result;
                 }
 
-            private void AddWalls(GameState gameState, string layout)
+            private void AddWalls()
                 {
-                var lines = layout.Trim().Replace("\r\n", "\t").Split('\t').Select(line => line.Trim()).ToArray();
-               
-                foreach (WorldArea wa in this._worldAreas)
+                var lines = _layout.Trim().Replace("\r\n", "\t").Split('\t').Select(line => line.Trim()).ToArray();
+                
+                foreach (WorldArea wa in this._wl._worldAreas)
                     {
                     if (wa.TileDefinitions.Count == 0)
                         continue;
@@ -297,7 +286,7 @@ namespace Labyrinth.Services.WorldBuilding
                             case TileTypeByMap.Wall:
                                 {
                                 this._tileUsage[p.X, p.Y] = new TileUsage(TileTypeByMap.Wall);
-                                gameState.AddWall(p.ToPosition(), "Tiles/" + td.TextureName);
+                                this._gameState.AddWall(p.ToPosition(), "Tiles/" + td.TextureName);
                                 break;
                                 }
                             case TileTypeByMap.Floor:
@@ -393,14 +382,14 @@ namespace Labyrinth.Services.WorldBuilding
                     throw new InvalidOperationException(message.ToString());
                 } 
 
-            private static Monster GetMonster(GameState gameState, XmlElement mdef)
+            private Monster GetMonster(XmlElement mdef)
                 {
                 string type = mdef.GetAttribute("Type");
                 var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
                 Vector2 position = tilePos.ToPosition();
                 int e = int.Parse(mdef.GetAttribute("Energy"));
-                Monster result = gameState.CreateMonster(type, position, e);
-                string initialDirection = mdef.GetAttribute("InitialDirection");
+                Monster result = this._gameState.CreateMonster(type, position, e);
+                string initialDirection = mdef.GetAttribute("Direction");
                 if (!string.IsNullOrEmpty(initialDirection))
                     result.InitialDirection = (Direction)Enum.Parse(typeof(Direction), initialDirection);
                 string mobility = mdef.GetAttribute("Mobility");
@@ -436,52 +425,71 @@ namespace Labyrinth.Services.WorldBuilding
                     result.SplitsOnHit = Boolean.Parse(splitsOnHit);
                     }
             
-                // todo: add MonsterShootBehaviour, ShotsBounceOff, IsActive
+                string monsterShootBehaviourAttribute = mdef.GetAttribute("MonsterShootBehaviour");
+                if (!string.IsNullOrEmpty(monsterShootBehaviourAttribute))
+                    {
+                    MonsterShootBehaviour monsterShootBehaviour = (MonsterShootBehaviour) Enum.Parse(typeof(MonsterShootBehaviour), monsterShootBehaviourAttribute);
+                    result.MonsterShootBehaviour = monsterShootBehaviour;
+                    }
+                
+                string shotsBounceOffAttribute = mdef.GetAttribute("ShotsBounceOff");
+                if (!string.IsNullOrEmpty(shotsBounceOffAttribute))
+                    {
+                    bool shotsBounceOff = bool.Parse(shotsBounceOffAttribute);
+                    result.ShotsBounceOff = shotsBounceOff;
+                    }
 
+                string isActiveAttribute = mdef.GetAttribute("IsActive");
+                if (!string.IsNullOrEmpty(isActiveAttribute))
+                    {
+                    bool isActive = bool.Parse(isActiveAttribute);
+                    result.IsActive = isActive;
+                    }
+                
                 return result;
                 }
 
-            private static Crystal GetCrystal(GameState gameState, XmlElement cdef)
+            private Crystal GetCrystal(XmlElement cdef)
                 {
                 var id = int.Parse(cdef.GetAttribute("Id"));
                 var tilePos = new TilePos(int.Parse(cdef.GetAttribute("Left")), int.Parse(cdef.GetAttribute("Top")));
                 var position = tilePos.ToPosition();
                 var score = int.Parse(cdef.GetAttribute("Score"));
                 var energy = int.Parse(cdef.GetAttribute("Energy"));
-                var result = gameState.AddCrystal(position, id, score, energy);
+                var result = this._gameState.AddCrystal(position, id, score, energy);
                 return result;
                 }
 
-            private static Boulder GetBoulder(GameState gameState, XmlElement bdef)
+            private Boulder GetBoulder(XmlElement bdef)
                 {
                 var tilePos = new TilePos(int.Parse(bdef.GetAttribute("Left")), int.Parse(bdef.GetAttribute("Top")));
                 var position = tilePos.ToPosition();
-                var result = gameState.AddBoulder(position);
+                var result = this._gameState.AddBoulder(position);
                 return result;
                 }
 
-            private static IEnumerable<ForceField> GetForceFields(GameState gameState, XmlElement fdef)
+            private IEnumerable<ForceField> GetForceFields(XmlElement fdef)
                 {
                 int crystalRequired = int.Parse(fdef.GetAttribute("CrystalRequired"));
                 Rectangle r = WorldArea.GetRectangleFromDefinition(fdef);
-                var result = r.PointsInside().Select(tp => gameState.AddForceField(tp.ToPosition(), crystalRequired));
+                var result = r.PointsInside().Select(tp => this._gameState.AddForceField(tp.ToPosition(), crystalRequired));
                 return result;
                 }
 
-            private static CrumblyWall GetCrumblyWall(GameState gameState, XmlElement wdef)
+            private CrumblyWall GetCrumblyWall(XmlElement wdef)
                 {
                 var tilePos = new TilePos(int.Parse(wdef.GetAttribute("Left")), int.Parse(wdef.GetAttribute("Top")));
                 var position = tilePos.ToPosition();
                 var energy = int.Parse(wdef.GetAttribute("Energy"));
                 var textureName = wdef.GetAttribute("Texture");
-                var result = gameState.AddCrumblyWall(position, "Tiles/" + textureName, energy);
+                var result = this._gameState.AddCrumblyWall(position, "Tiles/" + textureName, energy);
                 return result;
                 }
 
-            private void GetListOfFruit(GameState gameState)
+            private void GetListOfFruit()
                 {
                 var rnd = GlobalServices.Randomess;
-                foreach (WorldArea wa in this._worldAreas)
+                foreach (WorldArea wa in this._wl._worldAreas)
                     {
                     foreach (FruitDefinition fd in wa.FruitDefinitions.Values)
                         {
@@ -493,7 +501,7 @@ namespace Labyrinth.Services.WorldBuilding
                                 continue;
                             this._tileUsage[tilePos.X, tilePos.Y].SetOccupationByFruit();
                             Vector2 position = tilePos.ToPosition();
-                            gameState.AddFruit(position, fd.FruitType);
+                            this._gameState.AddFruit(position, fd.FruitType);
                             i++;
                             }
                         }

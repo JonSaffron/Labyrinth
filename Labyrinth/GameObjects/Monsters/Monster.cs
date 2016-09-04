@@ -21,7 +21,7 @@ namespace Labyrinth.GameObjects
         public bool LaysMushrooms { private get; set; }
         public bool SplitsOnHit { private get; set; }
         public bool IsActive { get; set; }
-        public bool ShotsBounceOff { get; protected set; }
+        public bool ShotsBounceOff { get; set; }
         public MonsterShootBehaviour MonsterShootBehaviour { get; set; }
         
         [NotNull]

@@ -340,10 +340,11 @@
       <Processor>PassThroughProcessor</Processor>
       <SubType>Designer</SubType>
     </None>
-    <Compile Include="Levels\WorldSchema.xsd">
+    <None Include="Levels\WorldSchema.xsd">
       <Name>WorldSchema</Name>
       <SubType>Designer</SubType>
-    </Compile>
+      <Processor>PassThroughProcessor</Processor>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tiles\Floor5.png">
@@ -652,11 +653,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Levels\World2.xml">
+    <None Include="Levels\World2.xml">
       <Name>World2</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
-    </Compile>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NewTiles\Borgen.png">
