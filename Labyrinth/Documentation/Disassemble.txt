@@ -54,6 +54,13 @@ current monster data 400 to 7bf
 0b00 to 0b9f	-- map of current room
 
 0ba0 to 0ba5	-- temporary storage when generating room layout
+0ba0			-- top and bottom rows
+0ba1			-- 2nd and penultimate rows
+0ba2			-- first and last column
+0ba3			-- 3rd, 4th, 7th and 8th rows
+0ba4			-- centre shape
+0ba5			-- exits (up is lowest 2 bits, down next, then right, left is highest bits. 
+							0 indicates no exit, 1 a small exit, 2 a large exit. 3 is not used)
 
 0ba6			-- 2 for world 1, 0 for 2nd world	
 
@@ -72,8 +79,8 @@ current monster data 400 to 7bf
 0bca			-- used as a counter during iteration of recent monster list
 
 0bcc			-- last room number
-0bcd			-- highest level achieved
-0bce			-- ???
+0bcd			-- highest level achieved within 1st world, or FF in other worlds
+0bce			-- countdown until monsters can move rooms
 0bcf			-- 0 for keyboard input, &FF for joystick input (18e0 and 18e1 have details)
 
 0bd0 - 0bd3		-- internal key number for directions left, right, up and down)
@@ -2397,7 +2404,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1EA6 A9 00     LDA #00                  
 1EA8 8D DC 0B  STA 0BDC                 -- indicate that main loop shouldn't end
 1EAB 85 8A     STA 8A                   -- indicate that world has not been completed
-1EAD 8D C3 0B  STA 0BC3                 
+1EAD 8D C3 0B  STA 0BC3                 -- player will be moving forwards (not being bounced)
 1EB0 8D C7 0B  STA 0BC7                 -- reset firing flag
 1EB3 20 31 09  JSR 0931                 -- generate room layout
 1EB6 AD C6 0B  LDA 0BC6                 -- get current room
@@ -2416,10 +2423,13 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1ED2 8D 01 0C  STA 0C01                 -- restore player tile number
 1ED5 68        PLA                      
 1ED6 8D 0E 0C  STA 0C0E                 -- restore player energy
+
+		-- move any monsters in the player's restart room to an adjacent room
+
 1ED9 AD C6 0B  LDA 0BC6                 -- get current room
-1EDC 85 89     STA 89                   
+1EDC 85 89     STA 89                   -- store it to restore later
 1EDE A9 FF     LDA #FF                  
-1EE0 8D C6 0B  STA 0BC6                 -- clear room number
+1EE0 8D C6 0B  STA 0BC6                 -- set current room number
 1EE3 A9 BF     LDA #BF                  -- initialise loop counter
 1EE5 85 88     STA 88                   
 1EE7 A4 88     LDY 88                   
@@ -2434,17 +2444,29 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1EFA D0 EB     BNE 1EE7                 -- continue loop
 1EFC A5 89     LDA 89                   -- get current room
 1EFE 8D C6 0B  STA 0BC6                 -- restore current room
+
+		-- clear out-of-sight monster list
+
 1F01 A9 FF     LDA #FF                  
 1F03 A0 0F     LDY #0F                  -- initialise loop counter
 1F05 99 E0 0B  STA 0BE0,Y               -- clear out-of-sight monster list
 1F08 88        DEY                      
 1F09 10 FA     BPL 1F05                 -- continue loop
+
+		-- fill room contents
+
 1F0B 20 7E 25  JSR 257E                 -- load static objects and crystals into room
 1F0E 20 C9 23  JSR 23C9                 -- load monsters into room
+
+		-- check the player is not placed on top of a wall
+
 1F11 AC 01 0C  LDY 0C01                 -- get player tile number
 1F14 B9 00 0B  LDA 0B00,Y               -- get contents of tile
 1F17 C9 20     CMP #20                  -- is it empty?
 1F19 D0 13     BNE 1F2E                 -- not empty, so branch
+
+		-- check that the player is not placed on top of a monster
+
 1F1B A0 10     LDY #10                  -- initialise loop counter
 1F1D AD 01 0C  LDA 0C01                 -- get player tile number
 1F20 D9 01 0C  CMP 0C01,Y               -- compare to monster slot tile
@@ -2454,17 +2476,18 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1F27 69 10     ADC #10                  -- increment loop counter
 1F29 A8        TAY                      
 1F2A D0 F1     BNE 1F1D                 -- continue loop
+
 1F2C F0 17     BEQ 1F45                 -- jump over next bit
 
-		-- change player tile number
+		-- adjust player tile number by 1 in random direction
 
-1F2E AD 01 0C  LDA 0C01                 
-1F31 20 83 1C  JSR 1C83                 
-1F34 20 80 1E  JSR 1E80                 
-1F37 29 03     AND #03                  
-1F39 20 67 1C  JSR 1C67                 
-1F3C 20 90 1C  JSR 1C90                 
-1F3F 8D 01 0C  STA 0C01                 
+1F2E AD 01 0C  LDA 0C01                 -- get player tile number
+1F31 20 83 1C  JSR 1C83                 -- separate tile number into x and y
+1F34 20 80 1E  JSR 1E80                 -- generate random number
+1F37 29 03     AND #03                  -- only first 2 bits for a random direction
+1F39 20 67 1C  JSR 1C67                 -- increment/decrement x and y as per direction
+1F3C 20 90 1C  JSR 1C90                 -- combine x and y back to a tile number
+1F3F 8D 01 0C  STA 0C01                 -- store player tile number
 1F42 4C 11 1F  JMP 1F11                 -- retest
 
 1F45 A9 05     LDA #05                  -- initialise first slot for player info
@@ -3652,6 +3675,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2791 20 80 1E  JSR 1E80                 -- get random number
 2794 10 03     BPL 2799                 -- if +ve then branch over jump
 2796 4C 09 28  JMP 2809                 -- goto alternative routine
+
 2799 AD C9 0B  LDA 0BC9                 -- get flag which indicates that there's an entry in the recent monster list
 279C F0 57     BEQ 27F5                 -- branch when zero to check countdown
 
@@ -3706,7 +3730,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 27F1 8D C9 0B  STA 0BC9                 -- store zero in the flag
 27F4 60        RTS                      
 
-
+		-- check countdown
 
 27F5 AD CE 0B  LDA 0BCE                 -- get countdown
 27F8 30 04     BMI 27FE                 -- branch when negative to choose random monster
@@ -3717,15 +3741,17 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 27FE 20 80 1E  JSR 1E80                 -- get random number
 2801 C9 C0     CMP #C0                  
-2803 B0 F9     BCS 27FE                 
+2803 B0 F9     BCS 27FE                 -- must be below C0
 
 2805 20 FE 31  JSR 31FE                 -- change room number
 2808 60        RTS                      
 
+		-- alternative move monster routine
+
 2809 AD CD 0B  LDA 0BCD                 -- get highest level achieved
 280C 10 32     BPL 2840                 -- if 1st world then RTS
 
-		-- 2nd world 
+		-- move a monster in the 2nd world 
 
 280E AD D9 0B  LDA 0BD9                 -- get current counter
 2811 29 7F     AND #7F                  
@@ -5077,6 +5103,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3174 A9 01     LDA #01                  
 3176 20 D6 2D  JSR 2DD6                 -- play death sound on channel 0
 
+		-- add grave to world
+
 3179 20 B2 31  JSR 31B2                 -- get free static slot
 317C 98        TYA                      
 317D 30 32     BMI 31B1                 -- no slot free, RTS
@@ -5100,6 +5128,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 31AC A4 74     LDY 74                   
 31AE 99 00 0B  STA 0B00,Y               -- store grave into current room map
 31B1 60        RTS                      
+
+		-- Find a free static slot to store the grave
 
 31B2 A0 7F     LDY #7F                  
 31B4 B9 00 0E  LDA 0E00,Y               
@@ -5142,21 +5172,22 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 31F8 99 00 07  STA 0700,Y               -- store new monster type
 31FB 4C 7D 2F  JMP 2F7D                 -- kill monster
 
-		-- Possibly change the room that the monster is in
+		-- Possibly change the room that the specified monster is in
 		-- on entry, A is the monster index
 
 31FE A8        TAY                      
 31FF B9 00 04  LDA 0400,Y               -- get monster's room
-3202 30 0F     BMI 3213                 -- if -ve then it's dead
+3202 30 0F     BMI 3213                 -- if -ve then it's dead so RTS
 3204 CD C6 0B  CMP 0BC6                 -- compare with current room
-3207 F0 0A     BEQ 3213                 -- do nothing if equal (rts)
-3209 20 06 26  JSR 2606                 -- get monster's current level into a
-320C CD CD 0B  CMP 0BCD                 -- compare with highest level achieved
-320F F0 21     BEQ 3232                 -- branch if same level
-3211 90 1F     BCC 3232                 -- branch if a is less than 0BCD
+3207 F0 0A     BEQ 3213                 -- if equal then RTS
+3209 20 06 26  JSR 2606                 -- get monster's current level into A
+320C CD CD 0B  CMP 0BCD                 -- compare with highest level achieved by player
+320F F0 21     BEQ 3232                 -- branch over if same level
+3211 90 1F     BCC 3232                 -- branch over if monster level is less than player's level
 3213 60        RTS                      
 
--- modify monster's room changing behaviour if it's behaving cautiously
+		-- modify monster's room changing behaviour if it's behaving cautiously
+		-- on entry, Y is the monster index, 73 has the monster's suggested direction
 
 3214 B9 C0 04  LDA 04C0,Y               -- get movement type
 3217 29 07     AND #07                  -- test first 3 bits
@@ -5170,9 +5201,11 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3226 CD 0E 0C  CMP 0C0E                 -- compare to player's energy
 3229 B0 E8     BCS 3213                 -- RTS if monster's energy the same or greater
 322B A5 73     LDA 73                   -- get current result
-322D 49 01     EOR #01                  -- toggle bit 0
+322D 49 01     EOR #01                  -- toggle bit 0 to reverse direction
 322F 85 73     STA 73                   -- set current result
 3231 60        RTS                      
+
+		-- check monster movement attributes
 
 3232 B9 C0 04  LDA 04C0,Y               -- get monster movement type
 3235 29 10     AND #10                  -- check is moving between rooms bit
@@ -5182,15 +5215,16 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 323E 8A        TXA                      
 323F 48        PHA                      
-3240 B9 00 04  LDA 0400,Y               -- get room number
+3240 B9 00 04  LDA 0400,Y               -- get monster's room number
 3243 84 72     STY 72                   
-3245 20 00 09  JSR 0900                 -- get information about room
+3245 20 00 09  JSR 0900                 -- get information about room (updates 0ba0 to 0ba5)
 3248 A4 72     LDY 72                   
 324A B9 C0 04  LDA 04C0,Y               -- get monster movement type
-324D 29 20     AND #20                  -- test bit 5
-324F F0 42     BEQ 3293                 -- branch if should choose random direction
+324D 29 20     AND #20                  -- test bit 5 which is set if the monster follows the player
+324F F0 42     BEQ 3293                 -- branch if clear and the monster should move in a random direction
+
 3251 A9 00     LDA #00                  
-3253 85 73     STA 73                   -- set initial result? 0 is up, 1 is down, 3 is left, so 2 is right
+3253 85 73     STA 73                   -- set initial result to up (directions: 0 is up, 1 is down, 2 is right, 3 is left)
 3255 B9 00 04  LDA 0400,Y               -- get room number of monster
 3258 29 F0     AND #F0                  -- calculate y co-ord of monster (which row of world)
 325A 85 70     STA 70                   
@@ -5198,15 +5232,16 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 325F 29 F0     AND #F0                  -- calculate y co-ord of player
 3261 C5 70     CMP 70                   -- compare
 3263 F0 0E     BEQ 3273                 -- if the same then branch to next section
-3265 B0 02     BCS 3269                 -- branch if y co-ord of player > y co-ord of monster
+
+3265 B0 02     BCS 3269                 -- branch over next instruction if y co-ord of player > y co-ord of monster
 3267 E6 73     INC 73                   -- set result to down
 3269 20 14 32  JSR 3214                 -- modify for cautious behaviour (if scared, then toggle bit 0)
 326C A5 73     LDA 73                   -- get result
 326E 20 2C 33  JSR 332C                 -- is there an exit in that direction?
-3271 D0 32     BNE 32A5                 -- branch if there is
+3271 D0 32     BNE 32A5                 -- branch if there is to update the monster
 
-3273 A9 02     LDA #02                  -- set result to Right
-3275 85 73     STA 73                   
+3273 A9 02     LDA #02                  
+3275 85 73     STA 73                   -- now set result to Right
 
 3277 AD C6 0B  LDA 0BC6                 
 327A 29 0F     AND #0F                  -- get x co-ord of player
@@ -5219,7 +5254,9 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3289 20 14 32  JSR 3214                 -- modify for cautious behaviour (if scared, then toggle bit 0)
 328C A5 73     LDA 73                   -- get result
 328E 20 2C 33  JSR 332C                 -- check if move possible
-3291 D0 12     BNE 32A5                 -- branch if move is possible
+3291 D0 12     BNE 32A5                 -- branch if move is possible, otherwise fall through
+
+		-- move the monster in a random direction
 
 3293 20 80 1E  JSR 1E80                 -- get random number
 3296 29 03     AND #03                  -- only want the lowest 2 bits
@@ -5236,13 +5273,13 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 32A7 99 80 05  STA 0580,Y               
 32AA B9 00 04  LDA 0400,Y               -- get current room
 32AD 85 70     STA 70                   
-32AF 20 3A 33  JSR 333A                 -- update &70 with new room number
-32B2 A5 70     LDA 70                   
+32AF 20 3A 33  JSR 333A                 -- get new room and tile position according to direction chosen
+32B2 A5 70     LDA 70                   -- get new room number
 32B4 99 00 04  STA 0400,Y               -- store updated room number
 32B7 CD CC 0B  CMP 0BCC                 -- compare to player's last room
 32BA D0 05     BNE 32C1                 -- branch if not the same
-32BC A5 71     LDA 71                   
-32BE 99 80 05  STA 0580,Y               -- update tile position
+32BC A5 71     LDA 71                   -- get new tile position
+32BE 99 80 05  STA 0580,Y               -- update tile position 
 
 32C1 B9 00 04  LDA 0400,Y               -- get new room
 32C4 CD C6 0B  CMP 0BC6                 -- is it the same as the player?
@@ -5298,17 +5335,18 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 332B 60        RTS                      
 
 		-- test if there's an exit in the direction indicated
-		-- on entry, A is the direction to move in
+		-- on entry, A is the exit from the room
 		--		0 is up, 1 is down, 2 is right, 3 is left
 		-- on exit, A is non-zero when can move in the specified direction
 
 332C AA        TAX                      
 332D A9 03     LDA #03                  -- bit mask for testing exits
 332F CA        DEX                      
-3330 30 04     BMI 3336                 
-3332 0A        ASL A                    
-3333 0A        ASL A                    
+3330 30 04     BMI 3336                 -- end loop when X negative
+3332 0A        ASL A                    -- move mask left
+3333 0A        ASL A                    -- move mask left
 3334 D0 F9     BNE 332F                 
+
 3336 2D A5 0B  AND 0BA5                 -- compare with room exits
 3339 60        RTS                      
 
@@ -5671,13 +5709,13 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 35B9 D0 08     BNE 35C3                 -- branch if still alive
 35BB 20 80 1E  JSR 1E80                 -- get random number
 35BE 29 7F     AND #7F                  -- first 7 bits only
-35C0 8D 01 0C  STA 0C01                 -- store new tile number
+35C0 8D 01 0C  STA 0C01                 -- store new tile number so that player's position is random
 35C3 EE DC 0B  INC 0BDC                 -- increment delay counter
 35C6 30 07     BMI 35CF                 -- not zero, skip next bit
 35C8 68        PLA                      
-35C9 68        PLA                      -- remove return address from stack
+35C9 68        PLA                      -- remove and discard return address from stack
 35CA 68        PLA                      
-35CB 68        PLA                      -- remove return address from stack
+35CB 68        PLA                      -- remove and discard return address from stack
 35CC A9 00     LDA #00                  
 35CE 60        RTS                      -- end main loop, indicating death
 
