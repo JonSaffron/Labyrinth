@@ -3,11 +3,12 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
     {
-    class SoundPlayer : ISoundPlayer
+    public class SoundPlayer : ISoundPlayer
         {
         private readonly SoundLibrary _soundLibrary;
         private readonly IActiveSoundService _activeSoundService;
-        private float _masterVolumeLevel = 1;
+        private const int TopVolume = 11;
+        private int _currentVolume = 8;    // todo save and restore this value
 
         public SoundPlayer(SoundLibrary soundLibrary, IActiveSoundService activeSoundService)
             {
@@ -36,7 +37,7 @@ namespace Labyrinth.Services.Sound
             if (centrePointProvider == null)
                 throw new ArgumentNullException("centrePointProvider");
 
-            InternalPlay(gameSound, gameObject, centrePointProvider);
+            InternalPlayForObject(gameSound, gameObject, centrePointProvider);
             }
 
         public void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider, EventHandler callback)
@@ -48,30 +49,42 @@ namespace Labyrinth.Services.Sound
             if (callback == null)
                 throw new ArgumentNullException("callback");
 
-            InternalPlay(gameSound, gameObject, centrePointProvider);
+            InternalPlayForObject(gameSound, gameObject, centrePointProvider);
             AddCallback(gameSound, callback);
             }
 
-        public void Enable()
+        public void Unmute()
             {
-            SoundEffect.MasterVolume = this._masterVolumeLevel;
+            SetVolume();
             }
 
-        public void Disable()
+        public void Mute()
             {
             SoundEffect.MasterVolume = 0;
             }
 
-        public void TurnItUp()
+        public bool IsMuted
             {
-            this._masterVolumeLevel = Math.Min(1.0f, SoundEffect.MasterVolume + 0.1f);
-            SoundEffect.MasterVolume = this._masterVolumeLevel;
+            get
+                {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                var result = (SoundEffect.MasterVolume == 0);
+                return result;
+                }
             }
 
-        public void TurnItDown()
+        public void TurnUpTheVolume()
             {
-            this._masterVolumeLevel = Math.Max(0.0f, SoundEffect.MasterVolume - 0.1f);
-            SoundEffect.MasterVolume = this._masterVolumeLevel;
+            this._currentVolume = IsMuted ? 1 : Math.Min(this._currentVolume + 1, TopVolume);
+            SetVolume();
+            }
+
+        public void TurnDownTheVolume()
+            {
+            if (IsMuted)
+                return;
+            this._currentVolume = Math.Max(0, this._currentVolume - 1);
+            SetVolume();
             }
 
         public SoundLibrary SoundLibrary
@@ -90,6 +103,12 @@ namespace Labyrinth.Services.Sound
                 }
             }
 
+        private void SetVolume()
+            {
+            float volume = 1.0f / TopVolume * this._currentVolume;
+            SoundEffect.MasterVolume = volume;
+            }
+
         private void InternalPlay(GameSound gameSound)
             {
 #if DEBUG
@@ -102,7 +121,7 @@ namespace Labyrinth.Services.Sound
             this._activeSoundService.Add(activeSound);
             }
 
-        private void InternalPlay(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
+        private void InternalPlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
             {
 #if DEBUG
             if (!DoesSoundRequirePosition(gameSound))
@@ -133,6 +152,12 @@ namespace Labyrinth.Services.Sound
                 }
 
             return true;
+            }
+
+        public override string ToString()
+            {
+            var result = "Volume is " + (IsMuted ? "muted" : this._currentVolume + "/" + TopVolume);
+            return result;
             }
         }
     }

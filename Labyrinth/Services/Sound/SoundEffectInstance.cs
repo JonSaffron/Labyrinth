@@ -62,5 +62,11 @@ namespace Labyrinth.Services.Sound
                 this._soundEffectInstance.Dispose();
                 }
             }
+
+        public override string ToString()
+            {
+            var result = string.Format("{0} {1} vol={2} pan={3}", this.InstanceName, this.State, this.Volume, this.Pan);
+            return result;
+            }
         }
     }

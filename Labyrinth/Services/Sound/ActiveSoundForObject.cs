@@ -59,5 +59,13 @@ namespace Labyrinth.Services.Sound
             var panning = Math.Min(1.0f, distanceToTheSide / 320.0f) * Math.Sign(differenceInPosition.X);
             this.SoundEffectInstance.Pan = panning;
             }
+
+        public override string ToString()
+            {
+            var result = string.Format("{0} {1} for {2} vol={3} pan={4}", this.SoundEffectInstance.InstanceName, this.SoundEffectInstance.State, this.GameObject.GetType().Name, this.SoundEffectInstance.Volume, this.SoundEffectInstance.Pan);
+            if (this.RestartPlayWhenStopped)
+                result += " to be restarted";
+            return result;
+            }
         }
     }

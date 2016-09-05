@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Labyrinth.Services.Sound
     {
     class ActiveSoundService : IActiveSoundService
         {
-        private readonly List<IActiveSound> _activeSounds = new List<IActiveSound>();
+        private readonly HashSet<IActiveSound> _activeSounds = new HashSet<IActiveSound>();
 
         public void Add(IActiveSound activeSound)
             {
             if (activeSound == null)
                 throw new ArgumentNullException("activeSound");
 
-            this._activeSounds.RemoveAll(item => item.SoundEffectInstance == activeSound.SoundEffectInstance);
             this._activeSounds.Add(activeSound);
             activeSound.Play();
             }
@@ -23,33 +23,22 @@ namespace Labyrinth.Services.Sound
                 {
                 activeSound.Stop();
                 }
+            Update();
             }
 
         public void Update()
             {
-            List<IActiveSound> instancesToRemove = null;
+            this._activeSounds.RemoveWhere(item => item.HasFinishedPlaying);
 
             foreach (var item in this._activeSounds)
                 {
-                if (item.CanBeRemoved)
-                    {
-                    if (instancesToRemove == null)
-                        instancesToRemove = new List<IActiveSound>();
-                    instancesToRemove.Add(item);
-                    }
-                else
-                    item.Update();
-                }
-
-            if (instancesToRemove == null)
-                return;
-
-            foreach (var item in instancesToRemove)
-                {
-                this._activeSounds.Remove(item);
+                item.Update();
                 }
             }
 
+        /// <summary>
+        /// Returns the number of active sounds being managed. Useful for testing.
+        /// </summary>
         public int Count
             {
             get
@@ -59,11 +48,16 @@ namespace Labyrinth.Services.Sound
                 }
             }
 
+        /// <summary>
+        /// Returns the specified active sound. Useful for testing.
+        /// </summary>
+        /// <param name="index">The index of the active sound to return.</param>
+        /// <returns>An instance of an active sound object.</returns>
         public IActiveSound this[int index]
             {
             get
                 {
-                var result = this._activeSounds[index];
+                var result = this._activeSounds.ElementAt(index);
                 return result;
                 }
             }

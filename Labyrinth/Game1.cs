@@ -155,15 +155,15 @@ namespace Labyrinth
                 
             int changeToEnabled = (gameInput.HasSoundOnBeenTriggered ? 1 : 0) + (gameInput.HasSoundOffBeenTriggered ? -1 : 0);
             if (changeToEnabled < 0)
-                GlobalServices.SoundPlayer.Disable();
+                GlobalServices.SoundPlayer.Mute();
             else if (changeToEnabled > 0)
-                GlobalServices.SoundPlayer.Enable();
+                GlobalServices.SoundPlayer.Unmute();
 
             int changeToVolume = (gameInput.HasSoundIncreaseBeenTriggered ? 1 : 0) + (gameInput.HasSoundDecreaseBeenTriggered  ? -1 : 0);
             if (changeToVolume < 0)
-                GlobalServices.SoundPlayer.TurnItDown();
+                GlobalServices.SoundPlayer.TurnDownTheVolume();
             else if (changeToVolume > 0)
-                GlobalServices.SoundPlayer.TurnItUp();
+                GlobalServices.SoundPlayer.TurnUpTheVolume();
 
             if (gameInput.HasMoveToNextLevelBeenTriggered && this.World != null)
                 {

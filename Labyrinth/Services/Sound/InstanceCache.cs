@@ -7,8 +7,9 @@ namespace Labyrinth.Services.Sound
         {
         private readonly Func<T> _createNewInstance;
         private readonly T[] _cache;
-        private readonly int _size;
+        protected readonly int Size;
         protected int Position;
+        // ReSharper disable once MemberCanBePrivate.Global
         protected bool IsDisposed;
 
         public InstanceCache(int countOfEntries, Func<T> createNewInstance)
@@ -18,9 +19,10 @@ namespace Labyrinth.Services.Sound
 
             this._createNewInstance = createNewInstance;
             this._cache = new T[countOfEntries];
-            this._size = countOfEntries;
+            this.Size = countOfEntries;
             }
 
+        // ReSharper disable once VirtualMemberNeverOverridden.Global
         public virtual T GetNext()
             {
             if (this.IsDisposed)
@@ -32,7 +34,7 @@ namespace Labyrinth.Services.Sound
                 result = CreateNewInstance();
                 this._cache[this.Position] = result;
                 }
-            this.Position = (this.Position + 1) % this._size;
+            this.Position = (this.Position + 1) % this.Size;
             return result;
             }
 
@@ -44,6 +46,15 @@ namespace Labyrinth.Services.Sound
             return result;
             }
 
+        protected int Count
+            {
+            get
+                {
+                var result = this._cache.Count(item => item != null);
+                return result;
+                }
+            }
+
         public void Dispose()
             {
             foreach (var item in this._cache.OfType<IDisposable>())
@@ -51,6 +62,12 @@ namespace Labyrinth.Services.Sound
                 item.Dispose();
                 }
             this.IsDisposed = true;
+            }
+
+        public override string ToString()
+            {
+            string result = string.Format("Caching {0} of {1} objects of type {2}", this.Count, this.Size, typeof(T).Name);
+            return result;
             }
         }
     }

@@ -24,22 +24,27 @@ namespace Labyrinth.Services.Sound
             // nothing to do
             }
 
-        public void Enable()
+        public void Unmute()
             {
             // nothing to do
             }
 
-        public void Disable()
+        public void Mute()
             {
             // nothing to do
             }
 
-        public void TurnItUp()
+        public bool IsMuted
+            {
+            get { return true; }
+            }
+
+        public void TurnUpTheVolume()
             {
             // nothing to do
             }
 
-        public void TurnItDown()
+        public void TurnDownTheVolume()
             {
             // nothing to do
             }

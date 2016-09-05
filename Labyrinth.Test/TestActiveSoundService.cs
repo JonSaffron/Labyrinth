@@ -91,7 +91,7 @@ namespace Labyrinth.Test
 
             Assert.AreEqual(1, ass.Count);
             activeSound = (ActiveSound) ass[0];
-            Assert.IsTrue(activeSound.RestartPlay);
+            Assert.IsTrue(activeSound.RestartPlayWhenStopped);
             }
 
         [Test]
@@ -112,9 +112,9 @@ namespace Labyrinth.Test
 
             Assert.AreEqual(1, ass.Count);
             activeSoundWithoutObject = (ActiveSound) ass[0];
-            Assert.IsTrue(activeSoundWithoutObject.RestartPlay);
+            Assert.IsTrue(activeSoundWithoutObject.RestartPlayWhenStopped);
             ass.Update();
-            Assert.IsFalse(activeSoundWithoutObject.RestartPlay);
+            Assert.IsFalse(activeSoundWithoutObject.RestartPlayWhenStopped);
             Assert.AreEqual(1, activeSoundWithoutObject.SoundEffectInstance.Volume);
             Assert.AreEqual(0, activeSoundWithoutObject.SoundEffectInstance.Pan);
             }

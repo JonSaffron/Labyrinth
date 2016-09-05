@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -39,7 +38,6 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public void GetGameObjects(GameState gameState)
             {
             var x = new ProcessGameObjects(this, gameState);
