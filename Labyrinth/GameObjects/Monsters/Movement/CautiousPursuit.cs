@@ -1,5 +1,7 @@
 ﻿namespace Labyrinth.GameObjects.Movement
     {
+    // todo: cautious pursuit should not inherit from FullPursuit
+
     class CautiousPursuit : FullPursuit
         {
         public override Direction DetermineDirection(Monster monster)

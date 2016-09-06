@@ -63,6 +63,9 @@ namespace Labyrinth
                 this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
                 }
             this.Player.Reset();
+            
+            // todo: Move any monsters in the room (that can move rooms) to an adjacent room
+
             GlobalServices.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
             this._levelReturnType = LevelReturnType.Normal;
             _doNotUpdate = false;

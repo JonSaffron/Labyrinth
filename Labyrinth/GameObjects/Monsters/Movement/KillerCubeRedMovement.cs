@@ -2,6 +2,8 @@ using System;
 
 namespace Labyrinth.GameObjects.Movement
     {
+    // todo: this should not inherit from StandardRolling
+
     class KillerCubeRedMovement : StandardRolling
         {
         public override Direction DetermineDirection(Monster monster)

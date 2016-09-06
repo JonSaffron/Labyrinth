@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects.Movement
     {
+    // todo: this should not inherit from standardpatrolling
+
     class StandardRolling : StandardPatrolling
         {
         public StandardRolling(Direction initialDirection) : base(initialDirection)

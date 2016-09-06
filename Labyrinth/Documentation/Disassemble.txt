@@ -7,8 +7,8 @@ current monster data 400 to 7bf
 						0 still, 1 left/right, 2 up/down, 3 placid, 4 full pursuit,
 						5 attracted, 6 cautious, 7 rolling around
 					bit 3 set indicates that the monster stays in the same room
-					bit 4 set (when 3 isn't) indicates that the monster can move between rooms (usually set upon meeting player)
-					bit 5 set (when 3 isn't) indicates that the monster moves rooms following the player, otherwise it moves randomly
+					bit 4 set (when 3 isn't) indicates that the monster can move between rooms (usually set upon meeting player - the active flag)
+					bit 5 set (when 3 isn't) indicates that when the monster moves rooms, it follows the player, otherwise it moves randomly
 					bit 6 set indicates that the monster will shoot back having been shot
 					bit 7 set indicates that the monster will shoot at the player
 580 to 63f		-- tile number (position in room) (not used if template) &FF indicates random position 
@@ -60,7 +60,7 @@ current monster data 400 to 7bf
 0ba3			-- 3rd, 4th, 7th and 8th rows
 0ba4			-- centre shape
 0ba5			-- exits (up is lowest 2 bits, down next, then right, left is highest bits. 
-							0 indicates no exit, 1 a small exit, 2 a large exit. 3 is not used)
+							0 indicates no exit, 1 a small exit, 2 is not used, 3 is large gap)
 
 0ba6			-- 2 for world 1, 0 for 2nd world	
 
@@ -71,7 +71,7 @@ current monster data 400 to 7bf
 0bc2			-- number of lives left
 0bc3			-- 0 normally, 1 when being bounced backward by block
 0bc4			-- holds direction
-0bc5			-- ???
+0bc5			-- row number during room generation, calculation result during fruit population
 0bc6			-- current room being shown. 
 0bc7			-- firing flag to enforce one shot per key press
 0bc8			-- counter of shots before decrementing energy
@@ -80,14 +80,14 @@ current monster data 400 to 7bf
 
 0bcc			-- last room number
 0bcd			-- highest level achieved within 1st world, or FF in other worlds
-0bce			-- countdown until monsters can move rooms
+0bce			-- countdown until monsters can move rooms. Starts at 5 and moves to FF
 0bcf			-- 0 for keyboard input, &FF for joystick input (18e0 and 18e1 have details)
 
 0bd0 - 0bd3		-- internal key number for directions left, right, up and down)
 0bd4			-- internal key number for fire
 bd5 bd6 bd7		-- score
 
-bd9 bda bdb		-- ticks since start of game
+bd9 bda bdb		-- ticks since start of game. bd9 is incremented every game loop.
 
 bdc				-- delay until game's main loop ends
 
@@ -97,7 +97,7 @@ bdc				-- delay until game's main loop ends
 0bf0-0bff		-- list of crystals
 					1st byte is the room, 2nd byte is the tile number
 
-0c00 to 0cff	-- shot/monster information for things in same room (16 bytes each)
+0c00 to 0cff	-- room occupant information (16 slots of 16 bytes each)
 					the player is always the first slot
 	offset 0	-- type of object (0 slot is empty, 1 is monster, 4 crystal, 5 player, fe block, ff shot)
 	offset 1	-- current tile number
@@ -120,8 +120,8 @@ bdc				-- delay until game's main loop ends
 
 	-- static object data
 
-0e00 to 0e7f	-- room containing static object (0e7f is for boulder)
-0e80 to 0eff	-- tile number of static object (0eff is for boulder)
+0e00 to 0e7f	-- room containing static object or FF if empty (0e7f is for boulder)
+0e80 to 0eff	-- tile number of static object or FF if not set/undefined (0eff is for boulder)
 0f00 to 0f7f	-- type of object (12 wall, 20 free tile, 5a apple, 13 block)
 0f80 to 0fff	-- energy of static object
 
@@ -142,7 +142,7 @@ bdc				-- delay until game's main loop ends
 3e80 - 3eff		-- controls 2nd and penultimate lines
 3f00 - 3f7f		-- controls line up of first and last column
 3f80 - 3fff		-- controls 3rd, 4th, 7th and 8th rows
-4000 - 407f		-- controls + shape
+4000 - 407f		-- controls centre shape
 4080 - 40ff		-- controls exits:
 						up is bits 0 & 1 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
 						down is bits 2 & 3 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
@@ -1521,7 +1521,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 17E1 29 03     AND #03                  
 17E3 4C F9 13  JMP 13F9                 
 
-		-- call one of the routines above
+		-- call one of the 10 routines above
+		-- on entry 0BC5 indicates the row number
 
 17E6 AD C5 0B  LDA 0BC5                 
 17E9 0A        ASL A                    
@@ -2416,7 +2417,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1EC6 48        PHA                      
 1EC7 A0 00     LDY #00                  -- initialise loop counter
 1EC9 A9 00     LDA #00                  
-1ECB 99 00 0C  STA 0C00,Y               -- clear monster data
+1ECB 99 00 0C  STA 0C00,Y               -- clear room occupant data
 1ECE 88        DEY                      -- decrement loop counter
 1ECF D0 FA     BNE 1ECB                 -- continue loop
 1ED1 68        PLA                      
@@ -2924,13 +2925,16 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 226A C5 73     CMP 73                   
 226C F0 47     BEQ 22B5                 -- RTS
 226E CD CD 0B  CMP 0BCD                 -- compare to highest level achieved
-2271 90 17     BCC 228A                 -- lower level, so branch
-2273 F0 15     BEQ 228A                 -- same level, so branch
+2271 90 17     BCC 228A                 -- lower level, so branch over to next section
+2273 F0 15     BEQ 228A                 -- same level, so branch over to next section
+
+		-- player has entered new level
+
 2275 8D CD 0B  STA 0BCD                 -- update highest level achieved
 2278 20 E0 2A  JSR 2AE0                 -- load new set of fruit
 227B 85 70     STA 70                   
-227D C9 04     CMP #04                  -- is new level number 4?
-227F F0 09     BEQ 228A                 -- yes, so branch
+227D C9 04     CMP #04                  -- has entered level number 4?
+227F F0 09     BEQ 228A                 -- yes, so branch over playing sound
 2281 48        PHA                      
 2282 A9 16     LDA #16                  
 2284 20 D6 2D  JSR 2DD6                 -- play new level sound
@@ -2943,12 +2947,15 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 228C 48        PHA                      
 228D AD CD 0B  LDA 0BCD                 -- get highest level achieved
 2290 30 24     BMI 22B6                 -- branch if in the 2nd world
+
+		-- 1st world sprites set up
+
 2292 A5 70     LDA 70                   -- get current level
 2294 0A        ASL A                    -- double it
 2295 A8        TAY                      
 
 2296 B9 E0 08  LDA 08E0,Y               
-2299 20 23 1C  JSR 1C23                 -- calculate sprite number
+2299 20 23 1C  JSR 1C23                 -- calculate sprite number for wall
 229C A5 72     LDA 72                   
 229E 85 80     STA 80                   
 22A0 A5 73     LDA 73                   
@@ -2965,15 +2972,15 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 22B3 85 72     STA 72                   
 22B5 60        RTS                      
 
-		-- 2nd world
+		-- 2nd world sprites set up
 
-22B6 A9 1F     LDA #1F                  
+22B6 A9 1F     LDA #1F                  -- hard coded sprite for wall
 22B8 20 23 1C  JSR 1C23                 
 22BB A5 72     LDA 72                   
 22BD 85 80     STA 80                   
 22BF A5 73     LDA 73                   
 22C1 85 81     STA 81                   
-22C3 A9 15     LDA #15                  
+22C3 A9 15     LDA #15                  -- hard coded sprite for floor
 22C5 D0 E0     BNE 22A7                 
 
 		-- store all monster info when leave room
@@ -3355,7 +3362,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2573 A4 74     LDY 74                   
 2575 20 5A 25  JSR 255A                 -- get object type
 2578 A4 74     LDY 74                   
-257A 99 00 0B  STA 0B00,Y               
+257A 99 00 0B  STA 0B00,Y               -- store object type in map of room
 257D 60        RTS
 
 		-- load static objects & crystals into room
@@ -3674,10 +3681,10 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 2791 20 80 1E  JSR 1E80                 -- get random number
 2794 10 03     BPL 2799                 -- if +ve then branch over jump
-2796 4C 09 28  JMP 2809                 -- goto alternative routine
+2796 4C 09 28  JMP 2809                 -- goto add acorn routine
 
 2799 AD C9 0B  LDA 0BC9                 -- get flag which indicates that there's an entry in the recent monster list
-279C F0 57     BEQ 27F5                 -- branch when zero to check countdown
+279C F0 57     BEQ 27F5                 -- branch when zero (nothing in list) to check countdown
 
 		-- run through list of monsters recently seen, decrement count, when 0 then clear tile number
 
@@ -3741,9 +3748,9 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 27FE 20 80 1E  JSR 1E80                 -- get random number
 2801 C9 C0     CMP #C0                  
-2803 B0 F9     BCS 27FE                 -- must be below C0
+2803 B0 F9     BCS 27FE                 -- must be below C0 to be a valid monster number
 
-2805 20 FE 31  JSR 31FE                 -- change room number
+2805 20 FE 31  JSR 31FE                 -- possibly change the monster's room
 2808 60        RTS                      
 
 		-- alternative move monster routine
@@ -3751,15 +3758,15 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2809 AD CD 0B  LDA 0BCD                 -- get highest level achieved
 280C 10 32     BPL 2840                 -- if 1st world then RTS
 
-		-- move a monster in the 2nd world 
+		-- try to add an acorn to a random room (2nd world only)
 
-280E AD D9 0B  LDA 0BD9                 -- get current counter
-2811 29 7F     AND #7F                  
+280E AD D9 0B  LDA 0BD9                 -- get current game ticks
+2811 29 7F     AND #7F                  -- clear top bit leaving a number between 0 and 63
 2813 C9 78     CMP #78                  
-2815 B0 29     BCS 2840                 -- no more than &77
+2815 B0 29     BCS 2840                 -- if 78 or more than RTS
 2817 A8        TAY                      
 2818 B9 00 0E  LDA 0E00,Y               -- get static content room for slot Y
-281B C9 FF     CMP #FF                  -- is it occupied?
+281B C9 FF     CMP #FF                  -- is it already occupied?
 281D D0 21     BNE 2840                 -- yes, so RTS
 281F 20 80 1E  JSR 1E80                 -- get random number 
 2822 29 7F     AND #7F                  -- between 0 and &7F (room number)
@@ -3767,13 +3774,13 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2827 F0 17     BEQ 2840                 -- yes, so RTS
 2829 CD CC 0B  CMP 0BCC                 -- is it the same as the last room?
 282C F0 12     BEQ 2840                 -- yes, so RTS
-282E 99 00 0E  STA 0E00,Y               -- store random room number
+282E 99 00 0E  STA 0E00,Y               -- store the room number
 2831 A9 FF     LDA #FF                  
 2833 99 80 0E  STA 0E80,Y               -- store indeterminate tile number for object
 2836 A9 5F     LDA #5F                  
 2838 99 00 0F  STA 0F00,Y               -- store &5F (acorn) in type of object list
 283B A9 20     LDA #20                  
-283D 99 80 0F  STA 0F80,Y               -- store &20 in amount of energy list
+283D 99 80 0F  STA 0F80,Y               -- store &20 in amount of energy list (twice as much energy as an acorn has in 1st world)
 2840 60        RTS                      
 
 		-- monster hatches
@@ -4130,86 +4137,102 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2AAD 8D CD 08  STA 08CD                 -- set to play sound
 2AB0 F0 F4     BEQ 2AA6                 
 
-2AB2 48        PHA                      -- 
-2AB3 29 03     AND #03                  
+		-- subroutine to the determine the base room number for the specified level
+		-- on entry A is the level number
+		-- on exit A is the base room number
+
+2AB2 48        PHA                      
+2AB3 29 03     AND #03                  -- level 0 -> 0, 1 -> 1, 2 -> 2, 3 -> 3, 4 -> 0, 5 -> 1, 6 -> 2, 7 -> 3
 2AB5 85 70     STA 70                   
 2AB7 68        PLA                      
 2AB8 48        PHA                      
-2AB9 29 04     AND #04                  
-2ABB F0 02     BEQ 2ABF                 
-2ABD A9 03     LDA #03                  
-2ABF 45 70     EOR 70                   
-2AC1 0A        ASL A                    
-2AC2 0A        ASL A                    
+2AB9 29 04     AND #04                  -- level 0 -> 0, 1 -> 0, 2 -> 0, 3 -> 0, 4 -> 4, 5 -> 4, 6 -> 4, 7 -> 4
+2ABB F0 02     BEQ 2ABF                 -- branch if on levels 0 to 3 with a = 0
+2ABD A9 03     LDA #03                  -- levels 4 to 7 load a = 3
+
+2ABF 45 70     EOR 70                   -- level 0 -> 0, 1 -> 1, 2 -> 2, 3 -> 3, 4 -> 3, 5 -> 2, 6 -> 1, 7 -> 0
+2AC1 0A        ASL A                    -- level 0 -> 0, 1 -> 2, 2 -> 4, 3 -> 6, 4 -> 6, 5 -> 4, 6 -> 2, 7 -> 0
+2AC2 0A        ASL A                    -- level 0 -> 0, 1 -> 4, 2 -> 8, 3 -> 12, 4 -> 12, 5 -> 8, 6 -> 4, 7 -> 0
 2AC3 85 70     STA 70                   
 2AC5 68        PLA                      
-2AC6 29 04     AND #04                  
-2AC8 0A        ASL A                    
-2AC9 0A        ASL A                    
-2ACA 0A        ASL A                    
-2ACB 0A        ASL A                    
+2AC6 29 04     AND #04                  -- level 0 -> 0, 1 -> 0, 2 -> 0, 3 -> 0, 4 -> 4, 5 -> 4, 6 -> 4, 7 -> 4
+2AC8 0A        ASL A                    -- level 0 -> 0, 1 -> 0, 2 -> 0, 3 -> 0, 4 -> 8, 5 -> 8, 6 -> 8, 7 -> 8
+2AC9 0A        ASL A                    -- level 0 -> 0, 1 -> 0, 2 -> 0, 3 -> 0, 4 -> 16, 5 -> 16, 6 -> 16, 7 -> 16
+2ACA 0A        ASL A                    -- level 0 -> 0, 1 -> 0, 2 -> 0, 3 -> 0, 4 -> 32, 5 -> 32, 6 -> 32, 7 -> 32
+2ACB 0A        ASL A                    -- level 0 -> 0, 1 -> 0, 2 -> 0, 3 -> 0, 4 -> 64, 5 -> 64, 6 -> 64, 7 -> 64
 2ACC 05 70     ORA 70                   
-2ACE 85 70     STA 70                   
+2ACE 85 70     STA 70                   -- level 0 -> 0, 1 -> 4, 2 -> 8, 3 -> 12, 4 -> 76, 5 -> 72, 6 -> 68, 8 -> 64
 2AD0 60        RTS                      
 
+		-- subroutine that calculates the room number within a 4x4 level
+		-- on entry A is a random number between 0 and 15
+		-- on exit A is the same number with bits 2 and 3 shifted to 4 and 5
+
 2AD1 48        PHA                      
-2AD2 29 03     AND #03                  
+2AD2 29 03     AND #03                  -- get two lowest bits
 2AD4 85 70     STA 70                   
 2AD6 68        PLA                      
-2AD7 29 0C     AND #0C                  
-2AD9 0A        ASL A                    
-2ADA 0A        ASL A                    
-2ADB 05 70     ORA 70                   
-2ADD 85 70     STA 70                   
+2AD7 29 0C     AND #0C                  -- get next two bits
+2AD9 0A        ASL A                    -- shift bits left
+2ADA 0A        ASL A                    -- shift bits left again
+2ADB 05 70     ORA 70                   -- combine with previous mask
+2ADD 85 70     STA 70                   -- bits that could now be set are 00xx00xx
 2ADF 60        RTS                      
 
 		-- load fruit for level A
 
 2AE0 48        PHA                      
-2AE1 0A        ASL A                    
-2AE2 0A        ASL A                    
-2AE3 0A        ASL A                    
-2AE4 69 07     ADC #07                  
-2AE6 A8        TAY                      
+2AE1 0A        ASL A					-- a is now 0, 2, 4, 6, 8, 10, 12, 14
+2AE2 0A        ASL A					-- a is now 0, 4, 8, 12, 16, 20, 24, 28
+2AE3 0A        ASL A                    -- a is now 0, 8, 16, 24, 32, 40, 48, 56
+2AE4 69 07     ADC #07                  -- a is now 7, 15, 23, 31, 39, 47, 55, 63
+2AE6 A8        TAY                      -- y takes the value of a, and is the loop counter
 2AE7 68        PLA                      
 2AE8 48        PHA                      
-2AE9 20 B2 2A  JSR 2AB2                 
+2AE9 20 B2 2A  JSR 2AB2                 -- get base room number for level A
 2AEC 8D C5 0B  STA 0BC5                 
-2AEF B9 00 0E  LDA 0E00,Y               
+
+2AEF B9 00 0E  LDA 0E00,Y               -- get room number for the static object in slot Y
 2AF2 C9 FF     CMP #FF                  
-2AF4 D0 3C     BNE 2B32                 
-2AF6 20 80 1E  JSR 1E80                 
-2AF9 29 0F     AND #0F                  
-2AFB 20 D1 2A  JSR 2AD1                 
-2AFE 0D C5 0B  ORA 0BC5                 
-2B01 99 00 0E  STA 0E00,Y               
+2AF4 D0 3C     BNE 2B32                 -- continue loop if room slot occupied
+
+2AF6 20 80 1E  JSR 1E80					-- get random number 
+2AF9 29 0F     AND #0F                  -- between 0 and 15
+2AFB 20 D1 2A  JSR 2AD1                 -- calculate the respective room number within the level
+2AFE 0D C5 0B  ORA 0BC5                 -- combine with the base room number for the level
+2B01 99 00 0E  STA 0E00,Y               -- set room number for fruit
 2B04 A9 FF     LDA #FF                  
-2B06 99 80 0E  STA 0E80,Y               
-2B09 20 80 1E  JSR 1E80                 
-2B0C 29 01     AND #01                  
-2B0E 85 70     STA 70                   
-2B10 68        PLA                      
+2B06 99 80 0E  STA 0E80,Y               -- set unfixed tile number for fruit
+2B09 20 80 1E  JSR 1E80                 -- get random number
+2B0C 29 01     AND #01                  -- between 0 and 1
+2B0E 85 70     STA 70                   -- store for later
+
+2B10 68        PLA                      -- retrieve level number
 2B11 48        PHA                      
-2B12 F0 0F     BEQ 2B23                 
+2B12 F0 0F     BEQ 2B23                 -- if level 0, branch and always use apple
 2B14 C9 04     CMP #04                  
-2B16 90 02     BCC 2B1A                 
-2B18 E6 70     INC 70                   
+2B16 90 02     BCC 2B1A                 -- branch over next line if levels 0 to 3
+2B18 E6 70     INC 70                   -- 70 is now 1 or 2
 2B1A 38        SEC                      
-2B1B E5 70     SBC 70                   
+2B1B E5 70     SBC 70                   -- level 1 -> 0 or 1, 2 -> 1 or 2, 3 -> 2 or 3, 4 -> 2 or 3, 5 -> 3 or 4, 6 -> 4 or 5, 7 -> 5 or 6
 2B1D C9 06     CMP #06                  
-2B1F 90 02     BCC 2B23                 
-2B21 A9 05     LDA #05                  
-2B23 48        PHA                      
+2B1F 90 02     BCC 2B23                 -- if result was less than 6 then we have answer, so branch and act on it
+2B21 A9 05     LDA #05					-- use fruit type of acorn
+                 
+2B23 48        PHA                      -- push fruit type 
 2B24 18        CLC                      
-2B25 69 5A     ADC #5A                  
-2B27 99 00 0F  STA 0F00,Y               
-2B2A 68        PLA                      
-2B2B 0A        ASL A                    
+2B25 69 5A     ADC #5A                  -- 5A is the sprite number for the apple
+2B27 99 00 0F  STA 0F00,Y               -- set type of object
+
+2B2A 68        PLA                      -- retrieve fruit type 
+2B2B 0A        ASL A                    -- double value
 2B2C 18        CLC                      
-2B2D 69 06     ADC #06                  
-2B2F 99 80 0F  STA 0F80,Y               
-2B32 88        DEY                      
-2B33 10 BA     BPL 2AEF                 
+2B2D 69 06     ADC #06                  -- add 6
+2B2F 99 80 0F  STA 0F80,Y               -- set energy of fruit (apple = 6, Watermelon = 8, Pineapple = 10, Strawberry = 12, Cherries = 14, Acorn = 16)
+
+2B32 88        DEY                      -- decrement loop counter
+2B33 10 BA     BPL 2AEF                 -- loop whilst 0 or above
+
 2B35 68        PLA                      
 2B36 60        RTS                      
 
@@ -5208,7 +5231,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 		-- check monster movement attributes
 
 3232 B9 C0 04  LDA 04C0,Y               -- get monster movement type
-3235 29 10     AND #10                  -- check is moving between rooms bit
+3235 29 10     AND #10                  -- check is moving between rooms bit (the active flag)
 3237 F0 DA     BEQ 3213                 -- not set, so RTS
 3239 B9 00 07  LDA 0700,Y               -- get monster type
 323C 30 D5     BMI 3213                 -- if an egg, then RTS
@@ -5886,7 +5909,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3719 20 CD 2D  JSR 2DCD                 -- reset all sounds channels
 
 371C 68        PLA                      
-371D D0 2C     BNE 374B	                 -- branch if escape pressed
+371D D0 2C     BNE 374B	                -- branch if escape pressed
 371F A5 8A     LDA 8A                   
 3721 D0 33     BNE 3756                 -- branch if completed world
 3723 AD C2 0B  DEC 0BC2                 -- decrement lives
@@ -5895,7 +5918,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3728 AD A6 0B  LDA 0BA6                 -- get world number
 372B F0 16     BEQ 3743                 -- branch if 2nd world
 
-		-- 1st world initialisation
+		-- 1st world restart
 
 372D AD C6 0B  LDA 0BC6                 -- get current room number of player
 3730 20 06 26  JSR 2606                 -- calculate corresponding level
@@ -5906,7 +5929,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 373D 8D 0E 0C  STA 0C0E                 -- set player's energy level
 3740 4C 04 37  JMP 3704                 -- jump to new life
 
-		-- 2nd world initialisation
+		-- 2nd world restart
 
 3743 A9 FF     LDA #FF                  -- set energy to maximum
 3745 8D 0E 0C  STA 0C0E                 
@@ -5922,7 +5945,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 3753 4C 48 38  JMP 3848                 -- game ended - jump to high scores
 
-		-- world completed
+		-- set up for second world
 
 3756 AD A6 0B  LDA 0BA6                 -- get world number
 3759 F0 00     BEQ 375B                 

@@ -131,55 +131,29 @@
           <xs:attribute name="CrystalRequired" type="xs:int" use="required" />
         </xs:complexType>
       </xs:element>
-      
-      <xs:element name="Monster">
-        <xs:complexType>
-          <xs:attribute name="Type" type="xs:string" use="required" />
-          <xs:attribute name="Left" type="xs:int" use="required" />
-          <xs:attribute name="Top" type="xs:int" use="required" />
-          <xs:attribute name="Energy" type="xs:int" use="required" />
-          <xs:attribute name="Mobility" use="optional">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:pattern value="Static|Placid|Aggressive|Patrolling|Cautious" />
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="Direction" use="optional">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:pattern value="Left|Right|Up|Down" />
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="ChangeRooms" use="optional">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:pattern value="StaysWithinRoom|MovesRoom|FollowsPlayer" />
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="IsEgg" type="xs:boolean" use="optional" />
-          <xs:attribute name="TimeBeforeHatching" type="xs:int" use="optional" />
-          <xs:attribute name="LaysMushrooms" type="xs:boolean" use="optional" />
-          <xs:attribute name="LaysEggs" type="xs:boolean" use="optional" />
-          <xs:attribute name="SplitsOnHit" type="xs:boolean" use="optional" />
-          <xs:attribute name="MonsterShootBehaviour" use="optional">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:pattern value="None|ShootsImmediately|ShootsHavingBeenShot" />
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="ShotsBounceOff" type="xs:boolean" use="optional" />
-          <xs:attribute name="IsActive" type="xs:boolean" use="optional" />
-        </xs:complexType>
-      </xs:element>
+
+      <xs:element name="Monster" type="MonsterInstance" />
     </xs:choice>
   </xs:complexType>
 
+  <xs:complexType name="MonsterInstance">
+    <xs:complexContent>
+      <xs:extension base="MonsterBase">
+        <xs:attribute name="Left" type="xs:int" use="required" />
+        <xs:attribute name="Top" type="xs:int" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="MonsterTemplateDef">
-    <xs:attribute name="MatchingDiceRoll" type="xs:int" use="required" />
+    <xs:complexContent>
+      <xs:extension base="MonsterBase">
+        <xs:attribute name="MatchingDiceRoll" type="xs:int" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="MonsterBase">
     <xs:attribute name="Type" type="xs:string" use="required" />
     <xs:attribute name="Energy" type="xs:int" use="required" />
     <xs:attribute name="Mobility" use="optional">
