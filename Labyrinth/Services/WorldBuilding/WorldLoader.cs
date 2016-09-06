@@ -20,12 +20,19 @@ namespace Labyrinth.Services.WorldBuilding
         
         public void LoadWorld(string levelName)
             {
-            string levelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Levels/", levelName);
-            if (!File.Exists(levelPath))
-                throw new ArgumentOutOfRangeException(levelPath);
+            string worldDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Worlds");
+
+            string pathToWorld = worldDirectory + "/" + levelName;
+            if (!File.Exists(pathToWorld))
+                throw new ArgumentOutOfRangeException(pathToWorld);
             
             var xmlDoc = new XmlDocument();
-            xmlDoc.Load(levelPath);
+            xmlDoc.Load(pathToWorld);
+
+            var validator = new WorldValidator();
+            var pathToXsd = worldDirectory + "/WorldSchema.xsd";
+            validator.Validate(xmlDoc.OuterXml, pathToXsd);
+
             this._xmlRoot = xmlDoc.DocumentElement;
             this._xnm = new XmlNamespaceManager(xmlDoc.NameTable);
             this._xnm.AddNamespace("ns", "http://JonSaffron/Labyrinth");

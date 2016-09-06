@@ -333,14 +333,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Levels\World1.xml">
+    <None Include="Worlds\World1.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Name>World1</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Levels\WorldSchema.xsd">
+    <None Include="Worlds\WorldSchema.xsd">
       <Name>WorldSchema</Name>
       <SubType>Designer</SubType>
       <Processor>PassThroughProcessor</Processor>
@@ -654,7 +654,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Levels\World2.xml">
+    <None Include="Worlds\World2.xml">
       <Name>World2</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
