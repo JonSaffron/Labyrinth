@@ -39,7 +39,7 @@ namespace Labyrinth.Services.WorldBuilding
             throw new NotImplementedException();
             }
 
-        public Dictionary<int, StartState> GetStartStates()
+        public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
             throw new NotImplementedException();
             }

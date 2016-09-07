@@ -21,11 +21,11 @@
 
   <xs:complexType name="Area">
     <xs:sequence>
-      <xs:element name="StartPos" minOccurs="0" maxOccurs="1">
+      <xs:element name="PlayerStartState" minOccurs="0" maxOccurs="1">
         <xs:complexType>
-          <xs:attribute name="PlayerLeft" type="xs:int" use="required" />
-          <xs:attribute name="PlayerTop" type="xs:int" use="required" />
-          <xs:attribute name="StartEnergy" type="xs:int" use="required" />
+          <xs:attribute name="Left" type="xs:int" use="required" />
+          <xs:attribute name="Top" type="xs:int" use="required" />
+          <xs:attribute name="Energy" type="xs:int" use="required" />
         </xs:complexType>
       </xs:element>
 
@@ -64,6 +64,7 @@
               <xs:complexType>
                 <xs:attribute name="Type" type="xs:string" use="required" />
                 <xs:attribute name="Quantity" type="xs:int" use="required" />
+                <xs:attribute name="Energy" type="xs:int" use="required" />
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -86,11 +87,14 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
+    
     <xs:attribute name="Id" type="xs:int" use="optional" />
+    
     <xs:attribute name="Top" type="xs:int" use="required" />
     <xs:attribute name="Left" type="xs:int" use="required" />
     <xs:attribute name="Width" type="xs:int" use="required" />
     <xs:attribute name="Height" type="xs:int" use="required" />
+    
     <xs:attribute name="WorldStart" type="xs:boolean" use="optional" default="false" />
   </xs:complexType>
   

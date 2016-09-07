@@ -1,6 +1,7 @@
 ﻿using System;
 using Labyrinth.Annotations;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -18,11 +19,11 @@ namespace Labyrinth.GameObjects
         protected bool Flitters { private get; set; }
         private bool _flitterFlag;
 
-        public bool LaysMushrooms { private get; set; }
-        public bool SplitsOnHit { private get; set; }
+        public bool LaysMushrooms { get; set; }
+        public bool SplitsOnHit { get; set; }
         public bool IsActive { get; set; }
         public bool ShotsBounceOff { get; set; }
-        public MonsterShootBehaviour MonsterShootBehaviour { get; set; }
+        public MonsterShootBehaviour ShootBehaviour { get; set; }
         
         [NotNull]
         private IMonsterWeapon _weapon = new StandardMonsterWeapon();
@@ -266,21 +267,14 @@ namespace Labyrinth.GameObjects
                 if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
                     {
                     this.PlaySound(GameSound.MonsterLaysEgg);
-                    Monster m = ((ILayEggs) this).LayAnEgg();
-                    m.Mobility = this.Mobility;
-                    m.ChangeRooms = this.ChangeRooms;
-                    m.LaysMushrooms = this.LaysMushrooms;
-                    m.SplitsOnHit = this.SplitsOnHit;
-                    m.IsActive = true;
-                    m.ShotsBounceOff = this.ShotsBounceOff;
-                    m.MonsterShootBehaviour = this.MonsterShootBehaviour;
-                    m.SetDelayBeforeHatching((monsterRandom.Next(256) & 0x1f) + 8);
-                    m.LaysEggs = false;
-                    GlobalServices.GameState.AddMonster(m);
+                    MonsterDef md = ((ILayEggs) this).LayAnEgg();
+                    md.TimeBeforeHatching = (monsterRandom.Next(256) & 0x1f) + 8;
+                    md.LaysEggs = false;
+                    GlobalServices.GameState.CreateMonster(md);
                     }
                 }
 
-            if (this.MonsterShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInSight(this))
+            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInSight(this))
                 {
                 this._weapon.FireIfYouLike(this);
                 }
@@ -356,7 +350,7 @@ namespace Labyrinth.GameObjects
 
         public bool LaysEggs
             {
-            private get
+            get
                 {
                 return _laysEggs;
                 }

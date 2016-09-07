@@ -1,5 +1,4 @@
 ﻿using System;
-using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
@@ -34,7 +33,7 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private static bool IsMonsterDangerous(IMonster monster)
             {
-            if (monster.MonsterShootBehaviour != MonsterShootBehaviour.None)
+            if (monster.ShootBehaviour != MonsterShootBehaviour.None)
                 return true;
             if (!monster.IsStill)
                 return true;

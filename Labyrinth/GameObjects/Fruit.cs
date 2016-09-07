@@ -1,5 +1,4 @@
-﻿using System;
-using Labyrinth.Services.Display;
+﻿using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -9,32 +8,10 @@ namespace Labyrinth.GameObjects
         private readonly FruitType _fruitType;
         private bool _isTaken;
 
-        public Fruit(AnimationPlayer animationPlayer, Vector2 position, FruitType fruitType) : base(animationPlayer, position)
+        public Fruit(AnimationPlayer animationPlayer, Vector2 position, FruitType fruitType, int energy) : base(animationPlayer, position)
             {
             this._fruitType = fruitType;
-            switch (fruitType)
-                {
-                case FruitType.Apple:
-                    this.Energy = 6;
-                    break;
-                case FruitType.Watermelon:
-                    this.Energy = 8;
-                    break;
-                case FruitType.Pineapple:
-                    this.Energy = 10;
-                    break;
-                case FruitType.Strawberry:
-                    this.Energy = 12;
-                    break;
-                case FruitType.Cherries:
-                    this.Energy = 14;
-                    break;
-                case FruitType.Acorn:
-                    this.Energy = 16;
-                    break;
-                default:
-                    throw new InvalidOperationException();
-                }
+            this.Energy = energy;
             
             string textureName = string.Format("Sprites/Fruit/{0:G}", _fruitType);
             var a = Animation.StaticAnimation(textureName);

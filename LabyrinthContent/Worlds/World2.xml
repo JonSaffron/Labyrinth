@@ -86,7 +86,7 @@
   <Areas>
     <!-- Single Level -->
     <Area Id="1" Top="0" Left="0" Width="256" Height="80" WorldStart="true">
-      <StartPos PlayerLeft="8" PlayerTop="75" StartEnergy="50" />
+      <PlayerStartState Left="8" Top="75" Energy="50" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor2" />
 
@@ -107,6 +107,10 @@
         <TileDef Symbol="B" Type="PotentiallyOccupied" />
       </TileDefinitions>
     
+      <FruitDefinitions>
+        <FruitDef Type="Acorn" Quantity="120" Energy="32" />
+      </FruitDefinitions>
+      
       <RandomMonsterDistribution DiceToRoll="2D8" CountOfMonsters="190">
         <MonsterTemplates>
           <Monster MatchingDiceRoll="2" Type="RotaFloaterCyan" Energy="110" Mobility="Placid" ChangeRooms="FollowsPlayer" />
@@ -126,68 +130,6 @@
           <Monster MatchingDiceRoll="16" Type="CrazyCrawler" Energy="40" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> 
         </MonsterTemplates>
       </RandomMonsterDistribution>
-    </Area>
-
-    <!-- Area 1 -->
-    <Area Id="1" Top="40" Left="0" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Apple" Quantity="8" />
-      </FruitDefinitions>
-    </Area>
-
-    <!-- Area 2 -->
-    <Area Id="2" Top="40" Left="64" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Apple" Quantity="8" />
-        <FruitDef Type="Watermelon" Quantity="8" />
-      </FruitDefinitions>
-    </Area>
-
-    <!-- Area 3 -->
-    <Area Id="3" Top="40" Left="128" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Pineapple" Quantity="12" />
-        <FruitDef Type="Watermelon" Quantity="12" />
-      </FruitDefinitions>
-    </Area>
-
-    <!-- Area 4 bottom -->
-    <Area Top="40" Left="192" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Pineapple" Quantity="16" />
-        <FruitDef Type="Strawberry" Quantity="16" />
-      </FruitDefinitions>
-    </Area>
-
-    <!-- Area 4 top -->
-    <Area Top="0" Left="192" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Pineapple" Quantity="20" />
-        <FruitDef Type="Strawberry" Quantity="20" />
-      </FruitDefinitions>
-    </Area>
-
-    <!-- Area 5 -->
-    <Area Id="6" Top="0" Left="128" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Strawberry" Quantity="24" />
-        <FruitDef Type="Cherries" Quantity="24" />
-      </FruitDefinitions>
-    </Area>
-
-    <!-- Area 6 -->
-    <Area Id="7" Top="0" Left="64" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Cherries" Quantity="28" />
-        <FruitDef Type="Acorn" Quantity="28" />
-      </FruitDefinitions>
-    </Area>
-
-    <!-- Area 7 -->
-    <Area Id="8" Top="0" Left="0" Width="64" Height="40">
-      <FruitDefinitions>
-        <FruitDef Type="Acorn" Quantity="64" />
-      </FruitDefinitions>
     </Area>
   </Areas>
   

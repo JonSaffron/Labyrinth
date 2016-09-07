@@ -77,11 +77,11 @@ namespace Labyrinth.Services.WorldBuilding
             foreach (XmlElement a in areaList)
                 {
                 var wa = new WorldArea(a, this._xnm);
-                if (wa.TileDefinitions.Count != 0)
+                if (wa.TileDefinitions != null && wa.TileDefinitions.Count != 0)
                     {
                     WorldArea intersectingArea =
                         (from WorldArea r in result
-                        where r.Area.Intersects(wa.Area) && r.TileDefinitions.Count != 0
+                        where r.Area.Intersects(wa.Area) && r.TileDefinitions != null && r.TileDefinitions.Count != 0
                         select r).FirstOrDefault();
                     if (intersectingArea != null)
                         throw new InvalidOperationException(string.Format("The area {0} intersects with another area {1} (this is a problem because there are multiple tile definitions).", wa.Area, intersectingArea.Area));
@@ -92,9 +92,10 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        public Dictionary<int, StartState> GetStartStates()
+        public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
-            var result = this._worldAreas.Where(item => item.HasId).ToDictionary(key => key.Id, value => value.StartState);
+            var result =
+                this._worldAreas.Where(item => item.Id.HasValue).ToDictionary(key => key.Id.GetValueOrDefault(), value => value.PlayerStartState);
             return result;
             }
 
@@ -112,7 +113,7 @@ namespace Labyrinth.Services.WorldBuilding
             var spriteLibrary = GlobalServices.SpriteLibrary;
             foreach (WorldArea wa in this._worldAreas)
                 {
-                if (wa.TileDefinitions.Count == 0)
+                if (wa.TileDefinitions == null || wa.TileDefinitions.Count == 0)
                     continue;
                 
                 string defaultFloorName = wa.TileDefinitions.Values.Single(td => td.TileTypeByMap == TileTypeByMap.Floor).TextureName;
@@ -142,7 +143,10 @@ namespace Labyrinth.Services.WorldBuilding
                         default:
                             throw new InvalidOperationException();
                         }
-                    result[p.X, p.Y] = new Tile(floor, wa.Id);
+
+                    if (!wa.Id.HasValue)
+                        throw new InvalidOperationException("Area with tile definitions needs an id.");
+                    result[p.X, p.Y] = new Tile(floor, wa.Id.Value);
                     }
                 }
             return result;
@@ -163,7 +167,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        private class ProcessGameObjects
+        internal class ProcessGameObjects
             {
             private readonly WorldLoader _wl;
             private readonly GameState _gameState;
@@ -190,11 +194,13 @@ namespace Labyrinth.Services.WorldBuilding
                 this.AddWalls();
 
                 WorldArea initialWorldArea = this.GetInitialWorldArea();
-                StartState ss = initialWorldArea.StartState;
-                this._gameState.AddPlayer(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy, initialWorldArea.Id);
+                PlayerStartState pss = initialWorldArea.PlayerStartState;
+                if (pss == null)
+                    throw new InvalidOperationException("Initial world area should have a player start state.");
+                this._gameState.AddPlayer(pss.Position.ToPosition(), pss.Energy, initialWorldArea.Id);
             
                 var exceptions = new List<TileException>();
-                var playerStartPositions = this._wl._worldAreas.Where(wa => wa.StartState != null).Select(wa => new StartPositionReservation(wa.StartState.PlayerPosition));
+                var playerStartPositions = this._wl._worldAreas.Where(wa => wa.PlayerStartState != null).Select(wa => new StartPositionReservation(wa.PlayerStartState.Position));
                 exceptions.AddRange(SetTileOccupation(playerStartPositions, t => t.SetOccupationByStaticItem() ));
 
                 var movingMonsters = new List<IGameObject>();
@@ -274,14 +280,15 @@ namespace Labyrinth.Services.WorldBuilding
                 
                 foreach (WorldArea wa in this._wl._worldAreas)
                     {
-                    if (wa.TileDefinitions.Count == 0)
+                    var tileDefs = wa.TileDefinitions;
+                    if (tileDefs == null || tileDefs.Count == 0)
                         continue;
                 
                     foreach (TilePos p in wa.Area.PointsInside())
                         {
                         char symbol = lines[p.Y][p.X];
                         TileDefinition td;
-                        if (!wa.TileDefinitions.TryGetValue(symbol, out td))
+                        if (!tileDefs.TryGetValue(symbol, out td))
                             {
                             string text = string.Format("Don't know what symbol {0} indicates in world area {1}", symbol, wa.Id);
                             throw new InvalidOperationException(text);
@@ -385,56 +392,78 @@ namespace Labyrinth.Services.WorldBuilding
                 var dr = MessageBox.Show(message.ToString(), "Warnings", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (dr == DialogResult.Cancel)
                     throw new InvalidOperationException(message.ToString());
-                } 
+                }
 
             private Monster GetMonster(XmlElement mdef)
                 {
-                string type = mdef.GetAttribute("Type");
+                MonsterDef md = GetMonsterDef(mdef);
                 var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
-                Vector2 position = tilePos.ToPosition();
-                int e = int.Parse(mdef.GetAttribute("Energy"));
-                Monster result = this._gameState.CreateMonster(type, position, e);
+                md.Position = tilePos.ToPosition();
+
+                var result = this._gameState.CreateMonster(md);
+                return result;
+                }
+
+            internal static MonsterDef GetMonsterDef(XmlElement mdef)
+                {
+                MonsterDef result = new MonsterDef
+                    {
+                    MonsterType = mdef.GetAttribute("Type"),
+                    Energy = int.Parse(mdef.GetAttribute("Energy"))
+                    };
+
                 string initialDirection = mdef.GetAttribute("Direction");
                 if (!string.IsNullOrEmpty(initialDirection))
-                    result.InitialDirection = (Direction)Enum.Parse(typeof(Direction), initialDirection);
+                    {
+                    result.InitialDirection = (Direction) Enum.Parse(typeof(Direction), initialDirection);
+                    }
+
                 string mobility = mdef.GetAttribute("Mobility");
                 if (!String.IsNullOrEmpty(mobility))
-                    result.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);
+                    {
+                    result.Mobility = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), mobility);
+                    }
+
                 string changeRooms = mdef.GetAttribute("ChangeRooms");
                 if (!string.IsNullOrEmpty(changeRooms))
-                    result.ChangeRooms = (ChangeRooms)Enum.Parse(typeof(ChangeRooms), changeRooms);
-                string isEggAttribute = mdef.GetAttribute("IsEgg");
-                string timeBeforeHatchingAttribute = mdef.GetAttribute("TimeBeforeHatching");
-                if (!string.IsNullOrEmpty(isEggAttribute) && !string.IsNullOrEmpty(timeBeforeHatchingAttribute))
                     {
-                    bool isEgg = Boolean.Parse(isEggAttribute);
-                    int timeBeforeHatching = int.Parse(timeBeforeHatchingAttribute);
-                    if (isEgg)
-                        {
-                        result.SetDelayBeforeHatching(timeBeforeHatching | 1);
-                        }
+                    result.ChangeRooms = (ChangeRooms) Enum.Parse(typeof(ChangeRooms), changeRooms);
                     }
+
+                string isEggAttribute = mdef.GetAttribute("IsEgg");
+                if (!string.IsNullOrEmpty(isEggAttribute))
+                    {
+                    result.IsEgg = bool.Parse(isEggAttribute);
+                    }
+
+                string timeBeforeHatchingAttribute = mdef.GetAttribute("TimeBeforeHatching");
+                if (!string.IsNullOrEmpty(timeBeforeHatchingAttribute))
+                    {
+                    result.TimeBeforeHatching = int.Parse(timeBeforeHatchingAttribute) | 1;
+                    }
+
                 string laysMushrooms = mdef.GetAttribute("LaysMushrooms");
                 if (!string.IsNullOrEmpty(laysMushrooms))
                     {
-                    result.LaysMushrooms = Boolean.Parse(laysMushrooms);
+                    result.LaysMushrooms = bool.Parse(laysMushrooms);
                     }
+
                 string laysEggs = mdef.GetAttribute("LaysEggs");
                 if (!string.IsNullOrEmpty(laysEggs))
                     {
-                    result.LaysEggs = Boolean.Parse(laysEggs);
+                    result.LaysEggs = bool.Parse(laysEggs);
                     }
+
                 string splitsOnHit = mdef.GetAttribute("SplitsOnHit");
                 if (!string.IsNullOrEmpty(splitsOnHit))
                     {
-                    result.SplitsOnHit = Boolean.Parse(splitsOnHit);
+                    result.SplitsOnHit = bool.Parse(splitsOnHit);
                     }
             
                 string monsterShootBehaviourAttribute = mdef.GetAttribute("MonsterShootBehaviour");
                 if (!string.IsNullOrEmpty(monsterShootBehaviourAttribute))
                     {
-                    MonsterShootBehaviour monsterShootBehaviour = (MonsterShootBehaviour) Enum.Parse(typeof(MonsterShootBehaviour), monsterShootBehaviourAttribute);
-                    result.MonsterShootBehaviour = monsterShootBehaviour;
+                    result.ShootBehaviour = (MonsterShootBehaviour) Enum.Parse(typeof(MonsterShootBehaviour), monsterShootBehaviourAttribute);
                     }
                 
                 string shotsBounceOffAttribute = mdef.GetAttribute("ShotsBounceOff");
@@ -496,18 +525,22 @@ namespace Labyrinth.Services.WorldBuilding
                 var rnd = GlobalServices.Randomess;
                 foreach (WorldArea wa in this._wl._worldAreas)
                     {
-                    foreach (FruitDefinition fd in wa.FruitDefinitions.Values)
+                    if (wa.FruitDefinitions != null)
                         {
-                        for (int i = 0; i < fd.FruitQuantity; )
+                        foreach (FruitDefinition fd in wa.FruitDefinitions.Values)
                             {
-                            var tilePos = new TilePos(wa.Area.X + rnd.Next(wa.Area.Width), wa.Area.Y + rnd.Next(wa.Area.Height));
-                            TileUsage t = this._tileUsage[tilePos.X, tilePos.Y];
-                            if (!t.IsFree)
-                                continue;
-                            this._tileUsage[tilePos.X, tilePos.Y].SetOccupationByFruit();
-                            Vector2 position = tilePos.ToPosition();
-                            this._gameState.AddFruit(position, fd.FruitType);
-                            i++;
+                            for (int i = 0; i < fd.FruitQuantity;)
+                                {
+                                var tilePos = new TilePos(wa.Area.X + rnd.Next(wa.Area.Width),
+                                    wa.Area.Y + rnd.Next(wa.Area.Height));
+                                TileUsage t = this._tileUsage[tilePos.X, tilePos.Y];
+                                if (!t.IsFree)
+                                    continue;
+                                this._tileUsage[tilePos.X, tilePos.Y].SetOccupationByFruit();
+                                Vector2 position = tilePos.ToPosition();
+                                this._gameState.AddFruit(position, fd.FruitType, fd.Energy);
+                                i++;
+                                }
                             }
                         }
                     }

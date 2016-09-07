@@ -51,7 +51,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new player.
         /// </summary>
-        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy, int initialWorldAreaId) : base(animationPlayer, position)
+        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy, int? initialWorldAreaId) : base(animationPlayer, position)
             {
             // Load animated textures.
             this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 1);
@@ -66,7 +66,8 @@ namespace Labyrinth.GameObjects
             this._weapon1 = new StandardPlayerWeapon();
             this._weapon2 = new MineLayer();
             this.Energy = energy;
-            this._listOfWorldAreaIdsVisited.Add(initialWorldAreaId);
+            if (initialWorldAreaId.HasValue)
+                this._listOfWorldAreaIdsVisited.Add(initialWorldAreaId.Value);
             Reset();
             }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -164,11 +165,17 @@ namespace Labyrinth
         
         public void AddDiamondDemon(Vector2 p)
             {
-            var dd = CreateMonster(typeof(DiamondDemon), p, 30);
-            dd.Mobility = MonsterMobility.Aggressive;
-            dd.LaysEggs = true;
-            dd.ChangeRooms = ChangeRooms.FollowsPlayer;
-            dd.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
+            MonsterDef md = new MonsterDef
+                {
+                Type = typeof(DiamondDemon),
+                Position = p,
+                Energy = 30,
+                Mobility = MonsterMobility.Aggressive,
+                LaysEggs = true,
+                ChangeRooms = ChangeRooms.FollowsPlayer,
+                ShootBehaviour = MonsterShootBehaviour.ShootsImmediately
+                };
+            CreateMonster(md);
             }
 
         /// <summary>
@@ -208,11 +215,6 @@ namespace Labyrinth
             this._gameObjectCollection.Add(m);
             }
         
-        public void AddMonster(Monster m)
-            {
-            this._gameObjectCollection.Add(m);
-            }
-
         public Crystal AddCrystal(Vector2 position, int id, int score, int energy)
             {
             var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
@@ -235,22 +237,35 @@ namespace Labyrinth
             this._gameObjectCollection.Add(m);
             }
 
-        public Monster CreateMonster(string type, Vector2 position, int energy)
-            {
-            string typeName = "Labyrinth.GameObjects." + type;
-            Type monsterType = Type.GetType(typeName);
-            var result = CreateMonster(monsterType, position, energy);
-            return result;
-            }
-
-        public Monster CreateMonster(Type monsterType, Vector2 position, int energy)
+        public Monster CreateMonster(MonsterDef monsterDef)
             {
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var constructorInfo = monsterType.GetConstructor(new[] {typeof (AnimationPlayer), typeof (Vector2), typeof (int)});
+            var constructorInfo = monsterDef.Type.GetConstructor(new[] {typeof (AnimationPlayer), typeof (Vector2), typeof (int)});
             if (constructorInfo == null)
-                throw new InvalidOperationException("Failed to get matching constructor information for " + monsterType.Name + " object.");
-            var constructorArguments = new object[] {animationPlayer, position, energy};
+                throw new InvalidOperationException("Failed to get matching constructor information for " + monsterDef.MonsterType + " object.");
+            var constructorArguments = new object[] {animationPlayer, monsterDef.Position, monsterDef.Energy};
             var result = (Monster) constructorInfo.Invoke(constructorArguments);
+            if (monsterDef.Mobility.HasValue)
+                result.Mobility = monsterDef.Mobility.Value;
+            if (monsterDef.InitialDirection.HasValue)
+                result.InitialDirection = monsterDef.InitialDirection.Value;
+            if (monsterDef.ChangeRooms.HasValue)
+                result.ChangeRooms = monsterDef.ChangeRooms.Value;
+            if (monsterDef.IsEgg.GetValueOrDefault() && monsterDef.TimeBeforeHatching.HasValue)
+                result.SetDelayBeforeHatching(monsterDef.TimeBeforeHatching.Value);
+            if (monsterDef.LaysMushrooms.HasValue)
+                result.LaysMushrooms = monsterDef.LaysMushrooms.Value;
+            if (monsterDef.LaysEggs.HasValue)
+                result.LaysEggs = monsterDef.LaysEggs.Value;
+            if (monsterDef.SplitsOnHit.HasValue)
+                result.SplitsOnHit = monsterDef.SplitsOnHit.Value;
+            if (monsterDef.ShootBehaviour.HasValue)
+                result.ShootBehaviour = monsterDef.ShootBehaviour.Value;
+            if (monsterDef.ShotsBounceOff.HasValue)
+                result.ShotsBounceOff = monsterDef.ShotsBounceOff.Value;
+            if (monsterDef.IsActive.HasValue)
+                result.IsActive = monsterDef.IsActive.Value;
+
             this._gameObjectCollection.Add(result);
             return result;
             }
@@ -263,7 +278,7 @@ namespace Labyrinth
             return shot;
             }
 
-        public Player AddPlayer(Vector2 position, int energy, int initialWorldAreaId)
+        public Player AddPlayer(Vector2 position, int energy, int? initialWorldAreaId)
             {
             if (this.Player != null)
                 throw new InvalidOperationException("Cannot add more than one Player.");
@@ -306,10 +321,10 @@ namespace Labyrinth
             return result;
             }
 
-        public Fruit AddFruit(Vector2 position, FruitType fruitType)
+        public Fruit AddFruit(Vector2 position, FruitType fruitType, int energy)
             {
             var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new Fruit(ap, position, fruitType);
+            var result = new Fruit(ap, position, fruitType, energy);
             this._gameObjectCollection.Add(result);
             return result;
             }

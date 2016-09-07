@@ -208,6 +208,8 @@
     <Compile Include="GameObjects\Shot.cs" />
     <Compile Include="Services\Sound\SoundPlayer.cs" />
     <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
+    <Compile Include="Services\WorldBuilding\MonsterDef.cs" />
+    <Compile Include="Services\WorldBuilding\RandomMonsterDistribution.cs" />
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoaderForTest.cs" />
     <Compile Include="Services\WorldBuilding\WorldValidator.cs" />
@@ -235,7 +237,7 @@
     <Compile Include="Services\Sound\SoundEffectFinishedEventArgs.cs" />
     <Compile Include="Services\Sound\SoundLibrary.cs" />
     <Compile Include="Services\Display\SpriteBatchWindowed.cs" />
-    <Compile Include="Services\WorldBuilding\StartState.cs" />
+    <Compile Include="Services\WorldBuilding\PlayerStartState.cs" />
     <Compile Include="GameObjects\StaticItem.cs" />
     <Compile Include="GameObjects\Monsters\Thresher.cs" />
     <Compile Include="GameObjects\Monsters\ThresherBrown.cs" />

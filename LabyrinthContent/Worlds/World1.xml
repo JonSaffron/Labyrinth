@@ -86,7 +86,7 @@ O              OO              OO              OO              OO              O
   <Areas>
     <!-- Level 1 -->
     <Area Id="1" Top="40" Left="0" Width="64" Height="40" WorldStart="true">
-      <StartPos PlayerLeft="8" PlayerTop="75" StartEnergy="50" />
+      <PlayerStartState Left="8" Top="75" Energy="50" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor1" />
         <TileDef Symbol="©" Type="Wall" Tile="MBM1984" />
@@ -98,13 +98,13 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="#" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
-        <FruitDef Type="Apple" Quantity="8" />
+        <FruitDef Type="Apple" Quantity="8" Energy="6" />
       </FruitDefinitions>
     </Area>
 
     <!-- Level 2 -->
     <Area Id="2" Top="40" Left="64" Width="64" Height="40">
-      <StartPos PlayerLeft="72" PlayerTop="45" StartEnergy="100" />
+      <PlayerStartState Left="72" Top="45" Energy="100" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor2" />
         <TileDef Symbol="O" Type="Wall" Tile="Wall2" />
@@ -116,14 +116,14 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="#" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
-        <FruitDef Type="Apple" Quantity="8" />
-        <FruitDef Type="Watermelon" Quantity="8" />
+        <FruitDef Type="Apple" Quantity="8" Energy="6" />
+        <FruitDef Type="Watermelon" Quantity="8" Energy="8" />
       </FruitDefinitions>
     </Area>
 
     <!-- Level 3 -->
     <Area Id="3" Top="40" Left="128" Width="64" Height="40">
-      <StartPos PlayerLeft="136" PlayerTop="77" StartEnergy="150" />
+      <PlayerStartState Left="136" Top="77" Energy="150" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor3" />
         <TileDef Symbol="▓" Type="Wall" Tile="Wall3Full" />
@@ -143,14 +143,14 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="o" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
-        <FruitDef Type="Pineapple" Quantity="12" />
-        <FruitDef Type="Watermelon" Quantity="12" />
+        <FruitDef Type="Watermelon" Quantity="12" Energy="8" />
+        <FruitDef Type="Pineapple" Quantity="12" Energy="10" />
       </FruitDefinitions>
     </Area>
 
     <!-- Level 4 -->
     <Area Id="5" Top="0" Left="192" Width="64" Height="80">
-      <StartPos PlayerLeft="200" PlayerTop="65" StartEnergy="200" />
+      <PlayerStartState Left="200" Top="65" Energy="200" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor4" />
         <TileDef Symbol="□" Type="Wall" Tile="Wall4" />
@@ -168,21 +168,21 @@ O              OO              OO              OO              OO              O
 
     <Area Top="40" Left="192" Width="64" Height="40">
       <FruitDefinitions>
-        <FruitDef Type="Pineapple" Quantity="16" />
-        <FruitDef Type="Strawberry" Quantity="16" />
+        <FruitDef Type="Pineapple" Quantity="16" Energy="10" />
+        <FruitDef Type="Strawberry" Quantity="16" Energy="12" />
       </FruitDefinitions>
     </Area>
 
     <Area Top="0" Left="192" Width="64" Height="40">
       <FruitDefinitions>
-        <FruitDef Type="Pineapple" Quantity="20" />
-        <FruitDef Type="Strawberry" Quantity="20" />
+        <FruitDef Type="Pineapple" Quantity="20" Energy="10" />
+        <FruitDef Type="Strawberry" Quantity="20" Energy="12" />
       </FruitDefinitions>
     </Area>
 
     <!-- Level 5 -->
     <Area Id="6" Top="0" Left="128" Width="64" Height="40">
-      <StartPos PlayerLeft="183" PlayerTop="15" StartEnergy="200" />
+      <PlayerStartState Left="183" Top="15" Energy="200" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor5" />
         <TileDef Symbol="▓" Type="Wall" Tile="Wall5Full" />
@@ -201,14 +201,14 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="d" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
-        <FruitDef Type="Strawberry" Quantity="24" />
-        <FruitDef Type="Cherries" Quantity="24" />
+        <FruitDef Type="Strawberry" Quantity="24" Energy="12" />
+        <FruitDef Type="Cherries" Quantity="24" Energy="14" />
       </FruitDefinitions>
     </Area>
 
     <!-- Level 6 -->
     <Area Id="7" Top="0" Left="64" Width="64" Height="40">
-      <StartPos PlayerLeft="119" PlayerTop="35" StartEnergy="255" />
+      <PlayerStartState Left="119" Top="35" Energy="255" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor6" />
         <TileDef Symbol="▓" Type="Wall" Tile="Wall6Full" />
@@ -231,14 +231,14 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="c" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
-        <FruitDef Type="Cherries" Quantity="28" />
-        <FruitDef Type="Acorn" Quantity="28" />
+        <FruitDef Type="Cherries" Quantity="28" Energy="14" />
+        <FruitDef Type="Acorn" Quantity="28" Energy="16" />
       </FruitDefinitions>
     </Area>
 
     <!-- Level 7 -->
     <Area Id="8" Top="0" Left="0" Width="64" Height="40">
-      <StartPos PlayerLeft="56" PlayerTop="5" StartEnergy="255" />
+      <PlayerStartState Left="56" Top="5" Energy="255" />
       <TileDefinitions>
         <TileDef Symbol=" " Type="Floor" Tile="Floor4" />
         <TileDef Symbol="▓" Type="Wall" Tile="Wall7Full" />
@@ -250,7 +250,7 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="j" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
-        <FruitDef Type="Acorn" Quantity="64" />
+        <FruitDef Type="Acorn" Quantity="64" Energy="16" />
       </FruitDefinitions>
     </Area>
   </Areas>

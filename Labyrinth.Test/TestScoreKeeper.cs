@@ -22,7 +22,7 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyShoots()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.MonsterShootBehaviour).Returns(MonsterShootBehaviour.ShootsImmediately);
+            monster.Setup(monsterShoots => monsterShoots.ShootBehaviour).Returns(MonsterShootBehaviour.ShootsImmediately);
 
             var scoreKeeper = new ScoreKeeper();
             scoreKeeper.EnemyCrushed(monster.Object, 10);
@@ -58,7 +58,7 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyIsNotDangerous()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.MonsterShootBehaviour).Returns(MonsterShootBehaviour.None);
+            monster.Setup(monsterShoots => monsterShoots.ShootBehaviour).Returns(MonsterShootBehaviour.None);
             monster.Setup(monsterMoves => monsterMoves.IsStill).Returns(true);
             monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(false);
 

@@ -23,7 +23,7 @@ namespace Labyrinth
         [NotNull] public readonly Player Player;
 
         [NotNull] private readonly Tile[,] _tiles;
-        [NotNull] private readonly Dictionary<int, StartState> _startStates;
+        [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
         [NotNull] private readonly List<StaticItem>[] _itemsToDrawByZOrder;
 
         public Vector2 WindowPosition { get; private set; }
@@ -32,7 +32,7 @@ namespace Labyrinth
             {
             this._tiles = worldLoader.GetFloorTiles();
             var gameObjectCollection = new GameObjectCollection();
-            this._startStates = worldLoader.GetStartStates();
+            this._playerStartStates = worldLoader.GetPlayerStartStates();
             var gameState = new GameState(gameObjectCollection);
             worldLoader.GetGameObjects(gameState);
             this.Player = gameState.Player;
@@ -48,8 +48,8 @@ namespace Labyrinth
             GlobalServices.GameState.RemoveBangsAndShots();
 
             var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
-            StartState ss = this._startStates[worldAreaId];
-            this.Player.ResetPositionAndEnergy(ss.PlayerPosition.ToPosition(), ss.PlayerEnergy);
+            PlayerStartState pss = this._playerStartStates[worldAreaId];
+            this.Player.ResetPositionAndEnergy(pss.Position.ToPosition(), pss.Energy);
             GlobalServices.GameState.UpdatePosition(this.Player);
 
             ResetLevelForStartingNewLife(spw);
@@ -323,8 +323,8 @@ namespace Labyrinth
                 return;
 
             int currentWorldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
-            int maxId = this._startStates.Max(item => item.Key);
-            var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._startStates[i]).FirstOrDefault(startState => startState != null);
+            int maxId = this._playerStartStates.Max(item => item.Key);
+            var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._playerStartStates[i]).FirstOrDefault(startState => startState != null);
             if (newState == null)
                 return;
 
@@ -334,7 +334,7 @@ namespace Labyrinth
                 var i = new InteractionWithStaticItems(this, c, this.Player);
                 i.Collide();
                 }
-            this.Player.ResetPositionAndEnergy(newState.PlayerPosition.ToPosition(), newState.PlayerEnergy);
+            this.Player.ResetPositionAndEnergy(newState.Position.ToPosition(), newState.Energy);
             GlobalServices.GameState.UpdatePosition(this.Player);
             var boulder = GlobalServices.GameState.DistinctItemsOfType<Boulder>().FirstOrDefault();
             if (boulder != null)
@@ -343,7 +343,7 @@ namespace Labyrinth
                 for (int i = 0; i < 16; i++)
                     {
                     int x = (i % 2 == 0) ? 7 - (i / 2) : 8 + ((i - 1) / 2);
-                    var potentialPosition = new TilePos(x, newState.PlayerPosition.Y);
+                    var potentialPosition = new TilePos(x, newState.Position.Y);
                     if (!GlobalServices.GameState.IsStaticItemOnTile(potentialPosition))
                         {
                         tp = potentialPosition;

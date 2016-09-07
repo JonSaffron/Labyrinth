@@ -1,5 +1,6 @@
 ﻿using System;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -14,7 +15,7 @@ namespace Labyrinth.GameObjects
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
             this.LaysEggs = true;
-            this.MonsterShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
+            this.ShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
             }
 
         protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
@@ -28,9 +29,9 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public Monster LayAnEgg()
+        public MonsterDef LayAnEgg()
             {
-            var result = GlobalServices.GameState.CreateMonster(this.GetType(), this.Position, this.OriginalEnergy);
+            var result = MonsterDef.FromExistingMonster(this);
             return result;
             }
         }

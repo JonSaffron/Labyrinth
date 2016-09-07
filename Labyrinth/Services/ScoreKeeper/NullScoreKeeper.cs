@@ -1,6 +1,4 @@
-﻿using Labyrinth.GameObjects;
-
-namespace Labyrinth.Services.ScoreKeeper
+﻿namespace Labyrinth.Services.ScoreKeeper
     {
     class NullScoreKeeper : IScoreKeeper
         {

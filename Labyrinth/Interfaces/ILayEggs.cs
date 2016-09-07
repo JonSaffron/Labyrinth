@@ -1,9 +1,9 @@
-﻿using Labyrinth.GameObjects;
+﻿using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
     {
     interface ILayEggs
         {
-        Monster LayAnEgg();
+        MonsterDef LayAnEgg();
         }
     }
