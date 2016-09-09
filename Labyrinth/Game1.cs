@@ -12,8 +12,8 @@ namespace Labyrinth
     /// </summary>
     public class Game1 : Game
         {
-        private readonly IPlayerInput PlayerInput;
-        private ISpriteBatch SpriteBatch;
+        private readonly IPlayerInput _playerInput;
+        private ISpriteBatch _spriteBatch;
 
         private readonly GraphicsDeviceManager _gdm;
         private readonly IWorldLoader _worldLoader;
@@ -31,14 +31,14 @@ namespace Labyrinth
                 throw new ArgumentNullException("playerInput");
             if (worldLoader == null)
                 throw new ArgumentNullException("worldLoader");
-            this.PlayerInput = playerInput;
-            this.PlayerInput.GameInput = new GameInput(this);
+            this._playerInput = playerInput;
+            this._playerInput.GameInput = new GameInput(this);
             this._worldLoader = worldLoader;
             GlobalServices.SetSoundPlayer(soundPlayer);
             GlobalServices.SetSpriteLibrary(spriteLibrary);
             GlobalServices.SetServiceProvider(this.Services);
             GlobalServices.SetGameComponentCollection(this.Components);
-            GlobalServices.SetPlayerInput(this.PlayerInput);
+            GlobalServices.SetPlayerInput(this._playerInput);
             GlobalServices.SetScoreKeeper(this._scoreKeeper);
 
             this._gdm = new GraphicsDeviceManager(this)
@@ -60,7 +60,7 @@ namespace Labyrinth
         protected override void LoadContent()
             {
             // Create a new SpriteBatch, which can be used to draw textures.
-            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
+            this._spriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
 
             GlobalServices.SoundPlayer.SoundLibrary.LoadContent(this.Content);
             this._headsUpDisplay.LoadContent(this.Content);
@@ -74,7 +74,7 @@ namespace Labyrinth
             if (this.World == null) 
                 return;
             
-            this.SpriteBatch.Dispose();
+            this._spriteBatch.Dispose();
             this.World = null;
             }
 
@@ -127,7 +127,7 @@ namespace Labyrinth
                         return;
                         }
                     this._lives--;
-                    this.World.ResetLevelAfterLosingLife(SpriteBatch);
+                    this.World.ResetLevelAfterLosingLife(_spriteBatch);
                     break;
                 }
 
@@ -146,7 +146,7 @@ namespace Labyrinth
 
         private void ProcessGameInput()
             {
-            var gameInput = this.PlayerInput.GameInput;
+            var gameInput = this._playerInput.GameInput;
             if (gameInput.HasGameExitBeenTriggered)
                 this.Exit();
 
@@ -180,13 +180,13 @@ namespace Labyrinth
             GraphicsDevice.Clear(Color.Black);
 
             // Draw the sprite.
-            SpriteBatch.Begin(this.World.WindowPosition);
+            _spriteBatch.Begin(this.World.WindowPosition);
             if (this.World != null)
                 {
-                this.World.Draw(gameTime, SpriteBatch);
-                this._headsUpDisplay.DrawStatus(SpriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._displayedScore, this._lives);
+                this.World.Draw(gameTime, _spriteBatch);
+                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._displayedScore, this._lives);
                 }
-            SpriteBatch.End();
+            _spriteBatch.End();
 
             base.Draw(gameTime);
             }
@@ -196,13 +196,13 @@ namespace Labyrinth
             // Load the World.
             this._worldLoader.LoadWorld(level);
             this.World = new World(this._worldLoader);
-            this.World.ResetLevelForStartingNewLife(this.SpriteBatch);
+            this.World.ResetLevelForStartingNewLife(this._spriteBatch);
             }
 
         private void ToggleFullScreen()
             {
             this._gdm.ToggleFullScreen();
-            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
+            this._spriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
             }
 
         private static ISpriteBatch GetSpriteBatch(GraphicsDevice graphicsDevice, bool isFullScreen)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using Labyrinth.Annotations;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
@@ -124,7 +124,7 @@ namespace Labyrinth.Services.WorldBuilding
             {
             var result = new RandomMonsterDistribution
                 {
-                DiceRoll = node.GetAttribute("DiceToRoll"),
+                DiceRoll = new DiceRoll(node.GetAttribute("DiceToRoll")),
                 CountOfMonsters = int.Parse(node.GetAttribute("CountOfMonsters"))
                 };
             // ReSharper disable once PossibleNullReferenceException

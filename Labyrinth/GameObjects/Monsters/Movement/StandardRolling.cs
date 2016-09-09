@@ -1,5 +1,4 @@
-﻿using Labyrinth.Services.WorldBuilding;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects.Movement
     {

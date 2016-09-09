@@ -6,7 +6,7 @@ namespace Labyrinth.Services.WorldBuilding
         {
         private readonly Dictionary<int, MonsterDef> _monsterTemplates = new Dictionary<int, MonsterDef>();
 
-        public string DiceRoll { get; set; }
+        public DiceRoll DiceRoll { get; set; }
         public int CountOfMonsters { get; set; }
 
         public Dictionary<int, MonsterDef> Templates

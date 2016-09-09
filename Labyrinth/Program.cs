@@ -10,6 +10,7 @@ namespace Labyrinth
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        // ReSharper disable once UnusedParameter.Local
         static int Main(string[] args)
             {
             int result;

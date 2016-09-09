@@ -1,5 +1,4 @@
 ﻿using System;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -84,7 +83,7 @@ namespace Labyrinth.Services.Display
                 handler(this, e);
             }
         
-#warning this needs to be refactored - not all sprites will be tile sized.
+//todo this needs to be refactored - not all sprites will be tile sized.
         /// <summary>
         /// Returns the mid-point of animation
         /// </summary>

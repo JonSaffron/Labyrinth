@@ -66,8 +66,8 @@ current monster data 400 to 7bf
 
 0bb0 to 0bbf	-- used duration room generation
 
-0bc0			-- ???
-0bc1			-- ???
+0bc0			-- current horizontal scroll position for moving left/right between 0 and 63
+0bc1			-- current vertical scroll position for moving up/down between 0 and 19
 0bc2			-- number of lives left
 0bc3			-- 0 normally, 1 when being bounced backward by block
 0bc4			-- holds direction
@@ -104,7 +104,7 @@ bdc				-- delay until game's main loop ends
 	offset 2	-- previous/future tile number?
 	offset 3	-- position between tiles (between 0 and 3)
 	offset 4	-- direction (0 left, 1 right, 2 up, 3 down, 4 still)
-	offset 5	-- contents of tile being occupied?
+	offset 5	-- contents of tile being occupied
 	offset 6	-- index into above lists identifying monster, or for a shot: 2 indicates that it has rebounded
 	offset 7	-- toggle flag with &FF indicating moving at double speed, 0 at normal speed
 	offset 8	-- not really used
@@ -253,7 +253,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 15	40		2		No		3		deathcube			64
 
 
-		-- load data about specified room
+		-- retrieve data about specified room into 0BA0 - 0BA5
 		-- on entry, A is the room number
 
 0900 A8        TAY                      
@@ -265,7 +265,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 0910 8D A2 0B  STA 0BA2                 
 0913 B9 80 3F  LDA 3F80,Y               -- controls 3rd, 4th, 7th and 8th rows
 0916 8D A3 0B  STA 0BA3                 
-0919 B9 00 40  LDA 4000,Y               -- controls + shape
+0919 B9 00 40  LDA 4000,Y               -- controls centre shape
 091C 8D A4 0B  STA 0BA4                 
 
 091F AD A6 0B  LDA 0BA6                 -- get world number
@@ -278,31 +278,37 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 092E 4C 27 09  JMP 0927                 
 
 		-- generate room layout
+		-- on entry, 0BC6 contains the room number
 
 0931 AD C6 0B  LDA 0BC6                 -- get current room
 0934 20 00 09  JSR 0900                 -- get room data
-0937 A9 09     LDA #09                  -- set row number
+0937 A9 09     LDA #09                  -- initialise loop counter for row number
 0939 8D C5 0B  STA 0BC5                 
+
 093C 20 E6 17  JSR 17E6                 -- generate row of room
 093F AD C5 0B  LDA 0BC5                 -- get row number
 0942 0A        ASL A                    
 0943 0A        ASL A                    
 0944 0A        ASL A                    
-0945 0A        ASL A                    -- multiply to get start tile number
+0945 0A        ASL A                    -- multiply row number by 16 to get start tile number
 0946 18        CLC                      
-0947 69 0F     ADC #0F                  -- get end of row tile number
+0947 69 0F     ADC #0F                  -- calculate tile number at end of row
 0949 AA        TAX                      
-094A A0 0F     LDY #0F                  
-094C B9 B0 0B  LDA 0BB0,Y               
+094A A0 0F     LDY #0F                  -- initialise loop counter for cell within row
+
+094C B9 B0 0B  LDA 0BB0,Y               -- get tile for the cell Y in row 0BC5
 094F 9D 00 0B  STA 0B00,X               -- copy room data to B00
 0952 CA        DEX                      
 0953 88        DEY                      
-0954 10 F6     BPL 094C                 
+0954 10 F6     BPL 094C                 -- loop for next cell
+
 0956 CE C5 0B  DEC 0BC5                 -- set previous row
-0959 10 E1     BPL 093C                 
+0959 10 E1     BPL 093C                 -- loop for next row
+
 095B 60        RTS                      
 
-		-- review room occupants and room contents, draw the top level sprite
+		-- draw the top level sprite for the specified tile
+		-- on entry A is the tile number to draw
 
 095C 85 88     STA 88                   
 095E A0 00     LDY #00                  -- initialise loop counter
@@ -317,8 +323,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 0970 A8        TAY                      
 0971 D0 ED     BNE 0960                 -- continue loop
 
-0973 A4 88     LDY 88                   
-0975 B9 00 0B  LDA 0B00,Y               -- get contents of room
+0973 A4 88     LDY 88                   -- restore tile number
+0975 B9 00 0B  LDA 0B00,Y               -- get the tile contents
 0978 48        PHA                      
 0979 20 23 1C  JSR 1C23                 -- get sprite number
 097C 68        PLA                      
@@ -331,16 +337,17 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 098A 20 23 1C  JSR 1C23                 -- calculate sprite number
 098D 4C 39 1C  JMP 1C39                 -- draw to screen
 
-		-- draw screen
+		-- draw screen for moving down. Next room scrolls up from the bottom of the screen.
 
 0990 A9 24     LDA #24                  
 0992 85 86     STA 86                   
-0994 A2 00     LDX #00                  
+0994 A2 00     LDX #00                  -- initialise loop counter
 
 0996 86 88     STX 88                   
 0998 20 61 13  JSR 1361                 -- scroll
 099B 20 50 1D  JSR 1D50                 -- process playing sounds
 099E A6 88     LDX 88                   
+
 09A0 8A        TXA                      
 09A1 29 0F     AND #0F                  
 09A3 0A        ASL A                    
@@ -358,7 +365,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 09B4 D0 E0     BNE 0996                 
 09B6 60        RTS                      
 
-		-- draw screen
+		-- draw screen for moving up. Next room scrolls down from the top of the screen.
 
 09B7 A9 00     LDA #00                  
 09B9 85 86     STA 86                   
@@ -386,7 +393,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 09DD D0 DE     BNE 09BD                 
 09DF 60        RTS                      
 
-		-- draw screen
+		-- draw screen for moving right. Next room scrolls in moving from the right to the left.
 
 09E0 A9 3C     LDA #3C                  
 09E2 85 85     STA 85                   
@@ -418,7 +425,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 0A0C D0 D8     BNE 09E6                 
 0A0E 60        RTS                      
 
-		-- draw screen
+		-- draw screen for moving left. Next room scrolls in moving from the left to the right.
 
 0A0F A9 00     LDA #00                  
 0A11 85 85     STA 85                   
@@ -578,15 +585,16 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 0AF6 58        CLI                      
 0AF7 60        RTS                      
 
-
-
-
+		-- calculate the address of screen memory
+		-- on entry X and Y indicate the logical co-ordinates required (x 0->63, y 0->19)
+		-- 0BC0 and 0BC1 indicate the current offset due to hardware scrolling
+		-- on exit 70 and 71 indicate the absolute memory address between &5800 and &7FFF
 
 1100 8A        TXA                      
 1101 18        CLC                      
-1102 6D C0 0B  ADC 0BC0                 
+1102 6D C0 0B  ADC 0BC0                 -- add X co-ord to current offset
 1105 48        PHA                      
-1106 10 04     BPL 110C                 
+1106 10 04     BPL 110C                 -- result negative
 1108 A9 FF     LDA #FF                  
 110A D0 02     BNE 110E                 
 110C A9 00     LDA #00                  
@@ -604,21 +612,21 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1121 6D C1 0B  ADC 0BC1                 
 1124 0A        ASL A                    
 1125 18        CLC                      
-1126 69 58     ADC #58                  
+1126 69 58     ADC #58                  -- &5800 is the start of screen memory for mode 5
 1128 18        CLC                      
 1129 65 71     ADC 71                   
-112B 30 07     BMI 1134                 
+112B 30 07     BMI 1134                 -- is high byte of address over &7F
 112D C9 58     CMP #58                  
 112F 90 09     BCC 113A                 
 1131 85 71     STA 71                   
 1133 60        RTS                      
 
-1134 38        SEC                      
+1134 38        SEC                      -- reduce high byte of address to be between 58 and 7F
 1135 E9 28     SBC #28                  
 1137 85 71     STA 71                   
 1139 60        RTS                      
 
-113A 18        CLC                      
+113A 18        CLC                      -- increase high byte of address to be between 58 and 7F
 113B 69 28     ADC #28                  
 113D 85 71     STA 71                   
 113F 60        RTS                      
@@ -628,49 +636,60 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1140 A2 00     LDX #00                  
 1142 A0 00     LDY #00                  
 1144 20 00 11  JSR 1100                 
-1147 46 71     LSR 71                   
-1149 66 70     ROR 70                   
-114B 46 71     LSR 71                   
-114D 66 70     ROR 70                   
-114F 46 71     LSR 71                   
-1151 66 70     ROR 70                   
+1147 46 71     LSR 71                   -- halve 71 (carry gets bit 0)
+1149 66 70     ROR 70                   -- halve 70 (carry flag goes to bit 7)
+114B 46 71     LSR 71                   -- halve 71 (carry gets bit 0)
+114D 66 70     ROR 70                   -- halve 70 (carry flag goes to bit 7)
+114F 46 71     LSR 71                   -- halve 71 (carry gets bit 0)
+1151 66 70     ROR 70                   -- halve 70 (carry flag goes to bit 7)
 1153 78        SEI                      
-1154 A9 0C     LDA #0C                  
-1156 8D 00 FE  STA FE00                 
+1154 A9 0C     LDA #0C                  -- 6845 R12
+1156 8D 00 FE  STA FE00                 -- high order of screen start address (6 bits)
 1159 A5 71     LDA 71                   
-115B 8D 01 FE  STA FE01                 
-115E A9 0D     LDA #0D                  
-1160 8D 00 FE  STA FE00                 
+115B 8D 01 FE  STA FE01                 -- write new value
+115E A9 0D     LDA #0D                  -- 6845 R13
+1160 8D 00 FE  STA FE00                 -- low order of screen start address (8 bits)
 1163 A5 70     LDA 70                   
-1165 8D 01 FE  STA FE01                 
+1165 8D 01 FE  STA FE01                 -- write new value
 1168 58        CLI                      
 1169 60        RTS                      
 
-116A AD C1 0B  LDA 0BC1                 
+		-- for scrolling a new room down from the top of the screen
+
+116A AD C1 0B  LDA 0BC1                 -- reduce high order value by 2
 116D 38        SEC                      
 116E E9 02     SBC #02                  
 1170 8D C1 0B  STA 0BC1                 
 
-1173 AD C1 0B  LDA 0BC1                 
+		-- for scrolling a new room up from bottom of the screen
+
+1173 AD C1 0B  LDA 0BC1                 -- increment high order value
 1176 18        CLC                      
 1177 69 01     ADC #01                  
 1179 8D C1 0B  STA 0BC1                 
-117C 30 0D     BMI 118B                 
+117C 30 0D     BMI 118B                 -- branch if result negative
+
 117E C9 14     CMP #14                  
-1180 90 06     BCC 1188                 
-1182 38        SEC                      
+1180 90 06     BCC 1188                 -- okay
+
+1182 38        SEC                      -- subtract 20 from the high order value
 1183 E9 14     SBC #14                  
 1185 8D C1 0B  STA 0BC1                 
-1188 4C 40 11  JMP 1140                 
-118B 18        CLC                      
+1188 4C 40 11  JMP 1140                 -- set screen start address
+
+118B 18        CLC                      -- add 20 to the high order value
 118C 69 14     ADC #14                  
 118E 8D C1 0B  STA 0BC1                 
 1191 4C 88 11  JMP 1188                 
+
+		-- for scrolling a new room in from left to right
 
 1194 AD C0 0B  LDA 0BC0                 
 1197 38        SEC                      
 1198 E9 04     SBC #04                  
 119A 8D C0 0B  STA 0BC0                 
+
+		-- for scrolling a new room in from right to left
 
 119D AD C0 0B  LDA 0BC0                 
 11A0 18        CLC                      
@@ -678,11 +697,11 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 11A3 8D C0 0B  STA 0BC0                 
 11A6 48        PHA                      
 11A7 29 3F     AND #3F                  
-11A9 8D C0 0B  STA 0BC0                 
+11A9 8D C0 0B  STA 0BC0                 -- horizontal offset is between 0 and 63
 11AC 68        PLA                      
-11AD 30 BB     BMI 116A                 
+11AD 30 BB     BMI 116A                 -- gone negative so scroll down too
 11AF C9 40     CMP #40                  
-11B1 B0 C0     BCS 1173                 
+11B1 B0 C0     BCS 1173                 -- gone over so scroll up
 11B3 4C 40 11  JMP 1140                 
 
 		-- draw wall tile
@@ -944,14 +963,22 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 135E D0 C2     BNE 1322                 
 1360 60        RTS                      
 
+		-- scrolling for moving down
+
 1361 20 73 11  JSR 1173                 
 1364 4C 73 11  JMP 1173                 
+
+		-- scrolling for moving up
 
 1367 20 6A 11  JSR 116A                 
 136A 4C 6A 11  JMP 116A                 
 
+		-- scrolling for moving left
+
 136D 20 94 11  JSR 1194                 
 1370 4C 94 11  JMP 1194                 
+
+		-- scrolling for moving right
 
 1373 20 9D 11  JSR 119D                 
 1376 4C 9D 11  JMP 119D                 
@@ -1521,17 +1548,17 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 17E1 29 03     AND #03                  
 17E3 4C F9 13  JMP 13F9                 
 
-		-- call one of the 10 routines above
+		-- Generate a row of a room by calling one of the 10 routines above
 		-- on entry 0BC5 indicates the row number
 
-17E6 AD C5 0B  LDA 0BC5                 
-17E9 0A        ASL A                    
+17E6 AD C5 0B  LDA 0BC5                 -- get row number
+17E9 0A        ASL A                    -- double it
 17EA A8        TAY                      
-17EB B9 00 18  LDA 1800,Y               
+17EB B9 00 18  LDA 1800,Y               -- get address of respective routine
 17EE 85 70     STA 70                   
 17F0 B9 01 18  LDA 1801,Y               
 17F3 85 71     STA 71                   
-17F5 6C 70 00  JMP (0070)               
+17F5 6C 70 00  JMP (0070)               -- jump to routine
 
 		-- update animation frame for monster
 		-- on entry, X is the index into C00 identifying the monster to update
@@ -2164,11 +2191,11 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 1D0F 20 01 1C  JSR 1C01                 
 1D12 A9 00     LDA #00                  
-1D14 9D 08 0C  STA 0C08,X               
-1D17 9D 0C 0C  STA 0C0C,X               
-1D1A 9D 0D 0C  STA 0C0D,X               
+1D14 9D 08 0C  STA 0C08,X               -- unused?
+1D17 9D 0C 0C  STA 0C0C,X               -- current frame index
+1D1A 9D 0D 0C  STA 0C0D,X               -- count until next frame change
 1D1D BD 01 0C  LDA 0C01,X               
-1D20 9D 02 0C  STA 0C02,X               
+1D20 9D 02 0C  STA 0C02,X               -- copy current tile to previous
 1D23 60        RTS                      
 
 1D24 00        BRK                      
@@ -2716,6 +2743,9 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 20E4 D0 FC     BNE 20E2                 -- RTS if not animating player
 20E6 4C 95 29  JMP 2995                 -- check for pushing block
 
+		-- something may have gone off-screen
+		-- X is animation slot
+
 20E9 85 89     STA 89                   
 20EB C9 1F     CMP #1F                  -- is sprite now off-screen?
 20ED D0 F4     BNE 20E3                 -- branch if not
@@ -2723,68 +2753,78 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 20F0 F0 03     BEQ 20F5                 -- branch if animating player
 20F2 4C 84 21  JMP 2184                 -- potentially move monster's room
 
+		-- player leaving room
+
 20F5 20 C7 22  JSR 22C7                 -- store all monster info
+
+		-- draw tiles 0 to 5 and tiles 10 to 15 which is normally where the heads-up info is displayed
+
 20F8 A9 05     LDA #05                  -- initialise loop counter
 20FA 85 84     STA 84                   
+
 20FC A5 84     LDA 84                   
 20FE 48        PHA                      
-20FF 20 9D 1C  JSR 1C9D                 -- get screen position for tile number
+20FF 20 9D 1C  JSR 1C9D                 -- get x and y co-ords for tile number
 2102 68        PLA                      
 2103 48        PHA                      
-2104 20 5C 09  JSR 095C                 -- review room occupants and room contents, draw the top level sprite
+2104 20 5C 09  JSR 095C                 -- draw the top level sprite for the tile
 2107 68        PLA                      
 2108 18        CLC                      
 2109 69 0A     ADC #0A                  -- add 10 to tile number
 210B 48        PHA                      
 210C 20 9D 1C  JSR 1C9D                 -- get screen position for tile number
 210F 68        PLA                      
-2110 20 5C 09  JSR 095C                 -- review room occupants and room contents, draw the top level sprite
+2110 20 5C 09  JSR 095C                 -- draw the top level sprite for the tile
 2113 C6 84     DEC 84                   
 2115 10 E5     BPL 20FC                 -- continue loop
+
+		-- draw empty tile where player was
 
 2117 AD 01 0C  LDA 0C01                 -- get player tile number
 211A 20 9D 1C  JSR 1C9D                 -- get screen position for tile number
 211D A9 20     LDA #20                  -- select empty tile sprite
 211F 20 23 1C  JSR 1C23                 -- calculate sprite number
 2122 20 39 1C  JSR 1C39                 -- draw sprite to screen
+
 2125 AD C6 0B  LDA 0BC6                 -- get current room
 2128 8D CC 0B  STA 0BCC                 -- store as previous room number
 212B 85 70     STA 70                   
-212D 20 1B 22  JSR 221B                 -- calculate new room number
+212D 20 1B 22  JSR 221B                 -- calculate new room number into 70, and direction of exit into 72
 2130 A5 70     LDA 70                   
 2132 8D C6 0B  STA 0BC6                 -- store new room number
 2135 20 31 09  JSR 0931                 -- generate room layout
-2138 20 5C 22  JSR 225C                 -- enter new room
+2138 20 5C 22  JSR 225C                 -- check if new level
 213B 20 7E 25  JSR 257E                 -- load static objects and crystals
 213E 20 AC 23  JSR 23AC                 -- determine new tile number and load monsters
 2141 A9 00     LDA #00                  
 2143 8D C3 0B  STA 0BC3                 -- moving normally
-2146 AD 05 0C  LDA 0C05                 -- get contents of tile
+2146 AD 05 0C  LDA 0C05                 -- get underlying contents of tile
 2149 C9 20     CMP #20                  
 214B B0 03     BCS 2150                 -- branch if not moving towards block
 214D 20 62 2A  JSR 2A62                 -- deal with possibility of moving block
 
 2150 78        SEI                      
-2151 A5 72     LDA 72                   
+2151 A5 72     LDA 72                   -- get direction of travel
 2153 D0 09     BNE 215E                 
+
 2155 20 8D 1E  JSR 1E8D                 -- wait for vertical sync
-2158 20 0F 0A  JSR 0A0F                 -- draw screen
+2158 20 0F 0A  JSR 0A0F                 -- draw screen for travelling left 
 215B 4C 7E 21  JMP 217E                 
 
 215E C9 01     CMP #01                  
 2160 D0 09     BNE 216B                 
 2162 20 8D 1E  JSR 1E8D                 -- wait for vertical sync
-2165 20 E0 09  JSR 09E0                 -- draw screen
+2165 20 E0 09  JSR 09E0                 -- draw screen for travelling right
 2168 4C 7E 21  JMP 217E                 
 
 216B C9 02     CMP #02                  
 216D D0 09     BNE 2178                 
 216F 20 8D 1E  JSR 1E8D                 -- wait for vertical sync
-2172 20 B7 09  JSR 09B7                 -- draw screen
+2172 20 B7 09  JSR 09B7                 -- draw screen for travelling up
 2175 4C 7E 21  JMP 217E                 
 
 2178 20 8D 1E  JSR 1E8D                 -- wait for vertical sync
-217B 20 90 09  JSR 0990                 -- draw screen
+217B 20 90 09  JSR 0990                 -- draw screen for travelling down
 
 217E 58        CLI                      
 217F 68        PLA                      
@@ -2891,12 +2931,12 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 2236 C6 70     DEC 70                   -- decrement room number
 2238 A9 00     LDA #00                  
-223A 85 72     STA 72                   -- store 0 in 72
+223A 85 72     STA 72                   -- store 0 (left) in 72
 223C 60        RTS                      
 
 223D E6 70     INC 70                   -- increment room number
 223F A9 01     LDA #01                  
-2241 85 72     STA 72                   -- store 1 in 72
+2241 85 72     STA 72                   -- store 1 (right) in 72
 2243 60        RTS                      
 
 2244 A5 70     LDA 70                   -- get room number
@@ -2904,7 +2944,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2247 69 10     ADC #10                  -- add 10
 2249 85 70     STA 70                   -- store new room number
 224B A9 02     LDA #02                  
-224D 85 72     STA 72                   -- store 2 in 72
+224D 85 72     STA 72                   -- store 2 (up) in 72
 224F 60        RTS                      
 
 2250 A5 70     LDA 70                   -- get room number
@@ -2912,7 +2952,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2253 E9 10     SBC #10                  -- subtract 10
 2255 85 70     STA 70                   -- store new room number
 2257 A9 03     LDA #03                  
-2259 85 72     STA 72                   -- store 3 in 72
+2259 85 72     STA 72                   -- store 3 (down) in 72
 225B 60        RTS                      
 
 		-- enter new room
@@ -3097,12 +3137,14 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 -------------
 
 		-- calculate new co-ordinates when entering room
+		-- on entry X is the animation slot, 72 indicates the direction of exit (0 left, 1 right, 2 up, 3 down)
+		-- on exit, 85 and 86 contain the new x and y co-ordinates
 
 238F BD 01 0C  LDA 0C01,X               -- get tile position
 2392 20 83 1C  JSR 1C83                 -- seperate out into row and column
 2395 A5 72     LDA 72                   
-2397 29 02     AND #02                  -- test bit 1 of direction
-2399 F0 09     BEQ 23A4                 
+2397 29 02     AND #02                  -- test bit 1 of direction (up or down)
+2399 F0 09     BEQ 23A4                 -- branch if left/right
 239B A9 09     LDA #09                  -- from 9...
 239D 38        SEC                      
 239E E5 86     SBC 86                   -- take away the row number
@@ -3117,17 +3159,17 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 		-- determine new tile number
 
-23AC A2 00     LDX #00                  
+23AC A2 00     LDX #00                  -- set x to player's animation slot
 23AE 20 8F 23  JSR 238F                 -- calculate new co-ordinates when entering room
 23B1 20 90 1C  JSR 1C90                 -- combine x and y
-23B4 8D 01 0C  STA 0C01                 -- store new tile position
+23B4 8D 01 0C  STA 0C01                 -- store player's new tile position
 23B7 A8        TAY                      
 23B8 B9 00 0B  LDA 0B00,Y               -- get contents of tile
-23BB 8D 05 0C  STA 0C05                 
-23BE A9 04     LDA #04                  
+23BB 8D 05 0C  STA 0C05                 -- store the underlying contents of the tile
+23BE A9 04     LDA #04                  -- direction = not moving
 23C0 8D 04 0C  STA 0C04                 -- store in direction
 23C3 8D C4 0B  STA 0BC4                 
-23C6 20 0F 1D  JSR 1D0F                 -- initialise character data at 0c00
+23C6 20 0F 1D  JSR 1D0F                 -- initialise player's animation slot
 
 		-- load monsters into room
 
@@ -6034,7 +6076,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 		-- setup screen for game
 
 37F2 A9 05     LDA #05                  
-37F4 20 C7 37  JSR 37C7                 -- Mode 5
+37F4 20 C7 37  JSR 37C7                 -- Set mode 5
 37F7 A2 0E     LDX #0E                  
 37F9 BD D0 18  LDA 18D0,X               -- set 6845 video parameters
 37FC 8D 00 FE  STA FE00                 

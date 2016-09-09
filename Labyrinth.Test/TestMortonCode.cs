@@ -83,7 +83,6 @@ namespace Labyrinth.Test
             var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("pg");
-            var w = g.World;
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
@@ -112,7 +111,6 @@ namespace Labyrinth.Test
             var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("p ");
-            var w = g.World;
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
@@ -145,7 +143,6 @@ namespace Labyrinth.Test
             var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
             g.Components.Add(new SuppressDrawComponent(g));
             g.LoadLevel("pg");
-            var w = g.World;
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())

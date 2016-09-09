@@ -251,6 +251,15 @@ namespace Labyrinth.Services.WorldBuilding
                     exceptions.AddRange(SetTileOccupation(newItems, t => t.SetOccupationByStaticItem()));
                     }
 
+                var monsters = GetMonstersFromRandomDistribution();
+                foreach (Monster monster in monsters)
+                    {
+                    if (monster.IsStill)
+                        exceptions.AddRange(SetTileOccupation(new [] { monster }, t => t.SetOccupationByStaticItem()));
+                    else
+                        movingMonsters.Add(monster);
+                    }
+
                 GetListOfFruit();
 
                 exceptions.AddRange(SetTileOccupation(movingMonsters, t => t.SetOccupationByMovingMonster()));
@@ -520,28 +529,59 @@ namespace Labyrinth.Services.WorldBuilding
                 return result;
                 }
 
-            private void GetListOfFruit()
+            private IEnumerable<Monster> GetMonstersFromRandomDistribution()
                 {
                 var rnd = GlobalServices.Randomess;
-                foreach (WorldArea wa in this._wl._worldAreas)
+                var dists = 
+                    this._wl._worldAreas.Where(wa => wa.RandomMonsterDistribution != null)
+                        .Select(wa => new { wa.Area, Dist = wa.RandomMonsterDistribution});
+                var result = new List<Monster>();
+                foreach (var item in dists)
                     {
-                    if (wa.FruitDefinitions != null)
+                    for (int i = 0; i < item.Dist.CountOfMonsters; i++)
                         {
-                        foreach (FruitDefinition fd in wa.FruitDefinitions.Values)
-                            {
-                            for (int i = 0; i < fd.FruitQuantity;)
-                                {
-                                var tilePos = new TilePos(wa.Area.X + rnd.Next(wa.Area.Width),
-                                    wa.Area.Y + rnd.Next(wa.Area.Height));
-                                TileUsage t = this._tileUsage[tilePos.X, tilePos.Y];
-                                if (!t.IsFree)
-                                    continue;
-                                this._tileUsage[tilePos.X, tilePos.Y].SetOccupationByFruit();
-                                Vector2 position = tilePos.ToPosition();
-                                this._gameState.AddFruit(position, fd.FruitType, fd.Energy);
-                                i++;
-                                }
-                            }
+                        var monsterIndex = rnd.DiceRoll(item.Dist.DiceRoll.NumberOfDice, item.Dist.DiceRoll.NumberOfSides);
+                        var monsterDef = item.Dist.Templates[monsterIndex];
+
+                        TilePos tp = GetFreeTile(item.Area);
+                        monsterDef.Position = tp.ToPosition();
+                        result.Add(this._gameState.CreateMonster(monsterDef));
+                        i++;
+                        }
+                    }
+                return result;
+                }
+
+            private void GetListOfFruit()
+                {
+                var fruitDefinitions =
+                    this._wl._worldAreas.Where(wa => wa.FruitDefinitions != null)
+                        .SelectMany(wa => wa.FruitDefinitions.Values, (wa, fd) => new {wa.Area, FruitDefinition = fd});
+                foreach (var item in fruitDefinitions)
+                    {
+                    for (int i = 0; i < item.FruitDefinition.FruitQuantity;)
+                        {
+                        TilePos tp = GetFreeTile(item.Area);
+                        this._tileUsage[tp.X, tp.Y].SetOccupationByFruit();
+                        Vector2 position = tp.ToPosition();
+                        this._gameState.AddFruit(position, item.FruitDefinition.FruitType, item.FruitDefinition.Energy);
+                        i++;
+                        }
+                    }
+                }
+
+            private TilePos GetFreeTile(Rectangle area)
+                {
+                var rnd = GlobalServices.Randomess;
+                while (true)
+                    {
+                    int x = area.X + rnd.Next(area.Width);
+                    int y = area.Y + rnd.Next(area.Height);
+                    TileUsage t = this._tileUsage[x, y];
+                    if (t.IsFree)
+                        {
+                        var result = new TilePos(x, y);
+                        return result;
                         }
                     }
                 }

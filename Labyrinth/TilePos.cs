@@ -83,7 +83,7 @@ namespace Labyrinth
                 }
             }
 
-#warning does this need to be refactored? not every object will have its origin in the middle of tile.
+//todo does this need to be refactored? not every object will have its origin in the middle of tile.
         public Vector2 ToPosition()
             {
             int x = this.X * Constants.TileLength + Constants.HalfTileLength;

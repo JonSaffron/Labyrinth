@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Labyrinth.Annotations;
+using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

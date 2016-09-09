@@ -1,5 +1,5 @@
 ﻿using System;
-using Labyrinth.Annotations;
+using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;

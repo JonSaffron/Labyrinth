@@ -12,13 +12,17 @@ namespace Labyrinth.Test
         [Test]
         public void CannotConstructACacheWithNoEntries()
             {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new InstanceCache<string>(0, () => string.Empty));
+            // ReSharper disable once NotAccessedVariable
+            InstanceCache<string> x;
+            Assert.Throws<ArgumentOutOfRangeException>(() => x = new InstanceCache<string>(0, () => string.Empty));
             }
 
         [Test]
         public void CannotConstructACacheWithNegativeEntries()
             {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new InstanceCache<string>(-10, () => string.Empty));
+            // ReSharper disable once NotAccessedVariable
+            InstanceCache<string> x;
+            Assert.Throws<ArgumentOutOfRangeException>(() => x = new InstanceCache<string>(-10, () => string.Empty));
             }
 
         [Test]

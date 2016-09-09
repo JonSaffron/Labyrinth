@@ -77,6 +77,10 @@
       <HintPath>..\packages\Castle.Windsor.3.3.0\lib\net40-client\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="JetBrains.Annotations, Version=10.1.5.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.1.5\lib\net\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553">
       <Private>False</Private>
     </Reference>
@@ -179,7 +183,6 @@
     <Compile Include="GameObjects\Mine.cs" />
     <Compile Include="MineLayer.cs" />
     <Compile Include="InteractionWithStaticItems.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="GameObjects\Monsters\Butterfly.cs" />
     <Compile Include="GameObjects\Monsters\CrazyCrawler.cs" />
     <Compile Include="GameObjects\Monsters\FlitterbugBrown.cs" />
@@ -198,6 +201,7 @@
     <Compile Include="Services\Sound\SoundEffectInstance.cs" />
     <Compile Include="Services\Sound\SoundEffectInstanceCache.cs" />
     <Compile Include="Services\StandardRandom.cs" />
+    <Compile Include="Services\WorldBuilding\DiceRoll.cs" />
     <Compile Include="Services\WorldBuilding\FruitDefinition.cs" />
     <Compile Include="GameObjects\Grave.cs" />
     <Compile Include="Services\Input\PlayerInput.cs" />
@@ -234,7 +238,6 @@
     <Compile Include="GameObjects\Monsters\RotaFloaterBrown.cs" />
     <Compile Include="GameObjects\Monsters\RotaFloaterCyan.cs" />
     <Compile Include="GameObjects\StandardShot.cs" />
-    <Compile Include="Services\Sound\SoundEffectFinishedEventArgs.cs" />
     <Compile Include="Services\Sound\SoundLibrary.cs" />
     <Compile Include="Services\Display\SpriteBatchWindowed.cs" />
     <Compile Include="Services\WorldBuilding\PlayerStartState.cs" />

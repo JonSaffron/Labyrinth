@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Labyrinth
+namespace Labyrinth.Services.Sound
     {
     public class SoundEffectFinishedEventArgs : EventArgs
         {

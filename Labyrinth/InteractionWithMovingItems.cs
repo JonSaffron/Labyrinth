@@ -69,9 +69,13 @@ namespace Labyrinth
             var movingObject = items.FirstOrDefault(item => item != moveableObject && item.Capability.CanMoveAnother());
             if (moveableObject != null && movingObject != null)
                 {
-                if (PushOrBounceObject(moveableObject, movingObject))
+                var actionTaken = PushOrBounceObject(moveableObject, movingObject);
+                if (actionTaken)
+                    // ReSharper disable once RedundantJumpStatement
                     return;
                 }
+
+            // any other interaction here...
             }
 
         private static bool ShouldStartPushOrBounce(MovingItem moveableObject, MovingItem movingObject)
@@ -151,8 +155,11 @@ namespace Labyrinth
                 player.ReduceEnergy(explosionEnergy);
                 if (movingItem.IsAlive())
                     player.PlaySound(GameSound.PlayerInjured);
+                // ReSharper disable once RedundantJumpStatement
                 return;
                 }
+
+            // any other interaction here...
             }
 
         private static bool InteractionInvolvingShot(StandardShot shot, MovingItem movingItem)
