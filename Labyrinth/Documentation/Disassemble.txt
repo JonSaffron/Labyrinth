@@ -64,7 +64,7 @@ current monster data 400 to 7bf
 
 0ba6			-- 2 for world 1, 0 for 2nd world	
 
-0bb0 to 0bbf	-- used duration room generation
+0bb0 to 0bbf	-- used during room generation
 
 0bc0			-- current horizontal scroll position for moving left/right between 0 and 63
 0bc1			-- current vertical scroll position for moving up/down between 0 and 19
@@ -131,7 +131,17 @@ bdc				-- delay until game's main loop ends
 	offset 2	-- &FF where on alternate frames the monster will move at double speed (0c07, x)
 	offset 3	-- time to show each animation frame (0c0b, x)
 
-18d0 - 18df		-- start of table with 6845 register adjustments
+18d0 - 18df		-- start of table with 6845 register adjustments (works backwards)
+				R0 Nht	81	Horizontal total register (normally 3f) total display + non-displayed character time units minus 1
+				R3		28	Sync width register (normally 4 in lower bit for horizontal, normally 2 in higher bit for vertical)
+				R1 Nhd	40	Horizontal displayed register (normally 40) number of displayed characters per line
+				R2		5a	Horizontal sync position register (normally 31) positioning on screen
+				R6 Nvd	14	Vertical displayed register (normally 20) number of displayed character rows
+				R7		1e	Vertical sync position register (normally 22)
+				Rb		00	Cursor end register
+				Rb		00
+
+
 18e0 - 18e1		-- joystick input information
 
 38bb - 38c2		-- start room numbers per level: 0 34 8 1c/1c 6b 47 73
@@ -177,6 +187,26 @@ E: 25 2E 28		crazy crawler,		attracted,		follows player,										40
 F: 26 02 64		cyan thresher,		cautious,		follows player, lays mushrooms,						100
 
 5800			-- start of screen memory
+
+memory mapping as follows:
+Each sprite is 16 x 16 pixels and occupies 64 bytes
+The first sprite is located at:
+5800	5808	5810	5818	5820	5828	5830	5838
+5801	5809	5811	5819	
+5802	580a	5812	581a
+5803	580b	
+5804	580c
+5805	580d
+5806	580e
+5807	580f	5817	581f	5827	582f	5837	583f
+5a00	5a08	5a10	5a18	5a20	5a28	5a30	5a38
+5a01
+5a02
+5a03
+5a04
+5a05
+5a06
+5a07	5a0f	5a17	5a1f	5a27	5a2f	5a37	5a3f
 
 sounds
 
@@ -589,24 +619,27 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 		-- on entry X and Y indicate the logical co-ordinates required (x 0->63, y 0->19)
 		-- 0BC0 and 0BC1 indicate the current offset due to hardware scrolling
 		-- on exit 70 and 71 indicate the absolute memory address between &5800 and &7FFF
+		-- each movement along X is an increase in 8 bytes, each movement along Y is an increase in 0x200 bytes
 
 1100 8A        TXA                      
 1101 18        CLC                      
 1102 6D C0 0B  ADC 0BC0                 -- add X co-ord to current offset
 1105 48        PHA                      
-1106 10 04     BPL 110C                 -- result negative
-1108 A9 FF     LDA #FF                  
+1106 10 04     BPL 110C                 -- result 0 or more? It always is.
+1108 A9 FF     LDA #FF                  -- not used
 110A D0 02     BNE 110E                 
 110C A9 00     LDA #00                  
 110E 85 71     STA 71                   
 1110 68        PLA                      
 1111 85 70     STA 70                   
+
 1113 06 70     ASL 70                   
 1115 26 71     ROL 71                   
 1117 06 70     ASL 70                   
 1119 26 71     ROL 71                   
 111B 06 70     ASL 70                   
 111D 26 71     ROL 71                   
+
 111F 98        TYA                      
 1120 18        CLC                      
 1121 6D C1 0B  ADC 0BC1                 
@@ -2001,18 +2034,20 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 		-- Convert A to a number between 63 and 126
 		-- On entry, A is the sprite to draw
-		-- On exit, &73 is between 63 and 126
+		-- On exit, &72 and &73 are set
 
-1C23 85 73     STA 73                   
+1C23 85 73     STA 73                   -- store sprite in &73
 1C25 A9 00     LDA #00                  
-1C27 85 72     STA 72                   
-1C29 46 73     LSR 73                   
-1C2B 66 72     ROR 72                   
-1C2D 46 73     LSR 73                   
-1C2F 66 72     ROR 72                   
+1C27 85 72     STA 72                   -- store 0 in &72
+
+1C29 46 73     LSR 73                   -- halve 73 (bit 0 to carry)
+1C2B 66 72     ROR 72                   -- carry goes to bit 7
+1C2D 46 73     LSR 73                   -- halve 73 (bit 0 to carry)
+1C2F 66 72     ROR 72                   -- carry goes to bit 7
+
 1C31 A5 73     LDA 73                   
 1C33 18        CLC                      
-1C34 69 3F     ADC #3F                  
+1C34 69 3F     ADC #3F                  -- add 63 to 73
 1C36 85 73     STA 73                   
 1C38 60        RTS                      
 
