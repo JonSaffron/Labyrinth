@@ -152,6 +152,10 @@
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />
+    <Compile Include="Services\PathFinder\Node.cs" />
+    <Compile Include="Services\PathFinder\NodeState.cs" />
+    <Compile Include="Services\PathFinder\PathFinder.cs" />
+    <Compile Include="Services\PathFinder\SearchParameters.cs" />
     <Compile Include="Services\ScoreKeeper\NullScoreKeeper.cs" />
     <Compile Include="Services\ScoreKeeper\ScoreKeeper.cs" />
     <Compile Include="Services\Sound\ActiveSound.cs" />

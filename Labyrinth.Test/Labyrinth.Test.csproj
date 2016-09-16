@@ -62,6 +62,7 @@
     <Compile Include="DummySoundEffectInstance.cs" />
     <Compile Include="DummySpriteLibrary.cs" />
     <Compile Include="Helpers.cs" />
+    <Compile Include="PathFinderTests.cs" />
     <Compile Include="ShootBoulderTest.cs" />
     <Compile Include="PushAndBounceBackTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

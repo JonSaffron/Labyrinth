@@ -346,53 +346,55 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 0963 F0 07     BEQ 096C                 -- if zero, then continue loop
 0965 A5 88     LDA 88                   
 0967 D9 01 0C  CMP 0C01,Y               -- get occupant's tile number
-096A F0 1B     BEQ 0987                 -- if equal then branch
+096A F0 1B     BEQ 0987                 -- if equal then branch to draw animation frame
 096C 98        TYA                      
 096D 18        CLC                      
 096E 69 10     ADC #10                  -- move loop counter on
 0970 A8        TAY                      
 0971 D0 ED     BNE 0960                 -- continue loop
 
+		-- no animation found at that tile, so draw static object
+
 0973 A4 88     LDY 88                   -- restore tile number
 0975 B9 00 0B  LDA 0B00,Y               -- get the tile contents
 0978 48        PHA                      
-0979 20 23 1C  JSR 1C23                 -- get sprite number
+0979 20 23 1C  JSR 1C23                 -- get address of sprite data
 097C 68        PLA                      
 097D C9 13     CMP #13                  -- 12 and below is wall
 097F B0 03     BCS 0984                 -- branch if not wall
 0981 4C 38 1D  JMP 1D38                 -- draw wall to screen
-0984 4C 39 1C  JMP 1C39                 -- draw non-wall to screen
+0984 4C 39 1C  JMP 1C39                 -- draw non-wall sprite to screen
 
 0987 B9 09 0C  LDA 0C09,Y               -- get current frame of animation
-098A 20 23 1C  JSR 1C23                 -- calculate sprite number
-098D 4C 39 1C  JMP 1C39                 -- draw to screen
+098A 20 23 1C  JSR 1C23                 -- get address of sprite data
+098D 4C 39 1C  JMP 1C39                 -- draw sprite to screen
 
 		-- draw screen for moving down. Next room scrolls up from the bottom of the screen.
 
-0990 A9 24     LDA #24                  
-0992 85 86     STA 86                   
+0990 A9 24     LDA #24                  -- always draw sprites...
+0992 85 86     STA 86                   -- ...on row 36
 0994 A2 00     LDX #00                  -- initialise loop counter
 
 0996 86 88     STX 88                   
-0998 20 61 13  JSR 1361                 -- scroll
+0998 20 61 13  JSR 1361                 -- scroll up two lines by adjusting screen start address
 099B 20 50 1D  JSR 1D50                 -- process playing sounds
 099E A6 88     LDX 88                   
 
 09A0 8A        TXA                      
-09A1 29 0F     AND #0F                  
-09A3 0A        ASL A                    
-09A4 0A        ASL A                    
-09A5 85 85     STA 85                   
-09A7 8A        TXA                      
-09A8 20 5C 09  JSR 095C                 -- draw tile
+09A1 29 0F     AND #0F                  -- get low nibble of loop counter for x co-ordinate
+09A3 0A        ASL A                    -- double it
+09A4 0A        ASL A                    -- double it again
+09A5 85 85     STA 85                   -- store x co-ordinate
+09A7 8A        TXA                      -- set tile number to draw
+09A8 20 5C 09  JSR 095C                 -- draw top level sprite at tile number, at 85 and 86
 09AB E8        INX                      
 09AC 8A        TXA                      
 09AD 29 0F     AND #0F                  
-09AF D0 EF     BNE 09A0                 
+09AF D0 EF     BNE 09A0                 -- loop to draw next tile
 
 09B1 8A        TXA                      
 09B2 C9 A0     CMP #A0                  
-09B4 D0 E0     BNE 0996                 
+09B4 D0 E0     BNE 0996                 -- loop to scroll next line
 09B6 60        RTS                      
 
 		-- draw screen for moving up. Next room scrolls down from the top of the screen.
@@ -873,17 +875,21 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1298 68        PLA                      
 1299 85 72     STA 72                   
 129B 60        RTS                      
+
+		-- ???
+
 129C 8A        TXA                      
-129D 29 03     AND #03                  
+129D 29 03     AND #03                  -- mask out lowest two bits
 129F 0A        ASL A                    
 12A0 0A        ASL A                    
 12A1 0A        ASL A                    
-12A2 0A        ASL A                    
+12A2 0A        ASL A                    -- multiply by 16
 12A3 85 74     STA 74                   
+
 12A5 98        TYA                      
-12A6 29 03     AND #03                  
+12A6 29 03     AND #03                  -- mask out lowest two bits
 12A8 0A        ASL A                    
-12A9 0A        ASL A                    
+12A9 0A        ASL A                    -- multiply by 4
 12AA 18        CLC                      
 12AB 65 82     ADC 82                   
 12AD 65 74     ADC 74                   
@@ -1015,6 +1021,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 1373 20 9D 11  JSR 119D                 
 1376 4C 9D 11  JMP 119D                 
+
+		-- ???
 
 1379 A5 70     LDA 70                   
 137B 38        SEC                      
@@ -2032,22 +2040,22 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 1C20 85 7A     STA 7A                   
 1C22 60        RTS                      
 
-		-- Convert A to a number between 63 and 126
-		-- On entry, A is the sprite to draw
-		-- On exit, &72 and &73 are set
+		-- Get address for the specified sprite (from &3f00 onwards. Each sprite occupies 64 bytes)
+		-- On entry, A is the sprite index
+		-- On exit, &72 and &73 are set. &72 is low byte, &73 is high byte.
 
-1C23 85 73     STA 73                   -- store sprite in &73
-1C25 A9 00     LDA #00                  
-1C27 85 72     STA 72                   -- store 0 in &72
+1C23 85 73     STA 73                   -- store sprite index in &73 (high byte of result)
+1C25 A9 00     LDA #00                  -- initialise for low byte
+1C27 85 72     STA 72                   -- store 0 in &72 (low byte of result)
 
 1C29 46 73     LSR 73                   -- halve 73 (bit 0 to carry)
 1C2B 66 72     ROR 72                   -- carry goes to bit 7
 1C2D 46 73     LSR 73                   -- halve 73 (bit 0 to carry)
 1C2F 66 72     ROR 72                   -- carry goes to bit 7
 
-1C31 A5 73     LDA 73                   
+1C31 A5 73     LDA 73                   -- load high byte
 1C33 18        CLC                      
-1C34 69 3F     ADC #3F                  -- add 63 to 73
+1C34 69 3F     ADC #3F                  -- add &3f for start of data
 1C36 85 73     STA 73                   
 1C38 60        RTS                      
 
@@ -2146,15 +2154,15 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 		-- on exit, 85 is the column (X), 86 is the row (Y)
 
 1C9D 48        PHA                      
-1C9E 29 0F     AND #0F                  
-1CA0 0A        ASL A                    
-1CA1 0A        ASL A                    
-1CA2 85 85     STA 85                   
+1C9E 29 0F     AND #0F                  -- get lowest nibble (x co-ordinate)
+1CA0 0A        ASL A                    -- double it
+1CA1 0A        ASL A                    -- double it again (each tile has 4 positions)
+1CA2 85 85     STA 85                   -- store x co-ordinate
 1CA4 68        PLA                      
-1CA5 29 F0     AND #F0                  
-1CA7 4A        LSR A                    
-1CA8 4A        LSR A                    
-1CA9 85 86     STA 86                   
+1CA5 29 F0     AND #F0                  -- get highest nibble (y co-ordinate)
+1CA7 4A        LSR A                    -- halve it
+1CA8 4A        LSR A                    -- halve it again (each tile has 4 positions)
+1CA9 85 86     STA 86                   -- store y co-ordinate
 1CAB 60        RTS                      
 
 		-- calculate offset position and draw sprite
