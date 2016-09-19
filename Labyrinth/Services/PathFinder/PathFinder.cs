@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 // http://blog.two-cats.com/2014/06/a-star-example/
 // http://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html
@@ -9,7 +10,7 @@ namespace Labyrinth.Services.PathFinder
     {
     public class PathFinder
         {
-        private readonly PriorityQueue<float, ImmutableStack<Node>> _openNodes = new PriorityQueue<float, ImmutableStack<Node>>();
+        private readonly PriorityQueue<float, Path<Node>> _openNodes = new PriorityQueue<float, Path<Node>>();
         private readonly HashSet<Node> _closedNodes = new HashSet<Node>();
         private readonly SearchParameters _searchParameters;
 
@@ -26,10 +27,10 @@ namespace Labyrinth.Services.PathFinder
         /// Attempts to find a path from the start location to the end location based on the supplied SearchParameters
         /// </summary>
         /// <returns>A List of Points representing the path. If no path was found, the returned list is empty.</returns>
-        public List<TilePos> FindPath()
+        public IList<TilePos> FindPath()
             {
             // The start node is the first entry in the 'open' list
-            this._openNodes.Enqueue(0, new ImmutableStack<Node>(new Node(this._searchParameters.StartLocation)));
+            this._openNodes.Enqueue(0, new Path<Node>(new Node(this._searchParameters.StartLocation)));
 
             while (!this._openNodes.IsEmpty)
                 {
@@ -40,38 +41,28 @@ namespace Labyrinth.Services.PathFinder
 
                 if (path.LastStep.Location == this._searchParameters.EndLocation)
                     {
-                    var result = ExtractPath();
+                    var result = ExtractPath(path);
                     return result;
                     }
 
                 this._closedNodes.Add(path.LastStep);
 
-
-            IEnumerable<Node> nextNodes = GetAdjacentWalkableNodes(currentNode);
-            foreach (var nextNode in nextNodes)
-                {
-                this._nodes[nextNode.Location] = nextNode;
-                }
-
-            foreach (var nextNode in nextNodes)
-                {
-                this._nodes[nextNode.Location] = nextNode;
-
-                // Check whether the end node has been reached
-                if (nextNode.Location == this._searchParameters.EndLocation)
+                IEnumerable<Node> nextNodes = GetAdjacentWalkableNodes(path.LastStep);
+                foreach (var nextNode in nextNodes)
                     {
-                    goal = nextNode;
-                    return true;
+                    this._openNodes.Enqueue(nextNode.F, path.AddStep(nextNode, 1));
                     }
 
-                // If not, check the next set of nodes
-                if (Search(nextNode, out goal)) // Note: Recurses back into Search(Node)
-                    return true;
                 }
 
             // The method returns false if this path leads to be a dead end
-            goal = null;
-            return false;
+            return new List<TilePos>();
+            }
+
+        private IList<TilePos> ExtractPath(Path<Node> path)
+            {
+            var result = path.Select(item => item.Location).Reverse().ToList();
+            return result;
             }
 
         /// <summary>
@@ -89,14 +80,9 @@ namespace Labyrinth.Services.PathFinder
                 if (!this._searchParameters.CanBeOccupied(location))
                     continue;
 
-                Node node = new Node(location) {ParentNode = fromNode};
-
-                Node existingNode;
-                if (this._nodes.TryGetValue(location, out existingNode) && node.G >= existingNode.G)
-                    continue;
-
+                Node node = new Node(location);
+                node.G = fromNode.G + 1;
                 node.H = GetEstimatedTraversalCost(node.Location);
-                node.IsOpen = true;
 
                 yield return node;
                 }
@@ -131,6 +117,7 @@ namespace Labyrinth.Services.PathFinder
             int deltaY = Math.Abs(goal.Y - current.Y);
             float result = (deltaX + deltaY);
 
+            // add tie-breaker. This makes the heurisitic non-applicable but should improve the routes taken
             int dx1 = current.X - goal.X;
             int dy1 = current.Y - goal.Y;
             int dx2 = start.X - goal.X;

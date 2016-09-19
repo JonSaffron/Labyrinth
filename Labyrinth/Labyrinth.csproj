@@ -153,7 +153,6 @@
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />
     <Compile Include="Services\PathFinder\Node.cs" />
-    <Compile Include="Services\PathFinder\NodeState.cs" />
     <Compile Include="Services\PathFinder\Path.cs" />
     <Compile Include="Services\PathFinder\PathFinder.cs" />
     <Compile Include="Services\PathFinder\PriorityQueue.cs" />
