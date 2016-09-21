@@ -3,32 +3,33 @@ using System.Collections.Generic;
 
 namespace Labyrinth.Services.PathFinder
     {
-    class ImmutableStack<T> : IEnumerable<T>
+    class Path<T> : IEnumerable<T>
         {
         public T LastStep { get; private set; }
-        public ImmutableStack<T> PreviousSteps { get; private set; }
-        public double TotalCost { get; private set; }
+        public Path<T> PreviousSteps { get; private set; }
+        public int TotalCost { get; private set; }
 
-        public ImmutableStack(T start) : this(start, null, 0) 
+        public Path(T start) : this(start, null, 0) 
             {
+            // nothing to do
             }
 
-        private ImmutableStack(T lastStep, ImmutableStack<T> previousSteps, double totalCost)
+        private Path(T lastStep, Path<T> previousSteps, int totalCost)
             {
             this.LastStep = lastStep;
             this.PreviousSteps = previousSteps;
             this.TotalCost = totalCost;
             }
 
-        public ImmutableStack<T> AddStep(T step, double stepCost)
+        public Path<T> AddStep(T step, int stepCost)
             {
-            var result = new ImmutableStack<T>(step, this, this.TotalCost + stepCost);
+            var result = new Path<T>(step, this, this.TotalCost + stepCost);
             return result;
             }
 
         public IEnumerator<T> GetEnumerator()
             {
-            for (ImmutableStack<T> p = this; p != null; p = p.PreviousSteps)
+            for (Path<T> p = this; p != null; p = p.PreviousSteps)
                 yield return p.LastStep;
             }
 

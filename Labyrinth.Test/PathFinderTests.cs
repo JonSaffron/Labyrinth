@@ -86,7 +86,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            List<TilePos> path = pathFinder.FindPath();
+            IList<TilePos> path = pathFinder.FindPath();
 
             // Assert
             Assert.IsNotNull(path);
@@ -102,7 +102,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            List<TilePos> path = pathFinder.FindPath();
+            IList<TilePos> path = pathFinder.FindPath();
 
             // Assert
             Assert.IsNotNull(path);
@@ -118,7 +118,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            List<TilePos> path = pathFinder.FindPath();
+            IList<TilePos> path = pathFinder.FindPath();
 
             // Assert
             Assert.IsNotNull(path);
