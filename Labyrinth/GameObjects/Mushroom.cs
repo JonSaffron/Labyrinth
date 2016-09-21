@@ -36,19 +36,12 @@ namespace Labyrinth.GameObjects
             this._isTaken = true;
             }
 
-        public int CalculateEnergyToRemove(StaticItem si)
+        public int CalculateEnergyToRemove(Player p)
             {
             if (!this.IsExtant)
                 return 0;
 
-            int r = si.Energy; // LDA &0C0E
-            r >>= 2; // LSR A : LSR A
-            r -= si.Energy; // SEC : SBC &0C0E
-            r ^= 0xFF; // EOR #&FF
-            r++; // CLC : ADC #01
-            r &= 0xFF;
-
-            int result = si.Energy - r;
+            var result = p.Energy >> 2;
             return result;
             }
         }

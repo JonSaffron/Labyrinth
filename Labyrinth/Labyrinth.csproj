@@ -153,10 +153,10 @@
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Interfaces\ILayEggs.cs" />
     <Compile Include="Services\PathFinder\Node.cs" />
-    <Compile Include="Services\PathFinder\NodeState.cs" />
     <Compile Include="Services\PathFinder\Path.cs" />
     <Compile Include="Services\PathFinder\PathFinder.cs" />
     <Compile Include="Services\PathFinder\PriorityQueue.cs" />
+    <Compile Include="Services\PathFinder\PriorityQueuesProgram.cs" />
     <Compile Include="Services\PathFinder\SearchParameters.cs" />
     <Compile Include="Services\ScoreKeeper\NullScoreKeeper.cs" />
     <Compile Include="Services\ScoreKeeper\ScoreKeeper.cs" />

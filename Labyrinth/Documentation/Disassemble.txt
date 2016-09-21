@@ -3574,25 +3574,33 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 2641 8D 0E 0C  STA 0C0E                 
 2644 A9 02     LDA #02                  
 2646 20 D6 2D  JSR 2DD6                 -- play energy rise sound
-2649 20 6B 25  JSR 256B                 -- clear information about fruit
+
+2649 20 6B 25  JSR 256B                 -- clear information about fruit/mushroom
 264C 20 E9 33  JSR 33E9                 -- update energy bar (probably)
 264F 60        RTS                      
 
-2650 AD 0E 0C  LDA 0C0E   -- remove poison mushroom energy              
-2653 4A        LSR A                    
-2654 4A        LSR A                    
+		-- poisoned by mushroom, so reduce player's energy to 75% of previous value
+
+2650 AD 0E 0C  LDA 0C0E					-- calculate energy to remove, starting with player's current energy
+2653 4A        LSR A                    -- halve it
+2654 4A        LSR A                    -- halve it again
 2655 38        SEC                      
-2656 ED 0E 0C  SBC 0C0E                 
+2656 ED 0E 0C  SBC 0C0E                 -- subtract the player's energy to leave a negative value
 2659 49 FF     EOR #FF                  
 265B 18        CLC                      
-265C 69 01     ADC #01                  
-265E F0 0B     BEQ 266B                 
-2660 8D 0E 0C  STA 0C0E                 
+265C 69 01     ADC #01                  -- negate the negative value to give a positive result which is the player's remaining energy
+265E F0 0B     BEQ 266B                 -- does the player have any energy left?
+2660 8D 0E 0C  STA 0C0E                 -- store new energy
 2663 A9 04     LDA #04                  
 2665 20 D6 2D  JSR 2DD6					-- play clang sound               
-2668 4C 49 26  JMP 2649                 
-266B 20 6B 25  JSR 256B                 
-266E 4C 82 2E  JMP 2E82                 
+2668 4C 49 26  JMP 2649                 -- remove the mushroom from the world
+
+266B 20 6B 25  JSR 256B                 -- clear information about fruit/mushroom
+266E 4C 82 2E  JMP 2E82					-- player dies
+
+		-- convert value in A to Binary Coded Decimal
+		-- on exit, 70 contains low order of score to add, 71 contains high order of score to add
+
 2671 48        PHA                      
 2672 29 0F     AND #0F                  
 2674 A8        TAY                      
@@ -3623,9 +3631,15 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 269C E6 71     INC 71                   
 269E 60        RTS                      
 
-269F 20 71 26  JSR 2671                -- scoring (entry point to convert to bcd)
-26A2 18        CLC                     -- scoring already in decimal
-26A3 A5 70     LDA 70                   
+		-- add to player's score
+		-- on entry A is the amount to add to the score (divided by 10)
+
+269F 20 71 26  JSR 2671					-- scoring (entry point to convert to bcd)
+
+		-- alternative entry point where amount is already in BCD form
+
+26A2 18        CLC						
+26A3 A5 70     LDA 70                  
 26A5 F8        SED                      
 26A6 6D D5 0B  ADC 0BD5                 
 26A9 8D D5 0B  STA 0BD5                 
