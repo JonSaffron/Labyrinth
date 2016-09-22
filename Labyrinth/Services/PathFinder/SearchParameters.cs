@@ -26,6 +26,6 @@ namespace Labyrinth.Services.PathFinder
         /// <summary>
         /// Sets or returns the maximum length of the path that can be travelled
         /// </summary>
-        public int MaximumLengthOfPath { get; set; }
+        public int? MaximumLengthOfPath { get; set; }
         }
     }

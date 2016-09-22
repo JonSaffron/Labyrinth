@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 
 // http://blog.two-cats.com/2014/06/a-star-example/
-// http://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html
+// http://theory.stanford.edu/~amitp/GameProgramming/index.html
 // https://blogs.msdn.microsoft.com/ericlippert/2007/10/page/2/
 
 namespace Labyrinth.Services.PathFinder
     {
     public class PathFinder
         {
-        private readonly PriorityQueue<float, Path<Node>> _openNodes = new PriorityQueue<float, Path<Node>>();
-        private readonly HashSet<Node> _closedNodes = new HashSet<Node>();
+        private readonly PriorityQueue<float, Path<TilePos>> _openNodes = new PriorityQueue<float, Path<TilePos>>();
+        private readonly HashSet<Path<TilePos>> _closedNodes = new HashSet<Path<TilePos>>();
         private readonly SearchParameters _searchParameters;
 
         /// <summary>
@@ -30,38 +30,53 @@ namespace Labyrinth.Services.PathFinder
         public IList<TilePos> FindPath()
             {
             // The start node is the first entry in the 'open' list
-            this._openNodes.Enqueue(0, new Path<Node>(new Node(this._searchParameters.StartLocation)));
+            this._openNodes.Enqueue(0, new Path<TilePos>(this._searchParameters.StartLocation));
 
-            while (!this._openNodes.IsEmpty)
+            while (this._openNodes.Count != 0)
                 {
                 var path = this._openNodes.Dequeue();
-
-                if (this._closedNodes.Contains(path.LastStep))
+                if (!path.IsViable)
                     continue;
 
-                if (path.LastStep.Location == this._searchParameters.EndLocation)
+                if (path.LastStep == this._searchParameters.EndLocation)
                     {
                     var result = ExtractPath(path);
                     return result;
                     }
 
-                this._closedNodes.Add(path.LastStep);
+                this._closedNodes.Add(path);
 
-                IEnumerable<Node> nextNodes = GetAdjacentWalkableNodes(path.LastStep);
+                IEnumerable<TilePos> nextNodes = GetAdjacentWalkableNodes(path.LastStep);
                 foreach (var nextNode in nextNodes)
                     {
-                    this._openNodes.Enqueue(nextNode.F, path.AddStep(nextNode, 1));
-                    }
+                    var newPath = path.AddStep(nextNode, 1);
+                    if (this._searchParameters.MaximumLengthOfPath.HasValue && newPath.Cost > this._searchParameters.MaximumLengthOfPath.Value)
+                        continue;
+                    
+                    var pathYetToVisit = this._openNodes.Items.FirstOrDefault(item => item.LastStep == newPath.LastStep);
+                    if (pathYetToVisit != null)
+                        {
+                        if (newPath.Cost >= pathYetToVisit.Cost)
+                            continue;
+                        pathYetToVisit.IsViable = false;
+                        }
 
+                    var pathAlreadyVisited = this._closedNodes.FirstOrDefault(item => item.LastStep == newPath.LastStep);
+                    if (pathAlreadyVisited != null && newPath.Cost >= pathAlreadyVisited.Cost)
+                        continue;
+
+                    var estimatedCostToGoal = newPath.Cost + GetEstimatedTraversalCost(newPath.LastStep);
+                    this._openNodes.Enqueue(estimatedCostToGoal, newPath);
+                    }
                 }
 
             // The method returns false if this path leads to be a dead end
             return new List<TilePos>();
             }
 
-        private IList<TilePos> ExtractPath(Path<Node> path)
+        private IList<TilePos> ExtractPath(Path<TilePos> path)
             {
-            var result = path.Select(item => item.Location).Reverse().ToList();
+            var result = path.Reverse().Skip(1).ToList();
             return result;
             }
 
@@ -70,9 +85,9 @@ namespace Labyrinth.Services.PathFinder
         /// </summary>
         /// <param name="fromNode">The node from which to return the next possible nodes in the path</param>
         /// <returns>A list of next possible nodes in the path</returns>
-        private IEnumerable<Node> GetAdjacentWalkableNodes(Node fromNode)
+        private IEnumerable<TilePos> GetAdjacentWalkableNodes(TilePos fromNode)
             {
-            IEnumerable<TilePos> nextLocations = GetAdjacentLocations(fromNode.Location);
+            IEnumerable<TilePos> nextLocations = GetAdjacentLocations(fromNode);
 
             foreach (var location in nextLocations)
                 {
@@ -80,11 +95,7 @@ namespace Labyrinth.Services.PathFinder
                 if (!this._searchParameters.CanBeOccupied(location))
                     continue;
 
-                Node node = new Node(location);
-                node.G = fromNode.G + 1;
-                node.H = GetEstimatedTraversalCost(node.Location);
-
-                yield return node;
+                yield return location;
                 }
             }
 

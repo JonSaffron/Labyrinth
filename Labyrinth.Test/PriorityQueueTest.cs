@@ -8,12 +8,12 @@ namespace Labyrinth.Test
     class PriorityQueueTest
         {
         [Test]
-        public void TestPriorityQueue(string[] args)
+        public void TestPriorityQueue()
             {
             Console.WriteLine("\nBegin Priority Queue demo");
       
             Console.WriteLine("\nCreating priority queue of Employee items\n");
-            PriorityQueue<Employee> pq = new PriorityQueue<Employee>();
+            var pq = new PriorityQueue<double, Employee>();
 
             Employee e1 = new Employee("Aiden", 1.0);
             Employee e2 = new Employee("Baker", 2.0);
@@ -23,17 +23,17 @@ namespace Labyrinth.Test
             Employee e6 = new Employee("Flynn", 6.0);
 
             Console.WriteLine("Adding " + e5 + " to priority queue");
-            pq.Enqueue(e5);
+            pq.Enqueue(e5.Priority, e5);
             Console.WriteLine("Adding " + e3 + " to priority queue");
-            pq.Enqueue(e3);
+            pq.Enqueue(e3.Priority, e3);
             Console.WriteLine("Adding " + e6 + " to priority queue");
-            pq.Enqueue(e6);
+            pq.Enqueue(e6.Priority, e6);
             Console.WriteLine("Adding " + e4 + " to priority queue");
-            pq.Enqueue(e4);
+            pq.Enqueue(e4.Priority, e4);
             Console.WriteLine("Adding " + e1 + " to priority queue");
-            pq.Enqueue(e1);
+            pq.Enqueue(e1.Priority, e1);
             Console.WriteLine("Adding " + e2 + " to priority queue");
-            pq.Enqueue(e2);
+            pq.Enqueue(e2.Priority, e2);
 
             Console.WriteLine("\nPriory queue is: ");
             Console.WriteLine(pq.ToString());
@@ -57,7 +57,7 @@ namespace Labyrinth.Test
             }
 
         [Test]
-        public void TestPriorityQueue()
+        public void TestPriorityQueueRandom()
             {
             TestPriorityQueue(50000);
             }
@@ -65,7 +65,7 @@ namespace Labyrinth.Test
         private static void TestPriorityQueue(int numOperations)
             {
             Random rand = new Random(0);
-            PriorityQueue<Employee> pq = new PriorityQueue<Employee>();
+            var pq = new PriorityQueue<double, Employee>();
             for (int op = 0; op < numOperations; ++op)
                 {
                 int opType = rand.Next(0, 2);
@@ -74,7 +74,7 @@ namespace Labyrinth.Test
                     {
                     string lastName = op + "man";
                     double priority = (100.0 - 1.0) * rand.NextDouble() + 1.0;
-                    pq.Enqueue(new Employee(lastName, priority));
+                    pq.Enqueue(priority, new Employee(lastName, priority));
                     if (pq.IsConsistent() == false)
                         {
                         throw new InvalidOperationException("Test fails after enqueue operation # " + op);
@@ -82,7 +82,7 @@ namespace Labyrinth.Test
                     }
                 else // dequeue
                     {
-                    if (pq.Count() > 0)
+                    if (pq.Count > 0)
                         {
                         pq.Dequeue();
                         if (pq.IsConsistent() == false)
@@ -95,7 +95,7 @@ namespace Labyrinth.Test
             Console.WriteLine("\nAll tests passed");
             }
 
-        public class Employee : IComparable<Employee>
+        public class Employee
             {
             public string LastName { get; set; }
             public double Priority { get; set; }
@@ -109,15 +109,6 @@ namespace Labyrinth.Test
             public override string ToString()
                 {
                 return "(" + LastName + ", " + Priority.ToString("F1") + ")";
-                }
-
-            public int CompareTo(Employee other)
-                {
-                if (this.Priority < other.Priority) 
-                    return -1;
-                if (this.Priority > other.Priority) 
-                    return 1;
-                return 0;
                 }
             }
         }

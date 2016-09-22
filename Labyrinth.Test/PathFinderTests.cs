@@ -92,6 +92,10 @@ namespace Labyrinth.Test
             Assert.IsNotNull(path);
             Assert.IsTrue(path.Any());
             Assert.AreEqual(4, path.Count);
+            Assert.AreEqual(new TilePos(2, 2), path[0]);
+            Assert.AreEqual(new TilePos(3, 2), path[1]);
+            Assert.AreEqual(new TilePos(4, 2), path[2]);
+            Assert.AreEqual(new TilePos(5, 2), path[3]);
         }
 
         [Test]

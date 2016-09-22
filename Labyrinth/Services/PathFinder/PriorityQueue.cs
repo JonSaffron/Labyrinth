@@ -1,36 +1,107 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+
+// https://visualstudiomagazine.com/Articles/2012/11/01/Priority-Queues-with-C.aspx
 
 namespace Labyrinth.Services.PathFinder
     {
-    class PriorityQueue<P, V>
+    // ReSharper disable once InconsistentNaming
+    public class PriorityQueue<P, T> where P: IComparable<P>
         {
-        private readonly SortedDictionary<P, Queue<V>> _queues = new SortedDictionary<P, Queue<V>>();
-        
-        public void Enqueue(P priority, V value)
+        private readonly List<KeyValuePair<P, T>> _data = new List<KeyValuePair<P, T>>();
+
+        public void Enqueue(P priority, T item)
             {
-            Queue<V> q;
-            if (!_queues.TryGetValue(priority, out q))
+            this._data.Add(new KeyValuePair<P, T>(priority, item));
+
+            int childIndex = _data.Count - 1; // child index; start at end
+            while (childIndex > 0)
                 {
-                q = new Queue<V>();
-                _queues.Add(priority, q);
+                int parentIndex = (childIndex - 1) / 2; // parent index
+                if (this._data[childIndex].Key.CompareTo(this._data[parentIndex].Key) >= 0) 
+                    break; // child item is larger than (or equal) parent so we're done
+                KeyValuePair<P, T> tmp = this._data[childIndex]; 
+                this._data[childIndex] = this._data[parentIndex]; 
+                this._data[parentIndex] = tmp;
+                childIndex = parentIndex;
                 }
-            q.Enqueue(value);
             }
 
-        public V Dequeue()
+        public T Dequeue()
             {
-            // will throw if there isn’t any first element!
-            var pair = _queues.First();
-            var v = pair.Value.Dequeue();
-            if (pair.Value.Count == 0) // nothing left of the top priority.
-                _queues.Remove(pair.Key);
-            return v;
+            // assumes pq is not empty; up to calling code
+            int lastIndex = _data.Count - 1; // last index (before removal)
+            KeyValuePair<P, T> frontItem = this._data[0];   // fetch the front
+            this._data[0] = this._data[lastIndex];
+            this._data.RemoveAt(lastIndex);
+
+            lastIndex -= 1; // last index (after removal)
+            int parentIndex = 0; // parent index. start at front of pq
+            while (true)
+                {
+                int leftChildOfParentIndex = parentIndex * 2 + 1; // left child index of parent
+                if (leftChildOfParentIndex > lastIndex) 
+                    break;  // no children so done
+
+                int rightChildOfParentIndex = leftChildOfParentIndex + 1;     // right child
+                if (rightChildOfParentIndex <= lastIndex && this._data[rightChildOfParentIndex].Key.CompareTo(this._data[leftChildOfParentIndex].Key) < 0) // if there is a rc (ci + 1), and it is smaller than left child, use the rc instead
+                    leftChildOfParentIndex = rightChildOfParentIndex;
+
+                if (this._data[parentIndex].Key.CompareTo(this._data[leftChildOfParentIndex].Key) <= 0) 
+                    break; // parent is smaller than (or equal to) smallest child so done
+
+                KeyValuePair<P, T> tmp = this._data[parentIndex]; 
+                this._data[parentIndex] = this._data[leftChildOfParentIndex]; 
+                this._data[leftChildOfParentIndex] = tmp; // swap parent and child
+                parentIndex = leftChildOfParentIndex;
+                }
+            return frontItem.Value;
             }
 
-        public bool IsEmpty
+        public IEnumerable<T> Items
             {
-            get { return !_queues.Any(); }
+            get
+                {
+                var result = this._data.Select(item => item.Value);
+                return result;
+                }
+            }
+
+        public int Count
+            {
+            get { return _data.Count; }
+            }
+
+        public override string ToString()
+            {
+            string s = "";
+            for (int i = 0; i < _data.Count; ++i)
+                s += _data[i] + " ";
+            s += "count = " + _data.Count;
+            return s;
+            }
+
+        public bool IsConsistent()
+            {
+            // is the heap property true for all data?
+            if (this._data.Count == 0) 
+                return true;
+
+            int lastIndex = _data.Count - 1; // last index
+            for (int parentIndex = 0; parentIndex < _data.Count; parentIndex++) // each parent index
+                {
+                int leftChildIndex = 2 * parentIndex + 1; // left child index
+                int rightChildIndex = 2 * parentIndex + 2; // right child index
+
+                if (leftChildIndex <= lastIndex && this._data[parentIndex].Key.CompareTo(this._data[leftChildIndex].Key) > 0) 
+                    return false; // if lc exists and it's greater than parent then bad.
+
+                if (rightChildIndex <= lastIndex && this._data[parentIndex].Key.CompareTo(this._data[rightChildIndex].Key) > 0) 
+                    return false; // check the right child too.
+                }
+
+            return true; // passed all checks
             }
         }
     }
