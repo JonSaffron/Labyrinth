@@ -27,7 +27,7 @@ namespace Labyrinth.Services.PathFinder
         /// Attempts to find a path from the start location to the end location based on the supplied SearchParameters
         /// </summary>
         /// <returns>A List of Points representing the path. If no path was found, the returned list is empty.</returns>
-        public IList<TilePos> FindPath()
+        public bool TryFindPath(out IList<TilePos> result)
             {
             // The start node is the first entry in the 'open' list
             this._openNodes.Enqueue(0, new Path<TilePos>(this._searchParameters.StartLocation));
@@ -40,8 +40,8 @@ namespace Labyrinth.Services.PathFinder
 
                 if (path.LastStep == this._searchParameters.EndLocation)
                     {
-                    var result = ExtractPath(path);
-                    return result;
+                    result = path.Reverse().Skip(1).ToList();
+                    return true;
                     }
 
                 this._closedNodes.Add(path);
@@ -71,13 +71,8 @@ namespace Labyrinth.Services.PathFinder
                 }
 
             // The method returns false if this path leads to be a dead end
-            return new List<TilePos>();
-            }
-
-        private IList<TilePos> ExtractPath(Path<TilePos> path)
-            {
-            var result = path.Reverse().Skip(1).ToList();
-            return result;
+            result = null;
+            return false;
             }
 
         /// <summary>

@@ -4,16 +4,16 @@ using Labyrinth.Services.PathFinder;
 using NUnit.Framework;
 
 namespace Labyrinth.Test
-{
+    {
     [TestFixture]
     public class PathFinderTests
-    {
+        {
         private bool[,] _map;
         private SearchParameters _searchParameters;
 
         [SetUp]
         public void Initialize()
-        {
+            {
             //  □ □ □ □ □ □ □
             //  □ □ □ □ □ □ □
             //  □ S □ □ □ F □
@@ -25,11 +25,11 @@ namespace Labyrinth.Test
                 for (int x = 0; x < 7; x++)
                     _map[x, y] = true;
 
-        this._searchParameters = new SearchParameters();
-        this._searchParameters.StartLocation = new TilePos(1, 2);
-        this._searchParameters.EndLocation = new TilePos(5, 2);
-        this._searchParameters.CanBeOccupied = CanOccupyPositionOnMap;
-        }
+            this._searchParameters = new SearchParameters();
+            this._searchParameters.StartLocation = new TilePos(1, 2);
+            this._searchParameters.EndLocation = new TilePos(5, 2);
+            this._searchParameters.CanBeOccupied = CanOccupyPositionOnMap;
+            }
 
         private bool CanOccupyPositionOnMap(TilePos tp)
             {
@@ -43,7 +43,7 @@ namespace Labyrinth.Test
         /// Create an L-shaped wall between S and F
         /// </summary>
         private void AddWallWithGap()
-        {
+            {
             //  □ □ □ ■ □ □ □
             //  □ □ □ ■ □ □ □
             //  □ S □ ■ □ F □
@@ -57,13 +57,13 @@ namespace Labyrinth.Test
             this._map[3, 2] = false;
             this._map[3, 1] = false;
             this._map[4, 1] = false;
-        }
+            }
 
         /// <summary>
         /// Create a closed barrier between S and F
         /// </summary>
         private void AddWallWithoutGap()
-        {
+            {
             //  □ □ □ ■ □ □ □
             //  □ □ □ ■ □ □ □
             //  □ S □ ■ □ F □
@@ -77,18 +77,20 @@ namespace Labyrinth.Test
             this._map[3, 2] = false;
             this._map[3, 1] = false;
             this._map[3, 0] = false;
-        }
+            }
 
         [Test]
         public void Test_WithoutWalls_CanFindPath()
-        {
+            {
             // Arrange
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path = pathFinder.FindPath();
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
 
             // Assert
+            Assert.IsTrue(result);
             Assert.IsNotNull(path);
             Assert.IsTrue(path.Any());
             Assert.AreEqual(4, path.Count);
@@ -96,37 +98,93 @@ namespace Labyrinth.Test
             Assert.AreEqual(new TilePos(3, 2), path[1]);
             Assert.AreEqual(new TilePos(4, 2), path[2]);
             Assert.AreEqual(new TilePos(5, 2), path[3]);
-        }
+            }
 
         [Test]
         public void Test_WithOpenWall_CanFindPathAroundWall()
-        {
+            {
             // Arrange
             AddWallWithGap();
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path = pathFinder.FindPath();
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
 
             // Assert
+            Assert.IsTrue(result);
             Assert.IsNotNull(path);
             Assert.IsTrue(path.Any());
             Assert.AreEqual(8, path.Count);
-        }
+            }
 
         [Test]
         public void Test_WithClosedWall_CannotFindPath()
-        {
+            {
             // Arrange
             AddWallWithoutGap();
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path = pathFinder.FindPath();
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
 
             // Assert
-            Assert.IsNotNull(path);
-            Assert.IsFalse(path.Any());
+            Assert.IsFalse(result);
+            Assert.IsNull(path);
+            }
+
+        [Test]
+        public void Test_StartAndEndInSamePlace_IsOkay()
+            {
+            // Arrange
+            this._searchParameters.StartLocation = new TilePos(1, 1);
+            this._searchParameters.EndLocation = new TilePos(1, 1);
+            PathFinder pathFinder = new PathFinder(_searchParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(!path.Any());
+            }
+
+        [Test]
+        public void Test_MaximumRouteLengthIsNotLongEnough_IsOkay()
+            {
+            // Arrange
+            this._searchParameters.StartLocation = new TilePos(1, 1);
+            this._searchParameters.EndLocation = new TilePos(5, 3);
+            this._searchParameters.MaximumLengthOfPath = 5;
+            PathFinder pathFinder = new PathFinder(_searchParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsNull(path);
+            }
+
+        [Test]
+        public void Test_MaximumRouteLengthIsJustEnough_IsOkay()
+            {
+            // Arrange
+            this._searchParameters.StartLocation = new TilePos(1, 1);
+            this._searchParameters.EndLocation = new TilePos(5, 3);
+            this._searchParameters.MaximumLengthOfPath = 6;
+            PathFinder pathFinder = new PathFinder(_searchParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(this._searchParameters.MaximumLengthOfPath.Value, path.Count);
+            }
         }
     }
-}
