@@ -10,11 +10,6 @@ namespace Labyrinth
         
         public TilePos(int x, int y)
             {
-            if (x < 0)
-                throw new ArgumentOutOfRangeException("x", "X co-ordinate cannot be negative.");
-            if (y < 0)
-                throw new ArgumentOutOfRangeException("y", "y co-ordinate cannot be negative.");
-
             this.X = x;
             this.Y = y;
             }

@@ -140,6 +140,12 @@ namespace Labyrinth
             return result;
             }
 
+        /// <summary>
+        /// Tests whether an impassable object is occupying the specified position
+        /// </summary>
+        /// <remarks>This is to be used when looking for a clear path or line of sight</remarks>
+        /// <param name="tp">The tile position to test</param>
+        /// <returns>True if there is an impassable object occupying the specified position</returns>
         public bool IsImpassableItemOnTile(TilePos tp)
             {
             var objectsAtPosition = this.GetItemsOnTile(tp);

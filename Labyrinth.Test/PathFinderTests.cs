@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Labyrinth.Services.PathFinder;
 using NUnit.Framework;
 
@@ -19,10 +21,12 @@ namespace Labyrinth.Test
             //  □ S □ □ □ F □
             //  □ □ □ □ □ □ □
             //  □ □ □ □ □ □ □
+            //  □ □ □ □ □ □ □
+            //  □ □ □ □ □ □ □
             
-            this._map = new bool[7, 5];
-            for (int y = 0; y < 5; y++)
-                for (int x = 0; x < 7; x++)
+            this._map = new bool[7, 7];
+            for (int y = 0; y < this._map.GetLength(1); y++)
+                for (int x = 0; x < this._map.GetLength(0); x++)
                     _map[x, y] = true;
 
             this._searchParameters = new SearchParameters();
@@ -33,6 +37,8 @@ namespace Labyrinth.Test
 
         private bool CanOccupyPositionOnMap(TilePos tp)
             {
+            if (tp.X < 0 || tp.Y < 0)
+                return false;
             if (tp.X >= this._map.GetLength(0) || tp.Y >= this._map.GetLength(1))
                 return false;
             var result = this._map[tp.X, tp.Y];
@@ -44,19 +50,23 @@ namespace Labyrinth.Test
         /// </summary>
         private void AddWallWithGap()
             {
-            //  □ □ □ ■ □ □ □
-            //  □ □ □ ■ □ □ □
-            //  □ S □ ■ □ F □
-            //  □ □ □ ■ ■ □ □
             //  □ □ □ □ □ □ □
+            //  □ □ □ ■ ■ □ □
+            //  □ S □ ■ □ F □
+            //  □ □ □ ■ □ □ □
+            //  □ □ □ ■ □ □ □
+            //  □ □ □ ■ □ □ □
+            //  □ □ □ ■ □ □ □
 
             // Path: 1,2 ; 2,1 ; 3,0 ; 4,0 ; 5,1 ; 5,2
 
-            this._map[3, 4] = false;
-            this._map[3, 3] = false;
-            this._map[3, 2] = false;
             this._map[3, 1] = false;
             this._map[4, 1] = false;
+            this._map[3, 2] = false;
+            this._map[3, 3] = false;
+            this._map[3, 4] = false;
+            this._map[3, 5] = false;
+            this._map[3, 6] = false;
             }
 
         /// <summary>
@@ -69,14 +79,82 @@ namespace Labyrinth.Test
             //  □ S □ ■ □ F □
             //  □ □ □ ■ □ □ □
             //  □ □ □ ■ □ □ □
+            //  □ □ □ ■ □ □ □
+            //  □ □ □ ■ □ □ □
 
             // No path
 
-            this._map[3, 4] = false;
-            this._map[3, 3] = false;
-            this._map[3, 2] = false;
-            this._map[3, 1] = false;
             this._map[3, 0] = false;
+            this._map[3, 1] = false;
+            this._map[3, 2] = false;
+            this._map[3, 3] = false;
+            this._map[3, 4] = false;
+            this._map[3, 5] = false;
+            this._map[3, 6] = false;
+            }
+
+        /// <summary>
+        /// Create a closed barrier between S and F
+        /// </summary>
+        private void AddConcaveObstacle()
+            {
+            //  □ □ □ □ □ □ F
+            //  □ ■ ■ ■ ■ ■ □
+            //  □ ■ □ □ □ ■ □
+            //  □ ■ □ □ □ ■ □
+            //  □ □ □ □ □ ■ □
+            //  □ S □ ■ ■ ■ □
+            //  □ □ □ □ □ □ □
+
+            // No path
+
+            this._map[1, 3] = false;
+            this._map[1, 2] = false;
+            this._map[1, 1] = false;
+            this._map[2, 1] = false;
+            this._map[3, 1] = false;
+            this._map[4, 1] = false;
+            this._map[5, 1] = false;
+            this._map[5, 2] = false;
+            this._map[5, 3] = false;
+            this._map[5, 4] = false;
+            this._map[5, 5] = false;
+            this._map[4, 5] = false;
+            this._map[3, 5] = false;
+            }
+
+
+        private void OutputRoute(IList<TilePos> path)
+            {
+            var newMap = new char[this._map.GetLength(0), this._map.GetLength(1)];
+            for (int y = 0; y < this._map.GetLength(1); y++)
+                {
+                for (int x = 0; x < this._map.GetLength(0); x++)
+                    {
+                    newMap[x, y] = this._map[x, y] ? '·' : '■';
+                    }
+                }
+            newMap[this._searchParameters.StartLocation.X, this._searchParameters.StartLocation.Y] = 'S';
+            if (path != null)
+                {
+                foreach (var location in path)
+                    {
+                    newMap[location.X, location.Y] = '+';
+                    }
+                }
+            newMap[this._searchParameters.EndLocation.X, this._searchParameters.EndLocation.Y] = (this._searchParameters.StartLocation == this._searchParameters.EndLocation) ? 'X' : 'F';
+
+            StringBuilder sb = new StringBuilder();
+            for (int y = 0; y < newMap.GetLength(1); y++)
+                {
+                for (int x = 0; x < newMap.GetLength(0); x++)
+                    {
+                    sb.Append(newMap[x, y]);
+                    }
+                sb.AppendLine();
+                }
+            System.Diagnostics.Trace.Write(sb.ToString());
+            Console.Write(sb.ToString());
             }
 
         [Test]
@@ -98,6 +176,7 @@ namespace Labyrinth.Test
             Assert.AreEqual(new TilePos(3, 2), path[1]);
             Assert.AreEqual(new TilePos(4, 2), path[2]);
             Assert.AreEqual(new TilePos(5, 2), path[3]);
+            OutputRoute(path);
             }
 
         [Test]
@@ -116,6 +195,7 @@ namespace Labyrinth.Test
             Assert.IsNotNull(path);
             Assert.IsTrue(path.Any());
             Assert.AreEqual(8, path.Count);
+            OutputRoute(path);
             }
 
         [Test]
@@ -132,6 +212,7 @@ namespace Labyrinth.Test
             // Assert
             Assert.IsFalse(result);
             Assert.IsNull(path);
+            OutputRoute(null);
             }
 
         [Test]
@@ -149,6 +230,7 @@ namespace Labyrinth.Test
             // Assert
             Assert.IsTrue(result);
             Assert.IsTrue(!path.Any());
+            OutputRoute(path);
             }
 
         [Test]
@@ -167,6 +249,7 @@ namespace Labyrinth.Test
             // Assert
             Assert.IsFalse(result);
             Assert.IsNull(path);
+            OutputRoute(null);
             }
 
         [Test]
@@ -185,6 +268,27 @@ namespace Labyrinth.Test
             // Assert
             Assert.IsTrue(result);
             Assert.AreEqual(this._searchParameters.MaximumLengthOfPath.Value, path.Count);
+            OutputRoute(path);
             }
+
+        [Test]
+        public void Test_ConcaveObstacle_CanRouteAround()
+            {
+            // Arrange
+            AddConcaveObstacle();
+            this._searchParameters.StartLocation = new TilePos(1, 5);
+            this._searchParameters.EndLocation = new TilePos(6, 0);
+            PathFinder pathFinder = new PathFinder(_searchParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(12, path.Count);
+            OutputRoute(path);
+            }
+
         }
     }

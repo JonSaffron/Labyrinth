@@ -7,6 +7,7 @@ using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Labyrinth.GameObjects;
+using Labyrinth.Services.PathFinder;
 
 namespace Labyrinth
     {
@@ -63,14 +64,53 @@ namespace Labyrinth
                 this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
                 }
             this.Player.Reset();
-            
-            // todo: Move any monsters in the room (that can move rooms) to an adjacent room
+
+            MoveNearbyMonstersToASafeDistance();
 
             GlobalServices.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
             this._levelReturnType = LevelReturnType.Normal;
             _doNotUpdate = false;
             }
-        
+
+        private void MoveNearbyMonstersToASafeDistance()
+            {
+            var monsters = GetNearbyMonsters();
+            foreach (var monster in monsters)
+                MoveMonsterToSafeDistance(monster);
+            }
+
+        private IEnumerable<Monster> GetNearbyMonsters()
+            {
+            var area = new TileRect(new TilePos(this.Player.TilePosition.X - 16, this.Player.TilePosition.Y - 16), 32, 32);
+            var searchParameters = new SearchParameters
+                {
+                EndLocation = this.Player.TilePosition,
+                MaximumLengthOfPath = 20,
+                CanBeOccupied = GlobalServices.GameState.IsImpassableItemOnTile
+                };
+
+            var result = new List<Monster>();
+            foreach (var monster in GlobalServices.GameState.AllItemsInRectangle(area).OfType<Monster>())
+                {
+                if (!monster.IsStill)
+                    {
+                    searchParameters.StartLocation = monster.TilePosition;
+
+                    var pf = new PathFinder(searchParameters);
+                    IList<TilePos> path;
+                    if (pf.TryFindPath(out path))
+                        result.Add(monster);
+                    }
+                }
+
+            return result;
+            }
+
+        private void MoveMonsterToSafeDistance(Monster monster)
+            {
+            throw new NotImplementedException();
+            }
+
         public void SetLevelReturnType(LevelReturnType levelReturnType)
             {
             this._levelReturnType = levelReturnType;
