@@ -59,6 +59,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RepelObjectTests.cs" />
     <Compile Include="DummySoundEffectInstance.cs" />
     <Compile Include="DummySpriteLibrary.cs" />
     <Compile Include="Helpers.cs" />
