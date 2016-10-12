@@ -9,11 +9,13 @@ namespace Labyrinth
         {
         private Texture2D _digits;
         private Texture2D _life;
+        private SpriteFont _statusFont;
 
         public void LoadContent(ContentManager contentManager)
             {
             this._digits = contentManager.Load<Texture2D>("Display/Digits");
             this._life = contentManager.Load<Texture2D>("Display/Life");
+            this._statusFont = contentManager.Load<SpriteFont>("Display/StatusFont");
             }
 
         public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, int score, int livesLeft)
@@ -91,6 +93,15 @@ namespace Labyrinth
                     break;
                 i++;
                 }
+            }
+
+        public void DrawPausedMessage(ISpriteBatch spriteBatch)
+            {
+            const string paused = "P A U S E D";
+            Vector2 size = this._statusFont.MeasureString(paused) * spriteBatch.Zoom;
+            Vector2 origin = Vector2.Zero;
+            Vector2 pos = new Vector2(Constants.RoomSizeInPixels.X * spriteBatch.Zoom / 2f - size.X / 2f, 200);
+            spriteBatch.DrawString(this._statusFont, paused, pos, Color.Green, origin);
             }
         }
     }

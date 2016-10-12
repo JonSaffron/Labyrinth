@@ -28,5 +28,15 @@ namespace Labyrinth.Services.Display
             var r = new Rectangle(x, y, width, height);
             this.SpriteBatch.Draw(texture, r, colour);
             }
+
+        public override void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin)
+            {
+            this.SpriteBatch.DrawString(font, text, pos, color, 0, origin, this._zoom, SpriteEffects.None, 0);
+            }
+
+        public float Zoom
+            {
+            get { return this._zoom; }
+            }
         }
     }

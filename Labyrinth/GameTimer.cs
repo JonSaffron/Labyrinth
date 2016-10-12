@@ -39,6 +39,9 @@ namespace Labyrinth
 
         public void Update(GameTime gameTime)
             {
+            if (!this._enabled)
+                return;
+
             this.TimeRemaining -= gameTime.ElapsedGameTime;
             if (TimeRemaining.Ticks <= 0)
                 {

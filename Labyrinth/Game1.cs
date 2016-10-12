@@ -25,6 +25,8 @@ namespace Labyrinth
         private readonly IScoreKeeper _scoreKeeper = new ScoreKeeper();
         private World _world;
 
+        private bool GameIsPaused { get; set; }
+
         public Game1(IPlayerInput playerInput, IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
             {
             if (playerInput == null)
@@ -110,25 +112,28 @@ namespace Labyrinth
 
             base.Update(gameTime);
 
-            // ReSharper disable once PossibleNullReferenceException
-            LevelReturnType lrt = this.World.Update(gameTime);
-            switch (lrt)
+            if (!this.GameIsPaused)
                 {
-                case LevelReturnType.FinishedLevel:
-                    this.World = null;
-                    this._lives++;
-                    break;
+                // ReSharper disable once PossibleNullReferenceException
+                LevelReturnType lrt = this.World.Update(gameTime);
+                switch (lrt)
+                    {
+                    case LevelReturnType.FinishedLevel:
+                        this.World = null;
+                        this._lives++;
+                        break;
                 
-                case LevelReturnType.LostLife:
-                    GlobalServices.SoundPlayer.ActiveSoundService.Clear();
-                    if (this._lives == 0)
-                        {
-                        this.Exit();
-                        return;
-                        }
-                    this._lives--;
-                    this.World.ResetLevelAfterLosingLife(_spriteBatch);
-                    break;
+                    case LevelReturnType.LostLife:
+                        GlobalServices.SoundPlayer.ActiveSoundService.Clear();
+                        if (this._lives == 0)
+                            {
+                            this.Exit();
+                            return;
+                            }
+                        this._lives--;
+                        this.World.ResetLevelAfterLosingLife(_spriteBatch);
+                        break;
+                    }
                 }
 
             if (gameTime.IsRunningSlowly)
@@ -149,6 +154,9 @@ namespace Labyrinth
             var gameInput = this._playerInput.GameInput;
             if (gameInput.HasGameExitBeenTriggered)
                 this.Exit();
+
+            if (gameInput.HasPauseBeenTriggered)
+                this.GameIsPaused = !this.GameIsPaused;
 
             if (gameInput.HasToggleFullScreenBeenTriggered)
                 ToggleFullScreen();
@@ -185,7 +193,10 @@ namespace Labyrinth
                 {
                 this.World.Draw(gameTime, _spriteBatch);
                 this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._displayedScore, this._lives);
+                if (this.GameIsPaused)
+                    this._headsUpDisplay.DrawPausedMessage(_spriteBatch);
                 }
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -209,6 +220,13 @@ namespace Labyrinth
             {
             var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, Constants.ZoomWhilstWindowed);
             return result;
+            }
+
+        protected override void OnDeactivated(object sender, EventArgs args)
+            {
+            base.OnDeactivated(sender, args);
+
+            this.GameIsPaused = true;
             }
         }
     }

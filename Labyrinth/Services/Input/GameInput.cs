@@ -5,14 +5,16 @@ namespace Labyrinth.Services.Input
     {
     public class GameInput : GameComponent
         {
-        public bool HasGameExitBeenTriggered { get; private set; }
         public bool HasToggleFullScreenBeenTriggered { get; private set; }
         public bool HasSoundOffBeenTriggered { get; private set; }
         public bool HasSoundOnBeenTriggered { get; private set; }
         public bool HasSoundIncreaseBeenTriggered { get; private set; }
         public bool HasSoundDecreaseBeenTriggered { get; private set; }
-        public bool HasMoveToNextLevelBeenTriggered { get; set; }
+        public bool HasMoveToNextLevelBeenTriggered { get; private set; }
+        public bool HasPauseBeenTriggered { get; private set; }
+        public bool HasGameExitBeenTriggered { get; private set; }
 
+        private KeyboardState _currentKeyboardState;
         private KeyboardState _previousKeyboardState;
 
         public GameInput(Game1 game) : base(game)
@@ -20,40 +22,41 @@ namespace Labyrinth.Services.Input
             game.Components.Add(this);
             }
 
-        public KeyboardState GetNewKeyboardState(out KeyboardState previousKeyboardState)
-            {
-            KeyboardState keyboardState = Keyboard.GetState();
-            HasToggleFullScreenBeenTriggered = IsKeyNewlyPressed(keyboardState, this._previousKeyboardState, Keys.Enter) && keyboardState.IsKeyDown(Keys.LeftAlt);
-            HasSoundOffBeenTriggered = IsKeyNewlyPressed(keyboardState, this._previousKeyboardState, Keys.Q);
-            HasSoundOnBeenTriggered = IsKeyNewlyPressed(keyboardState, this._previousKeyboardState, Keys.S);
-            HasSoundIncreaseBeenTriggered = IsKeyNewlyPressed(keyboardState, this._previousKeyboardState, Keys.PageUp);
-            HasSoundDecreaseBeenTriggered = IsKeyNewlyPressed(keyboardState, this._previousKeyboardState, Keys.PageDown);
-            previousKeyboardState = this._previousKeyboardState;
-            this._previousKeyboardState = keyboardState;
-            return keyboardState;
-            }
-
         public override void Initialize()
             {
-            this._previousKeyboardState = Keyboard.GetState();
+            this._currentKeyboardState = Keyboard.GetState();
             }
 
         public override void Update(GameTime gameTime)
             {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.HasGameExitBeenTriggered = true;
+            this._previousKeyboardState = this._currentKeyboardState;
+            this._currentKeyboardState = Keyboard.GetState();
 
-            HasToggleFullScreenBeenTriggered = false;
-            HasSoundOffBeenTriggered = false;
-            HasSoundOnBeenTriggered = false;
-            HasSoundIncreaseBeenTriggered = false;
-            HasSoundDecreaseBeenTriggered = false;
-            HasMoveToNextLevelBeenTriggered = false;
+            this.HasToggleFullScreenBeenTriggered = IsKeyNewlyPressed(Keys.Enter) && IsKeyCurrentlyPressed(Keys.LeftAlt);
+            this.HasSoundOffBeenTriggered = IsKeyNewlyPressed(Keys.Q);
+            this.HasSoundOnBeenTriggered = IsKeyNewlyPressed(Keys.S);
+            this.HasSoundIncreaseBeenTriggered = IsKeyNewlyPressed(Keys.PageUp);
+            this.HasSoundDecreaseBeenTriggered = IsKeyNewlyPressed(Keys.PageDown);
+            this.HasMoveToNextLevelBeenTriggered = IsKeyNewlyPressed(Keys.L) && IsKeyCurrentlyPressed(Keys.LeftShift);
+            this.HasPauseBeenTriggered = IsKeyNewlyPressed(Keys.P);
+            this.HasGameExitBeenTriggered = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
             }
 
-        public static bool IsKeyNewlyPressed(KeyboardState newState, KeyboardState previousState, Keys key)
+        public bool IsKeyNewlyPressed(Keys key)
             {
-            bool result = previousState.IsKeyUp(key) && newState.IsKeyDown(key);
+            bool result = this._previousKeyboardState.IsKeyUp(key) && this._currentKeyboardState.IsKeyDown(key);
+            return result;
+            }
+
+        public bool IsKeyCurrentlyPressed(Keys key)
+            {
+            bool result = this._currentKeyboardState.IsKeyDown(key);
+            return result;
+            }
+
+        public bool WasKeyPressed(Keys key)
+            {
+            bool result = this._previousKeyboardState.IsKeyDown(key);
             return result;
             }
         }

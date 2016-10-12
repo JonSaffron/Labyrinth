@@ -6,5 +6,6 @@ namespace Labyrinth
         {
         void LoadContent(ContentManager contentManager);
         void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, int score, int livesLeft);
+        void DrawPausedMessage(ISpriteBatch spriteBatch);
         }
     }

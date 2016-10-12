@@ -17,82 +17,79 @@ namespace Labyrinth.Services.Input
         /// </summary>
         public void ProcessInput(GameTime gameTime)
             {
-            KeyboardState previousKeyboardState;
-            KeyboardState keyboardState = this.GameInput.GetNewKeyboardState(out previousKeyboardState);
-
-            var direction = GetNewDirection(keyboardState, previousKeyboardState);
+            var direction = GetNewDirection();
             if (direction == Direction.None)
                 {
-                direction = GetContinuedDirection(keyboardState);
+                direction = GetContinuedDirection();
                 if (direction == Direction.None)
-                    direction = GetRemnantDirection(keyboardState);
+                    {
+                    direction = GetRemnantDirection();
+                    }
                 }
             this.Direction = direction;
             
-            if (GameInput.IsKeyNewlyPressed(keyboardState, previousKeyboardState, Keys.L) && keyboardState.IsKeyDown(Keys.LeftShift))
-                this.GameInput.HasMoveToNextLevelBeenTriggered = true; 
-            this.FireStatus1 = keyboardState.IsKeyDown(Keys.LeftControl) ? (previousKeyboardState.IsKeyDown(Keys.LeftControl) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None;
-            this.FireStatus2 = keyboardState.IsKeyDown(Keys.Space) ? (previousKeyboardState.IsKeyDown(Keys.Space) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None;
+            this.FireStatus1 = this.GameInput.IsKeyCurrentlyPressed(Keys.LeftControl) ? (this.GameInput.WasKeyPressed(Keys.LeftControl) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None;
+            this.FireStatus2 = this.GameInput.IsKeyCurrentlyPressed(Keys.Space) ? (this.GameInput.WasKeyPressed(Keys.Space) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None;
 
             this._previousRequestedDirectionOfMovement = direction;
             }
 
-        private static Direction GetNewDirection(KeyboardState newState, KeyboardState previousState)
+        private Direction GetNewDirection()
             {
-            if (GameInput.IsKeyNewlyPressed(newState, previousState, Keys.Left))
+            if (this.GameInput.IsKeyNewlyPressed(Keys.Left))
                 return Direction.Left;
-            if (GameInput.IsKeyNewlyPressed(newState, previousState, Keys.Up))
+            if (this.GameInput.IsKeyNewlyPressed(Keys.Up))
                 return Direction.Up;
-            if (GameInput.IsKeyNewlyPressed(newState, previousState, Keys.Right))
+            if (this.GameInput.IsKeyNewlyPressed(Keys.Right))
                 return Direction.Right;
-            if (GameInput.IsKeyNewlyPressed(newState, previousState, Keys.Down))
+            if (this.GameInput.IsKeyNewlyPressed(Keys.Down))
                 return Direction.Down;
             return Direction.None;
             }
 
-        private Direction GetContinuedDirection(KeyboardState keyboardState)
+        private Direction GetContinuedDirection()
             {
             switch (this._previousRequestedDirectionOfMovement)
                 {
                 case Direction.Left:
-                    if (keyboardState.IsKeyDown(Keys.Left))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Left))
                         return Direction.Left;
                     break;
 
                 case Direction.Right:
-                    if (keyboardState.IsKeyDown(Keys.Right))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Right))
                         return Direction.Right;
                     break;
 
                 case Direction.Up:
-                    if (keyboardState.IsKeyDown(Keys.Up))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Up))
                         return Direction.Up;
                     break;
 
                 case Direction.Down:
-                    if (keyboardState.IsKeyDown(Keys.Down))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Down))
                         return Direction.Down;
                     break;
                 }
             return Direction.None;
             }
 
-        private Direction GetRemnantDirection(KeyboardState keyboardState)
+        private Direction GetRemnantDirection()
             {
             switch (this._previousRequestedDirectionOfMovement)
                 {
                 case Direction.Left:
                 case Direction.Right:
-                    if (keyboardState.IsKeyDown(Keys.Up) && !keyboardState.IsKeyDown(Keys.Down))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Up) && !this.GameInput.IsKeyCurrentlyPressed(Keys.Down))
                         return Direction.Up;
-                    if (keyboardState.IsKeyDown(Keys.Down) && !keyboardState.IsKeyDown(Keys.Up))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Down) && !this.GameInput.IsKeyCurrentlyPressed(Keys.Up))
                         return Direction.Down;
                     break;
                 case Direction.Up:
                 case Direction.Down:
-                    if (keyboardState.IsKeyDown(Keys.Left) && !keyboardState.IsKeyDown(Keys.Right))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Left) && !this.GameInput.IsKeyCurrentlyPressed(Keys.Right))
                         return Direction.Left;
-                    if (keyboardState.IsKeyDown(Keys.Right) && !keyboardState.IsKeyDown(Keys.Left))
+                    if (this.GameInput.IsKeyCurrentlyPressed(Keys.Right) && !this.GameInput.IsKeyCurrentlyPressed(Keys.Left))
                         return Direction.Right;
                     break;
                 }
