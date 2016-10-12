@@ -17,6 +17,38 @@ namespace Labyrinth.Services.WorldBuilding
         public Rectangle Area { get; private set; }
         public bool IsInitialArea { get; private set; }
 
+        public WorldArea(XmlElement area, XmlNamespaceManager xnm)
+            {
+            string id = area.GetAttribute("Id");
+            if (!string.IsNullOrEmpty(id))
+                this.Id = int.Parse(id);
+            
+            this.Area = GetRectangleFromDefinition(area);
+            
+            string worldStart = area.GetAttribute("WorldStart");
+            this.IsInitialArea = !string.IsNullOrWhiteSpace(worldStart) && bool.Parse(worldStart);
+            
+            var startPos = (XmlElement) area.SelectSingleNode("ns:PlayerStartState", xnm);
+            if (startPos != null)
+                {
+                this._playerStartState = LoadPlayerStartState(startPos);
+                if (!this.Area.ContainsTile(this._playerStartState.Position))
+                    throw new InvalidOperationException("Invalid player start position - co-ordinate is not within the area.");
+                }
+
+            var tileDefinitions = area.SelectNodes("ns:TileDefinitions/ns:TileDef", xnm);
+            if (tileDefinitions != null)
+                this._tileDefs = LoadTileDefs(tileDefinitions);
+            
+            var fruitPopulation = area.SelectNodes("ns:FruitDefinitions/ns:FruitDef", xnm);
+            if (fruitPopulation != null)
+                this._fruitDefs = LoadFruitPopulation(fruitPopulation);
+
+            var randomMonsterDistribution = (XmlElement) area.SelectSingleNode("ns:RandomMonsterDistribution", xnm);
+            if (randomMonsterDistribution != null)
+                this._randomMonsterDistribution = LoadRandomMonsterDistribution(randomMonsterDistribution, xnm);
+            }
+
         [CanBeNull] public PlayerStartState PlayerStartState
             {
             get { return this._playerStartState; }
@@ -45,38 +77,6 @@ namespace Labyrinth.Services.WorldBuilding
             int height = int.Parse(area.GetAttribute("Height"));
             Rectangle result = new Rectangle(x, y, width, height);
             return result;
-            }
-
-        public WorldArea(XmlElement area, XmlNamespaceManager xnm)
-            {
-            string id = area.GetAttribute("Id");
-            if (!string.IsNullOrEmpty(id))
-                this.Id = int.Parse(id);
-            
-            this.Area = GetRectangleFromDefinition(area);
-            
-            if (area.GetAttribute("WorldStart") == "true")
-                this.IsInitialArea = true;
-            
-            var startPos = (XmlElement) area.SelectSingleNode("ns:StartPos", xnm);
-            if (startPos != null)
-                {
-                this._playerStartState = LoadPlayerStartState(startPos);
-                if (!this.Area.ContainsTile(this._playerStartState.Position))
-                    throw new InvalidOperationException("Invalid player start position - co-ordinate is not within the area.");
-                }
-
-            var tileDefinitions = area.SelectNodes("ns:TileDefinitions/ns:TileDef", xnm);
-            if (tileDefinitions != null)
-                this._tileDefs = LoadTileDefs(tileDefinitions);
-            
-            var fruitPopulation = area.SelectNodes("ns:FruitDefinitions/ns:FruitDef", xnm);
-            if (fruitPopulation != null)
-                this._fruitDefs = LoadFruitPopulation(fruitPopulation);
-
-            var randomMonsterDistribution = (XmlElement) area.SelectSingleNode("ns:RandomMonsterDistribution", xnm);
-            if (randomMonsterDistribution != null)
-                this._randomMonsterDistribution = LoadRandomMonsterDistribution(randomMonsterDistribution, xnm);
             }
 
         private static PlayerStartState LoadPlayerStartState(XmlElement startPos)
