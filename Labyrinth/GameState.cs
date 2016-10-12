@@ -251,10 +251,10 @@ namespace Labyrinth
                 throw new InvalidOperationException("Failed to get matching constructor information for " + monsterDef.MonsterType + " object.");
             var constructorArguments = new object[] {animationPlayer, monsterDef.Position, monsterDef.Energy};
             var result = (Monster) constructorInfo.Invoke(constructorArguments);
-            if (monsterDef.Mobility.HasValue)
-                result.Mobility = monsterDef.Mobility.Value;
             if (monsterDef.InitialDirection.HasValue)
                 result.InitialDirection = monsterDef.InitialDirection.Value;
+            if (monsterDef.Mobility.HasValue)
+                result.Mobility = monsterDef.Mobility.Value;
             if (monsterDef.ChangeRooms.HasValue)
                 result.ChangeRooms = monsterDef.ChangeRooms.Value;
             if (monsterDef.IsEgg.GetValueOrDefault() && monsterDef.TimeBeforeHatching.HasValue)
