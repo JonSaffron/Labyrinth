@@ -99,7 +99,7 @@ namespace Labyrinth.GameObjects
         /// <param name="energy">Initial energy</param>
         public void ResetPositionAndEnergy(Vector2 position, int energy)
             {
-            this.Position = position;
+            SetPosition(position);
             this.Energy = energy;
             this._countBeforeDecrementingEnergy = 0;
             }

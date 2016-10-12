@@ -51,7 +51,6 @@ namespace Labyrinth
             var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             PlayerStartState pss = this._playerStartStates[worldAreaId];
             this.Player.ResetPositionAndEnergy(pss.Position.ToPosition(), pss.Energy);
-            GlobalServices.GameState.UpdatePosition(this.Player);
 
             ResetLevelForStartingNewLife(spw);
             }
@@ -108,7 +107,21 @@ namespace Labyrinth
 
         private void MoveMonsterToSafeDistance(Monster monster)
             {
-            throw new NotImplementedException();
+            var repelParameters = new RepelParameters
+                {
+                StartLocation = monster.TilePosition,
+                RepelLocation = Player.TilePosition,
+                CanBeOccupied = GlobalServices.GameState.IsImpassableItemOnTile,
+                MaximumLengthOfPath = 24,
+                MinimumDistanceToMoveAway = 12
+                };
+            var repeller = new RepelObject(repelParameters);
+            IList<TilePos> path;
+            var result = repeller.TryFindPath(out path);
+            if (result)
+                {
+                monster.SetPosition(path.Last().ToPosition());
+                }
             }
 
         public void SetLevelReturnType(LevelReturnType levelReturnType)

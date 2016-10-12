@@ -28,8 +28,7 @@ namespace Labyrinth.GameObjects
 
         public void Reset(Vector2 position)
             {
-            this.Position = position;
-            this.CurrentMovement = Labyrinth.Movement.Still;
+            SetPosition(position);
             }
 
         public override bool IsExtant

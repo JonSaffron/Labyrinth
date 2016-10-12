@@ -16,6 +16,13 @@ namespace Labyrinth.GameObjects
             // nothing to do
             }
 
+        public void SetPosition(Vector2 position)
+            {
+            this.Position = position;
+            this.CurrentMovement = Labyrinth.Movement.Still;
+            GlobalServices.GameState.UpdatePosition(this);
+            }
+
         /// <summary>
         /// Determines whether an object can move in the specified direction
         /// </summary>

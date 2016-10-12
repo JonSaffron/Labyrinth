@@ -149,12 +149,6 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public void SetPosition(Vector2 newPosition)
-            {
-            this.Position = newPosition;
-            GlobalServices.GameState.UpdatePosition(this);
-            }
-
         public override ObjectCapability Capability
             {
             get
