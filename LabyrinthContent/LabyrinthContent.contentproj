@@ -333,6 +333,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Display\StatusFont.spritefont">
+      <Name>StatusFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
     <None Include="Worlds\World1.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Name>World1</Name>
