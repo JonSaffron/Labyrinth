@@ -259,6 +259,7 @@
     <Compile Include="Services\WorldBuilding\WorldLoader.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Documentation\_ReadMe.txt" />
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
     <Content Include="Documentation\_ToDo.txt" />
