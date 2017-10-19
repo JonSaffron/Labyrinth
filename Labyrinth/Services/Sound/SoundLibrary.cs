@@ -101,39 +101,16 @@ namespace Labyrinth.Services.Sound
 
         private SoundEffect GetSoundEffect(GameSound gameSound)
             {
-            SoundEffect result;
-            switch (gameSound)
-                {
-                case GameSound.PlayerMovesFirstFoot:
-                case GameSound.PlayerMovesSecondFoot:
-                    result = this._soundResources["PlayerMoves"];
-                    break;
-                default:
-                    result = this._soundResources[gameSound.ToString()];
-                    break;
-                }
+            var si = gameSound.GetAttributeOfType<SoundInfoAttribute>() ?? new SoundInfoAttribute();
+            string resourceName = si.ResourceName ?? gameSound.ToString();
+            var result = this._soundResources[resourceName];
             return result;
             }
 
         private static int GetCacheSize(GameSound gameSound)
             {
-            int result;
-            switch (gameSound)
-                {
-                case GameSound.PlayerCollectsCrystal:
-                case GameSound.PlayerFinishesWorld:
-                case GameSound.PlayerEntersNewLevel:
-                case GameSound.PlayerDies:
-                case GameSound.PlayerMovesFirstFoot:
-                case GameSound.PlayerMovesSecondFoot:
-                case GameSound.PlayerStartsNewLife:
-                    result = 1;
-                    break;
-
-                default:
-                    result = 3;
-                    break;
-                }
+            var si = gameSound.GetAttributeOfType<SoundInfoAttribute>() ?? new SoundInfoAttribute();
+            int result = si.CacheSize;
             return result;
             }
 

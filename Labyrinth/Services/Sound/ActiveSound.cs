@@ -61,6 +61,10 @@ namespace Labyrinth.Services.Sound
 
         public bool Equals(IActiveSound x, IActiveSound y)
             {
+            if (x == null && y == null)
+                return true;
+            if (x == null || y == null)
+                return false;
             var result = x.SoundEffectInstance.InstanceName == y.SoundEffectInstance.InstanceName;
             return result;
             }

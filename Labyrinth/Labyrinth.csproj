@@ -206,6 +206,7 @@
     <Compile Include="Services\Sound\NullSoundPlayer.cs" />
     <Compile Include="Services\Sound\SoundEffectInstance.cs" />
     <Compile Include="Services\Sound\SoundEffectInstanceCache.cs" />
+    <Compile Include="Services\Sound\SoundInfoAttribute.cs" />
     <Compile Include="Services\StandardRandom.cs" />
     <Compile Include="Services\WorldBuilding\DiceRoll.cs" />
     <Compile Include="Services\WorldBuilding\FruitDefinition.cs" />

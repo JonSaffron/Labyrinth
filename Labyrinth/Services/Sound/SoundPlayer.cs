@@ -141,17 +141,9 @@ namespace Labyrinth.Services.Sound
 
         private static bool DoesSoundRequirePosition(GameSound gameSound)
             {
-            switch (gameSound)
-                {
-                case GameSound.PlayerCollectsCrystal:
-                case GameSound.PlayerFinishesWorld:
-                case GameSound.PlayerEntersNewLevel:
-                case GameSound.PlayerDies:
-                case GameSound.PlayerStartsNewLife:
-                    return false;
-                }
-
-            return true;
+            var si = gameSound.GetAttributeOfType<SoundInfoAttribute>() ?? new SoundInfoAttribute();
+            bool result = si.RequiresGameObject;
+            return result;
             }
 
         public override string ToString()

@@ -1,4 +1,6 @@
-﻿namespace Labyrinth
+﻿using Labyrinth.Services.Sound;
+
+namespace Labyrinth
     {
     /// <summary>
     /// How the map describes each tile's usage
@@ -200,30 +202,30 @@
 
     public enum GameSound
         {
-        BoulderBounces,                     // position of boulder
-        PlayerCollectsCrystal,              // single instance
-        PlayerCollidesWithMonster,          // position of bang
-        PlayerShootsAndInjuresEgg,          // position of egg
-        PlayerEatsFruit,                    // position of player
-        PlayerFinishesWorld,                // single instance
-        MonsterDies,                        // position of bang
-        MonsterEntersRoom,                  // position of monster
-        EggHatches,                         // position of egg
-        PlayerShootsAndInjuresMonster,      // position of monster
-        MonsterLaysEgg,                     // position of monster
-        MonsterLaysMushroom,                // position of monster
-        MonsterLeavesRoom,                  // position of monster
-        MonsterShoots,                      // position of monster
-        PlayerEntersNewLevel,               // single instance
-        PlayerDies,                         // single instance
-        PlayerInjured,                      // position of player
-        PlayerMovesFirstFoot,               // single instance at position of player
-        PlayerMovesSecondFoot,              // single instance at position of player
-        PlayerShoots,                       // position of player
-        ShotBounces,                        // position of shot
-        MonsterShattersIntoNewLife,         // position of bang
-        PlayerStartsNewLife,                // single instance
-        StaticObjectShotAndInjured          // position of object
+        [SoundInfo(3, true)]                BoulderBounces,                     // position of boulder
+        [SoundInfo]                         PlayerCollectsCrystal,              // single instance
+        [SoundInfo(3, true)]                PlayerCollidesWithMonster,          // position of bang
+        [SoundInfo(3, true)]                PlayerShootsAndInjuresEgg,          // position of egg
+        [SoundInfo(3, true)]                PlayerEatsFruit,                    // position of player
+        [SoundInfo]                         PlayerFinishesWorld,                // single instance
+        [SoundInfo(3, true)]                MonsterDies,                        // position of bang
+        [SoundInfo(3, true)]                MonsterEntersRoom,                  // position of monster
+        [SoundInfo(3, true)]                EggHatches,                         // position of egg
+        [SoundInfo(3, true)]                PlayerShootsAndInjuresMonster,      // position of monster
+        [SoundInfo(3, true)]                MonsterLaysEgg,                     // position of monster
+        [SoundInfo(3, true)]                MonsterLaysMushroom,                // position of monster
+        [SoundInfo(3, true)]                MonsterLeavesRoom,                  // position of monster
+        [SoundInfo(3, true)]                MonsterShoots,                      // position of monster
+        [SoundInfo]                         PlayerEntersNewLevel,               // single instance
+        [SoundInfo]                         PlayerDies,                         // single instance
+        [SoundInfo(3, true)]                PlayerInjured,                      // position of player
+        [SoundInfo(1, true, "PlayerMoves")] PlayerMovesFirstFoot,               // single instance at position of player
+        [SoundInfo(1, true, "PlayerMoves")] PlayerMovesSecondFoot,              // single instance at position of player
+        [SoundInfo(3, true)]                PlayerShoots,                       // position of player
+        [SoundInfo(3, true)]                ShotBounces,                        // position of shot
+        [SoundInfo(3, true)]                MonsterShattersIntoNewLife,         // position of bang
+        [SoundInfo]                         PlayerStartsNewLife,                // single instance
+        [SoundInfo(3, true)]                StaticObjectShotAndInjured          // position of object
         }
 
     /// <summary>

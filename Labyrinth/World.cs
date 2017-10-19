@@ -96,6 +96,7 @@ namespace Labyrinth
                     searchParameters.StartLocation = monster.TilePosition;
 
                     var pf = new PathFinder(searchParameters);
+                    // ReSharper disable once NotAccessedVariable
                     IList<TilePos> path;
                     if (pf.TryFindPath(out path))
                         result.Add(monster);
