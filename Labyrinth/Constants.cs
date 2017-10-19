@@ -47,7 +47,7 @@ namespace Labyrinth
         public static readonly Vector2 CentreOfTile = TileSize / 2;
 
         /// <summary>
-        /// Rectanglular area of a tile
+        /// Rectangular area of a tile
         /// </summary>
         public static readonly Rectangle TileRectangle = new Rectangle(0, 0, TileLength, TileLength);
 
