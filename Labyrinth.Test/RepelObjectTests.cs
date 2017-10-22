@@ -214,5 +214,49 @@ namespace Labyrinth.Test
             Assert.IsNull(path);
             OutputRoute(null);
             }
+
+        [Test]
+        public void TestObstacleBetweenObjects()
+            {
+            // Arrange
+            AddCentralIsland();
+            OpenEastWall();
+            this._repelParameters.StartLocation = new TilePos(26, 14);
+            this._repelParameters.RepelLocation = new TilePos(20, 14);
+            this._repelParameters.MaximumLengthOfPath = 24;
+            this._repelParameters.MinimumDistanceToMoveAway = 16;
+            RepelObject pathFinder = new RepelObject(this._repelParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(path.Any());
+            OutputRoute(path);
+            }
+
+        [Test]
+        public void TestMoveAroundObstacle()
+            {
+            // Arrange
+            AddCentralIsland();
+            OpenEastWall();
+            this._repelParameters.StartLocation = new TilePos(21, 14);
+            this._repelParameters.RepelLocation = new TilePos(20, 14);
+            this._repelParameters.MaximumLengthOfPath = 24;
+            this._repelParameters.MinimumDistanceToMoveAway = 16;
+            RepelObject pathFinder = new RepelObject(this._repelParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(path.Any());
+            OutputRoute(path);
+            }
         }
     }

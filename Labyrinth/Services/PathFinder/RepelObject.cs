@@ -34,8 +34,8 @@ namespace Labyrinth.Services.PathFinder
                 if (!path.IsViable)
                     continue;
 
-                var currentDistance = ManhattanDistance(this._repelParameters.RepelLocation, path.LastStep) >= this._repelParameters.MinimumDistanceToMoveAway;
-                if (currentDistance)
+                var currentDistanceAwayFromRepelOrigin = ManhattanDistance(this._repelParameters.RepelLocation, path.LastStep);
+                if (currentDistanceAwayFromRepelOrigin >= this._repelParameters.MinimumDistanceToMoveAway)
                     {
                     result = path.Reverse().Skip(1).ToList();
                     return true;
@@ -53,13 +53,17 @@ namespace Labyrinth.Services.PathFinder
                     var pathYetToVisit = this._openNodes.Items.FirstOrDefault(item => item.LastStep == newPath.LastStep);
                     if (pathYetToVisit != null)
                         {
-                        if (newPath.Cost < pathYetToVisit.Cost)
+                        if (newPath.Cost >= pathYetToVisit.Cost)
+                            // don't add the newpath as it's no better than one we've already found
                             continue;
+
+                        // mark the path we've already queued as not worth investigating
                         pathYetToVisit.IsViable = false;
                         }
 
-                    var pathAlreadyVisited = this._closedNodes.FirstOrDefault(item => item.LastStep == newPath.LastStep);
-                    if (pathAlreadyVisited != null && newPath.Cost < pathAlreadyVisited.Cost)
+                    var pathsAlreadyVisitedThatEndUpInTheSamePlace = this._closedNodes.Where(item => item.LastStep == newPath.LastStep);
+                    if (pathsAlreadyVisitedThatEndUpInTheSamePlace.Any(p => p.Cost <= newPath.Cost))
+                        // don't add the newpath as it's no better than one we've already found
                         continue;
 
                     var estimatedCostToGoal = -(ManhattanDistance(this._repelParameters.RepelLocation, nextNode)) + GetTieBreaker(nextNode);
@@ -67,7 +71,7 @@ namespace Labyrinth.Services.PathFinder
                     }
                 }
 
-            // The method returns false if this path leads to be a dead end
+            // The method returns false if no path can be found
             result = null;
             return false;
             }
@@ -111,7 +115,6 @@ namespace Labyrinth.Services.PathFinder
         /// <summary>
         /// Gets the estimated distance between a specifed point and the goal
         /// </summary>
-
         private static int ManhattanDistance(TilePos tp1, TilePos tp2)
             {
             int deltaX = Math.Abs(tp1.X - tp2.X);

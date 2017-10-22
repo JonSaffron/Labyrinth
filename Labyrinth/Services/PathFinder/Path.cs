@@ -1,14 +1,23 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Labyrinth.Services.PathFinder
     {
-    class Path<T> : IEnumerable<T>, IComparable<Path<T>>
+    /// <summary>
+    /// An ordered list of items with an associated cost which is implemented as an immutable list for memory efficiency
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    [DebuggerDisplay("{ToString()}")] 
+    public class Path<T> : IEnumerable<T>, IComparable<Path<T>>
         {
+        /// <summary>
+        /// The last step along the path
+        /// </summary>
         public T LastStep { get; private set; }
 
-        public Path<T> PreviousSteps { get; private set; }
+        private readonly Path<T> _previousSteps;
 
         /// <summary>
         /// The actual cost of this path
@@ -28,7 +37,7 @@ namespace Labyrinth.Services.PathFinder
         private Path(T lastStep, Path<T> previousSteps, int cost)
             {
             this.LastStep = lastStep;
-            this.PreviousSteps = previousSteps;
+            this._previousSteps = previousSteps;
             this.Cost = cost;
             this.IsViable = true;
             }
@@ -41,7 +50,7 @@ namespace Labyrinth.Services.PathFinder
 
         public IEnumerator<T> GetEnumerator()
             {
-            for (Path<T> p = this; p != null; p = p.PreviousSteps)
+            for (Path<T> p = this; p != null; p = p._previousSteps)
                 yield return p.LastStep;
             }
 
@@ -58,15 +67,15 @@ namespace Labyrinth.Services.PathFinder
 
         public override string ToString()
             {
-            var result = this.IsViable ? "Viable" : "Not viable";
             var steps = string.Empty;
             var i = 0;
-            for (var p = this; p != null; p = this.PreviousSteps)
+            for (var p = this; p != null; p = p._previousSteps)
                 {
                 i++;
-                steps += p.LastStep;
+                steps = p.LastStep + steps;
                 }
-            result += " path of " + i + " steps " + steps;
+            var result = this.IsViable ? "Viable" : "Not viable";
+            result += " path " + i + " steps, cost=" + this.Cost + " " + steps;
             return result;
             }
         }

@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// https://visualstudiomagazine.com/Articles/2012/11/01/Priority-Queues-with-C.aspx
-
 namespace Labyrinth.Services.PathFinder
     {
+    /// <summary>
+    /// Priority Queue implemented using a binary heap structure.
+    /// </summary>
+    /// <typeparam name="P">Type of the priority values</typeparam>
+    /// <typeparam name="T">Type of the data items</typeparam>
+    /// <remarks>Adapted from article at https://visualstudiomagazine.com/Articles/2012/11/01/Priority-Queues-with-C.aspx</remarks>
     // ReSharper disable once InconsistentNaming
     public class PriorityQueue<P, T> where P: IComparable<P>
         {
@@ -30,7 +34,9 @@ namespace Labyrinth.Services.PathFinder
 
         public T Dequeue()
             {
-            // assumes pq is not empty; up to calling code
+            if (this._data.Count == 0)
+                throw new InvalidOperationException("Queue is empty");
+
             int lastIndex = _data.Count - 1; // last index (before removal)
             KeyValuePair<P, T> frontItem = this._data[0];   // fetch the front
             this._data[0] = this._data[lastIndex];

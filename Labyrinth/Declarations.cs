@@ -120,10 +120,21 @@ namespace Labyrinth
         CanPushOrCauseBounceBack
         }
 
-    enum PushStatus
+    public enum PushStatus
         {
+        /// <summary>
+        /// The push succeeds and the the pushed object moves in forward direction
+        /// </summary>
         Yes,
+
+        /// <summary>
+        /// The push fails and nothing can move
+        /// </summary>
         No,
+
+        /// <summary>
+        /// The push results in a bounce-back and the pushed object moves backwards
+        /// </summary>
         Bounce
         }
 
@@ -174,22 +185,55 @@ namespace Labyrinth
 
     public enum ChangeRooms
         {
+        /// <summary>
+        /// Monster always stays in the same room
+        /// </summary>
         StaysWithinRoom,
+
+        /// <summary>
+        /// Monster is capable of moving to a different room
+        /// </summary>
         MovesRoom,
+
+        /// <summary>
+        /// Monster follows the player if the player leaves the room its in
+        /// </summary>
         FollowsPlayer
         }
 
     public enum MonsterShootBehaviour
         {
+        /// <summary>
+        /// Monster cannot shoot
+        /// </summary>
         None,
+
+        /// <summary>
+        /// Monster can shoot at the player
+        /// </summary>
         ShootsImmediately,
+
+        /// <summary>
+        /// Monster can shoot at the player only after it has been shot at
+        /// </summary>
         ShootsHavingBeenShot
         }
 
     public enum MonsterState
         {
+        /// <summary>
+        /// Monster is in it's normal state
+        /// </summary>
         Normal,
+
+        /// <summary>
+        /// Monster is a stationery egg and a countdown is running before it hatches
+        /// </summary>
         Egg,
+
+        /// <summary>
+        /// The countdown to hatching has expired and the monster is about to transition to its normal state
+        /// </summary>
         Hatching
         }
 
