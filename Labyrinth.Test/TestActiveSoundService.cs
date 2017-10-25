@@ -91,7 +91,7 @@ namespace Labyrinth.Test
 
             Assert.AreEqual(1, ass.Count);
             activeSound = (ActiveSound) ass[0];
-            Assert.IsTrue(activeSound.RestartPlayWhenStopped);
+            Assert.IsTrue(sei.RestartPlayWhenStopped);
             }
 
         [Test]
@@ -100,7 +100,7 @@ namespace Labyrinth.Test
             var ass = new ActiveSoundService();
             var sei = new DummySoundEffectInstance();
             var gameObject = new Mock<IGameObject>();
-            gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(true);
+            gameObject.Setup(aliveGameObject => aliveGameObject.IsExtant).Returns(true);
             gameObject.Setup(objectToTheSide => objectToTheSide.Position).Returns(new Vector2(10, 10));
             var centrePointProvider = new Mock<ICentrePointProvider>();
             centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
@@ -112,9 +112,9 @@ namespace Labyrinth.Test
 
             Assert.AreEqual(1, ass.Count);
             activeSoundWithoutObject = (ActiveSound) ass[0];
-            Assert.IsTrue(activeSoundWithoutObject.RestartPlayWhenStopped);
+            Assert.IsTrue(sei.RestartPlayWhenStopped);
             ass.Update();
-            Assert.IsFalse(activeSoundWithoutObject.RestartPlayWhenStopped);
+            Assert.IsFalse(sei.RestartPlayWhenStopped);
             Assert.AreEqual(1, activeSoundWithoutObject.SoundEffectInstance.Volume);
             Assert.AreEqual(0, activeSoundWithoutObject.SoundEffectInstance.Pan);
             }

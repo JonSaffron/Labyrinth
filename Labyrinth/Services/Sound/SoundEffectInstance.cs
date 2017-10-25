@@ -23,6 +23,8 @@ namespace Labyrinth.Services.Sound
 
         public string InstanceName { get; set; }
 
+        public bool RestartPlayWhenStopped { get; set; }
+
         public SoundState State
             {
             get

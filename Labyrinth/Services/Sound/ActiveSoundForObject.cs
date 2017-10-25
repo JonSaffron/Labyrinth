@@ -60,10 +60,15 @@ namespace Labyrinth.Services.Sound
             this.SoundEffectInstance.Pan = panning;
             }
 
+        //public override int GetHashCode()
+        //    {
+        //    return base.GetHashCode();
+        //    }
+
         public override string ToString()
             {
             var result = string.Format("{0} {1} for {2} vol={3} pan={4}", this.SoundEffectInstance.InstanceName, this.SoundEffectInstance.State, this.GameObject.GetType().Name, this.SoundEffectInstance.Volume, this.SoundEffectInstance.Pan);
-            if (this.RestartPlayWhenStopped)
+            if (this.SoundEffectInstance.RestartPlayWhenStopped)
                 result += " to be restarted";
             return result;
             }

@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
     {
-    public class ActiveSound : IActiveSound, IEqualityComparer<IActiveSound>
+    public class ActiveSound : IActiveSound
         {
         public ISoundEffectInstance SoundEffectInstance { get; private set; }
-        public bool RestartPlayWhenStopped { get; private set; }
 
         public ActiveSound(ISoundEffectInstance soundEffectInstance)
             {
@@ -20,7 +18,7 @@ namespace Labyrinth.Services.Sound
             {
             get
                 {
-                var result = this.SoundEffectInstance.State == SoundState.Stopped && !this.RestartPlayWhenStopped;
+                var result = this.SoundEffectInstance.State == SoundState.Stopped && !this.SoundEffectInstance.RestartPlayWhenStopped;
                 return result;
                 }
             }
@@ -37,7 +35,7 @@ namespace Labyrinth.Services.Sound
             if (this.SoundEffectInstance.State == SoundState.Playing)
                 {
                 this.SoundEffectInstance.Stop();
-                this.RestartPlayWhenStopped = true;
+                this.SoundEffectInstance.RestartPlayWhenStopped = true;
                 return;
                 }
 
@@ -47,38 +45,22 @@ namespace Labyrinth.Services.Sound
         public void Stop()
             {
             this.SoundEffectInstance.Stop();
-            this.RestartPlayWhenStopped = false;
+            this.SoundEffectInstance.RestartPlayWhenStopped = false;
             }
 
         public virtual void Update()
             {
-            if (this.RestartPlayWhenStopped && this.SoundEffectInstance.State == SoundState.Stopped)
+            if (this.SoundEffectInstance.RestartPlayWhenStopped && this.SoundEffectInstance.State == SoundState.Stopped)
                 {
                 InternalPlay();
-                this.RestartPlayWhenStopped = false;
+                this.SoundEffectInstance.RestartPlayWhenStopped = false;
                 }
-            }
-
-        public bool Equals(IActiveSound x, IActiveSound y)
-            {
-            if (x == null && y == null)
-                return true;
-            if (x == null || y == null)
-                return false;
-            var result = x.SoundEffectInstance.InstanceName == y.SoundEffectInstance.InstanceName;
-            return result;
-            }
-
-        public int GetHashCode(IActiveSound activeSound)
-            {
-            var result = activeSound.SoundEffectInstance.InstanceName.GetHashCode();
-            return result;
             }
 
         public override string ToString()
             {
             var result = string.Format("{0} {1}", this.SoundEffectInstance.InstanceName, this.SoundEffectInstance.State);
-            if (this.RestartPlayWhenStopped)
+            if (this.SoundEffectInstance.RestartPlayWhenStopped)
                 result += " to be restarted";
             return result;
             }

@@ -4,15 +4,17 @@ using System.Linq;
 
 namespace Labyrinth.Services.Sound
     {
-    class ActiveSoundService : IActiveSoundService
+    public class ActiveSoundService : IActiveSoundService
         {
-        private readonly HashSet<IActiveSound> _activeSounds = new HashSet<IActiveSound>();
+        private readonly HashSet<IActiveSound> _activeSounds = new HashSet<IActiveSound>(new ActiveSoundComparer());
 
         public void Add(IActiveSound activeSound)
             {
             if (activeSound == null)
                 throw new ArgumentNullException("activeSound");
 
+            // slightly odd looking, but this means that if a SoundEffectInstance is added as an ActiveSound and as an ActiveSoundForObject then the code copes
+            this._activeSounds.Remove(activeSound);
             this._activeSounds.Add(activeSound);
             activeSound.Play();
             }
@@ -58,6 +60,25 @@ namespace Labyrinth.Services.Sound
             get
                 {
                 var result = this._activeSounds.ElementAt(index);
+                return result;
+                }
+            }
+
+        private class ActiveSoundComparer : IEqualityComparer<IActiveSound>
+            {
+            public bool Equals(IActiveSound x, IActiveSound y)
+                {
+                if (x == null && y == null)
+                    return true;
+                if (x == null || y == null)
+                    return false;
+                var result = x.SoundEffectInstance.InstanceName.Equals(y.SoundEffectInstance.InstanceName, StringComparison.Ordinal);
+                return result;
+                }
+
+            public int GetHashCode(IActiveSound obj)
+                {
+                var result = obj.SoundEffectInstance.InstanceName.GetHashCode();
                 return result;
                 }
             }

@@ -8,11 +8,11 @@ namespace Labyrinth.Test
         private SoundState _state = SoundState.Stopped;
         private float _pan;
         private float _volume;
-        private string _instanceName = "Instance";
 
         public DummySoundEffectInstance()
             {
-            Volume = 1.0f;
+            this.Volume = 1.0f;
+            this.InstanceName = "Instance";
             }
 
         public void Dispose()
@@ -30,17 +30,9 @@ namespace Labyrinth.Test
             this._state = SoundState.Stopped;
             }
 
-        public string InstanceName
-            {
-            get
-                {
-                return this._instanceName;
-                }
-            set
-                {
-                this._instanceName = value;
-                }
-            }
+        public string InstanceName { get; set; }
+
+        public bool RestartPlayWhenStopped { get; set; }
 
         public SoundState State
             {

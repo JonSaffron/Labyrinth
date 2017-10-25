@@ -10,6 +10,7 @@ namespace Labyrinth
 
         string InstanceName { get; set; }
         SoundState State { get; }
+        bool RestartPlayWhenStopped { get; set; }
         float Pan { get; set; }
         float Volume { get; set; }
         }
