@@ -258,5 +258,102 @@ namespace Labyrinth.Test
             Assert.IsTrue(path.Any());
             OutputRoute(path);
             }
+
+        [Test]
+        public void TestNoNeedToMove()
+            {
+            // Arrange
+            this._repelParameters.StartLocation = new TilePos(20, 4);
+            this._repelParameters.RepelLocation = new TilePos(20, 18);
+            this._repelParameters.MaximumLengthOfPath = 24;
+            this._repelParameters.MinimumDistanceToMoveAway = 12;
+            RepelObject pathFinder = new RepelObject(this._repelParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsFalse(path.Any());
+            OutputRoute(path);
+            }
+
+        [Test]
+        public void TestCantMove()
+            {
+            // Arrange
+            OpenNorthWall();
+            OpenEastWall();
+            OpenWestWall();
+            OpenSouthWall();
+            this._repelParameters.StartLocation = new TilePos(20, 13);
+            this._map[this._repelParameters.StartLocation.X - 1, this._repelParameters.StartLocation.Y] = false;
+            this._map[this._repelParameters.StartLocation.X + 1, this._repelParameters.StartLocation.Y] = false;
+            this._map[this._repelParameters.StartLocation.X, this._repelParameters.StartLocation.Y - 1] = false;
+            this._map[this._repelParameters.StartLocation.X, this._repelParameters.StartLocation.Y + 1] = false;
+            this._repelParameters.RepelLocation = new TilePos(20, 15);
+            this._repelParameters.MaximumLengthOfPath = 24;
+            this._repelParameters.MinimumDistanceToMoveAway = 12;
+            RepelObject pathFinder = new RepelObject(this._repelParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.IsNull(path.Any());
+            OutputRoute(path);
+            }
+
+        [Test]
+        public void TestOnlyExitIsSouthAndMonsterToNorthThenMonsterMovesDownPastRepelLocation()
+            {
+            // Arrange
+            OpenSouthWall();
+            AddCentralIsland();
+            AddTopCentralPairOfIslands();
+            this._repelParameters.StartLocation = new TilePos(20, 13);
+            this._repelParameters.RepelLocation = new TilePos(20, 15);
+            this._repelParameters.MaximumLengthOfPath = 24;
+            this._repelParameters.MinimumDistanceToMoveAway = 12;
+            RepelObject pathFinder = new RepelObject(this._repelParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(path.Any());
+            OutputRoute(path);
+            }
+ 
+        [Test]
+        public void TestRepelLocationIsSameAsStartLocation()
+            {
+            // Arrange
+            OpenNorthWall();
+            OpenEastWall();
+            OpenWestWall();
+            OpenSouthWall();
+            AddCentralIsland();
+            AddTopCentralPairOfIslands();
+            this._repelParameters.StartLocation = new TilePos(20, 15);
+            this._repelParameters.RepelLocation = new TilePos(20, 15);
+            this._repelParameters.MaximumLengthOfPath = 24;
+            this._repelParameters.MinimumDistanceToMoveAway = 16;
+            RepelObject pathFinder = new RepelObject(this._repelParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(path.Any());
+            OutputRoute(path);
+            }
         }
     }

@@ -16,6 +16,10 @@ namespace Labyrinth.Services.PathFinder
         /// <param name="repelParameters">An instance of a RepelParameters object that defines the search to perform</param>
         public RepelObject(RepelParameters repelParameters)
             {
+            if (repelParameters == null)
+                throw new ArgumentNullException("repelParameters");
+            if (repelParameters.CanBeOccupied == null)
+                throw new ArgumentException("RepelParameters.CanBeOccupied must be set.");
             this._repelParameters = repelParameters;
             }
 
@@ -123,6 +127,11 @@ namespace Labyrinth.Services.PathFinder
             return result;
             }
 
+        /// <summary>
+        /// Gets a value that can be used to adjust the path so that it continues a line between the RepelLocation and the StartLocation
+        /// </summary>
+        /// <param name="current">The position to consider</param>
+        /// <returns>A float value that measures closeness to the line between RepelLocation and StartLocation</returns>
         private float GetTieBreaker(TilePos current)
             {
             var start = this._repelParameters.StartLocation;
