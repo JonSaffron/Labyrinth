@@ -100,7 +100,8 @@ namespace Labyrinth.Test
                     {
                     newMap[location.X, location.Y] = '+';
                     }
-                newMap[path.Last().X, path.Last().Y] = 'F';
+                if (path.Any())
+                    newMap[path.Last().X, path.Last().Y] = 'F';
                 }
 
             StringBuilder sb = new StringBuilder();
@@ -303,8 +304,8 @@ namespace Labyrinth.Test
 
             // Assert
             Assert.IsFalse(result);
-            Assert.IsNull(path.Any());
-            OutputRoute(path);
+            Assert.IsNull(path);
+            OutputRoute(null);
             }
 
         [Test]

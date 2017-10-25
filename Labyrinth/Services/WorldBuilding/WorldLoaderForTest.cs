@@ -36,12 +36,15 @@ namespace Labyrinth.Services.WorldBuilding
 
         public Tile[,] GetFloorTiles()
             {
-            throw new NotImplementedException();
+            var result = new Tile[this.Width, this.Height];
+            return result;
             }
 
         public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
-            throw new NotImplementedException();
+            var result = new Dictionary<int, PlayerStartState>();
+            result.Add(0, new PlayerStartState());
+            return result;
             }
 
         public void GetGameObjects(GameState gameState)

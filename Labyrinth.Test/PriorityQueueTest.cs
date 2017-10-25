@@ -53,7 +53,6 @@ namespace Labyrinth.Test
             Console.WriteLine("\n");
 
             Console.WriteLine("\nEnd Priority Queue demo");
-            Console.ReadLine();
             }
 
         [Test]

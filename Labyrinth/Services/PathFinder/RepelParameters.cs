@@ -34,7 +34,7 @@ namespace Labyrinth.Services.PathFinder
             set
                 {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException("MaximumLengthOfPath", "Cannot be negative.");
+                    throw new ArgumentOutOfRangeException("value", "Cannot be negative.");
                 this._maximumLengthOfPath = value;
                 }
             }
@@ -51,7 +51,7 @@ namespace Labyrinth.Services.PathFinder
             set
                 {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException("MinimumDistanceToMoveAway", "Cannot be negative.");
+                    throw new ArgumentOutOfRangeException("value", "Cannot be negative.");
                 this._minimumDistanceToMoveAway = value;
                 }
             }

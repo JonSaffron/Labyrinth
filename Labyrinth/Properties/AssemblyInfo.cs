@@ -7,10 +7,10 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("Labyrinth")]
 [assembly: AssemblyProduct("Labyrinth")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Acornsoft Labyrinth")]
 [assembly: AssemblyCompany("")]
 
-[assembly: AssemblyCopyright("Copyright © 2011")]
+[assembly: AssemblyCopyright("Copyright © Jon Saffron 2011-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
