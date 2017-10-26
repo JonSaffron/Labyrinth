@@ -153,8 +153,8 @@ namespace Labyrinth.GameObjects
                 return;
                 }
 
-            this.PlaySound(GameSound.MonsterDies);
-            GlobalServices.GameState.AddBang(this.Position, BangType.Long);
+            var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
+            bang.PlaySound(GameSound.MonsterDies);
             
             if (this.SplitsOnHit)
                 {

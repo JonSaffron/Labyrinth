@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth
@@ -31,14 +32,13 @@ namespace Labyrinth
         /// Adds a single item to the collection
         /// </summary>
         /// <param name="gameObject">Specifies the item to add</param>
-        public void Add(StaticItem gameObject)
+        public void Add([NotNull] StaticItem gameObject)
             {
             if (gameObject == null)
-                throw new ArgumentNullException("gameObject");
+                throw new ArgumentNullException(nameof(gameObject));
 
             InsertIntoAllGameItemsArray(gameObject);
-            var mi = gameObject as MovingItem;
-            if (mi == null) 
+            if (!(gameObject is MovingItem mi)) 
                 return;
 
             mi.OriginalPosition = mi.Position;
@@ -47,17 +47,16 @@ namespace Labyrinth
                 this.CountOfShots++;
             }
 
-        public void Remove(StaticItem gameObject)
+        public void Remove([NotNull] StaticItem gameObject)
             {
             if (gameObject == null)
-                throw new ArgumentNullException("gameObject");
+                throw new ArgumentNullException(nameof(gameObject));
 
-            var movingItem = gameObject as MovingItem;
-            if (movingItem != null)
+            if (gameObject is MovingItem movingItem)
                 {
                 bool wasItemRemoved = this._interactiveGameItems.Remove(movingItem);
                 if (!wasItemRemoved)
-                    throw new ArgumentOutOfRangeException("gameObject");
+                    throw new ArgumentOutOfRangeException(nameof(gameObject));
                 }
 
             if (gameObject is Shot)
@@ -88,7 +87,7 @@ namespace Labyrinth
         private void EnsureArrayIsLargeEnough(TilePos tp)
             {
             if (tp.X < 0 || tp.Y < 0)
-                throw new ArgumentOutOfRangeException("tp", "TilePosition cannot have an X or Y component that is less than zero.");
+                throw new ArgumentOutOfRangeException(nameof(tp), "TilePosition cannot have an X or Y component that is less than zero.");
             if (tp.X <= this._maxWidth && tp.Y <= this._maxHeight)
                 return;
 
@@ -141,7 +140,7 @@ namespace Labyrinth
         public void UpdatePosition(MovingItem item)
             {
             if (item == null)
-                throw new ArgumentNullException("item");
+                throw new ArgumentNullException(nameof(item));
 
             int previousMortonCode = TilePos.TilePosFromPosition(item.OriginalPosition).MortonCode;
             int newMortonCode = item.TilePosition.MortonCode;

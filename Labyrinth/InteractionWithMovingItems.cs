@@ -75,6 +75,8 @@ namespace Labyrinth
                     return;
                 }
 
+            //todo move crush code
+
             // any other interaction here...
             }
 

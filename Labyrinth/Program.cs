@@ -22,6 +22,7 @@ namespace Labyrinth
                     GlobalServices.SetRandomness(container.Resolve<IRandomess>());
 
                     var game = container.Resolve<Game1>();
+                    game.IsInteractive = true;
                     game.Run();
                     }
                 result = 0;

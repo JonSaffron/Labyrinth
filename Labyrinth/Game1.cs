@@ -26,6 +26,7 @@ namespace Labyrinth
         private World _world;
 
         private bool GameIsPaused { get; set; }
+        public bool IsInteractive { get; set; }
 
         public Game1(IPlayerInput playerInput, IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
             {
@@ -102,11 +103,10 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Update</param>
         protected override void Update(GameTime gameTime)
             {
-            // todo IsActive returns false during unit testing. Not useful.
-#if !DEBUG
-            if (!this.IsActive)
-                return;
-#endif
+            if (!this.IsActive && this.IsInteractive && this.World != null)
+                {
+                this.GameIsPaused = true;
+                }
 
             if (this.World == null)
                 {

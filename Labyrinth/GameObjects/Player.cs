@@ -138,7 +138,7 @@ namespace Labyrinth.GameObjects
                 result = true;
                 this.TryToCompleteMoveToTarget(ref timeRemaining);
                 if (CheckIfEnteredNewWorldArea())
-                    this.PlaySound(GameSound.PlayerEntersNewLevel);
+                    GlobalServices.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
                 }
 
             if (result)
