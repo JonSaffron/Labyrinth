@@ -37,6 +37,9 @@ namespace Labyrinth.Services.WorldBuilding
         public Tile[,] GetFloorTiles()
             {
             var result = new Tile[this.Width, this.Height];
+            for (int x = 0; x < this.Width; x++)
+                for (int y = 0; y < this.Height; y++)
+                    result[x, y] = new Tile(null, 0);
             return result;
             }
 

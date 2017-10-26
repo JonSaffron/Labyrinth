@@ -61,7 +61,7 @@ namespace Labyrinth.Services.Sound
             {
             get 
                 {
-                return null;
+                return new ActiveSoundService();
                 }
             }
         }

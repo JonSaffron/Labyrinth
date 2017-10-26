@@ -102,8 +102,11 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Update</param>
         protected override void Update(GameTime gameTime)
             {
+            // todo IsActive returns false during unit testing. Not useful.
+#if !DEBUG
             if (!this.IsActive)
                 return;
+#endif
 
             if (this.World == null)
                 {

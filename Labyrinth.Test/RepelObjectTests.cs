@@ -264,6 +264,7 @@ namespace Labyrinth.Test
         public void TestNoNeedToMove()
             {
             // Arrange
+            OpenNorthWall();
             this._repelParameters.StartLocation = new TilePos(20, 4);
             this._repelParameters.RepelLocation = new TilePos(20, 18);
             this._repelParameters.MaximumLengthOfPath = 24;

@@ -23,7 +23,7 @@ namespace Labyrinth
         /// </summary>
         public GameObjectCollection()
             {
-            this._allGameItems = new List<StaticItem>[0];
+            this._allGameItems = new List<StaticItem>[1];
             this._interactiveGameItems = new LinkedList<MovingItem>();
             }
 
@@ -114,7 +114,7 @@ namespace Labyrinth
             if (tp.X < 0 || tp.Y < 0)
                 return EmptyItemList;
             var mortonIndex = tp.MortonCode;
-            if (mortonIndex > this._allGameItems.GetLength(0))
+            if (mortonIndex >= this._allGameItems.GetLength(0))
                 return EmptyItemList;
             var result = this._allGameItems[mortonIndex] ?? EmptyItemList;
             return result;
@@ -163,6 +163,7 @@ namespace Labyrinth
                 previousList.Remove(item);
                 }
             
+            EnsureArrayIsLargeEnough(item.TilePosition);
             var newList = this._allGameItems[newMortonCode];
             if (newList == null && countOfItems == 1)
                 {
