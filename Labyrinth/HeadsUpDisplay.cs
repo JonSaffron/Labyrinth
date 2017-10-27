@@ -18,7 +18,7 @@ namespace Labyrinth
             this._statusFont = contentManager.Load<SpriteFont>("Display/StatusFont");
             }
 
-        public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, int score, int livesLeft)
+        public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, int score, int livesLeft, bool isGameRunningSlowly)
             {
             DrawEnergyRect(spriteBatch);
             if (isPlayerExtant)

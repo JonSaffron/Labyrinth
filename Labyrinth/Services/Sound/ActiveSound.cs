@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
@@ -7,7 +8,7 @@ namespace Labyrinth.Services.Sound
         {
         public ISoundEffectInstance SoundEffectInstance { get; private set; }
 
-        public ActiveSound(ISoundEffectInstance soundEffectInstance)
+        public ActiveSound([NotNull] ISoundEffectInstance soundEffectInstance)
             {
             if (soundEffectInstance == null)
                 throw new ArgumentNullException("soundEffectInstance");

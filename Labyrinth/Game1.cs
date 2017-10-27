@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.ScoreKeeper;
@@ -28,7 +29,7 @@ namespace Labyrinth
         private bool GameIsPaused { get; set; }
         public bool IsInteractive { get; set; }
 
-        public Game1(IPlayerInput playerInput, IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
+        public Game1([NotNull] IPlayerInput playerInput, [NotNull] IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
             {
             if (playerInput == null)
                 throw new ArgumentNullException("playerInput");
@@ -43,7 +44,7 @@ namespace Labyrinth
             GlobalServices.SetGameComponentCollection(this.Components);
             GlobalServices.SetPlayerInput(this._playerInput);
             GlobalServices.SetScoreKeeper(this._scoreKeeper);
-
+            
             this._gdm = new GraphicsDeviceManager(this)
                             {
                                 PreferredBackBufferWidth = (int) Constants.RoomSizeInPixels.X * Constants.ZoomWhilstWindowed,
@@ -113,7 +114,13 @@ namespace Labyrinth
                 LoadLevel("World1.xml");
                 }
 
+            if (this.GameIsPaused)
+                gameTime = new GameTime();
+
+            // allow registered components to update. this includes the GameTimers and the Keyboard handler.
             base.Update(gameTime);
+            ProcessGameInput();
+            GlobalServices.SoundPlayer.ActiveSoundService.Update();
 
             if (!this.GameIsPaused)
                 {
@@ -147,9 +154,6 @@ namespace Labyrinth
 
             if (this._displayedScore < this._scoreKeeper.CurrentScore)
                 this._displayedScore++;
-
-            ProcessGameInput();
-            GlobalServices.SoundPlayer.ActiveSoundService.Update();
             }
 
         private void ProcessGameInput()
@@ -188,14 +192,17 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Draw</param>
         protected override void Draw(GameTime gameTime)
             {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(!gameTime.IsRunningSlowly ? Color.Black : Color.DarkRed);
+
+            if (this.GameIsPaused)
+                gameTime = new GameTime();
 
             // Draw the sprite.
             _spriteBatch.Begin(this.World.WindowPosition);
             if (this.World != null)
                 {
                 this.World.Draw(gameTime, _spriteBatch);
-                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._displayedScore, this._lives);
+                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._displayedScore, this._lives, gameTime.IsRunningSlowly);
                 if (this.GameIsPaused)
                     this._headsUpDisplay.DrawPausedMessage(_spriteBatch);
                 }

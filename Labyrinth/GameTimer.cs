@@ -73,11 +73,7 @@ namespace Labyrinth
 
         private void OnEnabledChanged()
             {
-            var handler = this.EnabledChanged;
-            if (handler != null)
-                {
-                handler(this, new EventArgs());
-                }
+            this.EnabledChanged?.Invoke(this, new EventArgs());
             }
 
         public int UpdateOrder
@@ -98,12 +94,7 @@ namespace Labyrinth
 
         private void OnUpdateOrderChanged()
             {
-            var handler = this.UpdateOrderChanged;
-            if (handler != null)
-                {
-                handler(this, new EventArgs());
-                }
+            this.UpdateOrderChanged?.Invoke(this, new EventArgs());
             }
-
         }
     }

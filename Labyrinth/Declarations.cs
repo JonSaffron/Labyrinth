@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.Sound;
+﻿using JetBrains.Annotations;
+using Labyrinth.Services.Sound;
 
 namespace Labyrinth
     {
@@ -140,12 +141,12 @@ namespace Labyrinth
 
     public enum FruitType
         {
-        Apple = 1,
-        Watermelon = 2,
-        Pineapple = 3,
-        Strawberry = 4,
-        Cherries = 5,
-        Acorn = 6
+        [UsedImplicitly] Apple = 1,
+        [UsedImplicitly] Watermelon = 2,
+        [UsedImplicitly] Pineapple = 3,
+        [UsedImplicitly] Strawberry = 4,
+        [UsedImplicitly] Cherries = 5,
+        [UsedImplicitly] Acorn = 6
         }
 
     public enum LevelReturnType
