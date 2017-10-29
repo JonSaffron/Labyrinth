@@ -15,6 +15,8 @@ namespace Labyrinth.Services.Sound
                 throw new ArgumentNullException("gameObject");
             if (centrePointProvider == null)
                 throw new ArgumentNullException("centrePointProvider");
+            if (!gameObject.IsExtant)
+                throw new ArgumentException("GameObject is not extant.");
             this.GameObject = gameObject;
             this.CentrePointProvider = centrePointProvider;
             }

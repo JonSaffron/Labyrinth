@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -12,8 +13,7 @@ namespace Labyrinth.GameObjects
         public Direction DirectionOfTravel { get; private set; }
 
         private double _timeToTravel;
-        private readonly Rectangle _boundsForHorizontalMovement;
-        private readonly Rectangle _boundsForVerticalMovement;
+        private readonly Dictionary<Direction, Rectangle> _boundingRectangles;
 
         public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, ShotType shotType) : base(animationPlayer, position)
             {
@@ -38,10 +38,22 @@ namespace Labyrinth.GameObjects
             Ap.PlayAnimation(staticImage);
             ResetTimeToTravel();
 
+            this._boundingRectangles = GetBoundingRectangles();
+            }
+
+        private Dictionary<Direction, Rectangle> GetBoundingRectangles()
+            {
+            var result = new Dictionary<Direction, Rectangle>();
+
             const int shortSideLength = Constants.TileLength / 8; // 4 pixels
             const int longSideLength = Constants.TileLength / 2; // 16 pixels
-            this._boundsForHorizontalMovement = new Rectangle(-(longSideLength / 2), -(shortSideLength / 2), longSideLength, shortSideLength);
-            this._boundsForVerticalMovement = new Rectangle(-(shortSideLength / 2), -(longSideLength / 2), shortSideLength, longSideLength);
+            var boundsForHorizontalMovement = new Rectangle(-(longSideLength / 2), -(shortSideLength / 2), longSideLength, shortSideLength);
+            var boundsForVerticalMovement = new Rectangle(-(shortSideLength / 2), -(longSideLength / 2), shortSideLength, longSideLength);
+            result.Add(Direction.Up, boundsForVerticalMovement);
+            result.Add(Direction.Down, boundsForVerticalMovement);
+            result.Add(Direction.Left, boundsForHorizontalMovement);
+            result.Add(Direction.Right, boundsForHorizontalMovement);
+            return result;
             }
 
         private void ResetTimeToTravel()
@@ -72,26 +84,13 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                Rectangle result;
-                if (this.DirectionOfTravel.IsHorizontal())
-                    result = this._boundsForHorizontalMovement;
-                else if (this.DirectionOfTravel.IsVertical())
-                    result = this._boundsForVerticalMovement;
-                else
-                    throw new InvalidOperationException();
-
+                Rectangle result = this._boundingRectangles[this.DirectionOfTravel];
                 result.Offset((int) this.Position.X, (int) this.Position.Y);
                 return result;
                 }
             }
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.Shot;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.Shot;
 
         public override bool IsExtant
             {
@@ -141,29 +140,10 @@ namespace Labyrinth.GameObjects
             ResetTimeToTravel();
             }
 
-        public override bool IsMoving
-            {
-            get
-                {
-                return true;
-                }
-            }
+        public override bool IsMoving => true;
 
-        public override ObjectCapability Capability
-            {
-            get
-                {
-                return ObjectCapability.CanPushOthers;
-                }
-            }
+        public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
 
-        protected override decimal StandardSpeed
-            {
-            get
-                {
-                return Constants.BaseSpeed * 4;
-                }
-            }
-
+        protected override decimal StandardSpeed => Constants.BaseSpeed * 4;
         }
     }

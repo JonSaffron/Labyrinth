@@ -43,6 +43,8 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
+        public bool RestartInSameRoom => false;
+
         public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
             var result = new Dictionary<int, PlayerStartState>();

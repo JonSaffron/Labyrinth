@@ -31,6 +31,18 @@
                 }
             }
 
+        public void SetOccupationByMovingRandomlyDistributedMonster()
+            {
+            if (this._tileTypeByMap == TileTypeByMap.Wall)
+                throw new TileException(TileExceptionType.Error, "Wall tile cannot be occupied.");
+            if (this._tileTypeByData == TileTypeByData.Free)
+                this._tileTypeByData = TileTypeByData.Moving;
+            if (this._tileTypeByMap == TileTypeByMap.Floor)
+                {
+                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
+                }
+            }
+
         public void SetOccupationByStaticItem()
             {
             if (this._tileTypeByMap == TileTypeByMap.Wall)
@@ -42,6 +54,19 @@
                 {
                 this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
                 throw new TileException(TileExceptionType.Warning, "Tile is not marked as potentially occupied.");
+                }
+            }
+
+        public void SetOccupationByRandomMonsterDistribution()
+            {
+            if (this._tileTypeByMap == TileTypeByMap.Wall)
+                throw new TileException(TileExceptionType.Error, "Wall tile cannot be occupied.");
+            if (this._tileTypeByData == TileTypeByData.Static)
+                throw new TileException(TileExceptionType.Error, "Tile is already occupied by a static item.");
+            this._tileTypeByData = TileTypeByData.Static;
+            if (this._tileTypeByMap == TileTypeByMap.Floor)
+                {
+                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
                 }
             }
 

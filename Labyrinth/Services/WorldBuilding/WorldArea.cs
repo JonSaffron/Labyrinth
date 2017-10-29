@@ -128,7 +128,7 @@ namespace Labyrinth.Services.WorldBuilding
                 CountOfMonsters = int.Parse(node.GetAttribute("CountOfMonsters"))
                 };
             // ReSharper disable once PossibleNullReferenceException
-            foreach (XmlElement mdef in node.SelectNodes("ns:MonsterTemplates", xnm))
+            foreach (XmlElement mdef in node.SelectNodes("ns:MonsterTemplates/ns:Monster", xnm))
                 {
                 var md = WorldLoader.ProcessGameObjects.GetMonsterDef(mdef);
                 int matchingDiceRoll = int.Parse(mdef.GetAttribute("MatchingDiceRoll"));

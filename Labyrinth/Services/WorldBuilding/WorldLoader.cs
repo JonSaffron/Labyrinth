@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    class WorldLoader : IWorldLoader
+    public class WorldLoader : IWorldLoader
         {
         private XmlElement _xmlRoot;
         private XmlNamespaceManager _xnm;
@@ -43,6 +43,18 @@ namespace Labyrinth.Services.WorldBuilding
             {
             var result = GetFloorLayout();
             return result;
+            }
+
+        public bool RestartInSameRoom
+            {
+            get 
+                {
+                var text = this._xmlRoot.GetAttribute("RestartInSameRoom");
+                if (string.IsNullOrWhiteSpace(text))
+                    return false;
+                bool result = bool.Parse(text);
+                return result;
+                }
             }
 
         public void GetGameObjects(GameState gameState)
@@ -94,8 +106,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
-            var result =
-                this._worldAreas.Where(item => item.Id.HasValue).ToDictionary(key => key.Id.GetValueOrDefault(), value => value.PlayerStartState);
+            var result = this._worldAreas.Where(item => item.Id.HasValue).ToDictionary(key => key.Id.GetValueOrDefault(), value => value.PlayerStartState);
             return result;
             }
 
@@ -251,18 +262,17 @@ namespace Labyrinth.Services.WorldBuilding
                     exceptions.AddRange(SetTileOccupation(newItems, t => t.SetOccupationByStaticItem()));
                     }
 
-                var monsters = GetMonstersFromRandomDistribution();
+                var monsters = GetMonstersFromRandomDistribution().ToList();
                 foreach (Monster monster in monsters)
                     {
                     if (monster.IsStill)
-                        exceptions.AddRange(SetTileOccupation(new [] { monster }, t => t.SetOccupationByStaticItem()));
-                    else
-                        movingMonsters.Add(monster);
+                        exceptions.AddRange(SetTileOccupation(new [] { monster }, t => t.SetOccupationByRandomMonsterDistribution()));
                     }
 
                 GetListOfFruit();
 
                 exceptions.AddRange(SetTileOccupation(movingMonsters, t => t.SetOccupationByMovingMonster()));
+                exceptions.AddRange(SetTileOccupation(monsters, t => t.SetOccupationByMovingRandomlyDistributedMonster()));
             
                 ReviewPotentiallyOccupiedTiles(exceptions);
             

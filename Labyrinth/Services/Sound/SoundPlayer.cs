@@ -1,19 +1,21 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
     {
     public class SoundPlayer : ISoundPlayer
         {
-        private readonly SoundLibrary _soundLibrary;
-        private readonly IActiveSoundService _activeSoundService;
+        public SoundLibrary SoundLibrary { get; }
+        public IActiveSoundService ActiveSoundService { get; }
+
         private const int TopVolume = 11;
         private int _currentVolume = 8;    // todo save and restore this value
 
         public SoundPlayer(SoundLibrary soundLibrary, IActiveSoundService activeSoundService)
             {
-            this._soundLibrary = soundLibrary;
-            this._activeSoundService = activeSoundService;
+            this.SoundLibrary = soundLibrary;
+            this.ActiveSoundService = activeSoundService;
             }
 
         public void Play(GameSound gameSound)
@@ -21,7 +23,7 @@ namespace Labyrinth.Services.Sound
             InternalPlay(gameSound);
             }
 
-        public void PlayWithCallback(GameSound gameSound, EventHandler callback)
+        public void PlayWithCallback(GameSound gameSound, [NotNull] EventHandler callback)
             {
             if (callback == null)
                 throw new ArgumentNullException("callback");
@@ -30,7 +32,7 @@ namespace Labyrinth.Services.Sound
             AddCallback(gameSound, callback);
             }
 
-        public void PlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
+        public void PlayForObject(GameSound gameSound, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider)
             {
             if (gameObject == null)
                 throw new ArgumentNullException("gameObject");
@@ -40,7 +42,7 @@ namespace Labyrinth.Services.Sound
             InternalPlayForObject(gameSound, gameObject, centrePointProvider);
             }
 
-        public void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider, EventHandler callback)
+        public void PlayForObjectWithCallback(GameSound gameSound, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider, [NotNull] EventHandler callback)
             {
             if (gameObject == null)
                 throw new ArgumentNullException("gameObject");
@@ -87,22 +89,6 @@ namespace Labyrinth.Services.Sound
             SetVolume();
             }
 
-        public SoundLibrary SoundLibrary
-            {
-            get
-                {
-                return this._soundLibrary;
-                }
-            }
-
-        public IActiveSoundService ActiveSoundService
-            {
-            get 
-                {
-                return this._activeSoundService;
-                }
-            }
-
         private void SetVolume()
             {
             float volume = 1.0f / TopVolume * this._currentVolume;
@@ -116,9 +102,9 @@ namespace Labyrinth.Services.Sound
                 throw new ArgumentOutOfRangeException("GameSound " + gameSound + " needs to be associated with a GameObject.");
 #endif
 
-            ISoundEffectInstance soundEffect = this._soundLibrary[gameSound];
+            ISoundEffectInstance soundEffect = this.SoundLibrary[gameSound];
             var activeSound = new ActiveSound(soundEffect);
-            this._activeSoundService.Add(activeSound);
+            this.ActiveSoundService.Add(activeSound);
             }
 
         private void InternalPlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
@@ -128,14 +114,14 @@ namespace Labyrinth.Services.Sound
                 throw new ArgumentOutOfRangeException("GameSound " + gameSound + " should not be associated with a GameObject.");
 #endif
 
-            ISoundEffectInstance soundEffect = this._soundLibrary[gameSound];
+            ISoundEffectInstance soundEffect = this.SoundLibrary[gameSound];
             var activeSound = new ActiveSoundForObject(soundEffect, gameObject, centrePointProvider);
-            this._activeSoundService.Add(activeSound);
+            this.ActiveSoundService.Add(activeSound);
             }
 
         private void AddCallback(GameSound gameSound, EventHandler callback)
             {
-            var duration = this._soundLibrary.GetDuration(gameSound);
+            var duration = this.SoundLibrary.GetDuration(gameSound);
             GameTimer.AddGameTimer(duration, callback);
             }
 

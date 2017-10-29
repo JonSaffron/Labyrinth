@@ -20,6 +20,7 @@ namespace Labyrinth
         private int _levelUnlocked;
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
         private bool _doNotUpdate;
+        private bool _restartInSameRoom;
         
         [NotNull] public readonly Player Player;
 
@@ -32,6 +33,7 @@ namespace Labyrinth
         public World(IWorldLoader worldLoader)
             {
             this._tiles = worldLoader.GetFloorTiles();
+            this._restartInSameRoom = worldLoader.RestartInSameRoom;
             var gameObjectCollection = new GameObjectCollection();
             this._playerStartStates = worldLoader.GetPlayerStartStates();
             var gameState = new GameState(gameObjectCollection);
@@ -49,8 +51,9 @@ namespace Labyrinth
             GlobalServices.GameState.RemoveBangsAndShots();
 
             var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
-            PlayerStartState pss = this._playerStartStates[worldAreaId];
-            this.Player.ResetPositionAndEnergy(pss.Position.ToPosition(), pss.Energy);
+            var pss = this._playerStartStates[worldAreaId];
+            var resetPosition = this._restartInSameRoom ? this.Player.TilePosition : pss.Position;
+            this.Player.ResetPositionAndEnergy(resetPosition.ToPosition(), pss.Energy);
 
             ResetLevelForStartingNewLife(spw);
             }
@@ -85,7 +88,7 @@ namespace Labyrinth
                 {
                 EndLocation = this.Player.TilePosition,
                 MaximumLengthOfPath = 20,
-                CanBeOccupied = GlobalServices.GameState.IsImpassableItemOnTile
+                CanBeOccupied = tp => !GlobalServices.GameState.IsImpassableItemOnTile(tp)
                 };
 
             var result = new List<Monster>();
@@ -112,14 +115,13 @@ namespace Labyrinth
                 {
                 StartLocation = monster.TilePosition,
                 RepelLocation = Player.TilePosition,
-                CanBeOccupied = GlobalServices.GameState.IsImpassableItemOnTile,
+                CanBeOccupied = tp => !GlobalServices.GameState.IsImpassableItemOnTile(tp),
                 MaximumLengthOfPath = 24,
                 MinimumDistanceToMoveAway = 12
                 };
             var repeller = new RepelObject(repelParameters);
-            IList<TilePos> path;
-            var result = repeller.TryFindPath(out path);
-            if (result)
+            var result = repeller.TryFindPath(out var path);
+            if (result && path.Any())
                 {
                 monster.SetPosition(path.Last().ToPosition());
                 }

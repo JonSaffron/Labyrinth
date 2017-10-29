@@ -20,7 +20,7 @@ namespace Labyrinth
 
         public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, int score, int livesLeft, bool isGameRunningSlowly)
             {
-            DrawEnergyRect(spriteBatch);
+            DrawEnergyRect(spriteBatch, isGameRunningSlowly);
             if (isPlayerExtant)
                 DrawEnergyBar(spriteBatch, playerEnergy);
 
@@ -29,10 +29,10 @@ namespace Labyrinth
             DrawLives(spriteBatch, livesLeft);
             }
 
-        private static void DrawEnergyRect(ISpriteBatch spriteBatch)
+        private static void DrawEnergyRect(ISpriteBatch spriteBatch, bool isGameRunningSlowly)
             {
             var r = new Rectangle(22, 6, 148, 20);
-            spriteBatch.DrawRectangle(r, Color.Blue);
+            spriteBatch.DrawRectangle(r, isGameRunningSlowly ? Color.Red : Color.Blue);
             
             r.Inflate(-2, -2);
             spriteBatch.DrawRectangle(r, Color.Black);

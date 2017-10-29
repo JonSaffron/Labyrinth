@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
@@ -10,15 +12,10 @@ namespace Labyrinth
         private readonly MovingItem _movingItem1;
         private readonly MovingItem _movingItem2;
 
-        public InteractionWithMovingItems(MovingItem movingItem1, MovingItem movingItem2)
+        public InteractionWithMovingItems([NotNull] MovingItem movingItem1, [NotNull] MovingItem movingItem2)
             {
-            if (movingItem1 == null)
-                throw new ArgumentNullException("movingItem1");
-            if (movingItem2 == null)
-                throw new ArgumentNullException("movingItem2");
-
-            this._movingItem1 = movingItem1;
-            this._movingItem2 = movingItem2;
+            this._movingItem1 = movingItem1 ?? throw new ArgumentNullException(nameof(movingItem1));
+            this._movingItem2 = movingItem2 ?? throw new ArgumentNullException(nameof(movingItem2));
             }
 
         public void Collide()
@@ -26,7 +23,7 @@ namespace Labyrinth
             if (!this._movingItem1.IsExtant || !this._movingItem2.IsExtant)
                 return;
 
-            var items = new[] { this._movingItem1, this._movingItem2 };
+            var items = new Collection<MovingItem> { this._movingItem1, this._movingItem2 };
 
             var explosion = items.OfType<Explosion>().FirstOrDefault();
             if (explosion != null)
@@ -66,21 +63,43 @@ namespace Labyrinth
                 }
             
             var moveableObject = items.FirstOrDefault(item => item.Solidity == ObjectSolidity.Moveable);
-            var movingObject = items.FirstOrDefault(item => item != moveableObject && item.Capability.CanMoveAnother());
-            if (moveableObject != null && movingObject != null)
+            if (moveableObject != null)
                 {
-                var actionTaken = PushOrBounceObject(moveableObject, movingObject);
-                if (actionTaken)
+                var otherObject = items.Single(item => item != moveableObject);
+                if (otherObject.Capability.CanMoveAnother())
+                    {
+                    var actionTaken = PushOrBounceObject(moveableObject, otherObject);
+                    if (actionTaken)
+                        return;
+                    }
+
+                if (CrushObject(moveableObject, otherObject))
                     // ReSharper disable once RedundantJumpStatement
                     return;
                 }
 
-            //todo move crush code
-
             // any other interaction here...
             }
 
-        private static bool ShouldStartPushOrBounce(MovingItem moveableObject, MovingItem movingObject)
+        /// <summary>
+        /// Deals with the situation where one object could be moving another
+        /// </summary>
+        /// <param name="moveableObject">An item such as the boulder</param>
+        /// <param name="movingObject">An item that is capable of moving another item such as the player or a shot</param>
+        /// <returns></returns>
+        private static bool PushOrBounceObject([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
+            {
+            var result = ShouldStartPushOrBounce(moveableObject, movingObject);
+            if (result)
+                {
+                moveableObject.PushOrBounce(movingObject, movingObject.CurrentMovement.Direction);
+                if (movingObject is StandardShot standardShot)
+                    GlobalServices.GameState.ConvertShotToBang(standardShot);
+                }
+            return result;            
+            }
+
+        private static bool ShouldStartPushOrBounce([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
             {
             bool isMoveableObjectAlreadyInMotion = moveableObject.CurrentMovement.IsMoving;
             bool isMovingObjectMotionless = !movingObject.CurrentMovement.IsMoving;
@@ -97,29 +116,18 @@ namespace Labyrinth
             return isGettingCloser;
             }
 
-        private static bool PushOrBounceObject(MovingItem moveableObject, MovingItem movingObject)
+        private static bool CrushObject([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
             {
-            if (ShouldStartPushOrBounce(moveableObject, movingObject))
+            if (IsCrushingPossible(moveableObject, movingObject))
                 {
-                moveableObject.PushOrBounce(movingObject, movingObject.CurrentMovement.Direction);
-                var standardShot = movingObject as StandardShot;
-                if (standardShot != null)
-                    GlobalServices.GameState.ConvertShotToBang(standardShot);
-                return true;
-                }
-
-            // test whether the moveable object crushing the insubstantial object
-            if (moveableObject.CurrentMovement.IsMoving && moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction)
-                {
-                var insubstantialObjectPosition = movingObject.CurrentMovement.Direction == Direction.None ? movingObject.Position : movingObject.CurrentMovement.MovingTowards;
-                var insubtantialObjectTile = TilePos.TilePosFromPosition(insubstantialObjectPosition);
+                var movingObjectPosition = movingObject.CurrentMovement.Direction == Direction.None ? movingObject.Position : movingObject.CurrentMovement.MovingTowards;
+                var movingObjectTile = TilePos.TilePosFromPosition(movingObjectPosition);
                 var moveableObjectTile = TilePos.TilePosFromPosition(moveableObject.CurrentMovement.MovingTowards);
-                if (insubtantialObjectTile == moveableObjectTile)
+                if (movingObjectTile == moveableObjectTile)
                     {
                     var energy = movingObject.InstantlyExpire();
                     var b = GlobalServices.GameState.AddBang(movingObject.Position, BangType.Long);
-                    var monster = movingObject as Monster;
-                    if (monster != null)
+                    if (movingObject is Monster monster)
                         {
                         b.PlaySound(GameSound.MonsterDies);
                         GlobalServices.ScoreKeeper.EnemyCrushed(monster, energy);
@@ -130,17 +138,27 @@ namespace Labyrinth
             return false;
             }
 
+        private static bool IsCrushingPossible([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
+            {
+            if (!moveableObject.CurrentMovement.IsMoving)
+                return false;
+            if (movingObject.Capability.CanMoveAnother())
+                {
+                var result = moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction;
+                return result;
+                }
+            return true;
+            }
+
         private static void InteractionInvolvesExplosion(Explosion explosion, MovingItem movingItem)
             {
-            var shot = movingItem as Shot;
-            if (shot != null)
+            if (movingItem is Shot shot)
                 {
                 shot.ReduceEnergy(explosion.Energy);
                 explosion.InstantlyExpire();
                 }
 
-            var monster = movingItem as Monster;
-            if (monster != null)
+            if (movingItem is Monster monster)
                 {
                 var energyRemoved = Math.Min(explosion.Energy, monster.Energy);
                 GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemoved);
@@ -149,8 +167,7 @@ namespace Labyrinth
                 return;
                 }
 
-            var player = movingItem as Player;
-            if (player != null)
+            if (movingItem is Player player)
                 {
                 var explosionEnergy = explosion.Energy;
                 explosion.InstantlyExpire();
@@ -166,7 +183,7 @@ namespace Labyrinth
 
         private static bool InteractionInvolvingShot(StandardShot shot, MovingItem movingItem)
             {
-            if (movingItem is Player && shot.HasRebounded)
+            if (movingItem is Player && (shot.ShotType == ShotType.Monster || (shot.ShotType == ShotType.Player && shot.HasRebounded)))
                 {
                 var shotEnergy = shot.Energy;
                 GlobalServices.GameState.ConvertShotToBang(shot);
@@ -176,15 +193,13 @@ namespace Labyrinth
                 return true;
                 }
 
-            var monster = movingItem as Monster;
-            if (monster != null)
+            if (movingItem is Monster monster)
                 {
                 var result = ShotHitsMonster(shot, monster);
                 return result;
                 }
 
-            var standardShot2 = movingItem as StandardShot;
-            if (standardShot2 != null)
+            if (movingItem is StandardShot standardShot2)
                 {
                 var result = ShotHitsShot(shot, standardShot2);
                 return result;
@@ -210,8 +225,7 @@ namespace Labyrinth
             standardShot1.ReduceEnergy(minEnergy);
             if (!standardShot1.IsExtant)
                 bang = GlobalServices.GameState.ConvertShotToBang(standardShot1);
-            if (bang != null)   // bang will always be not null
-                bang.PlaySound(GameSound.StaticObjectShotAndInjured);
+            bang?.PlaySound(GameSound.StaticObjectShotAndInjured);
             return true;
             }
 

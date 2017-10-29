@@ -90,6 +90,7 @@ namespace Labyrinth.Test
             ass.Add(activeSound);
 
             Assert.AreEqual(1, ass.Count);
+            // ReSharper disable once RedundantAssignment
             activeSound = (ActiveSound) ass[0];
             Assert.IsTrue(sei.RestartPlayWhenStopped);
             }

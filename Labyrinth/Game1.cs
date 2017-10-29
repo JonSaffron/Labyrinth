@@ -111,7 +111,7 @@ namespace Labyrinth
 
             if (this.World == null)
                 {
-                LoadLevel("World1.xml");
+                LoadLevel("World2.xml");
                 }
 
             if (this.GameIsPaused)

@@ -85,7 +85,8 @@ namespace Labyrinth.GameObjects
         private void EggIsHatching(object sender, EventArgs args)
             {
             this.MonsterState = MonsterState.Hatching;
-            PlaySoundWithCallback(GameSound.EggHatches, EggHasHatched);
+            if (this.IsExtant)
+                PlaySoundWithCallback(GameSound.EggHatches, EggHasHatched);
             }
 
         private void EggHasHatched(object sender, EventArgs args)
@@ -160,7 +161,7 @@ namespace Labyrinth.GameObjects
                 {
                 for (int i = 1; i <= 2; i++)
                     GlobalServices.GameState.AddDiamondDemon(this.Position);
-                this.PlaySound(GameSound.MonsterShattersIntoNewLife);
+                bang.PlaySound(GameSound.MonsterShattersIntoNewLife);
                 }
             }
 
@@ -268,6 +269,7 @@ namespace Labyrinth.GameObjects
                     {
                     this.PlaySound(GameSound.MonsterLaysEgg);
                     MonsterDef md = ((ILayEggs) this).LayAnEgg();
+                    md.IsEgg = true;
                     md.TimeBeforeHatching = (monsterRandom.Next(256) & 0x1f) + 8;
                     md.LaysEggs = false;
                     GlobalServices.GameState.CreateMonster(md);
