@@ -6,22 +6,44 @@ namespace Labyrinth.GameObjects
     {
     public abstract class MovingItem : StaticItem
         {
-        public Labyrinth.Movement CurrentMovement { get; protected set; }
-        public Vector2 OriginalPosition { get; set; }
-
-        public abstract bool Update(GameTime gameTime);
-
+        /// <inheritdoc />
+        /// <summary>
+        /// Constructs a new MovingItem object
+        /// </summary>
         protected MovingItem(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             // nothing to do
             }
 
-        public void SetPosition(Vector2 position)
+        /// <summary>
+        /// Returns or sets the current movement by this object
+        /// </summary>
+        public Labyrinth.Movement CurrentMovement { get; protected set; }
+
+        /// <summary>
+        /// Returns or sets the previous position of this object
+        /// </summary>
+        /// <remarks>Used by the <see cref="GameObjectCollection" /> to keep track of where the object has been</remarks>
+        public Vector2 OriginalPosition { get; set; }
+
+        /// <summary>
+        /// Arbitrarily sets the position of this object
+        /// </summary>
+        /// <param name="position">The new position for this object</param>
+        /// <remarks>The object will also be set to stationary</remarks>
+        public void ResetPosition(Vector2 position)
             {
             this.Position = position;
             this.CurrentMovement = Labyrinth.Movement.Still;
             GlobalServices.GameState.UpdatePosition(this);
             }
+
+        /// <summary>
+        /// Updates the position and/or activity of this object each tick of the game
+        /// </summary>
+        /// <param name="gameTime">The amount of gametime that has passed since the last time Update was called</param>
+        /// <returns>True if the position of the object changes, otherwise false if the object is stationary</returns>
+        public abstract bool Update(GameTime gameTime);
 
         /// <summary>
         /// Determines whether an object can move in the specified direction
@@ -35,10 +57,10 @@ namespace Labyrinth.GameObjects
             }
 
         /// <summary>
-        /// Used to begin a push or bounce action by the player
+        /// Initiates a push or bounce involving this object
         /// </summary>
-        /// <param name="byWhom">The game object that is acting on the boulder</param>
-        /// <param name="direction">Which direction the specified game object is directing the boulder</param>
+        /// <param name="byWhom">The object that is acting on this object</param>
+        /// <param name="direction">The direction that the specified object is directing this object</param>
         public void PushOrBounce(MovingItem byWhom, Direction direction)
             {
             var ps = CanBePushedOrBounced(byWhom, direction, true);
@@ -70,7 +92,7 @@ namespace Labyrinth.GameObjects
             }
 
         /// <summary>
-        /// Returns whether or not the object can begin to move in the specified direction
+        /// Returns whether or not this object can begin to move in the specified direction
         /// </summary>
         /// <param name="direction">The direction to test for</param>
         /// <param name="isBounceBackPossible">Specifies whether the movement is allowed to start a bounce back</param>
@@ -89,15 +111,17 @@ namespace Labyrinth.GameObjects
                     {
                     case ObjectSolidity.Stationary:
                     case ObjectSolidity.Insubstantial:
+                        // neither of these will stop this object moving onto the same tile
                         continue;
 
                     case ObjectSolidity.Impassable:
+                        // the target tile is already occupied and this object cannot move onto it
                         return false;
 
                     case ObjectSolidity.Moveable:
                         {
-                        var mi = item as MovingItem;
-                        if (mi == null)
+                        if (!(item is MovingItem mi))
+                            // There shouldn't be any Moveable objects that are not MovingItems as that would be a contradiction
                             return false;
                         var canMove = mi.CanBePushedOrBounced(this, direction, isBounceBackPossible);
                         if (canMove == PushStatus.Yes || canMove == PushStatus.Bounce)
@@ -113,28 +137,40 @@ namespace Labyrinth.GameObjects
             return true;
             }
 
+        /// <summary>
+        /// Used to determined if this object can be pushed or bounced
+        /// </summary>
+        /// <param name="byWhom">The object that is potentially pushing this object</param>
+        /// <param name="direction">Sets the direction in which this object might be moved</param>
+        /// <param name="isBounceBackPossible">Sets whether bounceback should be considered</param>
+        /// <returns>An indication of whether this object will move and if so, how it will react</returns>
+        /// <remarks>Currently only the boulder is moveable</remarks>
         private PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction, bool isBounceBackPossible)
             {
+            // if this object is not moveable then the answer's no
             if (this.Solidity != ObjectSolidity.Moveable)
                 return PushStatus.No;
 
+            // if the moving object cannot move other objects then the answer's no
             if (!byWhom.Capability.CanMoveAnother())
                 return PushStatus.No;
 
-            // first check if the object can be pushed
+            // check if this object can move in the specified direction
             if (this.CanMoveInDirection(direction, isBounceBackPossible))
                 return PushStatus.Yes;
 
-            // is bounce back possible?
+            // if bounceback is not a possibility then the answer's no
             if (byWhom.Capability != ObjectCapability.CanPushOrCauseBounceBack || !isBounceBackPossible)
                 return PushStatus.No;
 
-            var result = byWhom.CanMoveInDirection(direction.Reversed(), false) ? PushStatus.Bounce : PushStatus.No;
+            // this object will be able to bounceback only if the object that is pushing it can move backwards
+            var willBounceBack = byWhom.CanMoveInDirection(direction.Reversed(), false);
+            var result = willBounceBack ? PushStatus.Bounce : PushStatus.No;
             return result;
             }
 
         /// <summary>
-        /// Starts the object moving
+        /// Starts this object moving towards a single adjacent tile
         /// </summary>
         /// <param name="direction">The direction to move in</param>
         /// <param name="speed">The speed to move at</param>
@@ -146,12 +182,21 @@ namespace Labyrinth.GameObjects
             System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} from {2} to {3} ({4}) at {5}p/s", this.GetType().Name, direction, this.Position, movingTowards, movingTowardsTilePos, speed));
             }
 
+        /// <summary>
+        /// Makes this object stationary
+        /// </summary>
         protected void StandStill()
             {
             this.CurrentMovement = Labyrinth.Movement.Still;
             System.Diagnostics.Trace.WriteLine(string.Format("{0}: Standing still at {1}", this.GetType().Name, this.TilePosition));
             }
 
+        /// <summary>
+        /// Makes this object bounce backwards two tiles from where it is currently headed towards
+        /// </summary>
+        /// <param name="direction">The direction to move in</param>
+        /// <param name="speed">The speed to move at</param>
+        /// <remarks>This is used by an object that can move another, currently this will only be the player</remarks>
         protected void BounceBack(Direction direction, decimal speed)
             {
             var originallyMovingTowards = TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards);
@@ -171,7 +216,7 @@ namespace Labyrinth.GameObjects
         protected virtual bool TryToCompleteMoveToTarget(ref double timeRemaining)
             {
             if (timeRemaining <= 0)
-                throw new ArgumentOutOfRangeException("timeRemaining");
+                throw new ArgumentOutOfRangeException(nameof(timeRemaining));
             if (!this.CurrentMovement.IsMoving)
                 throw new InvalidOperationException("Not currently moving.");
 
@@ -195,51 +240,29 @@ namespace Labyrinth.GameObjects
             return hasArrivedAtDestination;
             }
 
-        public virtual bool IsMoving
-            {
-            get
-                {
-                var result = this.CurrentMovement.IsMoving;
-                return result;
-                }
-            }
-
         /// <summary>
-        /// Gets an indication of how solid the object is
+        /// Returns whether this object is currently moving
         /// </summary>
-        public override ObjectSolidity Solidity
-            {
-            get
-                {
-                return ObjectSolidity.Insubstantial;
-                }
-            }
+        public virtual bool IsMoving => this.CurrentMovement.IsMoving;
+
+        /// <inheritdoc />
+        public override ObjectSolidity Solidity => ObjectSolidity.Insubstantial;
 
         /// <summary>
         /// Gets an indication of what effect this object can have on others
         /// </summary>
-        public virtual ObjectCapability Capability
-            {
-            get
-                {
-                return ObjectCapability.CannotMoveOthers;
-                }
-            }
+        public virtual ObjectCapability Capability => ObjectCapability.CannotMoveOthers;
 
-        protected virtual decimal StandardSpeed
-            {
-            get
-                {
-                return Constants.BaseSpeed;
-                }
-            }
+        /// <summary>
+        /// Gets the normal speed this object moves at
+        /// </summary>
+        /// <remarks>Measured in pixels per second</remarks>
+        protected virtual decimal StandardSpeed => Constants.BaseSpeed;
 
-        protected virtual decimal BounceBackSpeed
-            {
-            get
-                {
-                return Constants.BounceBackSpeed;
-                }
-            }
+        /// <summary>
+        /// Gets the speed this object moves at when bouncing back
+        /// </summary>
+        /// <remarks>Measured in pixels per second</remarks>
+        protected virtual decimal BounceBackSpeed => Constants.BounceBackSpeed;
         }
     }

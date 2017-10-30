@@ -26,11 +26,6 @@ namespace Labyrinth.GameObjects
             _staticImage = Animation.StaticAnimation("Sprites/Boulder/Boulder");
             }
 
-        public void Reset(Vector2 position)
-            {
-            SetPosition(position);
-            }
-
         public override bool IsExtant
             {
             get

@@ -13,14 +13,14 @@ namespace Labyrinth
     {
     public class World : ICentrePointProvider
         {
-        private readonly Vector2 _centreOfRoom = Constants.RoomSizeInPixels / 2;
+        private readonly Vector2 _centreOfRoom = Constants.RoomSizeInPixels / 2.0f;
 
         private int _gameClock;
         private double _time;
         private int _levelUnlocked;
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
         private bool _doNotUpdate;
-        private bool _restartInSameRoom;
+        private readonly bool _restartInSameRoom;
         
         [NotNull] public readonly Player Player;
 
@@ -123,7 +123,7 @@ namespace Labyrinth
             var result = repeller.TryFindPath(out var path);
             if (result && path.Any())
                 {
-                monster.SetPosition(path.Last().ToPosition());
+                monster.ResetPosition(path.Last().ToPosition());
                 }
             }
 
@@ -220,8 +220,7 @@ namespace Labyrinth
                             countOfInteractions++;
                             Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
                             var interaction = BuildInteraction(currentItem, si);
-                            if (interaction != null)
-                                interaction.Collide();
+                            interaction?.Collide();
                             }
                         }
                     }
@@ -408,7 +407,7 @@ namespace Labyrinth
                     }
                 if (tp.HasValue)
                     {
-                    boulder.Reset(tp.Value.ToPosition());
+                    boulder.ResetPosition(tp.Value.ToPosition());
                     GlobalServices.GameState.UpdatePosition(boulder);
                     }
                 }

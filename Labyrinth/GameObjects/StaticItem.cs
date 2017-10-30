@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -7,8 +8,6 @@ namespace Labyrinth.GameObjects
     public abstract class StaticItem : IGameObject
         {
         private Vector2 _position;
-        private TilePos _tilePosition;
-        private readonly AnimationPlayer _animationPlayer;
         private int _energy;
 
         /// <summary>
@@ -16,14 +15,9 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <param name="animationPlayer">An instance of the animation player to use for animating this object</param>
         /// <param name="position">The initial position of the object</param>
-        protected StaticItem(AnimationPlayer animationPlayer, Vector2 position)
+        protected StaticItem([NotNull] AnimationPlayer animationPlayer, Vector2 position)
             {
-            if (animationPlayer == null)
-                throw new ArgumentNullException("animationPlayer");
-            if (position == null)
-                throw new ArgumentNullException("position");
-
-            this._animationPlayer = animationPlayer;
+            this.Ap = animationPlayer ?? throw new ArgumentNullException(nameof(animationPlayer));
             this.Position = position;
             }
         
@@ -32,50 +26,25 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public Vector2 Position
             {
-            get
-                {
-                return this._position;
-                }
+            get => this._position;
 
             protected set
                 {
                 this._position = value;
-                this._tilePosition = TilePos.TilePosFromPosition(value);
+                this.TilePosition = TilePos.TilePosFromPosition(value);
                 SetBoundingRectangle(value);
                 }
-            }
-
-        private void SetBoundingRectangle(Vector2 position)
-            {
-            var r = Constants.TileRectangle;
-            var offsetX = (int) position.X - Constants.HalfTileLength;
-            var offsetY = (int) position.Y - Constants.HalfTileLength;
-            r.Offset(offsetX, offsetY);
-            this.BoundingRectangle = r;
             }
 
         /// <summary>
         /// Gets the nearest tile position to the object's position
         /// </summary>
-        public TilePos TilePosition
-            {
-            get
-                {
-                return this._tilePosition;
-                }
-            }
+        public TilePos TilePosition { get; private set; }
 
         /// <summary>
         /// Gets the animation player associated with the object
         /// </summary>
-        protected AnimationPlayer Ap
-            {
-            get
-                {
-                var result = this._animationPlayer;
-                return result;
-                }
-            }
+        protected AnimationPlayer Ap { get; }
 
         /// <summary>
         /// Gets or sets how much energy the object has
@@ -91,7 +60,7 @@ namespace Labyrinth.GameObjects
             protected set
                 {
                 if (value < 0 || value > 255)
-                    throw new ArgumentOutOfRangeException("value");
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 this._energy = value;
                 }
             }
@@ -119,7 +88,7 @@ namespace Labyrinth.GameObjects
         public virtual void ReduceEnergy(int energyToRemove)
             {
             if (energyToRemove <= 0)
-                throw new ArgumentOutOfRangeException("energyToRemove", energyToRemove, "Must be above 0.");
+                throw new ArgumentOutOfRangeException(nameof(energyToRemove), energyToRemove, "Must be above 0.");
 
             this.Energy = (this.Energy > energyToRemove) ? this.Energy - energyToRemove : 0;
             }
@@ -141,38 +110,44 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Gets whether the object has any energy remaining
         /// </summary>
-        public virtual bool IsExtant
-            {
-            get
-                {
-                return this.Energy > 0;
-                }
-            }
+        public virtual bool IsExtant => this.Energy > 0;
 
         /// <summary>
         /// Gets an indication of how solid the object is
         /// </summary>
-        public virtual ObjectSolidity Solidity
-            {
-            get
-                {
-                return ObjectSolidity.Stationary;
-                }
-            }
+        public virtual ObjectSolidity Solidity => ObjectSolidity.Stationary;
 
         /// <summary>
         /// Gets the order that objects are drawn in (lowest before highest)
         /// </summary>
         public abstract int DrawOrder { get; }
 
+        /// <summary>
+        /// Plays a sound which is centred on this instance
+        /// </summary>
+        /// <param name="gameSound">Sets which sound to play</param>
         public void PlaySound(GameSound gameSound)
             {
             GlobalServices.SoundPlayer.PlayForObject(gameSound, this, GlobalServices.CentrePointProvider);
             }
 
+        /// <summary>
+        /// Plays a sound which is centred on this instance and triggers a specified callback when the sound completes
+        /// </summary>
+        /// <param name="gameSound">Sets which sound to play</param>
+        /// <param name="callback">The routine to call when the sound finishes playing</param>
         protected void PlaySoundWithCallback(GameSound gameSound, EventHandler callback)
             {
             GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, this, GlobalServices.CentrePointProvider, callback);
+            }
+
+        private void SetBoundingRectangle(Vector2 position)
+            {
+            var r = Constants.TileRectangle;
+            var offsetX = (int) position.X - Constants.HalfTileLength;
+            var offsetY = (int) position.Y - Constants.HalfTileLength;
+            r.Offset(offsetX, offsetY);
+            this.BoundingRectangle = r;
             }
         }
     }

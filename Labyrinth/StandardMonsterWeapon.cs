@@ -13,7 +13,7 @@ namespace Labyrinth
             if (!DoesMonsterHaveClearShotAtPlayer(source.TilePosition, firingDirection))
                 return;
 
-            var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * (Constants.CentreOfTile);
+            var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * Constants.CentreOfTile;
             GlobalServices.GameState.AddStandardShot(startPos, firingDirection, source.Energy >> 2, ShotType.Monster);
             source.PlaySound(GameSound.MonsterShoots);
             }

@@ -5,8 +5,9 @@ namespace Labyrinth.Services.WorldBuilding
     {
     class DiceRoll
         {
-        private readonly int _numberOfDice;
-        private readonly int _numberOfSides;
+        public int NumberOfDice { get; }
+
+        public int NumberOfSides { get; }
 
         public DiceRoll(string diceRoll)
             {
@@ -16,18 +17,8 @@ namespace Labyrinth.Services.WorldBuilding
             if (!match.Success)
                 throw new FormatException("Parameter must be in form <nuberofdice>D<numberofsides>, e.g. 4D6.");
 
-            this._numberOfDice = int.Parse(match.Groups["numberOfDice"].Value);
-            this._numberOfSides = int.Parse(match.Groups["numberOfSides"].Value);
-            }
-
-        public int NumberOfDice
-            {
-            get { return this._numberOfDice; }
-            }
-
-        public int NumberOfSides
-            {
-            get { return this._numberOfSides; }
+            this.NumberOfDice = int.Parse(match.Groups["numberOfDice"].Value);
+            this.NumberOfSides = int.Parse(match.Groups["numberOfSides"].Value);
             }
         }
     }

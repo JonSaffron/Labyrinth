@@ -31,13 +31,9 @@ namespace Labyrinth
 
         public Game1([NotNull] IPlayerInput playerInput, [NotNull] IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
             {
-            if (playerInput == null)
-                throw new ArgumentNullException("playerInput");
-            if (worldLoader == null)
-                throw new ArgumentNullException("worldLoader");
-            this._playerInput = playerInput;
+            this._playerInput = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
             this._playerInput.GameInput = new GameInput(this);
-            this._worldLoader = worldLoader;
+            this._worldLoader = worldLoader ?? throw new ArgumentNullException(nameof(worldLoader));
             GlobalServices.SetSoundPlayer(soundPlayer);
             GlobalServices.SetSpriteLibrary(spriteLibrary);
             GlobalServices.SetServiceProvider(this.Services);
@@ -104,10 +100,11 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Update</param>
         protected override void Update(GameTime gameTime)
             {
-            if (!this.IsActive && this.IsInteractive && this.World != null)
-                {
-                this.GameIsPaused = true;
-                }
+            // todo this should be covered by the OnDeactivate event handler
+            //if (!this.IsActive && this.IsInteractive && this.World != null)
+            //    {
+            //    this.GameIsPaused = true;
+            //    }
 
             if (this.World == null)
                 {
@@ -180,9 +177,9 @@ namespace Labyrinth
             else if (changeToVolume > 0)
                 GlobalServices.SoundPlayer.TurnUpTheVolume();
 
-            if (gameInput.HasMoveToNextLevelBeenTriggered && this.World != null)
+            if (gameInput.HasMoveToNextLevelBeenTriggered)
                 {
-                this.World.MoveUpALevel();
+                World?.MoveUpALevel();
                 }
             }
 
@@ -232,6 +229,7 @@ namespace Labyrinth
             return result;
             }
 
+        /// <inheritdoc />
         protected override void OnDeactivated(object sender, EventArgs args)
             {
             base.OnDeactivated(sender, args);

@@ -15,7 +15,7 @@ namespace Labyrinth
         public void Fire(StaticItem source, FiringState firingState, Direction direction)
             {
             if (direction == Direction.None)
-                throw new ArgumentOutOfRangeException("direction");
+                throw new ArgumentOutOfRangeException(nameof(direction));
 
             if (firingState != FiringState.Pulse || source.Energy < 4)
                 return;
@@ -26,8 +26,8 @@ namespace Labyrinth
                 shot.InstantlyExpire();
                 return;
                 }
-            startPos += direction.ToVector() * (Constants.CentreOfTile);
-            shot.SetPosition(startPos);
+            startPos += direction.ToVector() * Constants.CentreOfTile;
+            shot.ResetPosition(startPos);
 
             source.PlaySound(GameSound.PlayerShoots);
             _countOfShotsBeforeCostingEnergy--;
