@@ -230,25 +230,12 @@ namespace Labyrinth
             }
 
         [CanBeNull]
-        private IInteraction BuildInteraction(StaticItem thisGameItem, StaticItem thatGameItem)
+        private IInteraction BuildInteraction(MovingItem thisGameItem, StaticItem thatGameItem)
             {
-            var items = new[] { thisGameItem, thatGameItem };
-            var staticItem = items.FirstOrDefault(item => !(item is MovingItem));
-            if (staticItem == null)
-                {
-                IInteraction result = new InteractionWithMovingItems((MovingItem) thisGameItem, (MovingItem) thatGameItem);
-                return result;
-                }
-            
-            var otherItem = items.Single(item => item != staticItem);
-            var movingItem = otherItem as MovingItem;
-            if (otherItem is MovingItem)
-                {
-                IInteraction result = new InteractionWithStaticItems(this, staticItem, movingItem);
-                return result;
-                }
-
-            return null;
+            var result = thatGameItem is MovingItem secondMovingItem
+                ? (IInteraction) new InteractionWithMovingItems(thisGameItem, secondMovingItem)
+                : new InteractionWithStaticItems(this, thatGameItem, thisGameItem);
+            return result;
             }
 
         /// <summary>
