@@ -4,6 +4,7 @@ namespace Labyrinth
     {
     class MonsterMovementFactory : IMonsterMovementFactory
         {
+        // These can be single instance movement classes because they don't maintain any state
         private IMonsterMovement _fullPursuit;
         private IMonsterMovement _cautiousPursuit;
         private IMonsterMovement _semiAggressive;

@@ -1,20 +1,19 @@
-﻿using Microsoft.Xna.Framework;
-
-namespace Labyrinth.GameObjects.Movement
+﻿namespace Labyrinth.GameObjects.Movement
     {
-    // todo: this should not inherit from standardpatrolling
-
-    class StandardRolling : StandardPatrolling
+    class StandardRolling : IMonsterMovement
         {
-        public StandardRolling(Direction initialDirection) : base(initialDirection)
-            {
-            }
+        protected Direction CurrentDirection;
 
         public StandardRolling()
             {
             }
 
-        public override Direction DetermineDirection(Monster monster)
+        public StandardRolling(Direction initialDirection)
+            {
+            this.CurrentDirection = initialDirection;
+            }
+
+        public virtual Direction DetermineDirection(Monster monster)
             {
             var intendedDirection = GetIntendedDirection(monster);
             var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
@@ -26,17 +25,9 @@ namespace Labyrinth.GameObjects.Movement
             {
             if (this.CurrentDirection == Direction.None)
                 this.CurrentDirection = MonsterMovement.RandomDirection();
-            bool changeDirection = GlobalServices.Randomess.Test(7);
-            var result = changeDirection ? MonsterMovement.AlterDirection(this.CurrentDirection) : this.GetIntendedDirectionForPatrol(monster);
-            return result;
-            }
 
-        protected static bool IsPlayerInSight(Monster monster)
-            {
-            if (!GlobalServices.GameState.Player.IsAlive())
-                return false;
-            var distance = Vector2.Distance(monster.Position, GlobalServices.GameState.Player.Position) / Constants.TileLength;
-            var result = distance <= 20;
+            bool changeDirection = GlobalServices.Randomess.Test(7);
+            var result = changeDirection ? MonsterMovement.AlterDirection(this.CurrentDirection) : MonsterMovement.ContinueOrReverseWithinRoom(monster, this.CurrentDirection);
             return result;
             }
         }

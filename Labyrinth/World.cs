@@ -26,7 +26,6 @@ namespace Labyrinth
 
         [NotNull] private readonly Tile[,] _tiles;
         [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
-        [NotNull] private readonly List<StaticItem>[] _itemsToDrawByZOrder;
 
         public Vector2 WindowPosition { get; private set; }
 
@@ -40,10 +39,6 @@ namespace Labyrinth
             worldLoader.GetGameObjects(gameState);
             this.Player = gameState.Player;
             GlobalServices.SetGameState(gameState);
-
-            this._itemsToDrawByZOrder = new List<StaticItem>[10];
-            for (int i = 0; i < this._itemsToDrawByZOrder.GetLength(0); i++)
-                this._itemsToDrawByZOrder[i] = new List<StaticItem>();
             }
 
         public void ResetLevelAfterLosingLife(ISpriteBatch spw)
@@ -117,7 +112,7 @@ namespace Labyrinth
                 RepelLocation = Player.TilePosition,
                 CanBeOccupied = tp => !GlobalServices.GameState.IsImpassableItemOnTile(tp),
                 MaximumLengthOfPath = 24,
-                MinimumDistanceToMoveAway = 12
+                MinimumDistanceToMoveAway = 16
                 };
             var repeller = new RepelObject(repelParameters);
             var result = repeller.TryFindPath(out var path);
@@ -298,17 +293,16 @@ namespace Labyrinth
             DrawFloorTiles(spriteBatch, tileRect);
             
             var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(tileRect);
+            var drawQueue = new PriorityQueue<int, StaticItem>(100);
             foreach (var item in itemsToDraw)
                 {
-                int zOrder = item.DrawOrder;
-                this._itemsToDrawByZOrder[zOrder].Add(item);
+                drawQueue.Enqueue(item.DrawOrder, item);
                 }
 
-            foreach (var list in this._itemsToDrawByZOrder)
+            while (drawQueue.Count > 0)
                 {
-                foreach (var item in list)
-                    item.Draw(gameTime, spriteBatch);
-                list.Clear();
+                var item = drawQueue.Dequeue();
+                item.Draw(gameTime, spriteBatch);
                 }
             }
 

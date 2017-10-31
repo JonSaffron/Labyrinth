@@ -189,7 +189,7 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Draw</param>
         protected override void Draw(GameTime gameTime)
             {
-            GraphicsDevice.Clear(!gameTime.IsRunningSlowly ? Color.Black : Color.DarkRed);
+            GraphicsDevice.Clear(Color.Black);
 
             if (this.GameIsPaused)
                 gameTime = new GameTime();

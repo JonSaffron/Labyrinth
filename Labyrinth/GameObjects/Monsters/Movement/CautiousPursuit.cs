@@ -1,10 +1,8 @@
 ﻿namespace Labyrinth.GameObjects.Movement
     {
-    // todo: cautious pursuit should not inherit from FullPursuit
-
-    class CautiousPursuit : FullPursuit
+    class CautiousPursuit : IMonsterMovement
         {
-        public override Direction DetermineDirection(Monster monster)
+        public Direction DetermineDirection(Monster monster)
             {
             bool isScaredOfPlayer = IsScaredOfPlayer(monster);
             var result = isScaredOfPlayer ? MoveAwayFromPlayer(monster) : MoveTowardsPlayer(monster);
@@ -21,7 +19,7 @@
 
         private static Direction MoveAwayFromPlayer(Monster monster)
             {
-            var towardsPlayer = DetermineDirectionTowardsPlayer(monster);
+            var towardsPlayer = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
             bool alterDirection = GlobalServices.Randomess.Test(3);
             Direction result = alterDirection 
                 ?  MonsterMovement.AlterDirection(towardsPlayer) 
@@ -34,7 +32,7 @@
             bool alterDirection = GlobalServices.Randomess.Test(7);
             Direction result = alterDirection 
                 ? MonsterMovement.RandomDirection() 
-                : DetermineDirectionTowardsPlayer(monster);
+                : MonsterMovement.DetermineDirectionTowardsPlayer(monster);
             return result;
             }
         }

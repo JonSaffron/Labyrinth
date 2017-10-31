@@ -69,9 +69,6 @@ namespace Labyrinth.Services.Display
 
         public abstract void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin);
 
-        protected SpriteBatch SpriteBatch
-            {
-            get { return this._spriteBatch; }
-            }
+        protected SpriteBatch SpriteBatch => this._spriteBatch;
         }
     }

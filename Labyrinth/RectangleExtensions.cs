@@ -8,18 +8,16 @@ namespace Labyrinth
     /// </summary>
     public static class RectangleExtensions
         {
-        public static Rectangle NewRectangle(int x, int y, int right, int bottom)
-            {
-            return new Rectangle(x, y, right - x + 1, bottom - y + 1);
-            }
-        
         public static IEnumerable<TilePos> PointsInside(this Rectangle rect)
             {
-            var result = new List<TilePos>();
             for (int y = rect.Y; y < rect.Bottom; y++)
+                {
                 for (int x = rect.X; x < rect.Right; x++)
-                    result.Add(new TilePos(x, y));
-            return result;
+                    {
+                    var item = new TilePos(x, y);
+                    yield return item;
+                    }
+                }
             }
         
         public static bool ContainsTile(this Rectangle rect, TilePos tp)

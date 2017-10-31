@@ -2,13 +2,13 @@ using System;
 
 namespace Labyrinth.GameObjects.Movement
     {
-    // todo: this should not inherit from StandardRolling
-
     class KillerCubeRedMovement : StandardRolling
         {
+        //private Direction CurrentDirection;
+
         public override Direction DetermineDirection(Monster monster)
             {
-            if (!IsPlayerInSight(monster) || this.CurrentDirection == Direction.None)
+            if (!MonsterMovement.IsPlayerInSight(monster) || this.CurrentDirection == Direction.None)
                 return base.DetermineDirection(monster);
 
             var intendedDirection = GetIntendedDirection(monster);
@@ -58,7 +58,7 @@ namespace Labyrinth.GameObjects.Movement
                 return GlobalServices.Randomess.Next(2) == 0 ? Direction.Up : Direction.Down;
             if (currentDirection.IsVertical())
                 return GlobalServices.Randomess.Next(2) == 0 ? Direction.Left : Direction.Right;
-            throw new ArgumentOutOfRangeException("currentDirection");
+            throw new ArgumentOutOfRangeException(nameof(currentDirection));
             }
         }
     }

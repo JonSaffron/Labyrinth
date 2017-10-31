@@ -13,7 +13,17 @@ namespace Labyrinth.Services.PathFinder
     // ReSharper disable once InconsistentNaming
     public class PriorityQueue<P, T> where P: IComparable<P>
         {
-        private readonly List<KeyValuePair<P, T>> _data = new List<KeyValuePair<P, T>>();
+        private readonly List<KeyValuePair<P, T>> _data;
+
+        public PriorityQueue()
+            {
+            this._data = new List<KeyValuePair<P, T>>();
+            }
+
+        public PriorityQueue(int initialCapacity)
+            {
+            this._data = new List<KeyValuePair<P, T>>(initialCapacity);
+            }
 
         public void Enqueue(P priority, T item)
             {
@@ -74,10 +84,7 @@ namespace Labyrinth.Services.PathFinder
                 }
             }
 
-        public int Count
-            {
-            get { return _data.Count; }
-            }
+        public int Count => _data.Count;
 
         public override string ToString()
             {

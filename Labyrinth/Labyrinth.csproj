@@ -231,7 +231,7 @@
     <Compile Include="TileRect.cs" />
     <Compile Include="World.cs" />
     <Compile Include="GameObjects\Monsters\Monster.cs" />
-    <Compile Include="GameObjects\Monsters\MonsterMovement.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\MonsterMovement.cs" />
     <Compile Include="GameObjects\Monsters\TigerMoth.cs" />
     <Compile Include="GameObjects\MovingItem.cs" />
     <Compile Include="GameObjects\Mushroom.cs" />

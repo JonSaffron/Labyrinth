@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -276,7 +277,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInSight(this))
+            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
                 {
                 this._weapon.FireIfYouLike(this);
                 }

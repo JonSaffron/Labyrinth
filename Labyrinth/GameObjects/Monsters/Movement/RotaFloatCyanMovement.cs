@@ -1,12 +1,12 @@
 namespace Labyrinth.GameObjects.Movement
     {
-    // todo: this should not inherit from StandardRolling
-
     class RotaFloatCyanMovement : StandardRolling
         {
+        //private Direction CurrentDirection;
+
         public override Direction DetermineDirection(Monster monster)
             {
-            if (!IsPlayerInSight(monster) || this.CurrentDirection == Direction.None || !ShouldMakeAnAggressiveMove())
+            if (!MonsterMovement.IsPlayerInSight(monster) || this.CurrentDirection == Direction.None || !ShouldMakeAnAggressiveMove())
                 return base.DetermineDirection(monster);
 
             var intendedDirection = GetIntendedDirection(monster);
