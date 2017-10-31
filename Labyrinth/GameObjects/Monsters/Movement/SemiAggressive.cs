@@ -4,13 +4,21 @@
         {
         public Direction DetermineDirection(Monster monster)
             {
-            bool makeAggressiveMove = GlobalServices.Randomess.Test(1);
-            if (monster.ChangeRooms != ChangeRooms.FollowsPlayer)
-                makeAggressiveMove &= MonsterMovement.IsPlayerInSameRoomAsMonster(monster);
-            var shouldFollowPlayer = makeAggressiveMove && MonsterMovement.IsPlayerInSight(monster);
-            var result = shouldFollowPlayer ? MonsterMovement.DetermineDirectionTowardsPlayer(monster) : MonsterMovement.RandomDirection();
-            result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
+            var intendedDirection = 
+                ShouldMakeAnAggressiveMove(monster) 
+                    ? MonsterMovement.DetermineDirectionTowardsPlayer(monster) 
+                    : MonsterMovement.RandomDirection();
+            
+            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             return result;
             }
+
+        private static bool ShouldMakeAnAggressiveMove(Monster monster)
+            {
+            bool result = GlobalServices.Randomess.Test(1) && MonsterMovement.IsPlayerNearby(monster);
+            if (monster.ChangeRooms != ChangeRooms.FollowsPlayer && !MonsterMovement.IsPlayerInSameRoomAsMonster(monster))
+                result = false;
+            return result;
+            }   
         }
     }

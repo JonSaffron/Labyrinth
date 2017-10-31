@@ -55,7 +55,7 @@ namespace Labyrinth.GameObjects.Movement
             return result;
             }
 
-        public static bool IsPlayerInSight(Monster monster)
+        public static bool IsPlayerNearby(Monster monster)
             {
             if (!GlobalServices.GameState.Player.IsAlive())
                 return false;
@@ -83,6 +83,9 @@ namespace Labyrinth.GameObjects.Movement
 
         public static Direction UpdateDirectionWhereMovementBlocked(Monster m, Direction intendedDirection)
             {
+            if (intendedDirection == Direction.None)
+                intendedDirection = RandomDirection();
+
             TilePos tp = m.TilePosition;
             for (int i = 0; i < 3; i++, intendedDirection = GetNextDirection(intendedDirection))
                 {

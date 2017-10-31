@@ -185,6 +185,7 @@ namespace Labyrinth.GameObjects
 
             if (this._determineDirection == null)
                 throw new InvalidOperationException("Determine Direction object reference not set.");
+            
             Direction d = this._determineDirection.DetermineDirection(this);
 
             if (d == Direction.None)

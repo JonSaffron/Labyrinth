@@ -4,9 +4,12 @@
         {
         public Direction DetermineDirection(Monster monster)
             {
-            bool isScaredOfPlayer = IsScaredOfPlayer(monster);
-            var result = isScaredOfPlayer ? MoveAwayFromPlayer(monster) : MoveTowardsPlayer(monster);
-            result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
+            var intendedDirection = 
+                IsScaredOfPlayer(monster) 
+                    ? MoveAwayFromPlayer(monster) 
+                    : MoveTowardsPlayer(monster);
+
+            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             return result;
             }
 

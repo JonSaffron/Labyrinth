@@ -1,23 +1,20 @@
-using System;
-
 namespace Labyrinth.GameObjects.Movement
     {
     class KillerCubeRedMovement : StandardRolling
         {
-        //private Direction CurrentDirection;
-
         public override Direction DetermineDirection(Monster monster)
             {
-            if (!MonsterMovement.IsPlayerInSight(monster) || this.CurrentDirection == Direction.None)
-                return base.DetermineDirection(monster);
+            var intendedDirection = 
+                ShouldMakeAnAggressiveMove(monster)
+                    ? GetIntendedDirection(monster)
+                    : base.DetermineDirection(monster);
 
-            var intendedDirection = GetIntendedDirection(monster);
             var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             this.CurrentDirection = result;
             return result;
             }
 
-        private Direction GetIntendedDirection(Monster monster)
+        private new Direction GetIntendedDirection(Monster monster)
             {
             TilePos tp = monster.TilePosition;
                 
@@ -27,7 +24,7 @@ namespace Labyrinth.GameObjects.Movement
             int xDiff = tp.X - playerPosition.X;    // +ve and the player is to the left, -ve and the player is to the right
                 
             // if on the same row or column as the player then will be at risk of being shot
-            if ((xDiff == 0 || yDiff == 0) && ShouldMakeMove())
+            if ((xDiff == 0 || yDiff == 0) && ShouldMakeMoveToAvoidTrouble())
                 newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
             else if ((this.CurrentDirection == Direction.Left && xDiff <= -5) || (this.CurrentDirection == Direction.Right && xDiff >= 5))
                 {
@@ -47,7 +44,7 @@ namespace Labyrinth.GameObjects.Movement
             return newDirection;
             }
 
-        private static bool ShouldMakeMove()
+        private static bool ShouldMakeMoveToAvoidTrouble()
             {
             return GlobalServices.Randomess.Next(8) == 0; 
             }
@@ -58,7 +55,13 @@ namespace Labyrinth.GameObjects.Movement
                 return GlobalServices.Randomess.Next(2) == 0 ? Direction.Up : Direction.Down;
             if (currentDirection.IsVertical())
                 return GlobalServices.Randomess.Next(2) == 0 ? Direction.Left : Direction.Right;
-            throw new ArgumentOutOfRangeException(nameof(currentDirection));
+            return MonsterMovement.RandomDirection();
+            }
+
+        private static bool ShouldMakeAnAggressiveMove(Monster monster)
+            {
+            var result = MonsterMovement.IsPlayerNearby(monster);
+            return result;
             }
         }
     }

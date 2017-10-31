@@ -20,6 +20,7 @@ namespace Labyrinth.GameObjects.Movement
                 this._currentDirection = this._initialPatrollingDirection;
 
             var intendedDirection = MonsterMovement.ContinueOrReverseWithinRoom(monster, this._currentDirection);
+            
             var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             this._currentDirection = result;
             return result;

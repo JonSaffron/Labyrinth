@@ -16,12 +16,13 @@
         public virtual Direction DetermineDirection(Monster monster)
             {
             var intendedDirection = GetIntendedDirection(monster);
+
             var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             this.CurrentDirection = result;
             return result;
             }
 
-        private Direction GetIntendedDirection(Monster monster)
+        protected Direction GetIntendedDirection(Monster monster)
             {
             if (this.CurrentDirection == Direction.None)
                 this.CurrentDirection = MonsterMovement.RandomDirection();

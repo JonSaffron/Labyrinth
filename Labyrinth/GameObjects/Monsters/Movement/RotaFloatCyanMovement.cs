@@ -2,20 +2,19 @@ namespace Labyrinth.GameObjects.Movement
     {
     class RotaFloatCyanMovement : StandardRolling
         {
-        //private Direction CurrentDirection;
-
         public override Direction DetermineDirection(Monster monster)
             {
-            if (!MonsterMovement.IsPlayerInSight(monster) || this.CurrentDirection == Direction.None || !ShouldMakeAnAggressiveMove())
-                return base.DetermineDirection(monster);
+            var intendedDirection = 
+                ShouldMakeAnAggressiveMove(monster) 
+                    ? GetIntendedDirection(monster) 
+                    : base.GetIntendedDirection(monster);
 
-            var intendedDirection = GetIntendedDirection(monster);
             var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             this.CurrentDirection = result;
             return result;
             }
 
-        private Direction GetIntendedDirection(Monster monster)
+        private new Direction GetIntendedDirection(Monster monster)
             {
             TilePos tp = monster.TilePosition;
             TilePos playerPosition = GlobalServices.GameState.Player.TilePosition;
@@ -41,9 +40,10 @@ namespace Labyrinth.GameObjects.Movement
             return newDirection;
             }
 
-        private static bool ShouldMakeAnAggressiveMove()
+        private static bool ShouldMakeAnAggressiveMove(Monster monster)
             {
-            return GlobalServices.Randomess.Next(7) == 0; 
+            var result = GlobalServices.Randomess.Next(7) == 0 && MonsterMovement.IsPlayerNearby(monster);
+            return result;
             }
         }
     }

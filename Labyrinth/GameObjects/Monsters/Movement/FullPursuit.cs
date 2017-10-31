@@ -2,18 +2,18 @@ namespace Labyrinth.GameObjects.Movement
     {
     class FullPursuit : IMonsterMovement
         {
-        public virtual Direction DetermineDirection(Monster monster)
+        public Direction DetermineDirection(Monster monster)
             {
-            Direction result = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
-            result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
-            if (result == Direction.None)
-                return result;
+            Direction intendedDirection = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
+            var alternativeDirectionWhenBlocked = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
+            if (alternativeDirectionWhenBlocked == Direction.None || alternativeDirectionWhenBlocked != intendedDirection)
+                return alternativeDirectionWhenBlocked;
 
-            TilePos potentiallyMovingTowards = monster.TilePosition.GetPositionAfterOneMove(result);
+            TilePos potentiallyMovingTowards = monster.TilePosition.GetPositionAfterOneMove(intendedDirection);
             if (potentiallyMovingTowards == GlobalServices.GameState.Player.TilePosition)
-                result = MonsterMovement.AlterDirection(result);
+                intendedDirection = MonsterMovement.AlterDirection(intendedDirection);
 
-            result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, result);
+            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             return result;
             }
         }
