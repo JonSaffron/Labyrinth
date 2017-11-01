@@ -48,6 +48,15 @@ current monster data 400 to 7bf
 08d9			-- countdown timer before decrementing player energy
 
 08e0-08ef		-- sprites to use for wall and floor per level
+					Level	Wall		Floor
+					1		1A			18
+					2		1A			15
+					3		16			15
+					4L		17			19
+					4U		17			19
+					5		1C			1B
+					6		1E			1D
+					7		1F			19
 
 900 to AFF		-- code
 
