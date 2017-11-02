@@ -33,7 +33,7 @@ namespace Labyrinth.GameObjects
         private readonly Animation _eggAnimation;
         private readonly Animation _hatchingAnimation;
 
-        protected readonly int OriginalEnergy;
+        public readonly int OriginalEnergy;
 
         private double _stepTime;
         private bool _laysEggs;

@@ -298,7 +298,7 @@ namespace Labyrinth
                 {
                 drawQueue.Enqueue(item.DrawOrder, item);
                 }
-
+            Trace.WriteLine("Drawing " + drawQueue.Count + " sprites.");
             while (drawQueue.Count > 0)
                 {
                 var item = drawQueue.Dequeue();

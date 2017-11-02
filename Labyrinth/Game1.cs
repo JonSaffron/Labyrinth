@@ -19,7 +19,6 @@ namespace Labyrinth
         private readonly GraphicsDeviceManager _gdm;
         private readonly IWorldLoader _worldLoader;
 
-        private int _displayedScore;
         private int _lives;
 
         private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
@@ -50,8 +49,8 @@ namespace Labyrinth
             this.Content.RootDirectory = "Content";
             //this.TargetElapsedTime = new TimeSpan(this.TargetElapsedTime.Ticks * 4);
             this._lives = 2;
+            this._headsUpDisplay.Reset();
             this._scoreKeeper.Reset();
-            this._displayedScore = 0;
             }
 
         /// <summary>
@@ -148,9 +147,6 @@ namespace Labyrinth
                 string text = string.Format("{0}: Running slowly", gameTime.TotalGameTime);
                 System.Diagnostics.Trace.WriteLine(text);
                 }
-
-            if (this._displayedScore < this._scoreKeeper.CurrentScore)
-                this._displayedScore++;
             }
 
         private void ProcessGameInput()
@@ -199,7 +195,7 @@ namespace Labyrinth
             if (this.World != null)
                 {
                 this.World.Draw(gameTime, _spriteBatch);
-                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._displayedScore, this._lives, gameTime.IsRunningSlowly);
+                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._scoreKeeper.CurrentScore, this._lives, gameTime.IsRunningSlowly);
                 if (this.GameIsPaused)
                     this._headsUpDisplay.DrawPausedMessage(_spriteBatch);
                 }

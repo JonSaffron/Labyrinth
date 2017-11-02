@@ -134,11 +134,31 @@ bdc				-- delay until game's main loop ends
 0f00 to 0f7f	-- type of object (12 wall, 20 free tile, 5a apple, 13 block)
 0f80 to 0fff	-- energy of static object
 
-1890			-- start of array of byte data structures
+1890			-- start of array of data structure that describes how to animate the monsters
 	offset 0	-- index of animation (goes to 0c09, x)
 	offset 1	-- frames in animation (goes to 0c0a, x)
 	offset 2	-- &FF where on alternate frames the monster will move at double speed (0c07, x)
 	offset 3	-- time to show each animation frame (0c0b, x)
+
+No.	Base 	Total	Flitter	Time/	Name				Index
+    Index	Frames	Flag	frame						Decimal
+0	2A		2		No		3		ForceField			42
+1	2C		2		No		3		thresher brown		44
+2	2E		2		No		4		thresher cyan		46
+3	30		3		No		2		rotafloater brown	48
+4	3D		3		Yes		2		rotafloater cyan	61
+5	33		2		No		3		killercube green	51
+6	35		2		Yes		4		flitterbug red		53
+7	37		2		Yes		4		flitterbug cyan		55
+8	39		2		No		3		killercube red		57
+9	3B		2		Yes		4		diamond demon		59
+10	44		2		Yes		4		flitterbug brown	68
+11	46		2		No		4		tiger moth			70
+12	48		2		Yes		3		butterfly			72
+13	4A		2		Yes		4		joker				74
+14	42		2		No		3		crazy crawler		66
+15	40		2		No		3		deathcube			64
+
 
 18d0 - 18df		-- start of table with 6845 register adjustments (works backwards)
 				R0 Nht	81	Horizontal total register (normally 3f) total display + non-displayed character time units minus 1
@@ -199,7 +219,7 @@ F: 26 02 64		cyan thresher,		cautious,		follows player, lays mushrooms,						100
 
 memory mapping as follows:
 Each sprite is 16 x 16 pixels and occupies 64 bytes
-The first sprite is located at:
+The first 16x16 sprite in the top-left corner is located at the following memory locations:
 5800	5808	5810	5818	5820	5828	5830	5838
 5801	5809	5811	5819	
 5802	580a	5812	581a
@@ -271,25 +291,6 @@ static object injured (b)
 17		-- bounce block (32 0B 11 00 FD)
 18		-- spawn new diamond demon 26 0F 31 2D 0D
 43		-- start new life (FF FE 0F 11 C8)
-
-No.	Base 	Total	Flitter	Time/	Name				Index
-    Index	Frames	Flag	frame						Decimal
-0	2A		2		No		3		ForceField			42
-1	2C		2		No		3		thresher brown		44
-2	2E		2		No		4		thresher cyan		46
-3	30		3		No		2		rotafloater brown	48
-4	3D		3		Yes		2		rotafloater cyan	61
-5	33		2		No		3		killercube green	51
-6	35		2		Yes		4		flitterbug red		53
-7	37		2		Yes		4		flitterbug cyan		55
-8	39		2		No		3		killercube red		57
-9	3B		2		Yes		4		diamond demon		59
-10	44		2		Yes		4		flitterbug brown	68
-11	46		2		No		4		tiger moth			70
-12	48		2		Yes		3		butterfly			72
-13	4A		2		Yes		4		joker				74
-14	42		2		No		3		crazy crawler		66
-15	40		2		No		3		deathcube			64
 
 
 		-- retrieve data about specified room into 0BA0 - 0BA5
@@ -5087,7 +5088,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 3058 29 40     AND #40                  -- extract bit 6 (does the monster shoot back, only after it's been shot)
 305A F0 08     BEQ 3064                 -- branch if it doesn't
 305C B9 C0 04  LDA 04C0,Y               -- get type of movement
-305F 09 80     ORA #80                  -- set bit 7 (monster shoots at player)
+305F 09 80     ORA #80                  -- set bit 7 (this enables the monster to shoot at the player)
 3061 99 C0 04  STA 04C0,Y               -- save new type of movement
 
 3064 B9 C0 04  LDA 04C0,Y               -- get type of movement

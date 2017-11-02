@@ -5,7 +5,8 @@ namespace Labyrinth
     internal interface IHeadsUpDisplay
         {
         void LoadContent(ContentManager contentManager);
-        void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, int score, int livesLeft, bool isRunningSlowly);
+        void Reset();
+        void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, decimal score, int livesLeft, bool isRunningSlowly);
         void DrawPausedMessage(ISpriteBatch spriteBatch);
         }
     }

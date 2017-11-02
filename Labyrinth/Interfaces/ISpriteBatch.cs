@@ -57,8 +57,19 @@ namespace Labyrinth
         /// <param name="colour">The colour to draw the rectangle in</param>
         void DrawRectangle(Rectangle r, Color colour);
 
+        /// <summary>
+        /// Draws text to the window
+        /// </summary>
+        /// <param name="font">The font to render the text in</param>
+        /// <param name="text">The text to draw</param>
+        /// <param name="pos">The position to draw the text at, relative to the origin</param>
+        /// <param name="color">The colour to draw the text in</param>
+        /// <param name="origin">The origin to calculate position relative to</param>
         void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin);
 
+        /// <summary>
+        /// The magnification applied to the display
+        /// </summary>
         float Zoom { get; }
         }
     }

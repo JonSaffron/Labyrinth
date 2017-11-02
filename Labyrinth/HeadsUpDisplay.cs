@@ -10,6 +10,8 @@ namespace Labyrinth
         private Texture2D _digits;
         private Texture2D _life;
         private SpriteFont _statusFont;
+        private decimal _displayedScore;
+        private int _displayedEnergy;
 
         public void LoadContent(ContentManager contentManager)
             {
@@ -18,14 +20,30 @@ namespace Labyrinth
             this._statusFont = contentManager.Load<SpriteFont>("Display/StatusFont");
             }
 
-        public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, int score, int livesLeft, bool isGameRunningSlowly)
+        public void Reset()
             {
+            this._displayedScore = 0;
+            this._displayedEnergy = 0;
+            }
+
+        public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, decimal score, int livesLeft, bool isGameRunningSlowly)
+            {
+            if (score != this._displayedScore)
+                {
+                double difference = (double) (score - this._displayedScore);
+                this._displayedScore += (int) Math.Ceiling(Math.Sqrt(difference));
+                }
+            if (playerEnergy > this._displayedEnergy)
+                {
+                this._displayedEnergy++;
+                }
+
             DrawEnergyRect(spriteBatch, isGameRunningSlowly);
             if (isPlayerExtant)
-                DrawEnergyBar(spriteBatch, playerEnergy);
+                DrawEnergyBar(spriteBatch, this._displayedEnergy);
 
             DrawScoreAndLivesRect(spriteBatch);
-            DrawScore(spriteBatch, score);
+            DrawScore(spriteBatch, this._displayedScore);
             DrawLives(spriteBatch, livesLeft);
             }
 
@@ -65,7 +83,7 @@ namespace Labyrinth
             spriteBatch.DrawRectangle(r, Color.Black);
             }
 
-        private void DrawScore(ISpriteBatch spriteBatch, int score)
+        private void DrawScore(ISpriteBatch spriteBatch, decimal score)
             {
             DrawValue(spriteBatch, score, 416, 8);
             }
@@ -79,17 +97,17 @@ namespace Labyrinth
                 }
             }
 
-        private void DrawValue(ISpriteBatch spriteBatch, int value, int right, int top)
+        private void DrawValue(ISpriteBatch spriteBatch, decimal value, int right, int top)
             {
             int i = 1;
             while (true)
                 {
-                int digit = value % 10;
+                int digit = (int) (value % 10m);
                 var source = new Rectangle(digit * 6, 0, 6, 16);
                 var destination = new Vector2(right - (i * 8), top);
                 spriteBatch.DrawTexture(this._digits, destination, source);
-                value = value / 10;
-                if (value == 0)
+                value = value / 10m;
+                if (value == 0m)
                     break;
                 i++;
                 }

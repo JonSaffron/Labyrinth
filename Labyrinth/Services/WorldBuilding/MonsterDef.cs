@@ -55,7 +55,7 @@ namespace Labyrinth.Services.WorldBuilding
                 {
                 Type = monster.GetType(),
                 Position = monster.Position,
-                Energy = monster.Energy,
+                Energy = monster.OriginalEnergy,
                 Mobility = monster.Mobility,
                 InitialDirection = monster.InitialDirection,
                 ChangeRooms = monster.ChangeRooms,

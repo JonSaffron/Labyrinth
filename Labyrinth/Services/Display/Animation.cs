@@ -12,44 +12,22 @@ namespace Labyrinth.Services.Display
     /// </remarks>
     public class Animation : IEquatable<Animation>
         {
-        private readonly string _textureName;
-        private readonly int _baseMovementsPerFrame;
-        private readonly bool _loopAnimation;
-
         /// <summary>
         /// The name of the texture to animate
         /// </summary>
-        public string TextureName
-            {
-            get
-                {
-                return this._textureName;
-                }
-            }
+        public string TextureName { get; }
 
         /// <summary>
         /// Returns the rate at which the animation moves to the next frame. 
         /// The higher the number, the longer the animation will remain on each frame.
         /// </summary>
-        public int BaseMovementsPerFrame
-            {
-            get
-                {
-                return this._baseMovementsPerFrame;
-                }
-            }
+        public int BaseMovementsPerFrame { get; }
 
         /// <summary>
         /// When the end of the animation is reached, should it
         /// continue playing from the beginning?
         /// </summary>
-        public bool LoopAnimation
-            {
-            get
-                {
-                return this._loopAnimation;
-                }
-            }
+        public bool LoopAnimation { get; }
 
         /// <summary>
         /// Constructs a new animation using a static image
@@ -69,7 +47,7 @@ namespace Labyrinth.Services.Display
         public static Animation LoopingAnimation(string textureName, int baseMovementsPerFrame)
             {
             if (baseMovementsPerFrame <= 0)
-                throw new ArgumentOutOfRangeException("baseMovementsPerFrame");
+                throw new ArgumentOutOfRangeException(nameof(baseMovementsPerFrame));
             var result = new Animation(textureName, baseMovementsPerFrame, true);
             return result;
             }
@@ -82,7 +60,7 @@ namespace Labyrinth.Services.Display
         public static Animation SingleRunAnimation(string textureName, int baseMovementsPerFrame)
             {
             if (baseMovementsPerFrame <= 0)
-                throw new ArgumentOutOfRangeException("baseMovementsPerFrame");
+                throw new ArgumentOutOfRangeException(nameof(baseMovementsPerFrame));
             var result = new Animation(textureName, baseMovementsPerFrame, false);
             return result;
             }
@@ -92,9 +70,9 @@ namespace Labyrinth.Services.Display
         /// </summary>        
         private Animation(string textureName, int baseMovementsPerFrame, bool loopAnimation)
             {
-            this._textureName = textureName;
-            this._baseMovementsPerFrame = baseMovementsPerFrame;
-            this._loopAnimation = loopAnimation;
+            this.TextureName = textureName;
+            this.BaseMovementsPerFrame = baseMovementsPerFrame;
+            this.LoopAnimation = loopAnimation;
             }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -60,56 +61,42 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private Action<GameTime> _advanceRoutine;
 
-        public AnimationPlayer(ISpriteLibrary spriteLibrary)
+        public AnimationPlayer([NotNull] ISpriteLibrary spriteLibrary)
             {
-            if (spriteLibrary == null)
-                throw new ArgumentNullException("spriteLibrary");
-            this._spriteLibrary = spriteLibrary;
+            this._spriteLibrary = spriteLibrary ?? throw new ArgumentNullException(nameof(spriteLibrary));
             }
 
         private void OnNewFrame(EventArgs e)
             {
-            var handler = NewFrame;
-
-            if (handler != null)
-                handler(this, e);
+            this.NewFrame?.Invoke(this, e);
             }
         
         private void OnAnimationFinished(EventArgs e)
             {
-            var handler = AnimationFinished;
-
-            if (handler != null)
-                handler(this, e);
+            this.AnimationFinished?.Invoke(this, e);
             }
         
 //todo this needs to be refactored - not all sprites will be tile sized.
         /// <summary>
         /// Returns the mid-point of animation
         /// </summary>
-        private static Vector2 Origin
-            {
-            get
-                {
-                return Constants.CentreOfTile;
-                }
-            }
+        private static Vector2 Origin => Constants.CentreOfTile;
 
         /// <summary>
         /// Begins or continues playback of an animation.
         /// </summary>
-        public void PlayAnimation(Animation animation)
+        public void PlayAnimation([NotNull] Animation animation)
             {
             if (animation == null)
-                throw new ArgumentNullException("animation");
+                throw new ArgumentNullException(nameof(animation));
 
             // If this animation is already running, do not restart it.
             if (animation.Equals(this._animation))
                 return;
 
             // Start the new animation.
-            this._texture = this._spriteLibrary.GetSprite(animation.TextureName);
             this._animation = animation;
+            this._texture = this._spriteLibrary.GetSprite(animation.TextureName);
             this._frameTime = animation.BaseMovementsPerFrame * Constants.BaseDistance / (double)Constants.BaseSpeed;
             this._frameIndex = 0;
             this.FrameCount = (_animation.BaseMovementsPerFrame == 0) ? 1 : (this._texture.Width / Constants.TileLength);
@@ -129,10 +116,7 @@ namespace Labyrinth.Services.Display
         /// </summary>
         public int FrameIndex
             {
-            get
-                {
-                return this._frameIndex;
-                }
+            get => this._frameIndex;
             set
                 {
                 if (value < 0 || value >= this.FrameCount)

@@ -67,8 +67,6 @@ namespace Labyrinth.Services.Display
 
         protected abstract void DrawTexture(Texture2D texture, Rectangle absolutePosition, Color colour);
 
-        public abstract void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin);
-
         protected SpriteBatch SpriteBatch => this._spriteBatch;
         }
     }
