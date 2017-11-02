@@ -114,7 +114,9 @@ bdc				-- delay until game's main loop ends
 	offset 3	-- position between tiles (between 0 and 3)
 	offset 4	-- direction (0 left, 1 right, 2 up, 3 down, 4 still)
 	offset 5	-- contents of tile being occupied
-	offset 6	-- index into above lists identifying monster, or for a shot: 2 indicates that it has rebounded
+	offset 6	-- when a monster, this is the monster id
+				   for a shot, this is 1 for a player shot, 2 for a player or monster rebound, or x0 for a monster shot (indicating the animation slot that spawned the shot)
+				   for the boulder, this is 3
 	offset 7	-- toggle flag with &FF indicating moving at double speed, 0 at normal speed
 	offset 8	-- not really used
 	offset 9	-- the base index of the animation to show
@@ -5030,7 +5032,7 @@ static object injured (b)
 2FF9 C9 01     CMP #01                  
 2FFB F0 09     BEQ 3006                 -- call scoring once for id 1 (shot)
 2FFD C9 03     CMP #03                  
-2FFF D0 0A     BNE 300B                 -- skip scoring if not 3
+2FFF D0 0A     BNE 300B                 -- skip scoring if not 3 (which indicates crushing by block)
 3001 68        PLA                      
 3002 48        PHA                      
 3003 20 9F 26  JSR 269F                 -- call scoring for block
