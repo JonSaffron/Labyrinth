@@ -53,12 +53,6 @@ namespace Labyrinth
         Error
         }
 
-    public enum ShotType
-        {
-        Player,
-        Monster
-        }
-
     public enum BangType
         {
         Short,
@@ -73,7 +67,14 @@ namespace Labyrinth
         Up,
         Down
         }
-    
+
+    public enum Orientation
+        {
+        Vertical,
+        Horizontal,
+        None
+        }
+
     /// <summary>
     /// Describes how solid an object is
     /// </summary>

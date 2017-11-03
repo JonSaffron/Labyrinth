@@ -6,13 +6,14 @@ namespace Labyrinth.Services.Display
     {
     public abstract class SpriteBatchBase : IDisposable
         {
-        private readonly SpriteBatch _spriteBatch;
         private readonly Texture2D _rectangleTexture;
         private Vector2 _windowPosition;
 
+        protected SpriteBatch SpriteBatch { get; }
+        
         protected SpriteBatchBase(GraphicsDevice graphicsDevice)
             {
-            this._spriteBatch = new SpriteBatch(graphicsDevice);
+            this.SpriteBatch = new SpriteBatch(graphicsDevice);
             this._rectangleTexture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
             this._rectangleTexture.SetData(new [] { Color.White });
             }
@@ -20,19 +21,19 @@ namespace Labyrinth.Services.Display
         public virtual void Begin(Vector2 windowPosition)
             {
             this._windowPosition = windowPosition;
-            this._spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            this.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             }
 
         public virtual void End()
             {
-            this._spriteBatch.End();
+            this.SpriteBatch.End();
             }
 
         public virtual void Dispose()
             {
-            if (!this._spriteBatch.IsDisposed)
+            if (!this.SpriteBatch.IsDisposed)
                 {
-                this._spriteBatch.Dispose();
+                this.SpriteBatch.Dispose();
                 }
             }
 
@@ -67,6 +68,5 @@ namespace Labyrinth.Services.Display
 
         protected abstract void DrawTexture(Texture2D texture, Rectangle absolutePosition, Color colour);
 
-        protected SpriteBatch SpriteBatch => this._spriteBatch;
         }
     }

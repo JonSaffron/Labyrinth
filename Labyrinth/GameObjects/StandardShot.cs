@@ -7,33 +7,27 @@ namespace Labyrinth.GameObjects
     {
     public class StandardShot : Shot
         {
-        // Movement
-        public ShotType ShotType { get; private set; }
+        public StaticItem Originator { get; }
         public bool HasRebounded { get; private set; }
-        public Direction DirectionOfTravel { get; private set; }
+        public Orientation Orientation { get; }
+        
+        private Direction _directionOfTravel;
 
         private double _timeToTravel;
         private readonly Dictionary<Direction, Rectangle> _boundingRectangles;
 
-        public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, ShotType shotType) : base(animationPlayer, position)
+        public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, StaticItem originator) : base(animationPlayer, position)
             {
+            if (d == Direction.None)
+                throw new ArgumentOutOfRangeException("d");
+
             this.Energy = energy;
-            this.ShotType = shotType;
-            this.DirectionOfTravel = d;
+            this.Originator = originator;
+            this._directionOfTravel = d;
+            this.Orientation = d.Orientation();
             SetDirectionAndDestination();
 
-            string textureName;
-            switch (this.ShotType)
-                {
-                case ShotType.Player:
-                    textureName = "Sprites/Shot/RedShot";
-                    break;
-                case ShotType.Monster: 
-                    textureName = "Sprites/Shot/GreenShot";
-                    break;
-                default:
-                    throw new InvalidOperationException();
-                }
+            string textureName = originator is Player ? "Sprites/Shot/RedShot" : "Sprites/Shot/GreenShot";
             var staticImage = Animation.StaticAnimation(textureName);
             Ap.PlayAnimation(staticImage);
             ResetTimeToTravel();
@@ -59,7 +53,7 @@ namespace Labyrinth.GameObjects
         private void ResetTimeToTravel()
             {
             decimal distanceToTravel;
-            switch (this.DirectionOfTravel)
+            switch (this._directionOfTravel)
                 {
                 case Direction.Left:
                 case Direction.Right:
@@ -84,7 +78,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                Rectangle result = this._boundingRectangles[this.DirectionOfTravel];
+                Rectangle result = this._boundingRectangles[this._directionOfTravel];
                 result.Offset((int) this.Position.X, (int) this.Position.Y);
                 return result;
                 }
@@ -126,7 +120,7 @@ namespace Labyrinth.GameObjects
 
         private void SetDirectionAndDestination()
             {
-            this.Move(this.DirectionOfTravel, this.StandardSpeed);
+            this.Move(this._directionOfTravel, this.StandardSpeed);
             }
 
         public void Reverse()
@@ -134,7 +128,7 @@ namespace Labyrinth.GameObjects
             if (this.HasRebounded)
                 throw new InvalidOperationException();
             
-            this.DirectionOfTravel = this.DirectionOfTravel.Reversed();
+            this._directionOfTravel = this._directionOfTravel.Reversed();
             this.PlaySound(GameSound.ShotBounces);
             this.HasRebounded = true;
             ResetTimeToTravel();

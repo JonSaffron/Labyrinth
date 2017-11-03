@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth
@@ -17,6 +16,7 @@ namespace Labyrinth
         private int _maxWidth;
         private int _maxHeight;
 
+        /// <inheritdoc />
         public int CountOfShots { get; private set; }
 
         /// <summary>
@@ -28,11 +28,8 @@ namespace Labyrinth
             this._interactiveGameItems = new LinkedList<MovingItem>();
             }
 
-        /// <summary>
-        /// Adds a single item to the collection
-        /// </summary>
-        /// <param name="gameObject">Specifies the item to add</param>
-        public void Add([NotNull] StaticItem gameObject)
+        /// <inheritdoc />
+        public void Add(StaticItem gameObject)
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
@@ -47,7 +44,8 @@ namespace Labyrinth
                 this.CountOfShots++;
             }
 
-        public void Remove([NotNull] StaticItem gameObject)
+        /// <inheritdoc />
+        public void Remove(StaticItem gameObject)
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
@@ -98,6 +96,7 @@ namespace Labyrinth
             Array.Resize(ref this._allGameItems, maxMortonCode + 1);
             }
 
+        /// <inheritdoc />
         public IEnumerable<MovingItem> InteractiveGameItems
             {
             get
@@ -108,6 +107,7 @@ namespace Labyrinth
                 }
             }
 
+        /// <inheritdoc />
         public IEnumerable<StaticItem> ItemsAtPosition(TilePos tp)
             {
             if (tp.X < 0 || tp.Y < 0)
@@ -119,6 +119,7 @@ namespace Labyrinth
             return result;
             }
 
+        /// <inheritdoc />
         public IEnumerable<StaticItem> DistinctItems()
             {
             var set = new HashSet<StaticItem>();
@@ -131,12 +132,9 @@ namespace Labyrinth
                         yield return item;
                     }
                 }
-            } 
+            }
 
-        /// <summary>
-        /// Allows the collection to update its knowledge of where the specified game object is located
-        /// </summary>
-        /// <param name="item">The game object whose position has changed</param>
+        /// <inheritdoc />
         public void UpdatePosition(MovingItem item)
             {
             if (item == null)

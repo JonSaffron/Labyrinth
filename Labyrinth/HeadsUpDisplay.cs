@@ -113,9 +113,10 @@ namespace Labyrinth
                 }
             }
 
+        // todo this shouldn't need to know anything about zoom
         public void DrawPausedMessage(ISpriteBatch spriteBatch)
             {
-            const string paused = "P A U S E D";
+            const string paused = "> P A U S E D <";
             Vector2 size = this._statusFont.MeasureString(paused) * spriteBatch.Zoom;
             Vector2 origin = Vector2.Zero;
             Vector2 pos = new Vector2(Constants.RoomSizeInPixels.X * spriteBatch.Zoom / 2f - size.X / 2f, 200);

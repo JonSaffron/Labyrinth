@@ -4852,13 +4852,13 @@ static object injured (b)
 		-- possibly rebound shot
 
 2EC3 BD 06 0C  LDA 0C06,X               -- get shot id
-2EC6 C9 02     CMP #02                  -- is it a rebound?
+2EC6 C9 02     CMP #02                  -- has it already rebounded?
 2EC8 F0 F8     BEQ 2EC2                 -- RTS if so
 2ECA BD 04 0C  LDA 0C04,X               -- get the direction of travel
 2ECD 49 01     EOR #01                  -- reverse direction
 2ECF 9D 04 0C  STA 0C04,X               -- store new direction
 2ED2 A9 02     LDA #02                  
-2ED4 9D 06 0C  STA 0C06,X               -- set shot to be a rebound
+2ED4 9D 06 0C  STA 0C06,X               -- mark shot as a rebound
 2ED7 A9 03     LDA #03                  
 2ED9 9D 03 0C  STA 0C03,X               -- set position between tiles
 2EDC 4C D6 2D  JMP 2DD6                 -- play shot bounce sound
@@ -4960,11 +4960,15 @@ static object injured (b)
 2F7D A4 84     LDY 84                   
 2F7F B9 06 0C  LDA 0C06,Y               -- get monster id
 2F82 A8        TAY                      
-2F83 20 12 30  JSR 3012                 -- hit and possibly kill monster
+2F83 20 12 30  JSR 3012                 -- hit and possibly kill monster, 
+										-- A will be 0 if monster died, 1 if monster died and spawned, and FF if it survived
+
 2F86 30 16     BMI 2F9E                 -- branch if it's still alive
 2F88 D0 05     BNE 2F8F                 -- branch if it died and split
 2F8A A4 84     LDY 84                   -- standard death
 2F8C 4C 5B 2F  JMP 2F5B                 -- set up long bang
+
+		-- spawn two diamond demons
 
 2F8F A4 89     LDY 89                   
 2F91 20 65 29  JSR 2965                 -- add newly spawned diamond demon to room
@@ -4972,6 +4976,8 @@ static object injured (b)
 2F96 20 65 29  JSR 2965                 -- add newly spawned diamond demon to room
 2F99 A4 84     LDY 84                   
 2F9B 4C 5B 2F  JMP 2F5B                 -- set up long bang
+
+		-- continue dealing survival of monster
 
 2F9E A4 74     LDY 74                   
 2FA0 B9 40 06  LDA 0640,Y               -- get energy from cache
@@ -5035,10 +5041,10 @@ static object injured (b)
 2FFF D0 0A     BNE 300B                 -- skip scoring if not 3 (which indicates crushing by block)
 3001 68        PLA                      
 3002 48        PHA                      
-3003 20 9F 26  JSR 269F                 -- call scoring for block
+3003 20 9F 26  JSR 269F                 -- call scoring once for block
 3006 68        PLA                      
 3007 48        PHA                      
-3008 20 9F 26  JSR 269F                 -- call scoring
+3008 20 9F 26  JSR 269F                 -- call scoring for the second time for block, for the first time for a shot
 300B 68        PLA                      
 300C 68        PLA                      
 300D A8        TAY                      
@@ -5047,7 +5053,8 @@ static object injured (b)
 3010 38        SEC                      
 3011 60        RTS                      
 
-		-- hit and injure/kill monster
+		-- hit and injure/kill monster subroutine
+		-- returns 0 if monster died, 1 if monster died and spawned, and FF if it survived
 
 3012 A9 0B     LDA #0B                  
 3014 20 D6 2D  JSR 2DD6                 -- play high pip

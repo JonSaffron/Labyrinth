@@ -22,7 +22,7 @@ namespace Labyrinth.GameObjects
             }
         
         /// <summary>
-        /// Gets or sets the position of the object
+        /// Gets or sets the position of the object's centre
         /// </summary>
         public Vector2 Position
             {

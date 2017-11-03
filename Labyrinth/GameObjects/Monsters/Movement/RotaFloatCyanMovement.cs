@@ -21,23 +21,23 @@ namespace Labyrinth.GameObjects.Movement
             int yDiff = tp.Y - playerPosition.Y;    // +ve and the monster is below, -ve and the monster is above
             int xDiff = tp.X - playerPosition.X;    // +ve and the monster is to the right, -ve and the monster is to the left
 
-            Direction newDirection = this.CurrentDirection;
-            if (this.CurrentDirection.IsHorizontal())
+            var orientation = this.CurrentDirection.Orientation();
+            if (orientation == Orientation.Horizontal)
                 {
                 if (yDiff > 0)
-                    newDirection = Direction.Up;
-                else if (yDiff < 0)
-                    newDirection = Direction.Down;
+                    return Direction.Up;
+                if (yDiff < 0)
+                    return Direction.Down;
                 }
-            else if (this.CurrentDirection.IsVertical())
+            else if (orientation == Orientation.Vertical)
                 {
                 if (xDiff > 0)
-                    newDirection = Direction.Left;
-                else if (xDiff < 0)
-                    newDirection = Direction.Right;
+                    return Direction.Left;
+                if (xDiff < 0)
+                    return Direction.Right;
                 }
 
-            return newDirection;
+            return MonsterMovement.RandomDirection();
             }
 
         private static bool ShouldMakeAnAggressiveMove(Monster monster)

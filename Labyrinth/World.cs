@@ -89,7 +89,7 @@ namespace Labyrinth
             var result = new List<Monster>();
             foreach (var monster in GlobalServices.GameState.AllItemsInRectangle(area).OfType<Monster>())
                 {
-                if (!monster.IsStill)
+                if (!monster.IsStatic)
                     {
                     searchParameters.StartLocation = monster.TilePosition;
 

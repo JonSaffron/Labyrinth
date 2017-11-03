@@ -51,9 +51,10 @@ namespace Labyrinth.GameObjects.Movement
 
         private static Direction GetRandomPerpendicularDirection(Direction currentDirection)
             {
-            if (currentDirection.IsHorizontal())
+            var orientation = currentDirection.Orientation();
+            if (orientation == Orientation.Horizontal)
                 return GlobalServices.Randomess.Next(2) == 0 ? Direction.Up : Direction.Down;
-            if (currentDirection.IsVertical())
+            if (orientation == Orientation.Vertical)
                 return GlobalServices.Randomess.Next(2) == 0 ? Direction.Left : Direction.Right;
             return MonsterMovement.RandomDirection();
             }

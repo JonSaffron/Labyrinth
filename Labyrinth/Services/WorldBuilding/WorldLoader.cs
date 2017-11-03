@@ -230,7 +230,7 @@ namespace Labyrinth.Services.WorldBuilding
                         case "Monster":
                             {
                             var monster = GetMonster(definition);
-                            if (monster.IsStill)
+                            if (monster.IsStatic)
                                 newItems = new StaticItem[] { monster };
                             else
                                 movingMonsters.Add(monster);
@@ -265,7 +265,7 @@ namespace Labyrinth.Services.WorldBuilding
                 var monsters = GetMonstersFromRandomDistribution().ToList();
                 foreach (Monster monster in monsters)
                     {
-                    if (monster.IsStill)
+                    if (monster.IsStatic)
                         exceptions.AddRange(SetTileOccupation(new [] { monster }, t => t.SetOccupationByRandomMonsterDistribution()));
                     }
 

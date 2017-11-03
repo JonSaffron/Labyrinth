@@ -5,6 +5,8 @@ namespace Labyrinth.Services.Display
     {
     public class SpriteBatchWindowed : SpriteBatchBase, ISpriteBatch
         {
+        public float Zoom { get; }
+
         public SpriteBatchWindowed(GraphicsDevice graphicsDevice, float zoom) : base(graphicsDevice)
             {
             this.Zoom = zoom;
@@ -32,6 +34,5 @@ namespace Labyrinth.Services.Display
             this.SpriteBatch.DrawString(font, text, pos, color, 0, origin, this.Zoom, SpriteEffects.None, 0);
             }
 
-        public float Zoom { get; }
         }
     }

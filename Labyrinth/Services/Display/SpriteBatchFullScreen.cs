@@ -7,6 +7,7 @@ namespace Labyrinth.Services.Display
     public class SpriteBatchFullScreen : SpriteBatchBase, ISpriteBatch
         {
         private readonly Point _offset;
+        public float Zoom { get; }
         
         public SpriteBatchFullScreen(GraphicsDevice graphicsDevice) : base(graphicsDevice)
             {
@@ -50,11 +51,11 @@ namespace Labyrinth.Services.Display
             return result;
             }
 
+        // todo this is almost certainly incorrect and will position the text in the wrong place
         public void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin)
             {
             this.SpriteBatch.DrawString(font, text, pos, color, 0, origin, this.Zoom, SpriteEffects.None, 0);
             }
 
-        public float Zoom { get; }
         }
     }

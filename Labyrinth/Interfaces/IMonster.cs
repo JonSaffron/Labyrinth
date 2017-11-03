@@ -6,7 +6,7 @@
     public interface IMonster
         {
         MonsterShootBehaviour ShootBehaviour { get; }
-        bool IsStill { get; }
+        bool IsStatic { get; }
         bool IsEgg { get; }
         }
     }

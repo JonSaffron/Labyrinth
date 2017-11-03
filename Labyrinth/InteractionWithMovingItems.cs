@@ -183,19 +183,9 @@ namespace Labyrinth
 
         private static bool InteractionInvolvingShot(StandardShot shot, MovingItem movingItem)
             {
-            if (movingItem is Player && (shot.ShotType == ShotType.Monster || (shot.ShotType == ShotType.Player && shot.HasRebounded)))
+            if ((movingItem is Player || movingItem is Monster) && (shot.Originator != movingItem || shot.HasRebounded))
                 {
-                var shotEnergy = shot.Energy;
-                GlobalServices.GameState.ConvertShotToBang(shot);
-                movingItem.ReduceEnergy(shotEnergy);
-                if (movingItem.IsAlive())
-                    movingItem.PlaySound(GameSound.PlayerInjured);
-                return true;
-                }
-
-            if (movingItem is Monster monster)
-                {
-                var result = ShotHitsMonster(shot, monster);
+                var result = ShotHitsPlayerOrMonster(shot, movingItem);
                 return result;
                 }
 
@@ -208,40 +198,57 @@ namespace Labyrinth
             return false;
             }
 
+        private static bool ShotHitsPlayerOrMonster(StandardShot shot, MovingItem playerOrMonster)
+            {
+            Monster monster = playerOrMonster as Monster;
+            if (monster != null && monster.ShotsBounceOff)
+                {
+                // todo can a monster such a crazy crawler or deathcube be injured by a rebounding shot?
+                if (!shot.HasRebounded)
+                    shot.Reverse();
+                return false;
+                }
+
+            // no score from a rebound or from an enemy shot
+            if (!shot.HasRebounded && shot.Originator is Player && monster != null)
+                {
+                var energyRemovedForScoringPurposes = Math.Min(shot.Energy, monster.Energy);
+                GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemovedForScoringPurposes);
+                }
+
+            playerOrMonster.ReduceEnergy(shot.Energy);
+            GlobalServices.GameState.ConvertShotToBang(shot);
+
+            if (playerOrMonster.IsAlive())
+                {
+                if (playerOrMonster is Player)
+                    playerOrMonster.PlaySound(GameSound.PlayerInjured);
+                else if (monster != null)
+                    {
+                    var gs = monster.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
+                    monster.PlaySound(gs);
+                    }
+                }
+
+            return true;
+            }
+
         private static bool ShotHitsShot(StandardShot standardShot1, StandardShot standardShot2)
             {
-            if (standardShot2.ShotType == standardShot1.ShotType ||
-                standardShot2.DirectionOfTravel != standardShot1.DirectionOfTravel.Reversed())
+            if (standardShot2.Orientation != standardShot1.Orientation)
                 {
                 return false;
                 }
             
-            // todo: check what the original game does. It may not create more than one bang.
             int minEnergy = Math.Min(standardShot2.Energy, standardShot1.Energy);
             Bang bang = null;
             standardShot2.ReduceEnergy(minEnergy);
             if (!standardShot2.IsExtant)
                 bang = GlobalServices.GameState.ConvertShotToBang(standardShot2);
             standardShot1.ReduceEnergy(minEnergy);
-            if (!standardShot1.IsExtant)
+            if (!standardShot1.IsExtant && bang == null)    // only one bang needed from collision
                 bang = GlobalServices.GameState.ConvertShotToBang(standardShot1);
             bang?.PlaySound(GameSound.StaticObjectShotAndInjured);
-            return true;
-            }
-
-        private static bool ShotHitsMonster(StandardShot shot, Monster monster)
-            {
-            if (monster.ShotsBounceOff)
-                {
-                if (!shot.HasRebounded)
-                    shot.Reverse();
-                return false;
-                }
-
-            var energyRemoved = Math.Min(shot.Energy, monster.Energy);
-            GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemoved);
-            monster.ReduceEnergy(shot.Energy);
-            GlobalServices.GameState.ConvertShotToBang(shot);
             return true;
             }
         }

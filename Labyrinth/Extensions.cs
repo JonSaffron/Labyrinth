@@ -19,26 +19,19 @@ namespace Labyrinth
                 }
             }
 
-        public static bool IsHorizontal(this Direction d)
+        public static Orientation Orientation(this Direction d)
             {
             switch (d)
                 {
-                case Direction.Left:
+                case Direction.Left: 
                 case Direction.Right:
-                        return true;
-                }
-            return false;
-            }
-
-        public static bool IsVertical(this Direction d)
-            {
-            switch (d)
-                {
+                    return Labyrinth.Orientation.Horizontal;
                 case Direction.Up:
                 case Direction.Down:
-                        return true;
+                    return Labyrinth.Orientation.Vertical;
+                default:
+                    return Labyrinth.Orientation.None;
                 }
-            return false;
             }
 
         internal static Vector2 ToVector(this Direction d)

@@ -62,7 +62,7 @@ namespace Labyrinth
         public static readonly Vector2 RoomSizeInTiles = new Vector2(16, 10);
 
         /// <summary>
-        /// Size of a room measured in pixels
+        /// Size of a room measured in pixels 512 x 320
         /// </summary>
         public static readonly Vector2 RoomSizeInPixels = new Vector2(RoomSizeInTiles.X * TileLength, RoomSizeInTiles.Y * TileLength);
 

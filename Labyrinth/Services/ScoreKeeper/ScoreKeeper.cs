@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
@@ -11,19 +12,19 @@ namespace Labyrinth.Services.ScoreKeeper
             this._score = 0;
             }
 
-        public void EnemyShot(IMonster monster, int energyRemoved)
+        public void EnemyShot([NotNull] IMonster monster, int energyRemoved)
             {
             if (monster == null)
-                throw new ArgumentNullException("monster");
+                throw new ArgumentNullException(nameof(monster));
 
             var increaseToScore = (energyRemoved >> 1) + 1;
             this._score += increaseToScore;
             }
 
-        public void EnemyCrushed(IMonster monster, int energyRemoved)
+        public void EnemyCrushed([NotNull] IMonster monster, int energyRemoved)
             {
             if (monster == null)
-                throw new ArgumentNullException("monster");
+                throw new ArgumentNullException(nameof(monster));
 
             if (!IsMonsterDangerous(monster))
                 return;
@@ -35,17 +36,17 @@ namespace Labyrinth.Services.ScoreKeeper
             {
             if (monster.ShootBehaviour != MonsterShootBehaviour.None)
                 return true;
-            if (!monster.IsStill)
+            if (!monster.IsStatic)
                 return true;
             if (monster.IsEgg)
                 return true;
             return false;
             }
 
-        public void CrystalTaken(IValuable crystal)
+        public void CrystalTaken([NotNull] IValuable crystal)
             {
             if (crystal == null)
-                throw new ArgumentNullException("crystal");
+                throw new ArgumentNullException(nameof(crystal));
             this._score += crystal.Score;
             }
 
@@ -53,7 +54,7 @@ namespace Labyrinth.Services.ScoreKeeper
             {
             get
                 {
-                var result = this._score * 10;
+                var result = this._score * 10m;
                 return result;
                 }
             }

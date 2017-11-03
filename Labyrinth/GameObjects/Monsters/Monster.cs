@@ -131,7 +131,7 @@ namespace Labyrinth.GameObjects
                 }
             }
         
-        public bool IsStill
+        public bool IsStatic
             {
             get
                 {
@@ -144,9 +144,6 @@ namespace Labyrinth.GameObjects
             base.ReduceEnergy(energyToRemove);
             if (this.IsAlive())
                 {
-                var gs = this.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
-                this.PlaySound(gs);
-
                 if (!this.IsActive)
                     this.IsActive = true;
 
@@ -158,7 +155,7 @@ namespace Labyrinth.GameObjects
             var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             bang.PlaySound(GameSound.MonsterDies);
             
-            if (this.SplitsOnHit)
+            if (this.SplitsOnHit && !this.IsEgg)
                 {
                 for (int i = 1; i <= 2; i++)
                     GlobalServices.GameState.AddDiamondDemon(this.Position);
@@ -170,7 +167,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                var result = this.IsStill ? SpriteDrawOrder.StaticMonster : SpriteDrawOrder.MovingMonster;
+                var result = this.IsStatic ? SpriteDrawOrder.StaticMonster : SpriteDrawOrder.MovingMonster;
                 return (int) result;
                 }
             }
@@ -338,7 +335,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                var result = this.IsStill ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
+                var result = this.IsStatic ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
                 return result;
                 }
             }
@@ -354,10 +351,7 @@ namespace Labyrinth.GameObjects
 
         public bool LaysEggs
             {
-            get
-                {
-                return _laysEggs;
-                }
+            get => _laysEggs;
             set
                 {
                 if (value && !(this is ILayEggs))

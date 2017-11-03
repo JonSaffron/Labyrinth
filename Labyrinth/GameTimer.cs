@@ -57,10 +57,7 @@ namespace Labyrinth
 
         public bool Enabled
             {
-            get
-                {
-                return this._enabled;
-                }
+            get => this._enabled;
             set
                 {
                 if (this._enabled != value)
@@ -78,10 +75,7 @@ namespace Labyrinth
 
         public int UpdateOrder
             {
-            get 
-                {
-                return this._updateOrder;
-                }
+            get => this._updateOrder;
             set
                 {
                 if (this.UpdateOrder != value)

@@ -276,10 +276,10 @@ namespace Labyrinth
             return result;
             }
 
-        public StandardShot AddStandardShot(Vector2 startPos, Direction direction, int energy, ShotType shotType)
+        public StandardShot AddStandardShot(Vector2 startPos, Direction direction, int energy, StaticItem originator)
             {
             var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var shot = new StandardShot(ap, startPos, direction, energy, shotType);
+            var shot = new StandardShot(ap, startPos, direction, energy, originator);
             this._gameObjectCollection.Add(shot);
             return shot;
             }

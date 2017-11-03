@@ -20,7 +20,7 @@ namespace Labyrinth
             if (firingState != FiringState.Pulse || source.Energy < 4)
                 return;
             var startPos = source.TilePosition.ToPosition();
-            var shot = GlobalServices.GameState.AddStandardShot(startPos, direction, source.Energy >> 2, ShotType.Player);
+            var shot = GlobalServices.GameState.AddStandardShot(startPos, direction, source.Energy >> 2, source);
             if (!shot.CanMoveInDirection(direction))
                 {
                 shot.InstantlyExpire();

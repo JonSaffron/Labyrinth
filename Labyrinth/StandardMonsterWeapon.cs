@@ -8,13 +8,13 @@ namespace Labyrinth
         public void FireIfYouLike(StaticItem source)
             {
             Direction firingDirection = DetermineFiringDirection(source.TilePosition, GlobalServices.GameState.Player.TilePosition);
-            if (firingDirection == Direction.None)
+            if (firingDirection == Direction.None || source.Energy < 4)
                 return;
             if (!DoesMonsterHaveClearShotAtPlayer(source.TilePosition, firingDirection))
                 return;
 
             var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * Constants.CentreOfTile;
-            GlobalServices.GameState.AddStandardShot(startPos, firingDirection, source.Energy >> 2, ShotType.Monster);
+            GlobalServices.GameState.AddStandardShot(startPos, firingDirection, source.Energy >> 2, source);
             source.PlaySound(GameSound.MonsterShoots);
             }
 

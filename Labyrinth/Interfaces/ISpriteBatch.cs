@@ -32,7 +32,7 @@ namespace Labyrinth
         void DrawEntireTexture(Texture2D texture, Vector2 absolutePosition);
 
         /// <summary>
-        /// Draws the specified texture at the specified co-ordinates relative to the window position, specifying a source rectangle, rotation, origin and effectS
+        /// Draws the specified texture at the specified co-ordinates relative to the window position, specifying a source rectangle, rotation, origin and effects
         /// </summary>
         /// <param name="texture">Specifies the texture to draw</param>
         /// <param name="relativePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
