@@ -34,20 +34,8 @@ namespace Labyrinth.GameObjects
             this._isExtant = false;
             }
 
-        public override bool IsExtant
-            {
-            get
-                {
-                return this._isExtant;
-                }
-            }
+        public override bool IsExtant => this._isExtant;
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.Bang;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.Bang;
         }
     }

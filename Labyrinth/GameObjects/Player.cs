@@ -113,20 +113,14 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.Player;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.Player;
 
         /// <summary>
         /// Handles input, performs physics, and animates the player sprite.
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            System.Diagnostics.Trace.WriteLine(string.Format("Player update starts at {0}", this.Position));
+            //System.Diagnostics.Trace.WriteLine(string.Format("Player update starts at {0}", this.Position));
 
             bool result = false;
             var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
@@ -141,8 +135,8 @@ namespace Labyrinth.GameObjects
                     GlobalServices.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
                 }
 
-            if (result)
-                System.Diagnostics.Trace.WriteLine(string.Format("Player update finishes at {0}", this.Position));
+            //if (result)
+                //System.Diagnostics.Trace.WriteLine(string.Format("Player update finishes at {0}", this.Position));
 
             if (!IsExtant)
                 return false;
@@ -299,20 +293,8 @@ namespace Labyrinth.GameObjects
             return result;
             }
         
-        public override ObjectCapability Capability
-            {
-            get
-                {
-                return ObjectCapability.CanPushOrCauseBounceBack;
-                }
-            }
+        public override ObjectCapability Capability => ObjectCapability.CanPushOrCauseBounceBack;
 
-        protected override decimal StandardSpeed
-            {
-            get
-                {
-                return Constants.BaseSpeed * 2;
-                }
-            }
+        protected override decimal StandardSpeed => Constants.BaseSpeed * 2;
         }
     }

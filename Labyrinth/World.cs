@@ -207,21 +207,21 @@ namespace Labyrinth
                         {
                         if (bounds == null)
                             {
-                            Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si));
+                            //Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si));
                             bounds = currentItem.BoundingRectangle;
                             }
                         if (bounds.Value.Intersects(si.BoundingRectangle))
                             {
                             countOfInteractions++;
-                            Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
+                            //Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
                             var interaction = BuildInteraction(currentItem, si);
                             interaction?.Collide();
                             }
                         }
                     }
                 }
-            if (countOfGameItemsThatMoved > 0)
-                Trace.WriteLine(string.Format("Total interactive items: {0}, those that moved: {1}, interactions: {2}", countOfGameItems, countOfGameItemsThatMoved, countOfInteractions));
+            //if (countOfGameItemsThatMoved > 0)
+            //    Trace.WriteLine(string.Format("Total interactive items: {0}, those that moved: {1}, interactions: {2}", countOfGameItems, countOfGameItemsThatMoved, countOfInteractions));
             }
 
         [CanBeNull]
@@ -298,7 +298,7 @@ namespace Labyrinth
                 {
                 drawQueue.Enqueue(item.DrawOrder, item);
                 }
-            Trace.WriteLine("Drawing " + drawQueue.Count + " sprites.");
+            //Trace.WriteLine("Drawing " + drawQueue.Count + " sprites.");
             while (drawQueue.Count > 0)
                 {
                 var item = drawQueue.Dequeue();

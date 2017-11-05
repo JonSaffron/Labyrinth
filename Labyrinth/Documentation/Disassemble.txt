@@ -4888,7 +4888,7 @@ static object injured (b)
 
 2F07 4C BD 31  JMP 31BD                 -- not used
 
-		-- shot hitting shot
+		-- shot hitting shot - only if one or more of the shots is monster originated without rebounding will the shots interact
 
 2F0A BD 06 0C  LDA 0C06,X               -- get shot id
 2F0D 29 03     AND #03                  -- extract first two bits

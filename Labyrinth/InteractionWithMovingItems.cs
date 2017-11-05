@@ -203,7 +203,7 @@ namespace Labyrinth
             Monster monster = playerOrMonster as Monster;
             if (monster != null && monster.ShotsBounceOff)
                 {
-                // todo can a monster such a crazy crawler or deathcube be injured by a rebounding shot?
+                // A rebounded shot cannot hurt a monster that shots rebound off but it doesn't rebound again
                 if (!shot.HasRebounded)
                     shot.Reverse();
                 return false;
@@ -235,6 +235,14 @@ namespace Labyrinth
 
         private static bool ShotHitsShot(StandardShot standardShot1, StandardShot standardShot2)
             {
+            // this is the same logic the original game uses
+            var isAtLeastOneShotFromMonsterWhichHasNotRebounded = (standardShot1.Originator is Monster && !standardShot1.HasRebounded) || (standardShot2.Originator is Monster && !standardShot2.HasRebounded);
+            if (!isAtLeastOneShotFromMonsterWhichHasNotRebounded)
+                {
+                return false;
+                }
+
+            // this is new to this adaptation
             if (standardShot2.Orientation != standardShot1.Orientation)
                 {
                 return false;

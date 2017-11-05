@@ -54,7 +54,7 @@ namespace Labyrinth.Services.WorldBuilding
             var result = new MonsterDef
                 {
                 Type = monster.GetType(),
-                Position = monster.Position,
+                Position = monster.TilePosition.ToPosition(),
                 Energy = monster.OriginalEnergy,
                 Mobility = monster.Mobility,
                 InitialDirection = monster.InitialDirection,

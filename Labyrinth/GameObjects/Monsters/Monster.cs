@@ -131,14 +131,8 @@ namespace Labyrinth.GameObjects
                 }
             }
         
-        public bool IsStatic
-            {
-            get
-                {
-                return this.Mobility == MonsterMobility.Static || this.IsEgg;
-                }
-            }
-        
+        public bool IsStatic => this.Mobility == MonsterMobility.Static || this.IsEgg;
+
         public override void ReduceEnergy(int energyToRemove)
             {
             base.ReduceEnergy(energyToRemove);
@@ -228,10 +222,7 @@ namespace Labyrinth.GameObjects
                     if (!this.SetDirectionAndDestination())
                         break;
 
-                    if (this.Flitters)
-                        {
-                        this._flitterFlag = !this._flitterFlag;
-                        }
+                    this._flitterFlag = this.Flitters && !this._flitterFlag;
                     }
 
                 this.TryToCompleteMoveToTarget(ref remainingTime);
@@ -275,7 +266,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
+            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && inSameRoom && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
                 {
                 this._weapon.FireIfYouLike(this);
                 }

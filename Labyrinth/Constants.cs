@@ -10,20 +10,21 @@ namespace Labyrinth
         public const int TileLength = 32;
 
         /// <summary>
-        /// Number of base movements a sprite can make per second
-        /// </summary>
-        private const int MovementsPerSecond = 20;
-
-        /// <summary>
         /// Smallest move a sprite can make is a quarter of a tile
         /// </summary>
         public const int BaseDistance = TileLength / 4;
 
         /// <summary>
-        /// Slowest move a sprite can make is a quarter of a tile, and 20 movements take place per second.
+        /// Number of base distances a sprite can make per second
+        /// </summary>
+        /// <remarks>This is a speed value in terms of base distances</remarks>
+        private const int BaseDistancesMovedPerSecond = 10;
+
+        /// <summary>
+        /// Slowest move a sprite can make is a quarter of a tile, and x movements take place per second.
         /// Unit of measurement is therefore pixels per second.
         /// </summary>
-        public const int BaseSpeed = BaseDistance * MovementsPerSecond;
+        public const int BaseSpeed = BaseDistancesMovedPerSecond * BaseDistance;
 
         /// <summary>
         /// Speed when bouncing back
@@ -31,10 +32,10 @@ namespace Labyrinth
         public const int BounceBackSpeed = BaseSpeed * 3;
 
         /// <summary>
-        /// The internal game clock ticks once every movement by a sprite
+        /// The internal game clock ticks once every base distance by a sprite moving at base speed
         /// Unit of measurement is seconds.
         /// </summary>
-        public const float GameClockResolution = 1.0f / MovementsPerSecond;
+        public const float GameClockResolution = 1.0f / BaseDistancesMovedPerSecond;
 
         /// <summary>
         /// Size of tile in terms of a vector

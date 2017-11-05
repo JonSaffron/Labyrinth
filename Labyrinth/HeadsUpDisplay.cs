@@ -37,6 +37,10 @@ namespace Labyrinth
                 {
                 this._displayedEnergy++;
                 }
+            else if (playerEnergy < this._displayedEnergy)
+                {
+                this._displayedEnergy = playerEnergy;
+                }
 
             DrawEnergyRect(spriteBatch, isGameRunningSlowly);
             if (isPlayerExtant)
@@ -102,12 +106,12 @@ namespace Labyrinth
             int i = 1;
             while (true)
                 {
-                int digit = (int) (value % 10m);
+                int digit = (int) (value % 10);
                 var source = new Rectangle(digit * 6, 0, 6, 16);
                 var destination = new Vector2(right - (i * 8), top);
                 spriteBatch.DrawTexture(this._digits, destination, source);
-                value = value / 10m;
-                if (value == 0m)
+                value = Math.Floor(value / 10);
+                if (value == 0)
                     break;
                 i++;
                 }

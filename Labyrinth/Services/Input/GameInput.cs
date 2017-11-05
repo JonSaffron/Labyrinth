@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Labyrinth.Services.Input
@@ -29,6 +30,7 @@ namespace Labyrinth.Services.Input
 
         public override void Update(GameTime gameTime)
             {
+            Trace.WriteLine("Update");
             this._previousKeyboardState = this._currentKeyboardState;
             this._currentKeyboardState = Keyboard.GetState();
 
@@ -42,21 +44,17 @@ namespace Labyrinth.Services.Input
             this.HasGameExitBeenTriggered = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
             }
 
-        public bool IsKeyNewlyPressed(Keys key)
+        public KeyboardState LastKeyboardState => this._currentKeyboardState;
+
+        private bool IsKeyNewlyPressed(Keys key)
             {
             bool result = this._previousKeyboardState.IsKeyUp(key) && this._currentKeyboardState.IsKeyDown(key);
             return result;
             }
 
-        public bool IsKeyCurrentlyPressed(Keys key)
+        private bool IsKeyCurrentlyPressed(Keys key)
             {
             bool result = this._currentKeyboardState.IsKeyDown(key);
-            return result;
-            }
-
-        public bool WasKeyPressed(Keys key)
-            {
-            bool result = this._previousKeyboardState.IsKeyDown(key);
             return result;
             }
         }
