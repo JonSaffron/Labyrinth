@@ -116,7 +116,7 @@ namespace Labyrinth.GameObjects
             public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
                 {
                 this.Mine.Ap.PlayAnimation(this.Mine._staticUnarmedAnimation);
-                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
+                this.Mine.Ap.Draw(spriteBatch, this.Mine.Position);
                 }
 
             public override bool IsExtant()
@@ -155,7 +155,7 @@ namespace Labyrinth.GameObjects
             public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
                 {
                 this.Mine.Ap.PlayAnimation(this.Mine._movingUnarmedAnimation);
-                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
+                this.Mine.Ap.Draw(spriteBatch, this.Mine.Position);
                 }
 
             public override bool IsExtant()
@@ -186,7 +186,7 @@ namespace Labyrinth.GameObjects
             public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
                 {
                 this.Mine.Ap.PlayAnimation(this.Mine._armedAnimation);
-                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
+                this.Mine.Ap.Draw(spriteBatch, this.Mine.Position);
                 }
 
             public override bool IsExtant()

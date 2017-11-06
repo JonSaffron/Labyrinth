@@ -176,19 +176,25 @@ namespace Labyrinth.Services.Display
             }
 
         /// <summary>
-        /// Advances the time position and draws the current frame of the animation.
+        /// Advances the animation according to time passed
         /// </summary>
         /// <param name="gameTime">Time passed since the last call to Draw</param>
+        public void UpdateAnimation(GameTime gameTime)
+            {
+            // Advance the frame index
+            this._advanceRoutine?.Invoke(gameTime);
+            }
+
+        /// <summary>
+        /// Advances the time position and draws the current frame of the animation.
+        /// </summary>
         /// <param name="spriteBatch">The SpriteBatch object to draw the sprite to</param>
         /// <param name="position">The position of the sprite</param>
-        public void Draw(GameTime gameTime, ISpriteBatch spriteBatch, Vector2 position)
+        public void Draw(ISpriteBatch spriteBatch, Vector2 position)
             {
             if (_animation == null)
                 throw new NotSupportedException("No animation is currently playing.");
             
-            // Advance the frame index
-            this._advanceRoutine(gameTime);
-
             // Calculate the source rectangle of the current frame.
             var source = new Rectangle(FrameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
 

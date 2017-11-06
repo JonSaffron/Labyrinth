@@ -16,9 +16,7 @@ namespace Labyrinth
 
         public GameState(IGameObjectCollection gameObjectCollection)
             {
-            if (gameObjectCollection == null)
-                throw new ArgumentNullException("gameObjectCollection");
-            this._gameObjectCollection = gameObjectCollection;
+            this._gameObjectCollection = gameObjectCollection ?? throw new ArgumentNullException(nameof(gameObjectCollection));
             }
 
          /// <summary>
