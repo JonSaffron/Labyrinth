@@ -47,12 +47,25 @@ namespace Labyrinth
 
             var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
             var pss = this._playerStartStates[worldAreaId];
-            var resetPosition = this._restartInSameRoom ? this.Player.TilePosition : pss.Position;
+            var resetPosition = this._restartInSameRoom ? GetRestartLocation(this.Player.TilePosition, pss.Position) : pss.Position;
             this.Player.ResetPositionAndEnergy(resetPosition.ToPosition(), pss.Energy);
 
             ResetLevelForStartingNewLife(spw);
             }
-        
+
+        private TilePos GetRestartLocation(TilePos lastPosition, TilePos levelStartPosition)
+            {
+            var topLeft = GetTopLeftOfRoom(lastPosition);
+            var startPos = new TilePos(topLeft.X + 8, topLeft.Y + 5);
+            TilePos tilePos;
+            if (!GetFreeTileWithinRoom(startPos, out tilePos))
+                {
+                if (!GetFreeTileWithinRoom(levelStartPosition, out tilePos))
+                    throw new InvalidOperationException("Could not find a free tile to put the player on.");
+                }
+            return tilePos;
+            }
+
         public void ResetLevelForStartingNewLife(ISpriteBatch spw)
             {
             if (spw != null)
@@ -224,7 +237,6 @@ namespace Labyrinth
             //    Trace.WriteLine(string.Format("Total interactive items: {0}, those that moved: {1}, interactions: {2}", countOfGameItems, countOfGameItemsThatMoved, countOfInteractions));
             }
 
-        [CanBeNull]
         private IInteraction BuildInteraction(MovingItem thisGameItem, StaticItem thatGameItem)
             {
             var result = thatGameItem is MovingItem secondMovingItem
@@ -247,6 +259,11 @@ namespace Labyrinth
             return result;
             }
 
+        /// <summary>
+        /// Gets the rectangle that encompasses the room that contains the specified position
+        /// </summary>
+        /// <param name="position">Specifies the position within the world</param>
+        /// <returns>A rectangular structure which specifies the co-ordinates of the room containing the specified position</returns>
         public static Rectangle GetContainingRoom(Vector2 position)
             {
             var roomx = (int) (position.X / Constants.RoomSizeInPixels.X);
@@ -254,7 +271,20 @@ namespace Labyrinth
             var r = new Rectangle(roomx * (int) Constants.RoomSizeInPixels.X, roomy * (int) Constants.RoomSizeInPixels.Y, (int) Constants.RoomSizeInPixels.X, (int) Constants.RoomSizeInPixels.Y);
             return r;
             }
-        
+
+        /// <summary>
+        /// Gets the top-left tile position for the room containing the specified position
+        /// </summary>
+        /// <param name="position">Specifies the position within the world</param>
+        /// <returns>The top-left co-ordinate of the room containing the specified position</returns>
+        public static TilePos GetTopLeftOfRoom(TilePos position)
+            {
+            var roomx = (int)(position.X / Constants.RoomSizeInTiles.X);
+            var roomy = (int)(position.Y / Constants.RoomSizeInTiles.Y);
+            var result = new TilePos(roomx * (int)Constants.RoomSizeInTiles.X, roomy * (int)Constants.RoomSizeInTiles.Y);
+            return result;
+            }
+
         private void RecalculateWindow(GameTime gameTime)
             {
             const float currentVelocity = 750;
@@ -285,13 +315,13 @@ namespace Labyrinth
         /// <summary>
         /// Draw everything in the World from background to foreground.
         /// </summary>
-        public void Draw(GameTime gameTime, ISpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, [NotNull] ISpriteBatch spriteBatch)
             {
             RecalculateWindow(gameTime);
             
             var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(this.WindowPosition);
             DrawFloorTiles(spriteBatch, tileRect);
-            
+
             var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(tileRect);
             var drawQueue = new PriorityQueue<int, StaticItem>(100);
             foreach (var item in itemsToDraw)
@@ -375,27 +405,64 @@ namespace Labyrinth
             var boulder = GlobalServices.GameState.DistinctItemsOfType<Boulder>().FirstOrDefault();
             if (boulder != null)
                 {
-                TilePos? tp = null;
-                for (int i = 0; i < 16; i++)
+                var startPos = new TilePos(newState.Position.X + 2, newState.Position.Y);
+                if (GetFreeTileWithinRoom(startPos, out var boulderPosition))
                     {
-                    int x = (i % 2 == 0) ? 7 - (i / 2) : 8 + ((i - 1) / 2);
-                    var potentialPosition = new TilePos(x, newState.Position.Y);
-                    if (!GlobalServices.GameState.IsStaticItemOnTile(potentialPosition))
-                        {
-                        tp = potentialPosition;
-                        break;
-                        }
-                    }
-                if (tp.HasValue)
-                    {
-                    boulder.ResetPosition(tp.Value.ToPosition());
-                    GlobalServices.GameState.UpdatePosition(boulder);
+                    boulder.ResetPosition(boulderPosition.ToPosition());
                     }
                 }
             Point roomStart = GetContainingRoom(this.Player.Position).Location;
             this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
             }
 
+        private static bool GetFreeTileWithinRoom(TilePos startPos, out TilePos tilePos)
+            {
+            var roomSize = Constants.RoomSizeInTiles.X * Constants.RoomSizeInTiles.Y;
+            var roomDimensions = GetContainingRoom(startPos.ToPosition());
+            for (int i = 1; i <= roomSize; i++)
+                {
+                var positionInSpiral = GetPositionInSpiral(i);
+                var potentialPosition = new TilePos(startPos.X + positionInSpiral.X, startPos.Y + positionInSpiral.Y);
+                if (roomDimensions.ContainsTile(potentialPosition) && !GlobalServices.GameState.GetItemsOnTile(potentialPosition).Any())
+                    {
+                    tilePos = potentialPosition;
+                    return true;
+                    }
+                }
+            tilePos = new TilePos();
+            return false;
+            }
+
+        private static Point GetPositionInSpiral(int n)
+            {
+            var k = (int) Math.Ceiling((Math.Sqrt(n) - 1) / 2);
+            var t = 2 * k + 1;
+            var m = (int) Math.Pow(t, 2);
+
+            t -= 1;
+
+            if (n >= m - t)
+                {
+                return new Point(k - (m - n), -k);
+                }
+
+            m -= t;
+
+            if (n >= m - t)
+                {
+                return new Point(-k, -k + (m - n));
+                }
+
+            m -= t;
+
+            if (n >= m - t)
+                {
+                return new Point(-k + (m - n), k);
+                }
+
+            return new Point(k, k - (m - n - t));
+            }
+            
         public int GetWorldAreaIdForTilePos(TilePos tp)
             {
             var result = this._tiles[tp.X, tp.Y].WorldAreaId;
