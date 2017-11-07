@@ -357,5 +357,44 @@ namespace Labyrinth.Test
             Assert.IsTrue(path.Any());
             OutputRoute(path);
             }
+
+        [Test]
+        public void TestConstructor()
+            {
+            Assert.Throws<ArgumentNullException>(() => new RepelObject(null));
+            Assert.Throws<ArgumentException>(() => new RepelObject(new RepelParameters()));
+            }
+
+        [Test]
+        public void TestMaxPathLength()
+            {
+            this._map = new bool[10,1];
+            for (int i = 0; i < 10; i++)
+                this._map[i, 0] = true;
+            this._repelParameters.MaximumLengthOfPath = 5;
+            this._repelParameters.StartLocation = new TilePos(0, 0);
+            this._repelParameters.MinimumDistanceToMoveAway = 8;
+            RepelObject pathFinder = new RepelObject(this._repelParameters);
+
+            // Act
+            IList<TilePos> path;
+            var result = pathFinder.TryFindPath(out path);
+
+            // Assert
+            Assert.IsFalse(result);
+            }
+
+        [Test]
+        public void TestRepelParameters()
+            {
+            var rp = new RepelParameters();
+            rp.MaximumLengthOfPath = 10;
+            Assert.AreEqual(10, rp.MaximumLengthOfPath);
+            Assert.Throws<ArgumentOutOfRangeException>(() => rp.MaximumLengthOfPath = -1);
+
+            rp.MinimumDistanceToMoveAway = 20;
+            Assert.AreEqual(20, rp.MinimumDistanceToMoveAway);
+            Assert.Throws<ArgumentOutOfRangeException>(() => rp.MinimumDistanceToMoveAway = -1);
+            }
         }
     }

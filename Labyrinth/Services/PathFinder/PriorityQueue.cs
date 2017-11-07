@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Labyrinth.Services.PathFinder
     {
@@ -10,21 +12,33 @@ namespace Labyrinth.Services.PathFinder
     /// <typeparam name="P">Type of the priority values</typeparam>
     /// <typeparam name="T">Type of the data items</typeparam>
     /// <remarks>Adapted from article at https://visualstudiomagazine.com/Articles/2012/11/01/Priority-Queues-with-C.aspx</remarks>
+    [DebuggerDisplay("{" + nameof(ToString) + "()}")]
     // ReSharper disable once InconsistentNaming
     public class PriorityQueue<P, T> where P: IComparable<P>
         {
         private readonly List<KeyValuePair<P, T>> _data;
 
+        /// <summary>
+        /// Instantiate a new priority queue with the default capacity
+        /// </summary>
         public PriorityQueue()
             {
             this._data = new List<KeyValuePair<P, T>>();
             }
 
+        /// <summary>
+        /// Instantiate a new priority queue with the specified initial capacity
+        /// </summary>
         public PriorityQueue(int initialCapacity)
             {
             this._data = new List<KeyValuePair<P, T>>(initialCapacity);
             }
 
+        /// <summary>
+        /// Adds a new item to the queue
+        /// </summary>
+        /// <param name="priority">The priority of the item</param>
+        /// <param name="item">The item to be queued</param>
         public void Enqueue(P priority, T item)
             {
             this._data.Add(new KeyValuePair<P, T>(priority, item));
@@ -42,6 +56,11 @@ namespace Labyrinth.Services.PathFinder
                 }
             }
 
+        /// <summary>
+        /// Removes and returns the item at the top of the queue
+        /// </summary>
+        /// <returns>The item with the lowest priority score</returns>
+        [MustUseReturnValue]
         public T Dequeue()
             {
             if (this._data.Count == 0)
@@ -75,6 +94,9 @@ namespace Labyrinth.Services.PathFinder
             return frontItem.Value;
             }
 
+        /// <summary>
+        /// Returns all the items in the queue in no particular order.
+        /// </summary>
         public IEnumerable<T> Items
             {
             get
@@ -84,17 +106,32 @@ namespace Labyrinth.Services.PathFinder
                 }
             }
 
+        /// <summary>
+        /// Returns a count of all the items currently in the queue.
+        /// </summary>
         public int Count => _data.Count;
 
+        /// <summary>
+        /// Returns a string representation of the queue contents
+        /// </summary>
+        /// <returns>A string value that contains the default representation of the queue items</returns>
         public override string ToString()
             {
-            string s = "";
-            for (int i = 0; i < _data.Count; ++i)
-                s += _data[i] + " ";
-            s += "count = " + _data.Count;
+            var c = this._data.Count;
+            if (c == 0)
+                return "(empty)";
+            string s = $"{c} item" + (c != 1 ? "s" : string.Empty);
+            for (int i = 0; i < c; i++)
+                s += $"{(i == 0 ? ":" : ",")} {this._data[i]}";
+            s += ".";
             return s;
             }
 
+        /// <summary>
+        /// Checks whether the queue is correctly constructed
+        /// </summary>
+        /// <returns>True is the queue's binary heap is consistent, otherwise false.</returns>
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public bool IsConsistent()
             {
             // is the heap property true for all data?

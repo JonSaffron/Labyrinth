@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Labyrinth.Services.PathFinder;
@@ -290,5 +292,28 @@ namespace Labyrinth.Test
             OutputRoute(path);
             }
 
+        [Test]
+        public void TestPath()
+            {
+            var path1 = new Path<char>('A').AddStep('B', 1).AddStep('C', 2).AddStep('D', 3);
+            Assert.AreEqual(6, path1.Cost);
+            Assert.IsTrue('D' == path1.LastStep);
+            Assert.IsTrue(path1.IsViable);
+            Assert.IsTrue(path1.ToString().StartsWith("Viable path 4 steps, cost=6"));
+            path1.IsViable = false;
+            Assert.IsFalse(path1.IsViable);
+            Assert.IsTrue(path1.ToString().StartsWith("Not viable path 4 steps, cost=6"));
+            var enumerator = ((IEnumerable) path1).GetEnumerator();
+            var s = string.Empty;
+            while (enumerator.MoveNext())
+                {
+                s += (char) enumerator.Current;
+                }
+            Assert.IsTrue("DCBA" == s);
+
+            Assert.Positive(path1.CompareTo(path1.AddStep('E', 4)));
+            Assert.Negative(path1.AddStep('E', 4).CompareTo(path1));
+            Assert.Zero(path1.CompareTo(path1.AddStep(' ', 0)));
+            }
         }
     }

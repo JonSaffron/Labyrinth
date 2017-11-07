@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.ScoreKeeper;
+﻿using System;
+using Labyrinth.Services.ScoreKeeper;
 using NUnit.Framework;
 using Moq;
 
@@ -13,6 +14,7 @@ namespace Labyrinth.Test
             var monster = new Mock<IMonster>();
 
             var scoreKeeper = new ScoreKeeper();
+            Assert.Throws<ArgumentNullException>(() => scoreKeeper.EnemyShot(null, 99));
             scoreKeeper.EnemyShot(monster.Object, 10);
 
             Assert.AreEqual(60, scoreKeeper.CurrentScore);
@@ -25,6 +27,7 @@ namespace Labyrinth.Test
             monster.Setup(monsterShoots => monsterShoots.ShootBehaviour).Returns(MonsterShootBehaviour.ShootsImmediately);
 
             var scoreKeeper = new ScoreKeeper();
+            Assert.Throws<ArgumentNullException>(() => scoreKeeper.EnemyCrushed(null, 99));
             scoreKeeper.EnemyCrushed(monster.Object, 10);
 
             Assert.AreEqual(120, scoreKeeper.CurrentScore);
@@ -46,6 +49,8 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyIsEgg()
             {
             var monster = new Mock<IMonster>();
+            monster.Setup(monsterIsEgg => monsterIsEgg.ShootBehaviour).Returns(MonsterShootBehaviour.None);
+            monster.Setup(monsterIsEgg => monsterIsEgg.IsStatic).Returns(true);
             monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(true);
 
             var scoreKeeper = new ScoreKeeper();
@@ -75,6 +80,7 @@ namespace Labyrinth.Test
             valuable.Setup(valuableWithScore => valuableWithScore.Score).Returns(100);
 
             var scoreKeeper = new ScoreKeeper();
+            Assert.Throws<ArgumentNullException>(() => scoreKeeper.CrystalTaken(null));
             scoreKeeper.CrystalTaken(valuable.Object);
 
             Assert.AreEqual(1000, scoreKeeper.CurrentScore);

@@ -16,13 +16,13 @@ namespace Labyrinth.Services.Sound
         protected override ISoundEffectInstance CreateNewInstance()
             {
             var result = base.CreateNewInstance();
-            result.InstanceName = string.Format("{0}{1}", this._gameSound, this.Position);
+            result.InstanceName = $"{this._gameSound}{this.Position}";
             return result;
             }
 
         public override string ToString()
             {
-            string result = string.Format("Caching {0} of {1} sounds of {2}", this.Count, this.Size, this._gameSound);
+            string result = string.Format($"Cache for {this._gameSound}: {this.Count} of {this.Size} used");
             return result;
             }
         }

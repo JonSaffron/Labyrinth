@@ -111,7 +111,7 @@ namespace Labyrinth
             if (howManyCrystalsRemain == 0)
                 {
                 GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
-                    (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedLevel));
+                    (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedWorld));
                 world.SetDoNotUpdate();
                 }
             else

@@ -2,6 +2,7 @@
 
 namespace Labyrinth.Services.Sound
     {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     class SoundInfoAttribute : Attribute
         {
         public readonly int CacheSize;
@@ -17,7 +18,7 @@ namespace Labyrinth.Services.Sound
 
         public override string ToString()
             {
-            var result = string.Format("cacheSize {0}, requiresGameObject {1}, resourceName {2}", this.CacheSize, this.RequiresGameObject, this.ResourceName);
+            var result = $"cacheSize {this.CacheSize}, requiresGameObject {this.RequiresGameObject}, resourceName {this.ResourceName}";
             return result;
             }
         }

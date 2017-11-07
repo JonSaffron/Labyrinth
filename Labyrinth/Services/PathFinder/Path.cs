@@ -9,20 +9,20 @@ namespace Labyrinth.Services.PathFinder
     /// An ordered list of items with an associated cost which is implemented as an immutable list for memory efficiency
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [DebuggerDisplay("{ToString()}")] 
+    [DebuggerDisplay("{" + nameof(ToString) + "()}")] 
     public class Path<T> : IEnumerable<T>, IComparable<Path<T>>
         {
         /// <summary>
         /// The last step along the path
         /// </summary>
-        public T LastStep { get; private set; }
+        public T LastStep { get; }
 
         private readonly Path<T> _previousSteps;
 
         /// <summary>
         /// The actual cost of this path
         /// </summary>
-        public int Cost { get; private set; }
+        public int Cost { get; }
 
         /// <summary>
         /// Sets or returns whether this is a viable path

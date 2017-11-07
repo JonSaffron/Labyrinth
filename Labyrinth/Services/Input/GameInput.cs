@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Labyrinth.Services.Input
@@ -30,7 +29,6 @@ namespace Labyrinth.Services.Input
 
         public override void Update(GameTime gameTime)
             {
-            Trace.WriteLine("Update");
             this._previousKeyboardState = this._currentKeyboardState;
             this._currentKeyboardState = Keyboard.GetState();
 

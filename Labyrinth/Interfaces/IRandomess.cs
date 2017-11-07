@@ -1,4 +1,6 @@
-﻿namespace Labyrinth
+﻿using Labyrinth.Services.WorldBuilding;
+
+namespace Labyrinth
     {
     interface IRandomess
         {
@@ -19,9 +21,8 @@
         /// <summary>
         /// Returns the result of a simulated roll of dice
         /// </summary>
-        /// <param name="numberOfDice">The number of dice to roll</param>
-        /// <param name="numberOfSides">The number of sides of each dice</param>
+        /// <param name="diceRoll">The dice to roll</param>
         /// <returns>The sum of the dice rolls</returns>
-        int DiceRoll(int numberOfDice, int numberOfSides);
+        int DiceRoll(DiceRoll diceRoll);
         }
     }

@@ -17,7 +17,7 @@ namespace Labyrinth.Services.PathFinder
         public RepelObject(RepelParameters repelParameters)
             {
             if (repelParameters == null)
-                throw new ArgumentNullException("repelParameters");
+                throw new ArgumentNullException(nameof(repelParameters));
             if (repelParameters.CanBeOccupied == null)
                 throw new ArgumentException("RepelParameters.CanBeOccupied must be set.");
             this._repelParameters = repelParameters;

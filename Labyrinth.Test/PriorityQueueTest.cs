@@ -56,6 +56,54 @@ namespace Labyrinth.Test
             }
 
         [Test]
+        public void TestCantDequeue()
+            {
+            Employee e1 = new Employee("Aiden", 1.0);
+            Employee e2 = new Employee("Baker", 2.0);
+            Employee e3 = new Employee("Chung", 3.0);
+            Employee e4 = new Employee("Dunne", 4.0);
+            Employee e5 = new Employee("Eason", 5.0);
+            Employee e6 = new Employee("Flynn", 6.0);
+            var pq = new PriorityQueue<double, Employee>();
+            pq.Enqueue(e1.Priority, e1);
+            pq.Enqueue(e2.Priority, e2);
+            pq.Enqueue(e3.Priority, e3);
+            pq.Enqueue(e4.Priority, e4);
+            pq.Enqueue(e5.Priority, e5);
+            pq.Enqueue(e6.Priority, e6);
+            pq.Dequeue();
+            pq.Dequeue();
+            pq.Dequeue();
+            pq.Dequeue();
+            pq.Dequeue();
+            pq.Dequeue();
+
+            Assert.Throws<InvalidOperationException>(() => pq.Dequeue());
+            }
+
+        [Test]
+        public void TestToString()
+            {
+            Employee e1 = new Employee("Aiden", 1.0);
+            Employee e2 = new Employee("Baker", 2.0);
+            Employee e3 = new Employee("Chung", 3.0);
+            Employee e4 = new Employee("Dunne", 4.0);
+            Employee e5 = new Employee("Eason", 5.0);
+            Employee e6 = new Employee("Flynn", 6.0);
+            var pq = new PriorityQueue<double, Employee>();
+            Assert.IsTrue(pq.ToString() == "(empty)");
+
+            pq.Enqueue(e1.Priority, e1);
+            pq.Enqueue(e2.Priority, e2);
+            pq.Enqueue(e3.Priority, e3);
+            pq.Enqueue(e4.Priority, e4);
+            pq.Enqueue(e5.Priority, e5);
+            pq.Enqueue(e6.Priority, e6);
+            Assert.IsTrue(pq.ToString().Length > 20);
+            }
+
+
+        [Test]
         public void TestPriorityQueueRandom()
             {
             TestPriorityQueue(50000);
@@ -64,7 +112,7 @@ namespace Labyrinth.Test
         private static void TestPriorityQueue(int numOperations)
             {
             Random rand = new Random(0);
-            var pq = new PriorityQueue<double, Employee>();
+            var pq = new PriorityQueue<double, Employee>(1000);
             for (int op = 0; op < numOperations; ++op)
                 {
                 int opType = rand.Next(0, 2);

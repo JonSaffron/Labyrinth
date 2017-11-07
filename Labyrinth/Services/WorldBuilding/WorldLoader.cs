@@ -550,7 +550,7 @@ namespace Labyrinth.Services.WorldBuilding
                     {
                     for (int i = 0; i < item.Dist.CountOfMonsters; i++)
                         {
-                        var monsterIndex = rnd.DiceRoll(item.Dist.DiceRoll.NumberOfDice, item.Dist.DiceRoll.NumberOfSides);
+                        var monsterIndex = rnd.DiceRoll(item.Dist.DiceRoll);
                         var monsterDef = item.Dist.Templates[monsterIndex];
 
                         TilePos tp = GetFreeTile(item.Area);
@@ -607,7 +607,7 @@ namespace Labyrinth.Services.WorldBuilding
 
                 public Vector2 Position
                     {
-                    get { throw new NotImplementedException(); }
+                    get { throw new InvalidOperationException(); }
                     }
 
                 public TilePos TilePosition
@@ -617,7 +617,7 @@ namespace Labyrinth.Services.WorldBuilding
 
                 public bool IsExtant
                     {
-                    get { throw new NotImplementedException(); }
+                    get { throw new InvalidOperationException(); }
                     }
                 }
             }

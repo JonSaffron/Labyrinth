@@ -154,7 +154,7 @@ namespace Labyrinth
         {
         Normal,
         LostLife,
-        FinishedLevel
+        FinishedWorld
         }
 
     public enum MonsterMobility

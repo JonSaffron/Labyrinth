@@ -68,7 +68,7 @@ namespace Labyrinth
         public static readonly Vector2 RoomSizeInPixels = new Vector2(RoomSizeInTiles.X * TileLength, RoomSizeInTiles.Y * TileLength);
 
         /// <summary>
-        /// Magnification factor whlist in a window
+        /// Magnification factor whilst in a window
         /// </summary>
         public const int ZoomWhilstWindowed = 2;
         }

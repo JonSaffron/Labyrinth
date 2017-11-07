@@ -124,7 +124,7 @@ namespace Labyrinth
                 LevelReturnType lrt = this.World.Update(gameTime);
                 switch (lrt)
                     {
-                    case LevelReturnType.FinishedLevel:
+                    case LevelReturnType.FinishedWorld:
                         this.World = null;
                         this._lives++;
                         break;

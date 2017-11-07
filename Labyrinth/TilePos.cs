@@ -122,7 +122,6 @@ namespace Labyrinth
         /// Returns the co-ordinates of the middle of the specified Tile
         /// </summary>
         /// <returns>A Vector2 structure for the middle of the tile</returns>
-        //todo does this need to be refactored? not every object will have its origin in the middle of tile.
         public Vector2 ToPosition()
             {
             int x = this.X * Constants.TileLength + Constants.HalfTileLength;

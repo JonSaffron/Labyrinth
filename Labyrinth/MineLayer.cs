@@ -21,6 +21,7 @@ namespace Labyrinth
                 return;
 
             GlobalServices.GameState.AddMine(tp.ToPosition());
+            // todo play an appropriate sound here
             this._countOfMinesRemaining--;
             }
         }

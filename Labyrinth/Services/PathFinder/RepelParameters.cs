@@ -27,14 +27,11 @@ namespace Labyrinth.Services.PathFinder
         /// </summary>
         public int MaximumLengthOfPath 
             { 
-            get
-                {
-                return this._maximumLengthOfPath;
-                }
+            get => this._maximumLengthOfPath;
             set
                 {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException("value", "Cannot be negative.");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Cannot be negative.");
                 this._maximumLengthOfPath = value;
                 }
             }
@@ -44,14 +41,11 @@ namespace Labyrinth.Services.PathFinder
         /// </summary>
         public int MinimumDistanceToMoveAway 
             { 
-            get
-                {
-                return this._minimumDistanceToMoveAway;
-                }
+            get => this._minimumDistanceToMoveAway;
             set
                 {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException("value", "Cannot be negative.");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Cannot be negative.");
                 this._minimumDistanceToMoveAway = value;
                 }
             }

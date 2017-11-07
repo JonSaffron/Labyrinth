@@ -172,7 +172,6 @@
     <Compile Include="GameObjects\CrumblyWall.cs" />
     <Compile Include="GameObjects\Explosion.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Services\Input\GameController.cs" />
     <Compile Include="Services\Input\GameInput.cs" />
     <Compile Include="GameObjectCollection.cs" />
     <Compile Include="Services\Input\PlayerController.cs" />

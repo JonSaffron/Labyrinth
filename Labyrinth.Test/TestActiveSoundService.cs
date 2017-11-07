@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.Sound;
+﻿using System;
+using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Moq;
@@ -47,21 +48,14 @@ namespace Labyrinth.Test
             }
 
         [Test]
-        public void IfAnAttemptIsMadeToAddASoundForANonExtantObjectWillItBeIgnored()
+        public void CanAnActiveSoundBeCreatedForDeadObject()
             {
-            var ass = new ActiveSoundService();
             var sei = new DummySoundEffectInstance();
             var gameObject = new Mock<IGameObject>();
             gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(false);
             var centrePointProvider = new Mock<ICentrePointProvider>();
             centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
-            var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
-
-            ass.Add(activeSound);
-
-            Assert.AreEqual(1, ass.Count);
-            var item = ass[0];
-            Assert.AreEqual(SoundState.Stopped, item.SoundEffectInstance.State);
+            Assert.Throws<ArgumentException>(() => new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object));
             }
 
         [Test]
@@ -162,14 +156,13 @@ namespace Labyrinth.Test
             var sei = new DummySoundEffectInstance();
 
             var gameObject = new Mock<IGameObject>();
-            gameObject.SetupSequence(deadGameObject => deadGameObject.IsExtant)
-                .Returns(true)
-                .Returns(false);
+            gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(true);
             var centrePointProvider = new Mock<ICentrePointProvider>();
             centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
             var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
 
             ass.Add(activeSound);
+            gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(false);
             ass.Update();
 
             Assert.AreEqual(1, ass.Count);
