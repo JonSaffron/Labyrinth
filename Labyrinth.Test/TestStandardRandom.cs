@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using Labyrinth.Services;
 using Labyrinth.Services.WorldBuilding;
+
+// ReSharper disable AssignNullToNotNullAttribute
+// ReSharper disable MustUseReturnValue
 
 namespace Labyrinth.Test
     {
@@ -15,14 +17,24 @@ namespace Labyrinth.Test
         public void BasicTest()
             {
             var r = new StandardRandom();
-            for (byte i = 0; i < 255; i++)
-                {
-                r.Test(i);
-                }
+            Assert.IsTrue(r.Test(0));
+            Assert.DoesNotThrow(() => r.Test(0b1));
+            Assert.DoesNotThrow(() => r.Test(0b11));
+            Assert.DoesNotThrow(() => r.Test(0b111));
+            Assert.DoesNotThrow(() => r.Test(0b1111));
+            Assert.DoesNotThrow(() => r.Test(0b1_1111));
+            Assert.DoesNotThrow(() => r.Test(0b11_1111));
+            Assert.DoesNotThrow(() => r.Test(0b111_1111));
+            Assert.DoesNotThrow(() => r.Test(0b1111_1111));
 
             for (int i = 0; i <= 1000; i++)
                 {
-                r.Next(i);
+                var t = r.Next(i);
+                Assert.GreaterOrEqual(t, 0);
+                if (i == 0)
+                    Assert.AreEqual(0, i);
+                else
+                    Assert.Less(t, i);
                 }
             }
 
@@ -75,8 +87,10 @@ namespace Labyrinth.Test
                 {
                 for (int j = 1; j <= 10; j++)
                     {
-                    var dr = new DiceRoll($"{i}D{j}");
-                    r.DiceRoll(dr);
+                    var dr = new DiceRoll(i, j);
+                    var t = r.DiceRoll(dr);
+                    Assert.GreaterOrEqual(t, i);
+                    Assert.LessOrEqual(t, i * j);
                     }
                 }
             }

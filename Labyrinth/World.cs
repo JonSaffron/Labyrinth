@@ -55,7 +55,7 @@ namespace Labyrinth
 
         private TilePos GetRestartLocation(TilePos lastPosition, TilePos levelStartPosition)
             {
-            var topLeft = GetTopLeftOfRoom(lastPosition);
+            var topLeft = GetContainingRoom(lastPosition).TopLeft;
             var startPos = new TilePos(topLeft.X + 8, topLeft.Y + 5);
             TilePos tilePos;
             if (!GetFreeTileWithinRoom(startPos, out tilePos))
@@ -273,15 +273,16 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Gets the top-left tile position for the room containing the specified position
+        /// Gets the rectangle that encompasses the room that contains the specified position
         /// </summary>
         /// <param name="position">Specifies the position within the world</param>
-        /// <returns>The top-left co-ordinate of the room containing the specified position</returns>
-        public static TilePos GetTopLeftOfRoom(TilePos position)
+        /// <returns>A rectangular structure which specifies the co-ordinates of the room containing the specified position</returns>
+        public static TileRect GetContainingRoom(TilePos position)
             {
             var roomx = (int)(position.X / Constants.RoomSizeInTiles.X);
             var roomy = (int)(position.Y / Constants.RoomSizeInTiles.Y);
-            var result = new TilePos(roomx * (int)Constants.RoomSizeInTiles.X, roomy * (int)Constants.RoomSizeInTiles.Y);
+            var topLeft = new TilePos(roomx * (int) Constants.RoomSizeInTiles.X, roomy * (int) Constants.RoomSizeInTiles.Y);
+            var result = new TileRect(topLeft, (int) Constants.RoomSizeInTiles.X, (int) Constants.RoomSizeInTiles.Y);
             return result;
             }
 
@@ -417,13 +418,13 @@ namespace Labyrinth
 
         private static bool GetFreeTileWithinRoom(TilePos startPos, out TilePos tilePos)
             {
-            var roomSize = Constants.RoomSizeInTiles.X * Constants.RoomSizeInTiles.Y;
-            var roomDimensions = GetContainingRoom(startPos.ToPosition());
+            var roomSize = (int) (Constants.RoomSizeInTiles.X * Constants.RoomSizeInTiles.Y);
+            var roomDimensions = GetContainingRoom(startPos);
             for (int i = 1; i <= roomSize; i++)
                 {
                 var positionInSpiral = GetPositionInSpiral(i);
                 var potentialPosition = new TilePos(startPos.X + positionInSpiral.X, startPos.Y + positionInSpiral.Y);
-                if (roomDimensions.ContainsTile(potentialPosition) && !GlobalServices.GameState.GetItemsOnTile(potentialPosition).Any())
+                if (GetContainingRoom(potentialPosition).TopLeft == roomDimensions.TopLeft && !GlobalServices.GameState.GetItemsOnTile(potentialPosition).Any())
                     {
                     tilePos = potentialPosition;
                     return true;

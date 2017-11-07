@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework.Audio;
 using Moq;
 using NUnit.Framework;
 
+// ReSharper disable ObjectCreationAsStatement
+
 namespace Labyrinth.Test
     {
     [TestFixture]

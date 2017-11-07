@@ -51,11 +51,9 @@ namespace Labyrinth.Services.Display
             return result;
             }
 
-        // todo this is almost certainly incorrect and will position the text in the wrong place
         public void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin)
             {
             this.SpriteBatch.DrawString(font, text, pos, color, 0, origin, this.Zoom, SpriteEffects.None, 0);
             }
-
         }
     }

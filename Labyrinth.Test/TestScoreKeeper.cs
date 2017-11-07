@@ -3,6 +3,8 @@ using Labyrinth.Services.ScoreKeeper;
 using NUnit.Framework;
 using Moq;
 
+// ReSharper disable AssignNullToNotNullAttribute
+
 namespace Labyrinth.Test
     {
     [TestFixture]

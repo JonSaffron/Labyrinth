@@ -18,7 +18,7 @@ namespace Labyrinth
         /// Number of base distances a sprite can make per second
         /// </summary>
         /// <remarks>This is a speed value in terms of base distances</remarks>
-        private const int BaseDistancesMovedPerSecond = 10;
+        private const int BaseDistancesMovedPerSecond = 16;
 
         /// <summary>
         /// Slowest move a sprite can make is a quarter of a tile, and x movements take place per second.

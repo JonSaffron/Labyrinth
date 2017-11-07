@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Labyrinth.Services.PathFinder;
@@ -166,8 +165,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var path);
 
             // Assert
             Assert.IsTrue(result);
@@ -189,8 +187,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var path);
 
             // Assert
             Assert.IsTrue(result);
@@ -208,8 +205,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var path);
 
             // Assert
             Assert.IsFalse(result);
@@ -226,8 +222,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var path);
 
             // Assert
             Assert.IsTrue(result);
@@ -245,8 +240,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var path);
 
             // Assert
             Assert.IsFalse(result);
@@ -264,8 +258,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var path);
 
             // Assert
             Assert.IsTrue(result);
@@ -283,8 +276,7 @@ namespace Labyrinth.Test
             PathFinder pathFinder = new PathFinder(_searchParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var path);
 
             // Assert
             Assert.IsTrue(result);
@@ -307,6 +299,7 @@ namespace Labyrinth.Test
             var s = string.Empty;
             while (enumerator.MoveNext())
                 {
+                // ReSharper disable once PossibleNullReferenceException
                 s += (char) enumerator.Current;
                 }
             Assert.IsTrue("DCBA" == s);

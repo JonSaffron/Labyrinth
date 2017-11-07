@@ -5,6 +5,8 @@ using System.Text;
 using Labyrinth.Services.PathFinder;
 using NUnit.Framework;
 
+// ReSharper disable ObjectCreationAsStatement
+
 namespace Labyrinth.Test
     {
     [TestFixture]
@@ -377,8 +379,7 @@ namespace Labyrinth.Test
             RepelObject pathFinder = new RepelObject(this._repelParameters);
 
             // Act
-            IList<TilePos> path;
-            var result = pathFinder.TryFindPath(out path);
+            var result = pathFinder.TryFindPath(out var _);
 
             // Assert
             Assert.IsFalse(result);

@@ -3,11 +3,20 @@ using System.Text.RegularExpressions;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    class DiceRoll
+    internal class DiceRoll
         {
         public int NumberOfDice { get; }
-
         public int NumberOfSides { get; }
+
+        public DiceRoll(int numberOfDice, int numberOfSides)
+            {
+            if (numberOfDice <= 0)
+                throw new ArgumentOutOfRangeException(nameof(numberOfDice));
+            if (numberOfSides <= 0)
+                throw new ArgumentOutOfRangeException(nameof(numberOfSides));
+            this.NumberOfDice = numberOfDice;
+            this.NumberOfSides = numberOfSides;
+            }
 
         public DiceRoll(string diceRoll)
             {

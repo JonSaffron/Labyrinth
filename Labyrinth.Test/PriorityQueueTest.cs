@@ -2,6 +2,8 @@
 using Labyrinth.Services.PathFinder;
 using NUnit.Framework;
 
+// ReSharper disable MustUseReturnValue
+
 namespace Labyrinth.Test
     {
     [TestFixture]
