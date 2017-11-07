@@ -77,9 +77,8 @@ namespace Labyrinth.GameObjects
         /// <param name="spriteBatch">The spritebatch to draw to</param>
         public virtual void Draw(GameTime gt, ISpriteBatch spriteBatch)
             {
-            this.Ap.UpdateAnimation(gt);
             if (this.IsExtant)
-                this.Ap.Draw(spriteBatch, this.Position);
+                this.Ap.Draw(gt, spriteBatch, this.Position);
             }
         
         /// <summary>

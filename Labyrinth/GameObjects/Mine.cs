@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -6,7 +7,7 @@ namespace Labyrinth.GameObjects
     {
     class Mine : MovingItem
         {
-        private MineState _mineState;
+        [NotNull] private MineState _mineState;
         private TimeSpan _countdown;
 
         private readonly Animation _staticUnarmedAnimation;
@@ -17,19 +18,13 @@ namespace Labyrinth.GameObjects
             {
             this.Energy = 240;
             this._staticUnarmedAnimation = Animation.StaticAnimation("Sprites/Shot/MineUnarmed");
-            this._movingUnarmedAnimation = Animation.SingleRunAnimation("Sprites/Shot/MineUnarmed", 4);
+            this._movingUnarmedAnimation = Animation.ManualAnimation("Sprites/Shot/MineUnarmed", 4);
             this._armedAnimation = Animation.LoopingAnimation("Sprites/Shot/MineArmed", 4);
             this.Ap.PlayAnimation(this._staticUnarmedAnimation);
             this._mineState = new InactiveState(this);
             }
 
-        public override int DrawOrder
-            {
-            get 
-                {
-                return (int) SpriteDrawOrder.StaticItem;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
         public void SteppedOnBy(MovingItem movingItem)
             {
@@ -59,18 +54,14 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Gets an indication of how solid the object is
         /// </summary>
-        public override ObjectSolidity Solidity
-            {
-            get
-                {
-                return ObjectSolidity.Stationary;
-                }
-            }
+        public override ObjectSolidity Solidity => ObjectSolidity.Stationary;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /// <summary>
         /// Abstract class for the purposes of implementing the state pattern
         /// </summary>
-        abstract class MineState
+        private abstract class MineState
             {
             protected readonly Mine Mine;
 
@@ -85,10 +76,12 @@ namespace Labyrinth.GameObjects
             public abstract bool IsExtant();
             }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         /// <summary>
         /// The inactive state where the mine is waiting for the player to step away from it
         /// </summary>
-        class InactiveState : MineState
+        private class InactiveState : MineState
             {
             private static readonly TimeSpan TimeInState = TimeSpan.FromMilliseconds(1000);
 
@@ -116,7 +109,7 @@ namespace Labyrinth.GameObjects
             public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
                 {
                 this.Mine.Ap.PlayAnimation(this.Mine._staticUnarmedAnimation);
-                this.Mine.Ap.Draw(spriteBatch, this.Mine.Position);
+                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
                 }
 
             public override bool IsExtant()
@@ -125,20 +118,15 @@ namespace Labyrinth.GameObjects
                 }
             }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         /// <summary>
         /// The cooking state where the mine is arming itself
         /// </summary>
-        class CookingState : MineState
+        private class CookingState : MineState
             {
             public CookingState(Mine mine) : base(mine)
                 {
-                this.Mine.Ap.AnimationFinished += CookingFinished;
-                }
-
-            private void CookingFinished(object sender, EventArgs e)
-                {
-                this.Mine.Ap.AnimationFinished -= CookingFinished;
-                this.Mine._mineState = new PrimedState(this.Mine);
                 }
 
             public override void SteppedOnBy(MovingItem movingItem)
@@ -149,13 +137,16 @@ namespace Labyrinth.GameObjects
 
             public override bool Update(GameTime gameTime)
                 {
+                if (this.Mine.Ap.AdvanceManualAnimation(gameTime))
+                    return true;
+                this.Mine._mineState = new PrimedState(this.Mine);
                 return true;
                 }
 
             public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
                 {
                 this.Mine.Ap.PlayAnimation(this.Mine._movingUnarmedAnimation);
-                this.Mine.Ap.Draw(spriteBatch, this.Mine.Position);
+                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
                 }
 
             public override bool IsExtant()
@@ -164,10 +155,12 @@ namespace Labyrinth.GameObjects
                 }
             }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         /// <summary>
         /// The primed state where the mine will be fired should anything touch it
         /// </summary>
-        class PrimedState : MineState
+        private class PrimedState : MineState
             {
             public PrimedState(Mine mine) : base(mine)
                 {
@@ -186,7 +179,7 @@ namespace Labyrinth.GameObjects
             public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
                 {
                 this.Mine.Ap.PlayAnimation(this.Mine._armedAnimation);
-                this.Mine.Ap.Draw(spriteBatch, this.Mine.Position);
+                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
                 }
 
             public override bool IsExtant()
@@ -195,10 +188,12 @@ namespace Labyrinth.GameObjects
                 }
             }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         /// <summary>
         /// The fired state where everything around will be consumed by explosions
         /// </summary>
-        class FiredState : MineState
+        private class FiredState : MineState
             {
             private int _spreadPosition;
             private readonly int[] _energyEffects = { 240, 160, 80 };

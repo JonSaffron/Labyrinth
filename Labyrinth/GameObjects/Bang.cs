@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public class Bang : StaticItem
+    public class Bang : MovingItem
         {
         private bool _isExtant;
         
@@ -14,28 +14,27 @@ namespace Labyrinth.GameObjects
             switch (bangType)
                 {
                 case BangType.Short:
-                    a = Animation.SingleRunAnimation("Sprites/Props/ShortBang", 3);
+                    a = Animation.ManualAnimation("Sprites/Props/ShortBang", 3);
                     break;
                 case BangType.Long:
-                    a = Animation.SingleRunAnimation("Sprites/Props/LongBang", 3);
+                    a = Animation.ManualAnimation("Sprites/Props/LongBang", 3);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("bangType");
+                    throw new ArgumentOutOfRangeException(nameof(bangType));
                 }
             
             Ap.PlayAnimation(a);
-            Ap.AnimationFinished += AnimationFinished;
-
             this._isExtant = true;
-            }
-
-        private void AnimationFinished(object sender, EventArgs e)
-            {
-            this._isExtant = false;
             }
 
         public override bool IsExtant => this._isExtant;
 
         public override int DrawOrder => (int) SpriteDrawOrder.Bang;
+        public override bool Update(GameTime gameTime)
+            {
+            if (!this.Ap.AdvanceManualAnimation(gameTime))
+                this._isExtant = false;
+            return this._isExtant;
+            }
         }
     }

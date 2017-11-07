@@ -1,5 +1,4 @@
-﻿using System;
-using Labyrinth.Services.Display;
+﻿using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -11,16 +10,9 @@ namespace Labyrinth.GameObjects
         public Explosion(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
             this.Energy = energy;
-            var a = Animation.SingleRunAnimation("Sprites/Props/LongBang", 2);
+            var a = Animation.ManualAnimation("Sprites/Props/LongBang", 2);
             Ap.PlayAnimation(a);
-            Ap.AnimationFinished += AnimationFinished;
-
             this._isExtant = true;
-            }
-
-        private void AnimationFinished(object sender, EventArgs e)
-            {
-            this._isExtant = false;
             }
 
         public override bool IsExtant => this._isExtant;
@@ -34,7 +26,9 @@ namespace Labyrinth.GameObjects
 
         public override bool Update(GameTime gameTime)
             {
-            return false;
+            if (!this.Ap.AdvanceManualAnimation(gameTime))
+                this._isExtant = false;
+            return this._isExtant;
             }
         }
     }

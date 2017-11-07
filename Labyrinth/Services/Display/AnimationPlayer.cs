@@ -52,11 +52,6 @@ namespace Labyrinth.Services.Display
         public event EventHandler<EventArgs> NewFrame;
         
         /// <summary>
-        /// Used to notify a game object that the animation has completed showing all frames
-        /// </summary>
-        public event EventHandler<EventArgs> AnimationFinished;
-        
-        /// <summary>
         /// Which routine to use to advance the frame index
         /// </summary>
         private Action<GameTime> _advanceRoutine;
@@ -69,11 +64,6 @@ namespace Labyrinth.Services.Display
         private void OnNewFrame(EventArgs e)
             {
             this.NewFrame?.Invoke(this, e);
-            }
-        
-        private void OnAnimationFinished(EventArgs e)
-            {
-            this.AnimationFinished?.Invoke(this, e);
             }
         
 //todo this needs to be refactored - not all sprites will be tile sized.
@@ -107,8 +97,6 @@ namespace Labyrinth.Services.Display
                 this._advanceRoutine = AdvanceStaticAnimation;
             else if (animation.LoopAnimation)
                 this._advanceRoutine = AdvanceLoopedAnimation;
-            else
-                this._advanceRoutine = AdvanceSingleRunAnimation;
             }
 
         /// <summary>
@@ -153,10 +141,10 @@ namespace Labyrinth.Services.Display
             }
 
         /// <summary>
-        /// Advance frame index for single run animations
+        /// Advance frame index for manually controlled animations
         /// </summary>
         /// <param name="gameTime">Time passed since the last call to Draw</param>
-        private void AdvanceSingleRunAnimation(GameTime gameTime)
+        public bool AdvanceManualAnimation(GameTime gameTime)
             {
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
             while (this._time >= this._frameTime)
@@ -166,35 +154,28 @@ namespace Labyrinth.Services.Display
 
                 if ((this._frameIndex + 1) == this.FrameCount)
                     {
-                    OnAnimationFinished(new EventArgs());
-                    this._advanceRoutine = AdvanceStaticAnimation;
-                    return;
+                    return false;
                     }
 
                 this._frameIndex++;
                 }
-            }
-
-        /// <summary>
-        /// Advances the animation according to time passed
-        /// </summary>
-        /// <param name="gameTime">Time passed since the last call to Draw</param>
-        public void UpdateAnimation(GameTime gameTime)
-            {
-            // Advance the frame index
-            this._advanceRoutine?.Invoke(gameTime);
+            return true;
             }
 
         /// <summary>
         /// Advances the time position and draws the current frame of the animation.
         /// </summary>
+        /// <param name="gameTime">Time passed since the last call to Draw</param>
         /// <param name="spriteBatch">The SpriteBatch object to draw the sprite to</param>
         /// <param name="position">The position of the sprite</param>
-        public void Draw(ISpriteBatch spriteBatch, Vector2 position)
+        public void Draw(GameTime gameTime, ISpriteBatch spriteBatch, Vector2 position)
             {
             if (_animation == null)
                 throw new NotSupportedException("No animation is currently playing.");
-            
+
+            // Advance the frame index
+            this._advanceRoutine?.Invoke(gameTime);
+
             // Calculate the source rectangle of the current frame.
             var source = new Rectangle(FrameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
 

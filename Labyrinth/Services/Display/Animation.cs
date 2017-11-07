@@ -53,11 +53,11 @@ namespace Labyrinth.Services.Display
             }
         
         /// <summary>
-        /// Constructs a new animation which runs through only once
+        /// Constructs a new animation which can be manually controlled
         /// </summary>
         /// <param name="textureName">The name of a multi-framed graphic image to show</param>
         /// <param name="baseMovementsPerFrame">The rate to switch between frames</param>
-        public static Animation SingleRunAnimation(string textureName, int baseMovementsPerFrame)
+        public static Animation ManualAnimation(string textureName, int baseMovementsPerFrame)
             {
             if (baseMovementsPerFrame <= 0)
                 throw new ArgumentOutOfRangeException(nameof(baseMovementsPerFrame));
