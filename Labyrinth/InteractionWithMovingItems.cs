@@ -29,8 +29,8 @@ namespace Labyrinth
             if (explosion != null)
                 {
                 var otherItem = items.Single(item => item != explosion);
-                InteractionInvolvesExplosion(explosion, otherItem);
-                return;
+                if (InteractionInvolvesExplosion(explosion, otherItem))
+                    return;
                 }
                 
             var shot = items.OfType<StandardShot>().FirstOrDefault();
@@ -150,12 +150,12 @@ namespace Labyrinth
             return true;
             }
 
-        private static void InteractionInvolvesExplosion(Explosion explosion, MovingItem movingItem)
+        private static bool InteractionInvolvesExplosion(Explosion explosion, MovingItem movingItem)
             {
             if (movingItem is Shot shot)
                 {
                 shot.ReduceEnergy(explosion.Energy);
-                explosion.InstantlyExpire();
+                return true;
                 }
 
             if (movingItem is Monster monster)
@@ -163,22 +163,19 @@ namespace Labyrinth
                 var energyRemoved = Math.Min(explosion.Energy, monster.Energy);
                 GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemoved);
                 monster.ReduceEnergy(explosion.Energy);
-                explosion.InstantlyExpire();
-                return;
+                return true;
                 }
 
             if (movingItem is Player player)
                 {
                 var explosionEnergy = explosion.Energy;
-                explosion.InstantlyExpire();
                 player.ReduceEnergy(explosionEnergy);
                 if (movingItem.IsAlive())
                     player.PlaySound(GameSound.PlayerInjured);
-                // ReSharper disable once RedundantJumpStatement
-                return;
+                return true;
                 }
 
-            // any other interaction here...
+            return false;
             }
 
         private static bool InteractionInvolvingShot(StandardShot shot, MovingItem movingItem)

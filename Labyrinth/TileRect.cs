@@ -12,5 +12,15 @@
             this.Width = width;
             this.Height = height;
             }
+
+        public bool Contains(TilePos tp)
+            {
+            var result = 
+                    this.TopLeft.X <= tp.X 
+                &&  tp.X < this.TopLeft.X + this.Width
+                &&  this.TopLeft.Y <= tp.Y
+                &&  tp.Y < this.TopLeft.Y + this.Height;
+            return result;
+            }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Labyrinth.Services.Input;
 using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 
@@ -53,6 +54,13 @@ namespace Labyrinth
         public static void SetWorld(World world)
             {
             World = world;
+            }
+
+        public static GameInput GameInput { get; private set; }
+
+        public static void SetGameInput(GameInput gameInput)
+            {
+            GameInput = gameInput;
             }
 
         public static IPlayerInput PlayerInput { get; private set; }

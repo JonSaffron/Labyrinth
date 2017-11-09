@@ -13,8 +13,10 @@ namespace Labyrinth.Services.WorldBuilding
             if (string.IsNullOrEmpty(symbol) || symbol.Length != 1)
                 throw new InvalidOperationException();
             this.Symbol = symbol[0];
+
             if (!Enum.TryParse(tileTypeByMap, true, out this.TileTypeByMap))
                 throw new InvalidOperationException();
+
             this.TextureName = textureName;
             }
         }

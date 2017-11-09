@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this._isExtant = true;
             }
 
-        public override bool IsExtant => this._isExtant;
+        public override bool IsExtant => base.IsExtant && this._isExtant;
 
         public override void ReduceEnergy(int energyToRemove)
             {

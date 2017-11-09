@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Input;
-using Labyrinth.Services.Sound;
-using Labyrinth.Services.WorldBuilding;
 using NUnit.Framework;
 
 namespace Labyrinth.Test
@@ -50,11 +48,10 @@ namespace Labyrinth.Test
                 new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None)),
                 new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(100), new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None))
                 };
-
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("p ");
             var w = g.World;
 
@@ -77,11 +74,10 @@ namespace Labyrinth.Test
                 new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None)),
                 new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(100), new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None))
                 };
-
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("pg");
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
@@ -105,11 +101,10 @@ namespace Labyrinth.Test
                 new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None)),
                 new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(100), new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None))
                 };
-
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("p ");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
@@ -137,11 +132,10 @@ namespace Labyrinth.Test
                 new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None)),
                 new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(100), new PlayerController.Instruction(Direction.Right, FiringState.None, FiringState.None))
                 };
-
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("pg");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 

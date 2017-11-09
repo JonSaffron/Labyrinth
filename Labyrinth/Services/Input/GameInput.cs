@@ -32,12 +32,12 @@ namespace Labyrinth.Services.Input
             this._previousKeyboardState = this._currentKeyboardState;
             this._currentKeyboardState = Keyboard.GetState();
 
-            this.HasToggleFullScreenBeenTriggered = IsKeyNewlyPressed(Keys.Enter) && IsKeyCurrentlyPressed(Keys.LeftAlt);
+            this.HasToggleFullScreenBeenTriggered = IsKeyCurrentlyPressed(Keys.LeftAlt) && IsKeyNewlyPressed(Keys.Enter);
             this.HasSoundOffBeenTriggered = IsKeyNewlyPressed(Keys.Q);
             this.HasSoundOnBeenTriggered = IsKeyNewlyPressed(Keys.S);
             this.HasSoundIncreaseBeenTriggered = IsKeyNewlyPressed(Keys.PageUp);
             this.HasSoundDecreaseBeenTriggered = IsKeyNewlyPressed(Keys.PageDown);
-            this.HasMoveToNextLevelBeenTriggered = IsKeyNewlyPressed(Keys.L) && IsKeyCurrentlyPressed(Keys.LeftShift);
+            this.HasMoveToNextLevelBeenTriggered = IsKeyCurrentlyPressed(Keys.LeftShift) && IsKeyNewlyPressed(Keys.L);
             this.HasPauseBeenTriggered = IsKeyNewlyPressed(Keys.P);
             this.HasGameExitBeenTriggered = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
             }

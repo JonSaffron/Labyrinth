@@ -21,8 +21,7 @@ namespace Labyrinth
                     GlobalServices.SetMonsterMovementFactory(container.Resolve<IMonsterMovementFactory>());
                     GlobalServices.SetRandomness(container.Resolve<IRandomess>());
 
-                    var game = container.Resolve<Game1>();
-                    game.IsInteractive = true;
+                    var game = new Game1(new InteractiveServices());
                     game.Run();
                     }
                 result = 0;

@@ -27,7 +27,7 @@ namespace Labyrinth.GameObjects
             this._isExtant = true;
             }
 
-        public override bool IsExtant => this._isExtant;
+        public override bool IsExtant => base.IsExtant && this._isExtant;
 
         public override int DrawOrder => (int) SpriteDrawOrder.Bang;
         public override bool Update(GameTime gameTime)

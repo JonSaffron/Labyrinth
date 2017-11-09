@@ -2,6 +2,7 @@
 
 namespace Labyrinth.Services.Sound
     {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     class NullSoundPlayer : ISoundPlayer
         {
         public void Play(GameSound gameSound)
@@ -34,10 +35,7 @@ namespace Labyrinth.Services.Sound
             // nothing to do
             }
 
-        public bool IsMuted
-            {
-            get { return true; }
-            }
+        public bool IsMuted => true;
 
         public void TurnUpTheVolume()
             {
@@ -49,20 +47,8 @@ namespace Labyrinth.Services.Sound
             // nothing to do
             }
 
-        public SoundLibrary SoundLibrary
-            {
-            get
-                {
-                return new SoundLibrary();
-                }
-            }
+        public SoundLibrary SoundLibrary => new SoundLibrary();
 
-        public IActiveSoundService ActiveSoundService
-            {
-            get 
-                {
-                return new ActiveSoundService();
-                }
-            }
+        public IActiveSoundService ActiveSoundService => new ActiveSoundService();
         }
     }

@@ -2,8 +2,6 @@
 using System.Linq;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Input;
-using Labyrinth.Services.Sound;
-using Labyrinth.Services.WorldBuilding;
 using NUnit.Framework;
 
 namespace Labyrinth.Test
@@ -19,11 +17,10 @@ namespace Labyrinth.Test
                 new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.Left, FiringState.None, FiringState.None)),
                 new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(200), PlayerController.Instruction.DoNothingInstruction())
                 };
-
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("# bp#");
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
@@ -50,11 +47,10 @@ namespace Labyrinth.Test
                 new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.Left, FiringState.None, FiringState.None)),
                 new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(200), PlayerController.Instruction.DoNothingInstruction())
                 };
-
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("#bp #");
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
@@ -81,9 +77,8 @@ namespace Labyrinth.Test
         public void TestPlayerHasNoSpaceToBounceBoulder()
             {
             var pc = new PlayerController();
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("#bp#");
             var w = g.World;
 
@@ -106,9 +101,8 @@ namespace Labyrinth.Test
                 };
 
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("#bpb #");
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
@@ -140,9 +134,8 @@ namespace Labyrinth.Test
         public void TestPlayerCannotBouncesOneBoulderBecauseAnotherBoulderBehindCannotMove()
             {
             var pc = new PlayerController();
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("#bpb#");
             var w = g.World;
 
@@ -163,11 +156,10 @@ namespace Labyrinth.Test
                 new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.Left, FiringState.None, FiringState.None)),
                 new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(200), PlayerController.Instruction.DoNothingInstruction())
                 };
-
             var pc = new PlayerController(instructions);
-            var wl = new WorldLoaderForTest();
-            var g = new Game1(pc, wl, new NullSoundPlayer(), new DummySpriteLibrary());
-            g.Components.Add(new SuppressDrawComponent(g));
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
             g.LoadLevel("# bbp #");
 
             while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())

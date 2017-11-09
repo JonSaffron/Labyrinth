@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,6 +11,9 @@ namespace Labyrinth.Test
 
         public Texture2D GetSprite(string name)
             {
+            var mutex = new Mutex(true, "hello");
+            mutex.WaitOne();
+
             if (this._graphicsDevice == null)
                 {
                 var graphicsDeviceService = GlobalServices.ServiceProvider.GetService(typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
@@ -24,13 +28,10 @@ namespace Labyrinth.Test
                     }
                 this._graphicsDevice = graphicsDeviceService.GraphicsDevice;
                 }
+            mutex.ReleaseMutex();
+
             var result = new Texture2D(this._graphicsDevice, 1, 1, false, SurfaceFormat.Color);
             return result;
-            }
-
-        public void Dispose()
-            {
-            this._graphicsDevice = null;
             }
         }
     }

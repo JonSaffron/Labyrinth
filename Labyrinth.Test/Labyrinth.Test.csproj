@@ -72,6 +72,7 @@
     <Compile Include="TestMortonCode.cs" />
     <Compile Include="TestInstanceCache.cs" />
     <Compile Include="TestScoreKeeper.cs" />
+    <Compile Include="UnitTestServices.cs" />
     <Compile Include="TestStandardRandom.cs" />
   </ItemGroup>
   <ItemGroup>

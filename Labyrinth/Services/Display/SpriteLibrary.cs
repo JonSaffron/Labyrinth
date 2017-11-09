@@ -1,33 +1,28 @@
 ﻿using System;
-using Microsoft.Xna.Framework.Content;
+using JetBrains.Annotations;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
     public class SpriteLibrary : ISpriteLibrary
         {
-        private ContentManager _contentManager;
+        private readonly Game _game;
+
+        public SpriteLibrary([NotNull] Game game)
+            {
+            _game = game ?? throw new ArgumentNullException(nameof(game));
+            }
 
         public Texture2D GetSprite(string textureName)
             {
             if (textureName == null)
-                throw new ArgumentNullException("textureName");
+                throw new ArgumentNullException(nameof(textureName));
             if (string.IsNullOrWhiteSpace(textureName))
-                throw new ArgumentException("textureName");
+                throw new ArgumentException("Invalid texture name.", nameof(textureName));
 
-            if (this._contentManager == null)
-                this._contentManager = new ContentManager(GlobalServices.ServiceProvider, "Content");
-            var result = this._contentManager.Load<Texture2D>(textureName);
+            var result = this._game.Content.Load<Texture2D>(textureName);
             return result;
-            }
-
-        public void Dispose()
-            {
-            if (this._contentManager != null)
-                {
-                this._contentManager.Dispose();
-                this._contentManager = null;
-                }
             }
         }
     }

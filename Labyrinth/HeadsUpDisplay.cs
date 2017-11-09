@@ -12,6 +12,7 @@ namespace Labyrinth
         private SpriteFont _statusFont;
         private decimal _displayedScore;
         private int _displayedEnergy;
+        private int _green;
 
         public void LoadContent(ContentManager contentManager)
             {
@@ -120,11 +121,13 @@ namespace Labyrinth
         // todo this shouldn't need to know anything about zoom
         public void DrawPausedMessage(ISpriteBatch spriteBatch)
             {
+            this._green = (this._green + 1) % 512;
+            var greenComponent = Math.Abs(255 - this._green);
             const string paused = "-> P A U S E D <-";
             Vector2 size = this._statusFont.MeasureString(paused) * spriteBatch.Zoom;
             Vector2 origin = Vector2.Zero;
             Vector2 pos = new Vector2(Constants.RoomSizeInPixels.X * spriteBatch.Zoom / 2f - size.X / 2f, 200);
-            spriteBatch.DrawString(this._statusFont, paused, pos, Color.Green, origin);
+            spriteBatch.DrawString(this._statusFont, paused, pos, new Color(0, greenComponent, 0), origin);
             }
         }
     }

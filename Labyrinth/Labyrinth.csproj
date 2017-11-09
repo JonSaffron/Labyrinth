@@ -126,11 +126,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
-    <Compile Include="ComponentRegistration.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameObjects\Monsters\Movement\FullPursuit.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
+    <Compile Include="InteractiveServices.cs" />
     <Compile Include="Interfaces\IGameObjectCollection.cs" />
     <Compile Include="HeadsUpDisplay.cs" />
     <Compile Include="Interfaces\IHeadsUpDisplay.cs" />
@@ -143,6 +143,7 @@
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Interfaces\IValuable.cs" />
     <Compile Include="GameObjects\Monsters\Movement\KillerCubeRedMovement.cs" />
+    <Compile Include="Interfaces\IServiceSetup.cs" />
     <Compile Include="MonsterMovementFactory.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Placid.cs" />
     <Compile Include="GameObjects\Monsters\Movement\RotaFloatCyanMovement.cs" />

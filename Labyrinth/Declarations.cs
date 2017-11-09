@@ -279,14 +279,15 @@ namespace Labyrinth
     /// </summary>
     public enum SpriteDrawOrder
         {
-        Wall = 0,
-        StaticItem = 1,
-        ForceField = 2,
-        StaticMonster = 3,
-        MovingMonster = 4,
-        Player = 5,
-        Boulder = 6,
-        Shot = 7,
-        Bang = 8
+        Floor = 0,
+        Wall = 1,
+        StaticItem = 2,
+        ForceField = 3,
+        StaticMonster = 4,
+        MovingMonster = 5,
+        Player = 6,
+        Boulder = 7,
+        Shot = 8,
+        Bang = 9
         }
     }

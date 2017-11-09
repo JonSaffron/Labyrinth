@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -7,16 +9,21 @@ namespace Labyrinth.Services.Input
     {
     class PlayerInput : IPlayerInput
         {
-        public GameInput GameInput { get; set; }
         public Direction Direction { get; private set; }
         public FiringState FireStatus1 { get; private set; }
         public FiringState FireStatus2 { get; private set; }
 
+        private readonly GameInput _gameInput;
         private Direction _previousRequestedDirectionOfMovement;
         private KeyboardState _currentKeyboardState;
         private KeyboardState _previousKeyboardState;
         
         private static readonly List<DirectionForKey> KeysList = BuildKeys();
+
+        public PlayerInput([NotNull] GameInput gameInput)
+            {
+            this._gameInput = gameInput ?? throw new ArgumentNullException(nameof(gameInput));
+            }
 
         /// <summary>
         /// Gets player movement and fire action
@@ -24,7 +31,7 @@ namespace Labyrinth.Services.Input
         public void ProcessInput(GameTime gameTime)
             {
             this._previousKeyboardState = this._currentKeyboardState;
-            this._currentKeyboardState = this.GameInput.LastKeyboardState;
+            this._currentKeyboardState = this._gameInput.LastKeyboardState;
 
             this.Direction = GetDirection();
             this.FireStatus1 = this.IsKeyCurrentlyPressed(Keys.LeftControl) ? (this.WasKeyPressed(Keys.LeftControl) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None;
@@ -33,8 +40,7 @@ namespace Labyrinth.Services.Input
 
         private Direction GetDirection()
             {
-            Direction direction;
-            if (GetNewDirection(out direction))
+            if (GetNewDirection(out var direction))
                 {
                 this._previousRequestedDirectionOfMovement = direction;
                 return direction;

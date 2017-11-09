@@ -6,7 +6,7 @@ namespace Labyrinth.Services.Display
     {
     public class SpriteBatchFullScreen : SpriteBatchBase, ISpriteBatch
         {
-        private readonly Point _offset;
+        private readonly Vector2 _offset;
         public float Zoom { get; }
         
         public SpriteBatchFullScreen(GraphicsDevice graphicsDevice) : base(graphicsDevice)
@@ -17,19 +17,18 @@ namespace Labyrinth.Services.Display
 
         protected override void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects)
             {
-            var destination = new Vector2(position.X * this.Zoom + this._offset.X, position.Y * this.Zoom + this._offset.Y);
+            var destination = position * this.Zoom + this._offset;
             this.SpriteBatch.Draw(texture, destination, sourceRectangle, Color.White, rotation, origin, this.Zoom, effects, 0);
             }
 
         protected override void DrawTexture(Texture2D texture, Rectangle absolutePosition, Color colour)
             {
-            var x = (int)(absolutePosition.X * this.Zoom);
-            var y = (int)(absolutePosition.Y * this.Zoom);
+            var x = (int)(absolutePosition.X * this.Zoom) + (int)this._offset.X;
+            var y = (int)(absolutePosition.Y * this.Zoom) + (int)this._offset.Y;
             var width = (int)(absolutePosition.Width * this.Zoom);
             var height = (int)(absolutePosition.Height * this.Zoom);
 
             var r = new Rectangle(x, y, width, height);
-            r.Offset(this._offset);
             this.SpriteBatch.Draw(texture, r, colour);
             }
 
@@ -41,19 +40,19 @@ namespace Labyrinth.Services.Display
             return result;
             }
 
-        private static Point GetFullScreenOffset(Viewport viewport, float zoom)
+        private static Vector2 GetFullScreenOffset(Viewport viewport, float zoom)
             {
             var viewx = Constants.RoomSizeInPixels.X * zoom;
             var viewy = Constants.RoomSizeInPixels.Y * zoom;
             var offsetx = (viewport.Width - viewx) / 2;
             var offsety = (viewport.Height - viewy) / 2;
-            var result = new Point((int) offsetx, (int) offsety);
+            var result = new Vector2((int) offsetx, (int) offsety);
             return result;
             }
 
         public void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin)
             {
-            this.SpriteBatch.DrawString(font, text, pos, color, 0, origin, this.Zoom, SpriteEffects.None, 0);
+            this.SpriteBatch.DrawString(font, text, pos, color, 0, origin + this._offset, this.Zoom, SpriteEffects.None, 0);
             }
         }
     }

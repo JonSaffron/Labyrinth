@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Labyrinth.Services;
 using Labyrinth.Services.WorldBuilding;
 
+// ReSharper disable ObjectCreationAsStatement
 // ReSharper disable AssignNullToNotNullAttribute
 // ReSharper disable MustUseReturnValue
 
@@ -93,6 +94,23 @@ namespace Labyrinth.Test
                     Assert.LessOrEqual(t, i * j);
                     }
                 }
+            }
+
+        [Test]
+        public void TestDiceRollConstructor()
+            {
+            Assert.Throws<ArgumentOutOfRangeException>(() => new DiceRoll(0, 10));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new DiceRoll(10, 0));
+            Assert.DoesNotThrow(() => new DiceRoll(1, 1));
+
+            Assert.Throws<FormatException>(() => new DiceRoll(""));
+            Assert.Throws<FormatException>(() => new DiceRoll("D"));
+            Assert.Throws<FormatException>(() => new DiceRoll("0D"));
+            Assert.Throws<FormatException>(() => new DiceRoll("D0"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new DiceRoll("0D0"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new DiceRoll("0D10"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new DiceRoll("10D0"));
+            Assert.DoesNotThrow(() => new DiceRoll("1D1"));
             }
         }
     }

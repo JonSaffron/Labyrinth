@@ -6,13 +6,11 @@ namespace Labyrinth.Services.Sound
     {
     public class ActiveSound : IActiveSound
         {
-        public ISoundEffectInstance SoundEffectInstance { get; private set; }
+        public ISoundEffectInstance SoundEffectInstance { get; }
 
         public ActiveSound([NotNull] ISoundEffectInstance soundEffectInstance)
             {
-            if (soundEffectInstance == null)
-                throw new ArgumentNullException("soundEffectInstance");
-            this.SoundEffectInstance = soundEffectInstance;
+            this.SoundEffectInstance = soundEffectInstance ?? throw new ArgumentNullException(nameof(soundEffectInstance));
             }
 
         public bool HasFinishedPlaying

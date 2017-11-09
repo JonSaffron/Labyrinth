@@ -197,9 +197,7 @@ namespace Labyrinth
 
         public Bang AddBang(Vector2 p, BangType bangType, GameSound gameSound)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var b = new Bang(ap, p, bangType);
-            this._gameObjectCollection.Add(b);
+            var b = AddBang(p, bangType);
             b.PlaySound(gameSound);
             return b;
             }

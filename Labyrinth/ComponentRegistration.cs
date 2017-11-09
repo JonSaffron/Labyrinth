@@ -9,11 +9,13 @@ using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth
     {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ComponentRegistration : IWindsorInstaller
         {
         public void Install(IWindsorContainer container, IConfigurationStore store)
             {
             container.Register(Component.For<Game1, ICentrePointProvider>().ImplementedBy<Game1>());
+            container.Register(Component.For<GameInput>().ImplementedBy<GameInput>());
             container.Register(Component.For<IPlayerInput>().ImplementedBy<PlayerInput>());
             container.Register(Component.For<IWorldLoader>().ImplementedBy<WorldLoader>());
             container.Register(Component.For<ISoundPlayer>().ImplementedBy<SoundPlayer>());

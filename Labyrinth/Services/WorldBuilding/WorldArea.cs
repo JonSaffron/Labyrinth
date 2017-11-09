@@ -8,14 +8,17 @@ namespace Labyrinth.Services.WorldBuilding
     {
     class WorldArea : IEquatable<WorldArea>
         {
-        private readonly PlayerStartState _playerStartState;
-        private readonly Dictionary<char, TileDefinition> _tileDefs = new Dictionary<char, TileDefinition>();
-        private readonly Dictionary<FruitType, FruitDefinition> _fruitDefs = new Dictionary<FruitType, FruitDefinition>();
-        private readonly RandomMonsterDistribution _randomMonsterDistribution = new RandomMonsterDistribution();
-        
         public int? Id; 
-        public Rectangle Area { get; private set; }
-        public bool IsInitialArea { get; private set; }
+        public Rectangle Area { get; }
+        public bool IsInitialArea { get; }
+
+        [CanBeNull] public PlayerStartState PlayerStartState { get; }
+
+        [CanBeNull] public Dictionary<char, TileDefinition> TileDefinitions { get; }
+
+        [CanBeNull] public Dictionary<FruitType, FruitDefinition> FruitDefinitions { get; }
+
+        [CanBeNull] public RandomMonsterDistribution RandomMonsterDistribution { get; }
 
         public WorldArea(XmlElement area, XmlNamespaceManager xnm)
             {
@@ -31,42 +34,21 @@ namespace Labyrinth.Services.WorldBuilding
             var startPos = (XmlElement) area.SelectSingleNode("ns:PlayerStartState", xnm);
             if (startPos != null)
                 {
-                this._playerStartState = LoadPlayerStartState(startPos);
-                if (!this.Area.ContainsTile(this._playerStartState.Position))
+                var pss = LoadPlayerStartState(startPos);
+                if (!this.Area.ContainsTile(pss.Position))
                     throw new InvalidOperationException("Invalid player start position - co-ordinate is not within the area.");
+                this.PlayerStartState = pss;
                 }
 
             var tileDefinitions = area.SelectNodes("ns:TileDefinitions/ns:TileDef", xnm);
-            if (tileDefinitions != null)
-                this._tileDefs = LoadTileDefs(tileDefinitions);
-            
+            this.TileDefinitions = tileDefinitions != null ? LoadTileDefs(tileDefinitions) : new Dictionary<char, TileDefinition>();
+
+
             var fruitPopulation = area.SelectNodes("ns:FruitDefinitions/ns:FruitDef", xnm);
-            if (fruitPopulation != null)
-                this._fruitDefs = LoadFruitPopulation(fruitPopulation);
+            this.FruitDefinitions = fruitPopulation != null ? LoadFruitPopulation(fruitPopulation) : new Dictionary<FruitType, FruitDefinition>();
 
             var randomMonsterDistribution = (XmlElement) area.SelectSingleNode("ns:RandomMonsterDistribution", xnm);
-            if (randomMonsterDistribution != null)
-                this._randomMonsterDistribution = LoadRandomMonsterDistribution(randomMonsterDistribution, xnm);
-            }
-
-        [CanBeNull] public PlayerStartState PlayerStartState
-            {
-            get { return this._playerStartState; }
-            }
-
-        [CanBeNull] public Dictionary<char, TileDefinition> TileDefinitions
-            {
-            get { return this._tileDefs; }
-            }
-        
-        [CanBeNull] public Dictionary<FruitType, FruitDefinition> FruitDefinitions
-            {
-            get { return this._fruitDefs; }
-            }
-
-        [CanBeNull] public RandomMonsterDistribution RandomMonsterDistribution
-            {
-            get { return this._randomMonsterDistribution; }
+            this.RandomMonsterDistribution = randomMonsterDistribution != null ? LoadRandomMonsterDistribution(randomMonsterDistribution, xnm) : new RandomMonsterDistribution();
             }
 
         public static Rectangle GetRectangleFromDefinition(XmlElement area)

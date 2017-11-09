@@ -1,8 +1,6 @@
 using System;
 using JetBrains.Annotations;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.Input;
-using Labyrinth.Services.ScoreKeeper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,32 +11,21 @@ namespace Labyrinth
     /// </summary>
     public class Game1 : Game
         {
-        private readonly IPlayerInput _playerInput;
-        private ISpriteBatch _spriteBatch;
-
         private readonly GraphicsDeviceManager _gdm;
         private readonly IWorldLoader _worldLoader;
-
-        private int _lives;
-
         private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
-        private readonly IScoreKeeper _scoreKeeper = new ScoreKeeper();
+        private ISpriteBatch _spriteBatch;
+
         private World _world;
+        private int _lives;
+        private bool _isGamePaused;
 
-        private bool GameIsPaused { get; set; }
-        public bool IsInteractive { get; set; }
-
-        public Game1([NotNull] IPlayerInput playerInput, [NotNull] IWorldLoader worldLoader, ISoundPlayer soundPlayer, ISpriteLibrary spriteLibrary)
+        public Game1([NotNull] IServiceSetup services)
             {
-            this._playerInput = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
-            this._playerInput.GameInput = new GameInput(this);
-            this._worldLoader = worldLoader ?? throw new ArgumentNullException(nameof(worldLoader));
-            GlobalServices.SetSoundPlayer(soundPlayer);
-            GlobalServices.SetSpriteLibrary(spriteLibrary);
+            services.Setup(this);
+            this._worldLoader = services.WorldLoader ?? throw new ArgumentException("WorldLoader");
             GlobalServices.SetServiceProvider(this.Services);
             GlobalServices.SetGameComponentCollection(this.Components);
-            GlobalServices.SetPlayerInput(this._playerInput);
-            GlobalServices.SetScoreKeeper(this._scoreKeeper);
             
             this._gdm = new GraphicsDeviceManager(this)
                             {
@@ -47,10 +34,9 @@ namespace Labyrinth
                             };
 
             this.Content.RootDirectory = "Content";
-            //this.TargetElapsedTime = new TimeSpan(this.TargetElapsedTime.Ticks * 4);
             this._lives = 2;
             this._headsUpDisplay.Reset();
-            this._scoreKeeper.Reset();
+            GlobalServices.ScoreKeeper?.Reset();
             }
 
         /// <summary>
@@ -110,7 +96,7 @@ namespace Labyrinth
                 LoadLevel("World2.xml");
                 }
 
-            if (this.GameIsPaused)
+            if (this._isGamePaused)
                 gameTime = new GameTime();
 
             // allow registered components to update. this includes the GameTimers and the Keyboard handler.
@@ -118,7 +104,7 @@ namespace Labyrinth
             ProcessGameInput();
             GlobalServices.SoundPlayer.ActiveSoundService.Update();
 
-            if (!this.GameIsPaused)
+            if (!this._isGamePaused)
                 {
                 // ReSharper disable once PossibleNullReferenceException
                 LevelReturnType lrt = this.World.Update(gameTime);
@@ -137,7 +123,7 @@ namespace Labyrinth
                             return;
                             }
                         this._lives--;
-                        this.World.ResetLevelAfterLosingLife(_spriteBatch);
+                        this.World.ResetLevelAfterLosingLife();
                         break;
                     }
                 }
@@ -151,12 +137,12 @@ namespace Labyrinth
 
         private void ProcessGameInput()
             {
-            var gameInput = this._playerInput.GameInput;
+            var gameInput = GlobalServices.GameInput;
             if (gameInput.HasGameExitBeenTriggered)
                 this.Exit();
 
             if (gameInput.HasPauseBeenTriggered)
-                this.GameIsPaused = !this.GameIsPaused;
+                this._isGamePaused = !this._isGamePaused;
 
             if (gameInput.HasToggleFullScreenBeenTriggered)
                 ToggleFullScreen();
@@ -175,7 +161,7 @@ namespace Labyrinth
 
             if (gameInput.HasMoveToNextLevelBeenTriggered)
                 {
-                World?.MoveUpALevel();
+                this.World?.MoveUpALevel();
                 }
             }
 
@@ -187,7 +173,7 @@ namespace Labyrinth
             {
             GraphicsDevice.Clear(Color.Black);
 
-            if (this.GameIsPaused)
+            if (this._isGamePaused)
                 gameTime = new GameTime();
 
             // Draw the sprite.
@@ -195,8 +181,8 @@ namespace Labyrinth
             if (this.World != null)
                 {
                 this.World.Draw(gameTime, _spriteBatch);
-                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, this._scoreKeeper.CurrentScore, this._lives, gameTime.IsRunningSlowly);
-                if (this.GameIsPaused)
+                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, GlobalServices.ScoreKeeper.CurrentScore, this._lives, gameTime.IsRunningSlowly);
+                if (this._isGamePaused)
                     this._headsUpDisplay.DrawPausedMessage(_spriteBatch);
                 }
 
@@ -210,7 +196,7 @@ namespace Labyrinth
             // Load the World.
             this._worldLoader.LoadWorld(level);
             this.World = new World(this._worldLoader);
-            this.World.ResetLevelForStartingNewLife(this._spriteBatch);
+            this.World.ResetLevelForStartingNewLife();
             }
 
         private void ToggleFullScreen()
@@ -230,7 +216,7 @@ namespace Labyrinth
             {
             base.OnDeactivated(sender, args);
 
-            this.GameIsPaused = true;
+            this._isGamePaused = true;
             }
         }
     }

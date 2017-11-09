@@ -41,7 +41,7 @@ namespace Labyrinth
             GlobalServices.SetGameState(gameState);
             }
 
-        public void ResetLevelAfterLosingLife(ISpriteBatch spw)
+        public void ResetLevelAfterLosingLife()
             {
             GlobalServices.GameState.RemoveBangsAndShots();
 
@@ -50,7 +50,7 @@ namespace Labyrinth
             var resetPosition = this._restartInSameRoom ? GetRestartLocation(this.Player.TilePosition, pss.Position) : pss.Position;
             this.Player.ResetPositionAndEnergy(resetPosition.ToPosition(), pss.Energy);
 
-            ResetLevelForStartingNewLife(spw);
+            ResetLevelForStartingNewLife();
             }
 
         private TilePos GetRestartLocation(TilePos lastPosition, TilePos levelStartPosition)
@@ -66,13 +66,10 @@ namespace Labyrinth
             return tilePos;
             }
 
-        public void ResetLevelForStartingNewLife(ISpriteBatch spw)
+        public void ResetLevelForStartingNewLife()
             {
-            if (spw != null)
-                {
-                Point roomStart = GetContainingRoom(this.Player.Position).Location;
-                this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
-                }
+            Point roomStart = GetContainingRoom(this.Player.Position).Location;
+            this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
             this.Player.Reset();
 
             MoveNearbyMonstersToASafeDistance();

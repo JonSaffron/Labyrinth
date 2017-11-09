@@ -242,7 +242,7 @@ namespace Labyrinth.GameObjects
             var player = GlobalServices.GameState.Player;
             var monsterRandom = GlobalServices.Randomess;
 
-            if (this.LaysMushrooms && !this.IsEgg && GlobalServices.GameState.DoesShotExist() && inSameRoom && monsterRandom.Test(1) && IsDirectionCompatible(player.CurrentMovement.Direction, this.CurrentMovement.Direction))
+            if (this.LaysMushrooms && !this.IsEgg && GlobalServices.GameState.DoesShotExist() && inSameRoom && monsterRandom.Test(3) && IsDirectionCompatible(player.CurrentMovement.Direction, this.CurrentMovement.Direction))
                 {
                 TilePos tp = this.TilePosition;
                 if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
@@ -252,7 +252,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && monsterRandom.Test(0x1f))
+            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && monsterRandom.Test(0x3f))
                 {
                 TilePos tp = this.TilePosition;
                 if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
@@ -266,7 +266,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && inSameRoom && !this.IsEgg && !monsterRandom.Test(3) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
+            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && inSameRoom && !this.IsEgg && !monsterRandom.Test(0xf) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
                 {
                 this._weapon.FireIfYouLike(this);
                 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
@@ -6,19 +7,17 @@ namespace Labyrinth.Services.Sound
     {
     public class ActiveSoundForObject : ActiveSound
         {
-        public readonly IGameObject GameObject;
-        public readonly ICentrePointProvider CentrePointProvider;
+        private readonly IGameObject _gameObject;
+        private readonly ICentrePointProvider _centrePointProvider;
 
-        public ActiveSoundForObject(ISoundEffectInstance soundEffectInstance, IGameObject gameObject, ICentrePointProvider centrePointProvider) : base(soundEffectInstance)
+        public ActiveSoundForObject([NotNull] ISoundEffectInstance soundEffectInstance, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider) : base(soundEffectInstance)
             {
             if (gameObject == null)
-                throw new ArgumentNullException("gameObject");
-            if (centrePointProvider == null)
-                throw new ArgumentNullException("centrePointProvider");
+                throw new ArgumentNullException(nameof(gameObject));
             if (!gameObject.IsExtant)
                 throw new ArgumentException("GameObject is not extant.");
-            this.GameObject = gameObject;
-            this.CentrePointProvider = centrePointProvider;
+            this._gameObject = gameObject;
+            this._centrePointProvider = centrePointProvider ?? throw new ArgumentNullException(nameof(centrePointProvider));
             }
 
         protected override void InternalPlay()
@@ -29,13 +28,13 @@ namespace Labyrinth.Services.Sound
 
         public override void Play()
             {
-            if (this.GameObject.IsExtant)
+            if (this._gameObject.IsExtant)
                 base.Play();
             }
 
         public override void Update()
             {
-            if (!this.GameObject.IsExtant)
+            if (!this._gameObject.IsExtant)
                 {
                 this.Stop();
                 return;
@@ -49,8 +48,8 @@ namespace Labyrinth.Services.Sound
 
         private void UpdateVolumeAndPanning()
             {
-            var centrePoint = this.CentrePointProvider.CentrePoint;
-            var differenceInPosition = GameObject.Position - centrePoint;
+            var centrePoint = this._centrePointProvider.CentrePoint;
+            var differenceInPosition = _gameObject.Position - centrePoint;
 
             var adjustedDistanceApart = (differenceInPosition * new Vector2(1, 1.6f)).Length();
             var relativeCloseness = (768.0f - adjustedDistanceApart) / 768.0f;
@@ -62,14 +61,9 @@ namespace Labyrinth.Services.Sound
             this.SoundEffectInstance.Pan = panning;
             }
 
-        //public override int GetHashCode()
-        //    {
-        //    return base.GetHashCode();
-        //    }
-
         public override string ToString()
             {
-            var result = string.Format("{0} {1} for {2} vol={3} pan={4}", this.SoundEffectInstance.InstanceName, this.SoundEffectInstance.State, this.GameObject.GetType().Name, this.SoundEffectInstance.Volume, this.SoundEffectInstance.Pan);
+            var result = string.Format("{0} {1} for {2} vol={3} pan={4}", this.SoundEffectInstance.InstanceName, this.SoundEffectInstance.State, this._gameObject.GetType().Name, this.SoundEffectInstance.Volume, this.SoundEffectInstance.Pan);
             if (this.SoundEffectInstance.RestartPlayWhenStopped)
                 result += " to be restarted";
             return result;

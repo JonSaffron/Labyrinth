@@ -26,8 +26,14 @@ namespace Labyrinth.Services.WorldBuilding
             if (!match.Success)
                 throw new FormatException("Parameter must be in form <nuberofdice>D<numberofsides>, e.g. 4D6.");
 
-            this.NumberOfDice = int.Parse(match.Groups["numberOfDice"].Value);
-            this.NumberOfSides = int.Parse(match.Groups["numberOfSides"].Value);
+            var numberOfDice = int.Parse(match.Groups["numberOfDice"].Value);
+            var numberOfSides = int.Parse(match.Groups["numberOfSides"].Value);
+            if (numberOfDice <= 0)
+                throw new ArgumentOutOfRangeException(nameof(numberOfDice));
+            if (numberOfSides <= 0)
+                throw new ArgumentOutOfRangeException(nameof(numberOfSides));
+            this.NumberOfDice = numberOfDice;
+            this.NumberOfSides = numberOfSides;
             }
         }
     }
