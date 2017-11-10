@@ -99,6 +99,10 @@ namespace Labyrinth
             var result = new List<Monster>();
             foreach (var monster in GlobalServices.GameState.AllItemsInRectangle(area).OfType<Monster>())
                 {
+                if (monster.IsEgg)
+                    {
+                    monster.EggHatches(monster, new EventArgs());
+                    }
                 if (!monster.IsStatic)
                     {
                     searchParameters.StartLocation = monster.TilePosition;

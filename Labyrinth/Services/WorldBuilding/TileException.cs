@@ -4,7 +4,7 @@ namespace Labyrinth.Services.WorldBuilding
     {
     class TileException : Exception
         {
-        public TileExceptionType Type {get; private set;}
+        public TileExceptionType Type { get; }
 
         public TileException(TileExceptionType type, string message) : base(message)
             {

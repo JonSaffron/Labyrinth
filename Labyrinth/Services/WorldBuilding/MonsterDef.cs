@@ -35,7 +35,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         public string MonsterType
             {
-            get { return this._type != null ? this._type.Name : null; }
+            get { return this._type?.Name; }
             set
                 {
                 string typeName = "Labyrinth.GameObjects." + value;

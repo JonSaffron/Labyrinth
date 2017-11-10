@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth.Services.WorldBuilding
     {
-    class FruitDefinition
+    public class FruitDefinition
         {
         public FruitType FruitType { get; set; }
         public int FruitQuantity { get; set; }

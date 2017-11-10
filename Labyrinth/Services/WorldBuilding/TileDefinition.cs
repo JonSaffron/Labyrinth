@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Labyrinth.Services.WorldBuilding
     {
@@ -6,7 +7,7 @@ namespace Labyrinth.Services.WorldBuilding
         {
         public readonly char Symbol;
         public readonly TileTypeByMap TileTypeByMap;
-        public readonly string TextureName;
+        [CanBeNull] public readonly string TextureName;
         
         public TileDefinition(string symbol, string tileTypeByMap, string textureName)
             {

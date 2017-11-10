@@ -87,10 +87,10 @@ namespace Labyrinth.GameObjects
             {
             this.MonsterState = MonsterState.Hatching;
             if (this.IsExtant)
-                PlaySoundWithCallback(GameSound.EggHatches, EggHasHatched);
+                PlaySoundWithCallback(GameSound.EggHatches, EggHatches);
             }
 
-        private void EggHasHatched(object sender, EventArgs args)
+        public void EggHatches(object sender, EventArgs args)
             {
             this.MonsterState = MonsterState.Normal;
             }
