@@ -140,6 +140,7 @@ O              OO              OO              OO              OO              O
         <TileDef Symbol="K" Type="PotentiallyOccupied" />
         <TileDef Symbol="X" Type="PotentiallyOccupied" />
         <TileDef Symbol="#" Type="PotentiallyOccupied" />
+        <!-- todo remove the following line -->
         <TileDef Symbol="o" Type="PotentiallyOccupied" />
       </TileDefinitions>
       <FruitDefinitions>
@@ -277,7 +278,7 @@ O              OO              OO              OO              OO              O
     <ForceField Left="128" Top="34" Width="1" Height="2" CrystalRequired="5" />
     <ForceField Left="64" Top="4" Width="1" Height="2" CrystalRequired="6" />
 
-    <!-- test -->
+    <!-- todo remove the following line -->
     <CrumblyWall Left="142" Top="74" Energy="100" Texture="CrumblyWall3" />
     <CrumblyWall Left="142" Top="75" Energy="100" Texture="CrumblyWall3" />
     
