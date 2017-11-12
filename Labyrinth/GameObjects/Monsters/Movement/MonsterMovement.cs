@@ -119,19 +119,24 @@ namespace Labyrinth.GameObjects.Movement
                 }
             }
 
+        /// <summary>
+        /// This works in the same way to the original code. Movement to the right or left will be made in preference to up/down.
+        /// </summary>
+        /// <param name="m">The monster to determine the movement for</param>
+        /// <returns>The direction that brings the monster closer to the player</returns>
         public static Direction DetermineDirectionTowardsPlayer(Monster m)
             {
-            Vector2 diff = (m.Position - GlobalServices.GameState.Player.Position);
-            var hMove = Math.Abs(diff.X);
-            var vMove = Math.Abs(diff.Y);
+            TilePos playerPos = TilePos.TilePosFromPosition(GlobalServices.GameState.Player.Position);
+            int diffX = m.TilePosition.X - playerPos.X; 
             Direction result;
-            if (hMove > vMove)
+            if (diffX != 0)
                 {
-                result = diff.X > 0 ? Direction.Left : Direction.Right;
+                result = diffX > 0 ? Direction.Left : Direction.Right;
                 }
             else
                 {
-                result = diff.Y > 0 ? Direction.Up : Direction.Down;
+                int diffY = m.TilePosition.Y - playerPos.Y;
+                result = diffY > 0 ? Direction.Up : Direction.Down;
                 }
             return result;
             }

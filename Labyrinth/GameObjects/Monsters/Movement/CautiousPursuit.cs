@@ -25,6 +25,7 @@
             var towardsPlayer = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
             bool alterDirection = GlobalServices.Randomess.Test(3);
             Direction result = alterDirection 
+                    // todo this really should be an alteration of the direction it was last heading in
                 ?  MonsterMovement.AlterDirection(towardsPlayer) 
                 : towardsPlayer.Reversed();
             return result;
