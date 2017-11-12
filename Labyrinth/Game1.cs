@@ -85,23 +85,18 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Update</param>
         protected override void Update(GameTime gameTime)
             {
-            // todo this should be covered by the OnDeactivate event handler
-            //if (!this.IsActive && this.IsInteractive && this.World != null)
-            //    {
-            //    this.GameIsPaused = true;
-            //    }
-
             if (this.World == null)
                 {
                 LoadLevel("World2.xml");
                 }
 
+            // Must process keyboard input before checking pause status
+            ProcessGameInput();
             if (this._isGamePaused)
                 gameTime = new GameTime();
 
             // allow registered components to update. this includes the GameTimers and the Keyboard handler.
             base.Update(gameTime);
-            ProcessGameInput();
             GlobalServices.SoundPlayer.ActiveSoundService.Update();
 
             if (!this._isGamePaused)
