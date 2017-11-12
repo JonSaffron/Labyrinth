@@ -26,13 +26,7 @@ namespace Labyrinth.GameObjects
             _staticImage = Animation.StaticAnimation("Sprites/Boulder/Boulder");
             }
 
-        public override bool IsExtant
-            {
-            get
-                {
-                return true;
-                }
-            }
+        public override bool IsExtant => true;
 
         /// <summary>
         /// Handles input, performs physics, and animates the player sprite.
@@ -44,36 +38,20 @@ namespace Labyrinth.GameObjects
             bool result = false;
             if (this.IsMoving)
                 {
-                System.Diagnostics.Trace.WriteLine(string.Format("Boulder update starts at {0}", this.Position));
                 this.TryToCompleteMoveToTarget(ref elapsed);
-                System.Diagnostics.Trace.WriteLine(string.Format("Boulder update finishes at {0}", this.Position));
                 result = true;
                 }
             return result;
             }
 
-        public override ObjectSolidity Solidity
-            {
-            get
-                {
-                return ObjectSolidity.Moveable;
-                }
-            }
+        public override ObjectSolidity Solidity => ObjectSolidity.Moveable;
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.Boulder;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.Boulder;
 
-        protected override decimal StandardSpeed
-            {
-            get
-                {
-                return Constants.BaseSpeed * 2.5m;
-                }
-            }
+        protected override decimal StandardSpeed => Constants.BaseSpeed * 2.5m;
+
+        // todo remove this line
+        public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
+
         }
     }

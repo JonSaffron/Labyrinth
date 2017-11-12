@@ -12,19 +12,17 @@ namespace Labyrinth
 
         public InteractionWithStaticItems(World world, StaticItem staticItem, MovingItem movingItem)
             {
-            if (world == null)
-                throw new ArgumentNullException("world");
-            if (movingItem == null)
-                throw new ArgumentNullException("movingItem");
+            this._world = world ?? throw new ArgumentNullException(nameof(world));
+
             if (staticItem == null)
-                throw new ArgumentNullException("staticItem");
+                throw new ArgumentNullException(nameof(staticItem));
 
             if (staticItem is MovingItem)
-                throw new ArgumentOutOfRangeException("staticItem");
+                throw new ArgumentOutOfRangeException(nameof(staticItem));
 
-            this._world = world;
             this._staticItem = staticItem;
-            this._movingItem = movingItem;
+
+            this._movingItem = movingItem ?? throw new ArgumentNullException(nameof(movingItem));
             }
 
         public void Collide()
@@ -32,22 +30,19 @@ namespace Labyrinth
             if (!this._movingItem.IsExtant || !this._staticItem.IsExtant)
                 return;
 
-            var player = this._movingItem as Player;
-            if (player != null)
+            if (this._movingItem is Player player)
                 {
                 InteractionInvolvesPlayer(this._world, player, this._staticItem);
                 return;
                 }
 
-            var explosion = this._movingItem as Explosion;
-            if (explosion != null)
+            if (this._movingItem is Explosion explosion)
                 {
                 InteractionInvolvesExplosion(explosion, this._staticItem);
                 return;
                 }
 
-            var shot = this._movingItem as Shot;
-            if (shot != null)
+            if (this._movingItem is Shot shot)
                 {
                 InteractionInvolvesShot(shot, this._staticItem);
                 // return;
@@ -56,29 +51,25 @@ namespace Labyrinth
 
         private static void InteractionInvolvesPlayer(World world, Player player, StaticItem staticItem)
             {
-            var crystal = staticItem as Crystal;
-            if (crystal != null)
+            if (staticItem is Crystal crystal)
                 {
                 PlayerTakesCrystal(world, player, crystal);
                 return;
                 }
 
-            var forceField = staticItem as ForceField;
-            if (forceField != null)
+            if (staticItem is ForceField)
                 {
                 player.InstantlyExpire();
                 return;
                 }
 
-            var fruit = staticItem as Fruit;
-            if (fruit != null)
+            if (staticItem is Fruit fruit)
                 {
                 PlayerEatsFruit(player, fruit);
                 return;
                 }
 
-            var mushroom = staticItem as Mushroom;
-            if (mushroom != null)
+            if (staticItem is Mushroom mushroom)
                 {
                 PlayerPoisonedByMushroom(mushroom, player);
                 // return;
@@ -141,8 +132,7 @@ namespace Labyrinth
                 return;
                 }
 
-            var standardShot = shot as StandardShot;
-            if (standardShot == null)
+            if (!(shot is StandardShot standardShot))
                 return;
             if (staticItem is ForceField)
                 {
