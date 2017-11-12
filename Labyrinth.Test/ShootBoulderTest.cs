@@ -60,7 +60,7 @@ namespace Labyrinth.Test
             }
 
         [Test]
-        public void TestPlayerCannotShootBoulder()
+        public void TestPlayerCannotShootBoulder1()
             {
             var instructions = new[] 
                 { 
@@ -73,12 +73,16 @@ namespace Labyrinth.Test
             var g = new Game1(services);
             g.LoadLevel("#bp ");
 
-            while (!pc.HasFinishedQueue)
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
 
             Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            Assert.IsNotEmpty(list);
+            Assert.AreEqual(1, list.Count);
+            Assert.IsTrue(list[0] is Boulder);
             }
 
         [Test]
@@ -93,14 +97,48 @@ namespace Labyrinth.Test
 
             var services = new UnitTestServices(pc);
             var g = new Game1(services);
-            g.LoadLevel("# bbp ");
+            g.LoadLevel("#b p ");
 
-            while (!pc.HasFinishedQueue)
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
 
             Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
+            Assert.IsNotEmpty(list);
+            Assert.AreEqual(1, list.Count);
+            Assert.IsTrue(list[0] is Boulder);
+            }
+
+        [Test]
+        public void TestPlayerCannotShootBoulder3()
+            {
+            var instructions = new[] 
+                { 
+                new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.None, FiringState.Pulse, FiringState.None)),
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.DoNothingInstruction())
+                };
+            var pc = new PlayerController(instructions);
+
+            var services = new UnitTestServices(pc);
+            var g = new Game1(services);
+            g.LoadLevel("# bbp ");
+
+            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
+                {
+                g.Tick();
+                }
+
+            Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
+            var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(2, 0)).ToList();
+            Assert.IsNotEmpty(list);
+            Assert.AreEqual(1, list.Count);
+            Assert.IsTrue(list[0] is Boulder);
+            list = GlobalServices.GameState.GetItemsOnTile(new TilePos(3, 0)).ToList();
+            Assert.IsNotEmpty(list);
+            Assert.AreEqual(1, list.Count);
+            Assert.IsTrue(list[0] is Boulder);
             }
         }
     }
