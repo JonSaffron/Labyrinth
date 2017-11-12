@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
@@ -9,63 +7,63 @@ namespace Labyrinth
     {
     class InteractionWithMovingItems : IInteraction
         {
-        private readonly MovingItem _movingItem1;
-        private readonly MovingItem _movingItem2;
+        /// <summary>
+        /// This game object will have just moved its position (or at least returned true from its update method)
+        /// </summary>
+        private readonly MovingItem _primaryItem;
 
-        public InteractionWithMovingItems([NotNull] MovingItem movingItem1, [NotNull] MovingItem movingItem2)
+        /// <summary>
+        /// A second game object that is touching the first
+        /// </summary>
+        private readonly MovingItem _secondaryItem;
+
+        public InteractionWithMovingItems([NotNull] MovingItem primaryItem, [NotNull] MovingItem secondaryItem)
             {
-            this._movingItem1 = movingItem1 ?? throw new ArgumentNullException(nameof(movingItem1));
-            this._movingItem2 = movingItem2 ?? throw new ArgumentNullException(nameof(movingItem2));
+            this._primaryItem = primaryItem ?? throw new ArgumentNullException(nameof(primaryItem));
+            this._secondaryItem = secondaryItem ?? throw new ArgumentNullException(nameof(secondaryItem));
             }
 
         public void Collide()
             {
-            if (!this._movingItem1.IsExtant || !this._movingItem2.IsExtant)
+            if (!this._primaryItem.IsExtant || !this._secondaryItem.IsExtant)
                 return;
 
-            var items = new Collection<MovingItem> { this._movingItem1, this._movingItem2 };
-
-            var explosion = items.OfType<Explosion>().FirstOrDefault();
-            if (explosion != null)
+            if (this._primaryItem is Explosion explosion)
                 {
-                var otherItem = items.Single(item => item != explosion);
-                if (InteractionInvolvesExplosion(explosion, otherItem))
-                    return;
-                }
-                
-            var shot = items.OfType<StandardShot>().FirstOrDefault();
-            if (shot != null)
-                {
-                var otherItem = items.Single(item => item != shot);
-                if (InteractionInvolvingShot(shot, otherItem))
+                if (InteractionInvolvesExplosion(explosion, this._secondaryItem))
                     return;
                 }
 
-            var mine = items.OfType<Mine>().FirstOrDefault();
-            if (mine != null)
+            if (this._primaryItem is StandardShot shot)
                 {
-                var otherItem = items.Single(item => item != mine);
-                mine.SteppedOnBy(otherItem);
+                if (InteractionInvolvingShot(shot, this._secondaryItem))
+                    return;
+                }
+
+            if (this._primaryItem is Mine mine)
+                {
+                mine.SteppedOnBy(this._secondaryItem);
                 return;
                 }
 
-            var player = items.OfType<Player>().SingleOrDefault();
-            if (player != null)
+            if (this._primaryItem is Player player && this._secondaryItem is Monster monster)
                 {
-                var monster = items.Single(item => item != player) as Monster;
-                if (monster != null)
+                PlayerAndMonsterCollide(player, monster);
+                }
+            else
+                {
+                player = this._secondaryItem as Player;
+                monster = this._primaryItem as Monster;
+                if (player != null && monster != null)
                     {
-                    int monsterEnergy = monster.InstantlyExpire();
-                    player.ReduceEnergy(monsterEnergy);
-                    GlobalServices.GameState.AddBang(monster.Position, BangType.Long, GameSound.PlayerCollidesWithMonster);
-                    return;
+                    PlayerAndMonsterCollide(player, monster);
                     }
                 }
-            
-            var moveableObject = items.FirstOrDefault(item => item.Solidity == ObjectSolidity.Moveable);
+
+            var moveableObject = this._secondaryItem.Solidity == ObjectSolidity.Moveable ? this._secondaryItem : null;
             if (moveableObject != null)
                 {
-                var otherObject = items.Single(item => item != moveableObject);
+                var otherObject = this._primaryItem;
                 if (otherObject.Capability.CanMoveAnother())
                     {
                     var actionTaken = PushOrBounceObject(moveableObject, otherObject);
@@ -79,6 +77,13 @@ namespace Labyrinth
                 }
 
             // any other interaction here...
+            }
+
+        private static void PlayerAndMonsterCollide(Player player, Monster monster)
+            {
+            int monsterEnergy = monster.InstantlyExpire();
+            player.ReduceEnergy(monsterEnergy);
+            GlobalServices.GameState.AddBang(monster.Position, BangType.Long, GameSound.PlayerCollidesWithMonster);
             }
 
         /// <summary>

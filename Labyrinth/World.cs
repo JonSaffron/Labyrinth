@@ -238,11 +238,17 @@ namespace Labyrinth
             //    Trace.WriteLine(string.Format("Total interactive items: {0}, those that moved: {1}, interactions: {2}", countOfGameItems, countOfGameItemsThatMoved, countOfInteractions));
             }
 
-        private IInteraction BuildInteraction(MovingItem thisGameItem, StaticItem thatGameItem)
+        /// <summary>
+        /// Builds an interaction object from the two specified game objects
+        /// </summary>
+        /// <param name="updatedItem">An object that has just moved position</param>
+        /// <param name="thatGameItem">An object whose position overlaps the first object</param>
+        /// <returns>An instance of an interaction object</returns>
+        private IInteraction BuildInteraction(MovingItem updatedItem, StaticItem thatGameItem)
             {
             var result = thatGameItem is MovingItem secondMovingItem
-                ? (IInteraction) new InteractionWithMovingItems(thisGameItem, secondMovingItem)
-                : new InteractionWithStaticItems(this, thatGameItem, thisGameItem);
+                ? (IInteraction) new InteractionWithMovingItems(updatedItem, secondMovingItem)
+                : new InteractionWithStaticItems(this, thatGameItem, updatedItem);
             return result;
             }
 
