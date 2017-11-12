@@ -138,7 +138,7 @@ namespace Labyrinth.GameObjects
             }
 
         /// <summary>
-        /// Used to determined if this object can be pushed or bounced
+        /// Used to determine if this object can be pushed or bounced
         /// </summary>
         /// <param name="byWhom">The object that is potentially pushing this object</param>
         /// <param name="direction">Sets the direction in which this object might be moved</param>
