@@ -1861,7 +1861,7 @@ static object injured (b)
 1AC3 C9 06     CMP #06                  
 1AC5 D0 07     BNE 1ACE                 
 
-		-- 86 aggressive
+		-- 86 semi aggressive
 
 1AC7 20 80 1E  JSR 1E80                 -- get random number
 1ACA 30 80     BMI 1A4C                 -- if -ve then goto random direction routine
@@ -2695,12 +2695,27 @@ static object injured (b)
 2028 C9 01     CMP #01                  -- is it occupied by a monster?
 202A D0 54     BNE 2080                 -- nope, so continue loop
 
+		-- deal with monster activities such as:
+		--	controlling cautious behaviour, 
+		--	flittering, 
+		--	laying eggs and mushrooms, 
+		--	firing at player
+
 202C BD 03 0C  LDA 0C03,X               -- get position between tiles
 202F D0 4F     BNE 2080                 -- between tiles, so continue loop
+
+		-- should the monster be cautious?
+
 2031 20 37 2B  JSR 2B37                 -- check behaviour when cautious
+
+		-- check if monster is in egg form
+
 2034 BC 06 0C  LDY 0C06,X               -- get monster id
 2037 B9 00 07  LDA 0700,Y               -- get monster movement type
 203A 30 47     BMI 2083                 -- branch if negative (monster is an egg)
+
+		-- if monster flitters then toggle the flitter flag
+
 203C 48        PHA                      
 203D 29 0F     AND #0F                  -- extract basic monster type
 203F 0A        ASL A                    -- double it
@@ -2711,6 +2726,9 @@ static object injured (b)
 2047 BD 07 0C  LDA 0C07,X               -- get current double-speed flag
 204A 49 FF     EOR #FF                  -- reverse it
 204C 9D 07 0C  STA 0C07,X               -- store new double-speed flag
+
+		-- check for laying egg
+
 204F 68        PLA                      
 2050 48        PHA                      
 2051 29 40     AND #40                  -- extract whether the monster lays eggs
@@ -2722,10 +2740,16 @@ static object injured (b)
 205F 29 1F     AND #1F                  -- only first 5 bits (0 to 31)
 2061 D0 03     BNE 2066                 -- not zero, so branch over
 2063 20 BA 28  JSR 28BA                 -- lay egg
+
+		-- check for laying mushroom
+
 2066 68        PLA                      
 2067 29 20     AND #20                  -- extract whether the monster lays mushrooms
 2069 D0 03     BNE 206E                 -- nope, so branch over
 206B 20 5B 2B  JSR 2B5B                 -- possibly lay a mushroom
+
+		-- check for firing at player
+
 206E BC 06 0C  LDY 0C06,X               -- get monster id
 2071 B9 C0 04  LDA 04C0,Y               -- get type of movement
 2074 10 0A     BPL 2080                 -- branch if the monster doesn't shoot

@@ -203,6 +203,7 @@ namespace Labyrinth
         FollowsPlayer
         }
 
+    // todo rename these
     public enum MonsterShootBehaviour
         {
         /// <summary>
