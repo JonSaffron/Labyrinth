@@ -35,7 +35,9 @@ namespace Labyrinth.GameObjects
 
         public readonly int OriginalEnergy;
 
+        private bool _isAbleToMove;
         private double _stepTime;
+
         private bool _laysEggs;
 
         protected Monster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
@@ -141,6 +143,9 @@ namespace Labyrinth.GameObjects
                 if (!this.IsActive)
                     this.IsActive = true;
 
+                if (this.ShootBehaviour == MonsterShootBehaviour.ShootsHavingBeenShot)
+                    this.ShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
+
                 if (this.Mobility == MonsterMobility.Patrolling)
                     this.Mobility = MonsterMobility.Placid;
                 return;
@@ -208,40 +213,58 @@ namespace Labyrinth.GameObjects
 
             bool result = false;
             var remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
-            this._stepTime += remainingTime;
             while (remainingTime > 0)
                 {
-                if (_stepTime >= Constants.GameClockResolution)
-                    {
-                    _stepTime -= Constants.GameClockResolution;
-                    DoMonsterAction(inSameRoom);
-                    }
-
                 if (!this.IsMoving)
                     {
-                    if (!this.SetDirectionAndDestination())
-                        break;
+                    if (this.SetDirectionAndDestination())
+                        {
+                        this._isAbleToMove = true;
+                        this._stepTime = 0;
+                        }
+                    else
+                        {
+                        // todo monster still needs to be able to do something even if it's not moving
+                        // so when monster goes from moving to not moving we need to start timing
+                        // if it continues not to move we add the remainingTime on to the total
+                        // when the total goes above the time taken to reach the next tile
+                        // then do an action and toggle the flitter flag
+                        if (this._isAbleToMove)
+                            {
+                            this._isAbleToMove = false;
+                            this._stepTime = remainingTime;
+                            }
+                        else
+                            {
+                            this._stepTime += remainingTime;
+                            }
+                        var timeToReachNextTile = Constants.TileLength / (double) this.StandardSpeed;
+                        if (remainingTime < timeToReachNextTile)  
+                            break;
+
+                        remainingTime -= timeToReachNextTile;
+                        }
 
                     this._flitterFlag = this.Flitters && !this._flitterFlag;
+                    DoMonsterAction(inSameRoom);
                     }
 
                 this.TryToCompleteMoveToTarget(ref remainingTime);
                 result = true;
                 }
 
-            while (_stepTime >= Constants.GameClockResolution)
-                {
-                _stepTime -= Constants.GameClockResolution;
-                DoMonsterAction(inSameRoom);
-                }
             return result;
             }
 
+        // todo refactor this into separate classes
         private void DoMonsterAction(bool inSameRoom)
             {
             var player = GlobalServices.GameState.Player;
             var monsterRandom = GlobalServices.Randomess;
 
+            // in the original game, the E0 animation slot has to be hosting a shot for the test to be passed, E0 being the first slot available to a shot.
+            // of course, we can't replicate a test against a particular animation slot, we can only test that a shot is currently being animated which will happen more often.
+            // so we compromise by making the random test less likely to be passed.
             if (this.LaysMushrooms && !this.IsEgg && GlobalServices.GameState.DoesShotExist() && inSameRoom && monsterRandom.Test(3) && IsDirectionCompatible(player.CurrentMovement.Direction, this.CurrentMovement.Direction))
                 {
                 TilePos tp = this.TilePosition;
@@ -252,7 +275,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && monsterRandom.Test(0x3f))
+            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && monsterRandom.Test(0x1f))
                 {
                 TilePos tp = this.TilePosition;
                 if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
@@ -266,7 +289,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && inSameRoom && !this.IsEgg && !monsterRandom.Test(0xf) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
+            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && inSameRoom && !this.IsEgg && !monsterRandom.Test(0x03) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
                 {
                 this._weapon.FireIfYouLike(this);
                 }
