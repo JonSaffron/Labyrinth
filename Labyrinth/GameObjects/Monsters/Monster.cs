@@ -143,8 +143,8 @@ namespace Labyrinth.GameObjects
                 if (!this.IsActive)
                     this.IsActive = true;
 
-                if (this.ShootBehaviour == MonsterShootBehaviour.ShootsHavingBeenShot)
-                    this.ShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
+                if (this.ShootBehaviour == MonsterShootBehaviour.WhenProvoked)
+                    this.ShootBehaviour = MonsterShootBehaviour.Yes;
 
                 if (this.Mobility == MonsterMobility.Patrolling)
                     this.Mobility = MonsterMobility.Placid;
@@ -289,7 +289,7 @@ namespace Labyrinth.GameObjects
                     }
                 }
 
-            if (this.ShootBehaviour == MonsterShootBehaviour.ShootsImmediately && inSameRoom && !this.IsEgg && !monsterRandom.Test(0x03) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
+            if (this.ShootBehaviour == MonsterShootBehaviour.Yes && inSameRoom && !this.IsEgg && !monsterRandom.Test(0x03) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
                 {
                 this._weapon.FireIfYouLike(this);
                 }

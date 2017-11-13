@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
         {
         protected KillerCube(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
-            this.ShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
+            this.ShootBehaviour = MonsterShootBehaviour.Yes;
             }
         }
     }

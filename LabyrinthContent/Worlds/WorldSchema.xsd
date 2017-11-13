@@ -190,7 +190,7 @@
     <xs:attribute name="MonsterShootBehaviour" use="optional">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:pattern value="None|ShootsImmediately|ShootsHavingBeenShot" />
+          <xs:pattern value="No|Yes|WhenProvoked" />
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>

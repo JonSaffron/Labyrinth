@@ -26,7 +26,7 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyShoots()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.ShootBehaviour).Returns(MonsterShootBehaviour.ShootsImmediately);
+            monster.Setup(monsterShoots => monsterShoots.ShootBehaviour).Returns(MonsterShootBehaviour.Yes);
 
             var scoreKeeper = new ScoreKeeper();
             Assert.Throws<ArgumentNullException>(() => scoreKeeper.EnemyCrushed(null, 99));
@@ -51,7 +51,7 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyIsEgg()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterIsEgg => monsterIsEgg.ShootBehaviour).Returns(MonsterShootBehaviour.None);
+            monster.Setup(monsterIsEgg => monsterIsEgg.ShootBehaviour).Returns(MonsterShootBehaviour.No);
             monster.Setup(monsterIsEgg => monsterIsEgg.IsStatic).Returns(true);
             monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(true);
 
@@ -65,7 +65,7 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyIsNotDangerous()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.ShootBehaviour).Returns(MonsterShootBehaviour.None);
+            monster.Setup(monsterShoots => monsterShoots.ShootBehaviour).Returns(MonsterShootBehaviour.No);
             monster.Setup(monsterMoves => monsterMoves.IsStatic).Returns(true);
             monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(false);
 

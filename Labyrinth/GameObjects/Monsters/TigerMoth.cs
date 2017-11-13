@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.MovesRoom;
             this.LaysMushrooms = true;
-            this.ShootBehaviour = MonsterShootBehaviour.ShootsHavingBeenShot;
+            this.ShootBehaviour = MonsterShootBehaviour.WhenProvoked;
             }
 
         protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)

@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this.Flitters = true;
             this.LaysEggs = true;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
-            this.ShootBehaviour = MonsterShootBehaviour.ShootsImmediately;
+            this.ShootBehaviour = MonsterShootBehaviour.Yes;
             }
 
         protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)

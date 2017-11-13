@@ -177,7 +177,7 @@ namespace Labyrinth
                 Mobility = MonsterMobility.Aggressive,
                 LaysEggs = true,
                 ChangeRooms = ChangeRooms.FollowsPlayer,
-                ShootBehaviour = MonsterShootBehaviour.ShootsImmediately
+                ShootBehaviour = MonsterShootBehaviour.Yes
                 };
             CreateMonster(md);
             }

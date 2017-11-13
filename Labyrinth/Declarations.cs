@@ -203,23 +203,22 @@ namespace Labyrinth
         FollowsPlayer
         }
 
-    // todo rename these
     public enum MonsterShootBehaviour
         {
         /// <summary>
         /// Monster cannot shoot
         /// </summary>
-        None,
+        No,
 
         /// <summary>
         /// Monster can shoot at the player
         /// </summary>
-        ShootsImmediately,
+        Yes,
 
         /// <summary>
         /// Monster can shoot at the player only after it has been shot at
         /// </summary>
-        ShootsHavingBeenShot
+        WhenProvoked
         }
 
     public enum MonsterState
