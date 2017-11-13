@@ -479,12 +479,18 @@ namespace Labyrinth.Services.WorldBuilding
                     result.SplitsOnHit = bool.Parse(splitsOnHit);
                     }
             
-                string monsterShootBehaviourAttribute = mdef.GetAttribute("MonsterShootBehaviour");
-                if (!string.IsNullOrEmpty(monsterShootBehaviourAttribute))
+                string shootsAtPlayer = mdef.GetAttribute("ShootsAtPlayer");
+                if (!string.IsNullOrEmpty(shootsAtPlayer))
                     {
-                    result.ShootBehaviour = (MonsterShootBehaviour) Enum.Parse(typeof(MonsterShootBehaviour), monsterShootBehaviourAttribute);
+                    result.ShootsAtPlayer = Boolean.Parse(shootsAtPlayer);
                     }
-                
+
+                string shootsOnceProvoked = mdef.GetAttribute("ShootsOnceProvoked");
+                if (!string.IsNullOrEmpty(shootsOnceProvoked))
+                    {
+                    result.ShootsOnceProvoked = Boolean.Parse(shootsOnceProvoked);
+                    }
+
                 string shotsBounceOffAttribute = mdef.GetAttribute("ShotsBounceOff");
                 if (!string.IsNullOrEmpty(shotsBounceOffAttribute))
                     {

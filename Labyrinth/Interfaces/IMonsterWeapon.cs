@@ -1,9 +1,7 @@
-﻿using Labyrinth.GameObjects;
-
-namespace Labyrinth
+﻿namespace Labyrinth
     {
     interface IMonsterWeapon
         {
-        void FireIfYouLike(StaticItem source);
+        void FireIfYouLike();
         }
     }

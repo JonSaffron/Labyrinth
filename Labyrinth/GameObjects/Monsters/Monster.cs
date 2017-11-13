@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
+using Labyrinth.GameObjects.Monsters.Actions;
 using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -20,14 +22,14 @@ namespace Labyrinth.GameObjects
         protected bool Flitters { private get; set; }
         private bool _flitterFlag;
 
-        public bool LaysMushrooms { get; set; }
         public bool SplitsOnHit { get; set; }
         public bool IsActive { get; set; }
         public bool ShotsBounceOff { get; set; }
-        public MonsterShootBehaviour ShootBehaviour { get; set; }
-        
-        [NotNull]
-        private IMonsterWeapon _weapon = new StandardMonsterWeapon();
+        public bool ShootsOnceProvoked { get; set; }
+
+        private List<BaseAction> _actions;
+
+        private IMonsterWeapon _weapon;
 
         private Animation _normalAnimation;
         private readonly Animation _eggAnimation;
@@ -37,8 +39,6 @@ namespace Labyrinth.GameObjects
 
         private bool _isAbleToMove;
         private double _stepTime;
-
-        private bool _laysEggs;
 
         protected Monster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
@@ -143,8 +143,8 @@ namespace Labyrinth.GameObjects
                 if (!this.IsActive)
                     this.IsActive = true;
 
-                if (this.ShootBehaviour == MonsterShootBehaviour.WhenProvoked)
-                    this.ShootBehaviour = MonsterShootBehaviour.Yes;
+                if (this.ShootsOnceProvoked)
+                    this.ShootsAtPlayer = true;
 
                 if (this.Mobility == MonsterMobility.Patrolling)
                     this.Mobility = MonsterMobility.Placid;
@@ -224,7 +224,6 @@ namespace Labyrinth.GameObjects
                         }
                     else
                         {
-                        // todo monster still needs to be able to do something even if it's not moving
                         // so when monster goes from moving to not moving we need to start timing
                         // if it continues not to move we add the remainingTime on to the total
                         // when the total goes above the time taken to reach the next tile
@@ -239,14 +238,14 @@ namespace Labyrinth.GameObjects
                             this._stepTime += remainingTime;
                             }
                         var timeToReachNextTile = Constants.TileLength / (double) this.StandardSpeed;
-                        if (remainingTime < timeToReachNextTile)  
+                        if (this._stepTime < timeToReachNextTile)  
                             break;
 
                         remainingTime -= timeToReachNextTile;
                         }
 
                     this._flitterFlag = this.Flitters && !this._flitterFlag;
-                    DoMonsterAction(inSameRoom);
+                    DoMonsterActions();
                     }
 
                 this.TryToCompleteMoveToTarget(ref remainingTime);
@@ -256,72 +255,17 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        // todo refactor this into separate classes
-        private void DoMonsterAction(bool inSameRoom)
+        private void DoMonsterActions()
             {
-            var player = GlobalServices.GameState.Player;
-            var monsterRandom = GlobalServices.Randomess;
-
-            // in the original game, the E0 animation slot has to be hosting a shot for the test to be passed, E0 being the first slot available to a shot.
-            // of course, we can't replicate a test against a particular animation slot, we can only test that a shot is currently being animated which will happen more often.
-            // so we compromise by making the random test less likely to be passed.
-            if (this.LaysMushrooms && !this.IsEgg && GlobalServices.GameState.DoesShotExist() && inSameRoom && monsterRandom.Test(3) && IsDirectionCompatible(player.CurrentMovement.Direction, this.CurrentMovement.Direction))
-                {
-                TilePos tp = this.TilePosition;
-                if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
-                    {
-                    this.PlaySound(GameSound.MonsterLaysMushroom);
-                    GlobalServices.GameState.AddMushroom(tp);
-                    }
-                }
-
-            if (this.LaysEggs && inSameRoom && GlobalServices.GameState.Player.IsExtant && !this.IsEgg && monsterRandom.Test(0x1f))
-                {
-                TilePos tp = this.TilePosition;
-                if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
-                    {
-                    this.PlaySound(GameSound.MonsterLaysEgg);
-                    MonsterDef md = ((ILayEggs) this).LayAnEgg();
-                    md.IsEgg = true;
-                    md.TimeBeforeHatching = (monsterRandom.Next(256) & 0x1f) + 8;
-                    md.LaysEggs = false;
-                    GlobalServices.GameState.CreateMonster(md);
-                    }
-                }
-
-            if (this.ShootBehaviour == MonsterShootBehaviour.Yes && inSameRoom && !this.IsEgg && !monsterRandom.Test(0x03) && this.Energy >= 4 && player.IsExtant && MonsterMovement.IsPlayerInWeaponSights(this))
-                {
-                this._weapon.FireIfYouLike(this);
-                }
+            if (this._actions == null)
+                return;
+            foreach (var action in this._actions)
+                action.PerformAction();
             }
 
-        private static int GetDirectionNumber(Direction d)
+        public void FireWeapon()
             {
-            switch (d)
-                {
-                case Direction.Left:
-                    return 0;
-                case Direction.Right:
-                    return 1;
-                case Direction.Up:
-                    return 2;
-                case Direction.Down:
-                    return 3;
-                case Direction.None:
-                    return 4;
-                default:
-                    throw new InvalidOperationException();
-                }
-            }
-
-        private static bool IsDirectionCompatible(Direction playerDirection, Direction monsterDirection)
-            {
-            int p = GetDirectionNumber(playerDirection);
-            int m = GetDirectionNumber(monsterDirection);
-            int r = p ^ m;              // EOR 0c04
-            r &= 2;                     // AND #2
-            bool result = (r == 0);     // not compatible if not zero
-            return result;
+            _weapon?.FireIfYouLike();
             }
 
         protected override bool TryToCompleteMoveToTarget(ref double timeRemaining)
@@ -363,15 +307,78 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public bool LaysEggs
+        public bool LaysMushrooms
             {
-            get => _laysEggs;
+            get
+                {
+                var result = this._actions != null && this._actions.OfType<LaysMushroom>().Any();
+                return result;
+                }
             set
                 {
-                if (value && !(this is ILayEggs))
-                    throw new InvalidOperationException(string.Format("Cannot set a {0} as laying eggs because the ILayEggs interface is not implemented.", this.GetType().Name));
-                this._laysEggs = value;
+                if (value)
+                    AddAction(new LaysMushroom(this));
+                else
+                    RemoveAction<LaysMushroom>();
                 }
+            }
+
+        public bool LaysEggs
+            {
+            get
+                {
+                var result = this._actions != null && this._actions.OfType<LaysEgg>().Any();
+                return result;
+                }
+            set
+                {
+                if (value)
+                    AddAction(new LaysEgg(this));
+                else
+                    RemoveAction<LaysEgg>();
+                }
+            }
+
+        public bool ShootsAtPlayer
+            {
+            get
+                {
+                var result = this._actions != null && this._actions.OfType<ShootsAtPlayer>().Any();
+                return result;
+                }
+
+            set
+                {
+                if (value)
+                    {
+                    AddAction(new ShootsAtPlayer(this));
+                    this._weapon = new StandardMonsterWeapon(this);
+                    }
+                else
+                    {
+                    RemoveAction<ShootsAtPlayer>();
+                    this._weapon = null;
+                    }
+                }
+            }
+
+        private void AddAction([NotNull] BaseAction action)
+            {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (this._actions == null)
+                this._actions = new List<BaseAction>();
+            else
+                {
+                Type t = action.GetType();
+                if (this._actions.Any(item => item.GetType() == t))
+                    return;
+                }
+            this._actions.Add(action);
+            }
+
+        private void RemoveAction<T>()
+            {
+            _actions?.RemoveAll(item => item is T);
             }
         }
     }

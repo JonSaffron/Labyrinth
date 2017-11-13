@@ -177,7 +177,7 @@ namespace Labyrinth
                 Mobility = MonsterMobility.Aggressive,
                 LaysEggs = true,
                 ChangeRooms = ChangeRooms.FollowsPlayer,
-                ShootBehaviour = MonsterShootBehaviour.Yes
+                ShootsAtPlayer = true
                 };
             CreateMonster(md);
             }
@@ -261,8 +261,10 @@ namespace Labyrinth
                 result.LaysEggs = monsterDef.LaysEggs.Value;
             if (monsterDef.SplitsOnHit.HasValue)
                 result.SplitsOnHit = monsterDef.SplitsOnHit.Value;
-            if (monsterDef.ShootBehaviour.HasValue)
-                result.ShootBehaviour = monsterDef.ShootBehaviour.Value;
+            if (monsterDef.ShootsAtPlayer.HasValue)
+                result.ShootsAtPlayer = monsterDef.ShootsAtPlayer.Value;
+            if (monsterDef.ShootsOnceProvoked.HasValue)
+                result.ShootsOnceProvoked = monsterDef.ShootsOnceProvoked.Value;
             if (monsterDef.ShotsBounceOff.HasValue)
                 result.ShotsBounceOff = monsterDef.ShotsBounceOff.Value;
             if (monsterDef.IsActive.HasValue)

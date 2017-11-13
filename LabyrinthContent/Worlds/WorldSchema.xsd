@@ -187,13 +187,8 @@
     <xs:attribute name="LaysMushrooms" type="xs:boolean" use="optional" />
     <xs:attribute name="LaysEggs" type="xs:boolean" use="optional" />
     <xs:attribute name="SplitsOnHit" type="xs:boolean" use="optional" />
-    <xs:attribute name="MonsterShootBehaviour" use="optional">
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:pattern value="No|Yes|WhenProvoked" />
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:attribute>
+    <xs:attribute name="ShootsAtPlayer" type="xs:boolean" use="optional" />
+    <xs:attribute name="ShootsOnceProvoked" type="xs:boolean" use="optional" />
     <xs:attribute name="ShotsBounceOff" type="xs:boolean" use="optional" />
     <xs:attribute name="IsActive" type="xs:boolean" use="optional" />
   </xs:complexType>

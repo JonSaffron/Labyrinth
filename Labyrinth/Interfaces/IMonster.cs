@@ -5,7 +5,8 @@
     /// </summary>
     public interface IMonster
         {
-        MonsterShootBehaviour ShootBehaviour { get; }
+        bool ShootsAtPlayer { get; }
+        bool ShootsOnceProvoked { get; }
         bool IsStatic { get; }
         bool IsEgg { get; }
         }

@@ -1,21 +1,29 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
     class StandardMonsterWeapon : IMonsterWeapon
         {
-        public void FireIfYouLike(StaticItem source)
+        private readonly Monster _monster;
+
+        public StandardMonsterWeapon([NotNull] Monster monster)
             {
-            Direction firingDirection = DetermineFiringDirection(source.TilePosition, GlobalServices.GameState.Player.TilePosition);
-            if (firingDirection == Direction.None || source.Energy < 4)
+            _monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            }
+
+        public void FireIfYouLike()
+            {
+            Direction firingDirection = DetermineFiringDirection(this._monster.TilePosition, GlobalServices.GameState.Player.TilePosition);
+            if (firingDirection == Direction.None || this._monster.Energy < 4)
                 return;
-            if (!DoesMonsterHaveClearShotAtPlayer(source.TilePosition, firingDirection))
+            if (!DoesMonsterHaveClearShotAtPlayer(this._monster.TilePosition, firingDirection))
                 return;
 
-            var startPos = source.TilePosition.ToPosition() + firingDirection.ToVector() * Constants.CentreOfTile;
-            GlobalServices.GameState.AddStandardShot(startPos, firingDirection, source.Energy >> 2, source);
-            source.PlaySound(GameSound.MonsterShoots);
+            var startPos = this._monster.TilePosition.ToPosition() + firingDirection.ToVector() * Constants.CentreOfTile;
+            GlobalServices.GameState.AddStandardShot(startPos, firingDirection, this._monster.Energy >> 2, this._monster);
+            this._monster.PlaySound(GameSound.MonsterShoots);
             }
 
         private static Direction DetermineFiringDirection(TilePos fromTilePos, TilePos towardsTilePos)

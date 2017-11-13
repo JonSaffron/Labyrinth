@@ -34,7 +34,7 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private static bool IsMonsterDangerous(IMonster monster)
             {
-            if (monster.ShootBehaviour == MonsterShootBehaviour.Yes || monster.ShootBehaviour == MonsterShootBehaviour.WhenProvoked)
+            if (monster.ShootsAtPlayer || monster.ShootsOnceProvoked)
                 return true;
             if (!monster.IsStatic)
                 return true;

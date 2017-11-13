@@ -18,7 +18,8 @@ namespace Labyrinth.Services.WorldBuilding
         public bool? LaysMushrooms { get; set; }
         public bool? LaysEggs { get; set; }
         public bool? SplitsOnHit { get; set; }
-        public MonsterShootBehaviour? ShootBehaviour { get; set; }
+        public bool? ShootsAtPlayer { get; set; }
+        public bool? ShootsOnceProvoked { get; set; }
         public bool? ShotsBounceOff { get; set; }
         public bool? IsActive { get; set; }
 
@@ -63,7 +64,8 @@ namespace Labyrinth.Services.WorldBuilding
                 LaysMushrooms = monster.LaysMushrooms,
                 LaysEggs = monster.LaysEggs,
                 SplitsOnHit = monster.SplitsOnHit,
-                ShootBehaviour = monster.ShootBehaviour,
+                ShootsAtPlayer = monster.ShootsAtPlayer,
+                ShootsOnceProvoked = monster.ShootsOnceProvoked,
                 ShotsBounceOff = monster.ShotsBounceOff,
                 IsActive = monster.IsActive
                 };
