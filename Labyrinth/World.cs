@@ -165,6 +165,8 @@ namespace Labyrinth
 
         private void UpdateGameClock(GameTime gameTime)
             {
+            // todo in the 2nd world an acorn is randomly dropped every so often - 280e onwards
+
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
             while (this._time > Constants.GameClockResolution)
                 {

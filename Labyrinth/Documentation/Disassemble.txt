@@ -3888,17 +3888,17 @@ static object injured (b)
 2805 20 FE 31  JSR 31FE                 -- possibly change the monster's room
 2808 60        RTS                      
 
-		-- alternative move monster routine
+		-- try to add an acorn to a random room
 
 2809 AD CD 0B  LDA 0BCD                 -- get highest level achieved
 280C 10 32     BPL 2840                 -- if 1st world then RTS
 
-		-- try to add an acorn to a random room (2nd world only)
+		-- continue only in 2nd world
 
 280E AD D9 0B  LDA 0BD9                 -- get current game ticks
-2811 29 7F     AND #7F                  -- clear top bit leaving a number between 0 and 63
+2811 29 7F     AND #7F                  -- clear top bit leaving a number between decimal 0 and 127
 2813 C9 78     CMP #78                  
-2815 B0 29     BCS 2840                 -- if 78 or more than RTS
+2815 B0 29     BCS 2840                 -- if decimal 120 or more than RTS
 2817 A8        TAY                      
 2818 B9 00 0E  LDA 0E00,Y               -- get static content room for slot Y
 281B C9 FF     CMP #FF                  -- is it already occupied?
@@ -3927,7 +3927,7 @@ static object injured (b)
 2844 48        PHA                      
 2845 B9 06 0C  LDA 0C06,Y               -- get id of egg
 2848 AA        TAX                      
-2849 BC C0 04  LDY 04C0,X               -- get template for hatched monster
+2849 BC C0 04  LDY 04C0,X               -- get movement/behaviour template for hatched monster
 284C B9 00 07  LDA 0700,Y               -- get monster type
 284F 10 10     BPL 2861                 -- branch if monster type is not egg
 2851 A9 FF     LDA #FF                  
@@ -5216,6 +5216,10 @@ static object injured (b)
 3114 8D 00 0C  STA 0C00                 -- set player status to inactive
 3117 A9 10     LDA #10                  
 3119 20 D6 2D  JSR 2DD6                 -- play end of world sound
+
+		-- Set counter to hatching/type of movement property of each animation slot to 1
+		-- Not sure what this achieves.
+
 311C A0 10     LDY #10                  -- initialise loop counter
 311E A9 01     LDA #01                  
 3120 99 0F 0C  STA 0C0F,Y               -- set delay to removal
@@ -5224,6 +5228,8 @@ static object injured (b)
 3125 69 10     ADC #10                  -- increment counter
 3127 A8        TAY                      
 3128 D0 F4     BNE 311E                 -- continue loop
+
+
 312A 8D CD 0B  STA 0BCD                 -- store 0 as highest level achieved
 312D 8A        TXA                      
 312E 48        PHA                      
