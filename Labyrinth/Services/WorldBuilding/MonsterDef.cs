@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
@@ -69,6 +70,91 @@ namespace Labyrinth.Services.WorldBuilding
                 ShotsBounceOff = monster.ShotsBounceOff,
                 IsActive = monster.IsActive
                 };
+            return result;
+            }
+
+        internal static MonsterDef FromXml(XmlElement mdef)
+            {
+            MonsterDef result = new MonsterDef
+                {
+                MonsterType = mdef.GetAttribute(nameof(result.Type)),
+                Energy = int.Parse(mdef.GetAttribute(nameof(result.Energy)))
+                };
+
+            string initialDirection = mdef.GetAttribute(nameof(result.InitialDirection));
+            if (!string.IsNullOrEmpty(initialDirection))
+                {
+                result.InitialDirection = (Direction)Enum.Parse(typeof(Direction), initialDirection);
+                }
+
+            string mobility = mdef.GetAttribute(nameof(result.Mobility));
+            if (!String.IsNullOrEmpty(mobility))
+                {
+                result.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);
+                }
+
+            string changeRooms = mdef.GetAttribute(nameof(result.ChangeRooms));
+            if (!string.IsNullOrEmpty(changeRooms))
+                {
+                result.ChangeRooms = (ChangeRooms)Enum.Parse(typeof(ChangeRooms), changeRooms);
+                }
+
+            string isEggAttribute = mdef.GetAttribute(nameof(result.IsEgg));
+            if (!string.IsNullOrEmpty(isEggAttribute))
+                {
+                result.IsEgg = bool.Parse(isEggAttribute);
+                }
+
+            string timeBeforeHatchingAttribute = mdef.GetAttribute(nameof(result.TimeBeforeHatching));
+            if (!string.IsNullOrEmpty(timeBeforeHatchingAttribute))
+                {
+                result.TimeBeforeHatching = int.Parse(timeBeforeHatchingAttribute) | 1;
+                }
+
+            string laysMushrooms = mdef.GetAttribute(nameof(result.LaysMushrooms));
+            if (!string.IsNullOrEmpty(laysMushrooms))
+                {
+                result.LaysMushrooms = bool.Parse(laysMushrooms);
+                }
+
+            string laysEggs = mdef.GetAttribute(nameof(result.LaysEggs));
+            if (!string.IsNullOrEmpty(laysEggs))
+                {
+                result.LaysEggs = bool.Parse(laysEggs);
+                }
+
+            string splitsOnHit = mdef.GetAttribute(nameof(result.SplitsOnHit));
+            if (!string.IsNullOrEmpty(splitsOnHit))
+                {
+                result.SplitsOnHit = bool.Parse(splitsOnHit);
+                }
+
+            string shootsAtPlayer = mdef.GetAttribute(nameof(result.ShootsAtPlayer));
+            if (!string.IsNullOrEmpty(shootsAtPlayer))
+                {
+                result.ShootsAtPlayer = Boolean.Parse(shootsAtPlayer);
+                }
+
+            string shootsOnceProvoked = mdef.GetAttribute(nameof(result.ShootsOnceProvoked));
+            if (!string.IsNullOrEmpty(shootsOnceProvoked))
+                {
+                result.ShootsOnceProvoked = Boolean.Parse(shootsOnceProvoked);
+                }
+
+            string shotsBounceOffAttribute = mdef.GetAttribute(nameof(result.ShotsBounceOff));
+            if (!string.IsNullOrEmpty(shotsBounceOffAttribute))
+                {
+                bool shotsBounceOff = bool.Parse(shotsBounceOffAttribute);
+                result.ShotsBounceOff = shotsBounceOff;
+                }
+
+            string isActiveAttribute = mdef.GetAttribute(nameof(result.IsActive));
+            if (!string.IsNullOrEmpty(isActiveAttribute))
+                {
+                bool isActive = bool.Parse(isActiveAttribute);
+                result.IsActive = isActive;
+                }
+
             return result;
             }
         }

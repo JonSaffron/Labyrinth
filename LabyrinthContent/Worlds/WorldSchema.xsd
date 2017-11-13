@@ -97,6 +97,8 @@
     <xs:attribute name="Height" type="xs:int" use="required" />
     
     <xs:attribute name="WorldStart" type="xs:boolean" use="optional" default="false" />
+
+    <xs:attribute name="ReplenishFruit" type="xs:boolean" use="optional" default="false" />
   </xs:complexType>
   
   <xs:complexType name="Objects">
@@ -168,7 +170,7 @@
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
-    <xs:attribute name="Direction" use="optional">
+    <xs:attribute name="InitialDirection" use="optional">
       <xs:simpleType>
         <xs:restriction base="xs:string">
           <xs:pattern value="Left|Right|Up|Down" />

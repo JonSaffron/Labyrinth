@@ -60,7 +60,7 @@ namespace Labyrinth.Services.WorldBuilding
         public void GetGameObjects(GameState gameState)
             {
             var x = new ProcessGameObjects(this, gameState);
-            x.GetGameObjects();
+            x.AddGameObjects();
             }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Labyrinth.Services.WorldBuilding
                 this._layout = layoutDef.InnerText;
                 }
 
-            public void GetGameObjects()
+            public void AddGameObjects()
                 {
                 var objects = this._wl._xmlRoot.SelectNodes(@"ns:Objects/ns:*", this._wl._xnm);
                 var objectList = objects != null ? objects.Cast<XmlElement>() : Enumerable.Empty<XmlElement>();
@@ -269,7 +269,7 @@ namespace Labyrinth.Services.WorldBuilding
                         exceptions.AddRange(SetTileOccupation(new [] { monster }, t => t.SetOccupationByRandomMonsterDistribution()));
                     }
 
-                GetListOfFruit();
+                AddFruit();
 
                 exceptions.AddRange(SetTileOccupation(movingMonsters, t => t.SetOccupationByMovingMonster()));
                 exceptions.AddRange(SetTileOccupation(monsters, t => t.SetOccupationByMovingRandomlyDistributedMonster()));
@@ -309,7 +309,7 @@ namespace Labyrinth.Services.WorldBuilding
                         TileDefinition td;
                         if (!tileDefs.TryGetValue(symbol, out td))
                             {
-                            string text = string.Format("Don't know what symbol {0} indicates in world area {1}", symbol, wa.Id);
+                            string text = string.Format("Don't know what symbol {0} indicates in world area {1}", symbol, wa.Id.HasValue ? (object) wa.Id.Value : "(no number)");
                             throw new InvalidOperationException(text);
                             }
                         switch (td.TileTypeByMap)
@@ -415,7 +415,7 @@ namespace Labyrinth.Services.WorldBuilding
 
             private Monster GetMonster(XmlElement mdef)
                 {
-                MonsterDef md = GetMonsterDef(mdef);
+                MonsterDef md = MonsterDef.FromXml(mdef);
                 var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
                 md.Position = tilePos.ToPosition();
 
@@ -423,90 +423,6 @@ namespace Labyrinth.Services.WorldBuilding
                 return result;
                 }
 
-            internal static MonsterDef GetMonsterDef(XmlElement mdef)
-                {
-                MonsterDef result = new MonsterDef
-                    {
-                    MonsterType = mdef.GetAttribute("Type"),
-                    Energy = int.Parse(mdef.GetAttribute("Energy"))
-                    };
-
-                string initialDirection = mdef.GetAttribute("Direction");
-                if (!string.IsNullOrEmpty(initialDirection))
-                    {
-                    result.InitialDirection = (Direction) Enum.Parse(typeof(Direction), initialDirection);
-                    }
-
-                string mobility = mdef.GetAttribute("Mobility");
-                if (!String.IsNullOrEmpty(mobility))
-                    {
-                    result.Mobility = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), mobility);
-                    }
-
-                string changeRooms = mdef.GetAttribute("ChangeRooms");
-                if (!string.IsNullOrEmpty(changeRooms))
-                    {
-                    result.ChangeRooms = (ChangeRooms) Enum.Parse(typeof(ChangeRooms), changeRooms);
-                    }
-
-                string isEggAttribute = mdef.GetAttribute("IsEgg");
-                if (!string.IsNullOrEmpty(isEggAttribute))
-                    {
-                    result.IsEgg = bool.Parse(isEggAttribute);
-                    }
-
-                string timeBeforeHatchingAttribute = mdef.GetAttribute("TimeBeforeHatching");
-                if (!string.IsNullOrEmpty(timeBeforeHatchingAttribute))
-                    {
-                    result.TimeBeforeHatching = int.Parse(timeBeforeHatchingAttribute) | 1;
-                    }
-
-                string laysMushrooms = mdef.GetAttribute("LaysMushrooms");
-                if (!string.IsNullOrEmpty(laysMushrooms))
-                    {
-                    result.LaysMushrooms = bool.Parse(laysMushrooms);
-                    }
-
-                string laysEggs = mdef.GetAttribute("LaysEggs");
-                if (!string.IsNullOrEmpty(laysEggs))
-                    {
-                    result.LaysEggs = bool.Parse(laysEggs);
-                    }
-
-                string splitsOnHit = mdef.GetAttribute("SplitsOnHit");
-                if (!string.IsNullOrEmpty(splitsOnHit))
-                    {
-                    result.SplitsOnHit = bool.Parse(splitsOnHit);
-                    }
-            
-                string shootsAtPlayer = mdef.GetAttribute("ShootsAtPlayer");
-                if (!string.IsNullOrEmpty(shootsAtPlayer))
-                    {
-                    result.ShootsAtPlayer = Boolean.Parse(shootsAtPlayer);
-                    }
-
-                string shootsOnceProvoked = mdef.GetAttribute("ShootsOnceProvoked");
-                if (!string.IsNullOrEmpty(shootsOnceProvoked))
-                    {
-                    result.ShootsOnceProvoked = Boolean.Parse(shootsOnceProvoked);
-                    }
-
-                string shotsBounceOffAttribute = mdef.GetAttribute("ShotsBounceOff");
-                if (!string.IsNullOrEmpty(shotsBounceOffAttribute))
-                    {
-                    bool shotsBounceOff = bool.Parse(shotsBounceOffAttribute);
-                    result.ShotsBounceOff = shotsBounceOff;
-                    }
-
-                string isActiveAttribute = mdef.GetAttribute("IsActive");
-                if (!string.IsNullOrEmpty(isActiveAttribute))
-                    {
-                    bool isActive = bool.Parse(isActiveAttribute);
-                    result.IsActive = isActive;
-                    }
-                
-                return result;
-                }
 
             private Crystal GetCrystal(XmlElement cdef)
                 {
@@ -568,7 +484,7 @@ namespace Labyrinth.Services.WorldBuilding
                 return result;
                 }
 
-            private void GetListOfFruit()
+            private void AddFruit()
                 {
                 var fruitDefinitions =
                     this._wl._worldAreas.Where(wa => wa.FruitDefinitions != null)

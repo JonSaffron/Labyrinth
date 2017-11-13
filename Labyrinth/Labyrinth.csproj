@@ -225,6 +225,7 @@
     <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
     <Compile Include="Services\WorldBuilding\MonsterDef.cs" />
     <Compile Include="Services\WorldBuilding\RandomMonsterDistribution.cs" />
+    <Compile Include="Services\WorldBuilding\TileContentValidator.cs" />
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoaderForTest.cs" />
     <Compile Include="Services\WorldBuilding\WorldValidator.cs" />
