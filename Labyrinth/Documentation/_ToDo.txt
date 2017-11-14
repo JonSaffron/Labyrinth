@@ -75,37 +75,13 @@ y cyan flitterbug
 k red killer cube (moving)
 d diamond demon
 x flitterbug brown
-c crazy crawler
-m moth
+c tiger moth (not crazy crawler)
+m butterfly (not tiger moth)
 j joker
-b butterfly
+b crazy crawler (not butterfly)
 X deathcube
 
 C crystal
 
 ----------------------------------------------------------------
 
-map
-contains walls and floors and potentially occupied squares
-
-items
-block, crystals, forcefields, monsters
-
-load map array. mark down tile useage - floor, wall, potentially occupied
-
-load items lists, create 2nd map array useage - free, static monster, moving monster
-
-run through map arrays:
-	map			lists		results
-	-------------------------------
-	floor		free		ok
-	floor		static		bad
-	floor		moving		bad
-
-	wall		free		ok
-	wall		static		bad
-	wall		moving		bad
-
-	potential	free		bad
-	potential	static		ok
-	potential	moving		ok
