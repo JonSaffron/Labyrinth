@@ -8,7 +8,7 @@ namespace Labyrinth
         void LoadWorld(string levelName);
         bool RestartInSameRoom { get; }
         Tile[,] GetFloorTiles();
-        void GetGameObjects(GameState gameState);
+        void AddGameObjects(GameState gameState);
         Dictionary<int, PlayerStartState> GetPlayerStartStates(); 
         }
     }

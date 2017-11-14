@@ -2,108 +2,43 @@
     {
     class TileUsage
         {
-        private TileTypeByMap _tileTypeByMap;
-        private TileTypeByData _tileTypeByData;
+        public readonly TileTypeByMap TileTypeByMap;
         private readonly char _symbol;
+        private readonly string _description;
+        public bool IsUsedByRandomDistribution { get; private set; }
 
-        public TileUsage(TileTypeByMap tileTypeByMap)
+        public static TileUsage Floor(char symbol)
             {
-            this._tileTypeByMap = tileTypeByMap;
-            this._tileTypeByData = TileTypeByData.Free;
-            this._symbol = ' ';
+            return new TileUsage(symbol, TileTypeByMap.Floor);
             }
-        
-        public TileUsage(char symbol) : this(TileTypeByMap.PotentiallyOccupied)
+
+        public static TileUsage Wall(char symbol)
             {
+            return new TileUsage(symbol, TileTypeByMap.Wall);
+            }
+
+        public static TileUsage Object(char symbol, string description)
+            {
+            return new TileUsage(symbol, description);
+            }
+
+        private TileUsage(char symbol, TileTypeByMap tileTypeByMap)
+            {
+            this.TileTypeByMap = tileTypeByMap;
             this._symbol = symbol;
             }
-
-        public void SetOccupationByMovingMonster()
+        
+        private TileUsage(char symbol, string description)
             {
-            if (this._tileTypeByMap == TileTypeByMap.Wall)
-                throw new TileException(TileExceptionType.Error, "Wall tile cannot be occupied.");
-            if (this._tileTypeByData == TileTypeByData.Free)
-                this._tileTypeByData = TileTypeByData.Moving;
-            if (this._tileTypeByMap == TileTypeByMap.Floor)
-                {
-                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
-                throw new TileException(TileExceptionType.Warning, "Tile is not marked as potentially occupied.");
-                }
+            this._symbol = symbol;
+            this._description = description;
             }
 
-        public void SetOccupationByMovingRandomlyDistributedMonster()
+        public void SetUsedByRandomDistribution()
             {
-            if (this._tileTypeByMap == TileTypeByMap.Wall)
-                throw new TileException(TileExceptionType.Error, "Wall tile cannot be occupied.");
-            if (this._tileTypeByData == TileTypeByData.Free)
-                this._tileTypeByData = TileTypeByData.Moving;
-            if (this._tileTypeByMap == TileTypeByMap.Floor)
-                {
-                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
-                }
+            this.IsUsedByRandomDistribution = true;
             }
 
-        public void SetOccupationByStaticItem()
-            {
-            if (this._tileTypeByMap == TileTypeByMap.Wall)
-                throw new TileException(TileExceptionType.Error, "Wall tile cannot be occupied.");
-            if (this._tileTypeByData == TileTypeByData.Static)
-                throw new TileException(TileExceptionType.Error, "Tile is already occupied by a static item.");
-            this._tileTypeByData = TileTypeByData.Static;
-            if (this._tileTypeByMap == TileTypeByMap.Floor)
-                {
-                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
-                throw new TileException(TileExceptionType.Warning, "Tile is not marked as potentially occupied.");
-                }
-            }
-
-        public void SetOccupationByRandomMonsterDistribution()
-            {
-            if (this._tileTypeByMap == TileTypeByMap.Wall)
-                throw new TileException(TileExceptionType.Error, "Wall tile cannot be occupied.");
-            if (this._tileTypeByData == TileTypeByData.Static)
-                throw new TileException(TileExceptionType.Error, "Tile is already occupied by a static item.");
-            this._tileTypeByData = TileTypeByData.Static;
-            if (this._tileTypeByMap == TileTypeByMap.Floor)
-                {
-                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
-                }
-            }
-
-        public void SetOccupationByFruit()
-            {
-            if (this._tileTypeByMap == TileTypeByMap.Wall)
-                throw new TileException(TileExceptionType.Error, "Wall tile cannot be occupied.");
-            if (this._tileTypeByData == TileTypeByData.Static)
-                throw new TileException(TileExceptionType.Error, "Tile is already occupied by a static item.");
-            this._tileTypeByData = TileTypeByData.Static;
-            if (this._tileTypeByMap == TileTypeByMap.Floor)
-                {
-                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
-                }
-            }
-
-        public void CheckIfIncorrectlyPotentiallyOccupied()
-            {
-            if (this._tileTypeByMap == TileTypeByMap.PotentiallyOccupied && this._tileTypeByData == TileTypeByData.Free)
-                {
-                this._tileTypeByMap = TileTypeByMap.Floor;
-                throw new TileException(TileExceptionType.Warning, "Tile is marked as potentially occupied (symbol " + this._symbol + ") but is not occupied.");
-                }
-            if (this._tileTypeByMap == TileTypeByMap.Floor && this._tileTypeByData != TileTypeByData.Free)
-                {
-                this._tileTypeByMap = TileTypeByMap.PotentiallyOccupied;
-                throw new TileException(TileExceptionType.Warning, "Tile is not marked as potentially occupied but is occupied.");
-                }
-            }
-
-        public bool IsFree
-            {
-            get
-                {
-                bool result = (this._tileTypeByMap == TileTypeByMap.Floor) && (this._tileTypeByData == TileTypeByData.Free);
-                return result;
-                }
-            }
+        public string Description => $"'{this._symbol} {this._description}";
         }
     }

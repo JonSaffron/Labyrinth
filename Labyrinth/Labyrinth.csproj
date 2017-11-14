@@ -133,6 +133,7 @@
     <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameObjects\Monsters\Movement\FullPursuit.cs" />
+    <Compile Include="GameObjects\TileReservation.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
     <Compile Include="InteractiveServices.cs" />
@@ -259,7 +260,6 @@
     <Compile Include="GameObjects\Monsters\ThresherCyan.cs" />
     <Compile Include="Services\WorldBuilding\Tile.cs" />
     <Compile Include="Services\WorldBuilding\TileDefinition.cs" />
-    <Compile Include="Services\WorldBuilding\TileException.cs" />
     <Compile Include="TilePos.cs" />
     <Compile Include="Services\WorldBuilding\WorldArea.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoader.cs" />

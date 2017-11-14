@@ -32,8 +32,22 @@
 
       <xs:element name="TileDefinitions" minOccurs="0" maxOccurs="1" >
         <xs:complexType>
-          <xs:sequence>
-            <xs:element name="TileDef" minOccurs="0" maxOccurs="unbounded">
+          <xs:choice maxOccurs="unbounded">
+            <xs:element name="Wall" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="Symbol" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:length value="1" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                
+                <xs:attribute name="Tile" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="Floor" minOccurs="1" maxOccurs="unbounded">
               <xs:complexType>
                 <xs:attribute name="Symbol" use="required">
                   <xs:simpleType>
@@ -43,18 +57,26 @@
                   </xs:simpleType>
                 </xs:attribute>
 
-                <xs:attribute name="Type" use="required">
+                <xs:attribute name="Tile" type="xs:string" use="required" />
+
+                <xs:attribute name="Default" type="xs:boolean" use="optional" default="false" />
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="Symbol" use="required">
                   <xs:simpleType>
                     <xs:restriction base="xs:string">
-                      <xs:pattern value="Floor|Wall|PotentiallyOccupied" />
+                      <xs:length value="1" />
                     </xs:restriction>
                   </xs:simpleType>
                 </xs:attribute>
-                
-                <xs:attribute name="Tile" type="xs:string" use="optional" />
+
+                <xs:attribute name="Description" type="xs:string" use="required" />
               </xs:complexType>
             </xs:element>
-          </xs:sequence>
+          </xs:choice>
         </xs:complexType>
       </xs:element>
 

@@ -332,5 +332,13 @@ namespace Labyrinth
             this._gameObjectCollection.Add(result);
             return result;
             }
+
+        public TileReservation AddTileReservation(Vector2 position)
+            {
+            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
+            var result = new TileReservation(ap, position);
+            this._gameObjectCollection.Add(result);
+            return result;
+            }
         }
     }

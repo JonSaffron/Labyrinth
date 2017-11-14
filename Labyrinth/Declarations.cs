@@ -21,38 +21,9 @@ namespace Labyrinth
         /// <summary>
         /// Tile is expected to be occupied by an object
         /// </summary>
-        PotentiallyOccupied
+        Object
         }
     
-    /// <summary>
-    /// What sort of object is occupying a tile
-    /// </summary>
-    public enum TileTypeByData
-        {
-        /// <summary>
-        /// Tile is not occupied by any objects
-        /// </summary>
-        Free,
-
-        /// <summary>
-        /// Tile is occupied by an object that doesn't move
-        /// </summary>
-        /// <remarks>No more than one static object can occupy a given tile.</remarks>
-        Static,
-
-        /// <summary>
-        /// Tile is initially occupied by one or more objects that move
-        /// </summary>
-        /// <remarks>More than one moving object can occupy a given tile.</remarks>
-        Moving
-        }
-
-    public enum TileExceptionType
-        {
-        Warning,
-        Error
-        }
-
     public enum BangType
         {
         Short,

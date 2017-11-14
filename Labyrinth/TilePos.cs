@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -122,6 +123,7 @@ namespace Labyrinth
         /// Returns the co-ordinates of the middle of the specified Tile
         /// </summary>
         /// <returns>A Vector2 structure for the middle of the tile</returns>
+        [Pure]
         public Vector2 ToPosition()
             {
             int x = this.X * Constants.TileLength + Constants.HalfTileLength;

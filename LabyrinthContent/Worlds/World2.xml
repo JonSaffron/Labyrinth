@@ -88,24 +88,24 @@
     <Area Id="1" Top="0" Left="0" Width="256" Height="80" WorldStart="true" ReplenishFruit="true">
       <PlayerStartState Left="8" Top="75" Energy="255" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor2" />
+        <Floor Symbol=" " Tile="Floor2" />
 
-        <TileDef Symbol="©" Type="Wall" Tile="MBM1984" />
+        <Wall Symbol="©" Tile="MBM1984" />
 
-        <TileDef Symbol="▓" Type="Wall" Tile="Wall7Full" />
-        <TileDef Symbol="╔" Type="Wall" Tile="Wall7BottomRightRound" />
-        <TileDef Symbol="╗" Type="Wall" Tile="Wall7BottomLeftRound" />
-        <TileDef Symbol="╚" Type="Wall" Tile="Wall7TopRightRound" />
-        <TileDef Symbol="╝" Type="Wall" Tile="Wall7TopLeftRound" />
-        <TileDef Symbol="┌" Type="Wall" Tile="Wall7BottomRightStraight" />
-        <TileDef Symbol="┐" Type="Wall" Tile="Wall7BottomLeftStraight" />
-        <TileDef Symbol="└" Type="Wall" Tile="Wall7TopRightStraight" />
-        <TileDef Symbol="┘" Type="Wall" Tile="Wall7TopLeftStraight" />
+        <Wall Symbol="▓" Tile="Wall7Full" />
+        <Wall Symbol="╔" Tile="Wall7BottomRightRound" />
+        <Wall Symbol="╗" Tile="Wall7BottomLeftRound" />
+        <Wall Symbol="╚" Tile="Wall7TopRightRound" />
+        <Wall Symbol="╝" Tile="Wall7TopLeftRound" />
+        <Wall Symbol="┌" Tile="Wall7BottomRightStraight" />
+        <Wall Symbol="┐" Tile="Wall7BottomLeftStraight" />
+        <Wall Symbol="└" Tile="Wall7TopRightStraight" />
+        <Wall Symbol="┘" Tile="Wall7TopLeftStraight" />
 
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="B" Type="PotentiallyOccupied" />
-        <TileDef Symbol="m" Type="PotentiallyOccupied" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="S" Description="PlayerStart" />
+        <Object Symbol="B" Description="Boulder" />
+        <Object Symbol="m" Description="ThresherCyan" />
       </TileDefinitions>
     
       <FruitDefinitions>

@@ -88,14 +88,14 @@ O              OO              OO              OO              OO              O
     <Area Id="1" Top="40" Left="0" Width="64" Height="40" WorldStart="true">
       <PlayerStartState Left="8" Top="75" Energy="50" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor1" />
-        <TileDef Symbol="©" Type="Wall" Tile="MBM1984" />
-        <TileDef Symbol="O" Type="Wall" Tile="Wall1" />
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="t" Type="PotentiallyOccupied" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="B" Type="PotentiallyOccupied" />
-        <TileDef Symbol="#" Type="PotentiallyOccupied" />
+        <Floor Symbol=" " Tile="Floor1" />
+        <Wall Symbol="©" Tile="MBM1984" />
+        <Wall Symbol="O" Tile="Wall1" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="t" Description="Thresher" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="B" Description="Boulder" />
+        <Object Symbol="#" Description="ForceField" />
       </TileDefinitions>
       <FruitDefinitions>
         <FruitDef Type="Apple" Quantity="8" Energy="6" />
@@ -106,14 +106,14 @@ O              OO              OO              OO              OO              O
     <Area Id="2" Top="40" Left="64" Width="64" Height="40">
       <PlayerStartState Left="72" Top="45" Energy="100" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor2" />
-        <TileDef Symbol="O" Type="Wall" Tile="Wall2" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="t" Type="PotentiallyOccupied" />
-        <TileDef Symbol="r" Type="PotentiallyOccupied" />
-        <TileDef Symbol="X" Type="PotentiallyOccupied" />
-        <TileDef Symbol="#" Type="PotentiallyOccupied" />
+        <Floor Symbol=" " Tile="Floor2" />
+        <Wall Symbol="O" Tile="Wall2" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="t" Description="Thresher" />
+        <Object Symbol="r" Description="RotaFloater" />
+        <Object Symbol="X" Description="DeathCube" />
+        <Object Symbol="#" Description="ForceField" />
       </TileDefinitions>
       <FruitDefinitions>
         <FruitDef Type="Apple" Quantity="8" Energy="6" />
@@ -125,21 +125,21 @@ O              OO              OO              OO              OO              O
     <Area Id="3" Top="40" Left="128" Width="64" Height="40">
       <PlayerStartState Left="136" Top="77" Energy="150" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor3" />
-        <TileDef Symbol="▓" Type="Wall" Tile="Wall3Full" />
-        <TileDef Symbol="╔" Type="Wall" Tile="Wall3BottomRight" />
-        <TileDef Symbol="╗" Type="Wall" Tile="Wall3BottomLeft" />
-        <TileDef Symbol="╚" Type="Wall" Tile="Wall3TopRight" />
-        <TileDef Symbol="╝" Type="Wall" Tile="Wall3TopLeft" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="t" Type="PotentiallyOccupied" />
-        <TileDef Symbol="r" Type="PotentiallyOccupied" />
-        <TileDef Symbol="s" Type="PotentiallyOccupied" />
-        <TileDef Symbol="f" Type="PotentiallyOccupied" />
-        <TileDef Symbol="K" Type="PotentiallyOccupied" />
-        <TileDef Symbol="X" Type="PotentiallyOccupied" />
-        <TileDef Symbol="#" Type="PotentiallyOccupied" />
+        <Floor Symbol=" " Tile="Floor3" />
+        <Wall Symbol="▓" Tile="Wall3Full" />
+        <Wall Symbol="╔" Tile="Wall3BottomRight" />
+        <Wall Symbol="╗" Tile="Wall3BottomLeft" />
+        <Wall Symbol="╚" Tile="Wall3TopRight" />
+        <Wall Symbol="╝" Tile="Wall3TopLeft" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="t" Description="Thresher" />
+        <Object Symbol="r" Description="BrownRotaFloater" />
+        <Object Symbol="s" Description="CyanRotaFloater" />
+        <Object Symbol="f" Description="Flitterbug" />
+        <Object Symbol="K" Description="KillerCube" />
+        <Object Symbol="X" Description="DeathCube" />
+        <Object Symbol="#" Description="ForceField" />
       </TileDefinitions>
       <FruitDefinitions>
         <FruitDef Type="Watermelon" Quantity="12" Energy="8" />
@@ -151,17 +151,17 @@ O              OO              OO              OO              OO              O
     <Area Id="5" Top="0" Left="192" Width="64" Height="80">
       <PlayerStartState Left="200" Top="65" Energy="200" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor4" />
-        <TileDef Symbol="□" Type="Wall" Tile="Wall4" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="#" Type="PotentiallyOccupied" />
-        <TileDef Symbol="s" Type="PotentiallyOccupied" />
-        <TileDef Symbol="f" Type="PotentiallyOccupied" />
-        <TileDef Symbol="p" Type="PotentiallyOccupied" />
-        <TileDef Symbol="X" Type="PotentiallyOccupied" />
-        <TileDef Symbol="K" Type="PotentiallyOccupied" />
-        <TileDef Symbol="b" Type="PotentiallyOccupied" />
+        <Floor Symbol=" " Tile="Floor4" />
+        <Wall Symbol="□" Tile="Wall4" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="#" Description="ForceField" />
+        <Object Symbol="s" Description="RotaFloater" />
+        <Object Symbol="f" Description="Flitterbug" />
+        <Object Symbol="p" Description="Thresher" />
+        <Object Symbol="X" Description="DeathCube" />
+        <Object Symbol="K" Description="KillerCube" />
+        <Object Symbol="b" Description="CrazyCrawler" />
       </TileDefinitions>
     </Area>
 
@@ -183,21 +183,21 @@ O              OO              OO              OO              OO              O
     <Area Id="6" Top="0" Left="128" Width="64" Height="40">
       <PlayerStartState Left="183" Top="15" Energy="200" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor5" />
-        <TileDef Symbol="▓" Type="Wall" Tile="Wall5Full" />
-        <TileDef Symbol="╔" Type="Wall" Tile="Wall5BottomRight" />
-        <TileDef Symbol="╗" Type="Wall" Tile="Wall5BottomLeft" />
-        <TileDef Symbol="╚" Type="Wall" Tile="Wall5TopRight" />
-        <TileDef Symbol="╝" Type="Wall" Tile="Wall5TopLeft" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="#" Type="PotentiallyOccupied" />
-        <TileDef Symbol="p" Type="PotentiallyOccupied" />
-        <TileDef Symbol="b" Type="PotentiallyOccupied" />
-        <TileDef Symbol="k" Type="PotentiallyOccupied" />
-        <TileDef Symbol="y" Type="PotentiallyOccupied" />
-        <TileDef Symbol="K" Type="PotentiallyOccupied" />
-        <TileDef Symbol="d" Type="PotentiallyOccupied" />
+        <Floor Symbol=" " Tile="Floor5" />
+        <Wall Symbol="▓" Tile="Wall5Full" />
+        <Wall Symbol="╔" Tile="Wall5BottomRight" />
+        <Wall Symbol="╗" Tile="Wall5BottomLeft" />
+        <Wall Symbol="╚" Tile="Wall5TopRight" />
+        <Wall Symbol="╝" Tile="Wall5TopLeft" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="#" Description="ForceField" />
+        <Object Symbol="p" Description="Thresher" />
+        <Object Symbol="b" Description="CrazyCrawler" />
+        <Object Symbol="k" Description="KillerCubeRed" />
+        <Object Symbol="y" Description="FlitterbugCyan" />
+        <Object Symbol="K" Description="KillerCubeGreen" />
+        <Object Symbol="d" Description="DiamondDemon" />
       </TileDefinitions>
       <FruitDefinitions>
         <FruitDef Type="Strawberry" Quantity="24" Energy="12" />
@@ -209,25 +209,25 @@ O              OO              OO              OO              OO              O
     <Area Id="7" Top="0" Left="64" Width="64" Height="40">
       <PlayerStartState Left="119" Top="35" Energy="255" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor6" />
-        <TileDef Symbol="▓" Type="Wall" Tile="Wall6Full" />
-        <TileDef Symbol="╔" Type="Wall" Tile="Wall6BottomRightRound" />
-        <TileDef Symbol="╗" Type="Wall" Tile="Wall6BottomLeftRound" />
-        <TileDef Symbol="╚" Type="Wall" Tile="Wall6TopRightRound" />
-        <TileDef Symbol="╝" Type="Wall" Tile="Wall6TopLeftRound" />
-        <TileDef Symbol="┌" Type="Wall" Tile="Wall6BottomRightStraight" />
-        <TileDef Symbol="┐" Type="Wall" Tile="Wall6BottomLeftStraight" />
-        <TileDef Symbol="└" Type="Wall" Tile="Wall6TopRightStraight" />
-        <TileDef Symbol="┘" Type="Wall" Tile="Wall6TopLeftStraight" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="#" Type="PotentiallyOccupied" />
-        <TileDef Symbol="d" Type="PotentiallyOccupied" />
-        <TileDef Symbol="y" Type="PotentiallyOccupied" />
-        <TileDef Symbol="x" Type="PotentiallyOccupied" />
-        <TileDef Symbol="k" Type="PotentiallyOccupied" />
-        <TileDef Symbol="b" Type="PotentiallyOccupied" />
-        <TileDef Symbol="c" Type="PotentiallyOccupied" />
+        <Floor Symbol=" " Tile="Floor6" />
+        <Wall Symbol="▓" Tile="Wall6Full" />
+        <Wall Symbol="╔" Tile="Wall6BottomRightRound" />
+        <Wall Symbol="╗" Tile="Wall6BottomLeftRound" />
+        <Wall Symbol="╚" Tile="Wall6TopRightRound" />
+        <Wall Symbol="╝" Tile="Wall6TopLeftRound" />
+        <Wall Symbol="┌" Tile="Wall6BottomRightStraight" />
+        <Wall Symbol="┐" Tile="Wall6BottomLeftStraight" />
+        <Wall Symbol="└" Tile="Wall6TopRightStraight" />
+        <Wall Symbol="┘" Tile="Wall6TopLeftStraight" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="#" Description="ForceField" />
+        <Object Symbol="d" Description="DiamondDemon" />
+        <Object Symbol="y" Description="FlitterbugCyan" />
+        <Object Symbol="x" Description="FlitterbugBrown" />
+        <Object Symbol="k" Description="KillerCube" />
+        <Object Symbol="b" Description="CrazyCrawler" />
+        <Object Symbol="c" Description="TigerMoth" />
       </TileDefinitions>
       <FruitDefinitions>
         <FruitDef Type="Cherries" Quantity="28" Energy="14" />
@@ -239,14 +239,14 @@ O              OO              OO              OO              OO              O
     <Area Id="8" Top="0" Left="0" Width="64" Height="40">
       <PlayerStartState Left="56" Top="5" Energy="255" />
       <TileDefinitions>
-        <TileDef Symbol=" " Type="Floor" Tile="Floor4" />
-        <TileDef Symbol="▓" Type="Wall" Tile="Wall7Full" />
-        <TileDef Symbol="S" Type="PotentiallyOccupied" />
-        <TileDef Symbol="C" Type="PotentiallyOccupied" />
-        <TileDef Symbol="c" Type="PotentiallyOccupied" />
-        <TileDef Symbol="x" Type="PotentiallyOccupied" />
-        <TileDef Symbol="m" Type="PotentiallyOccupied" />
-        <TileDef Symbol="j" Type="PotentiallyOccupied" />
+        <Floor Symbol=" " Tile="Floor4" />
+        <Wall Symbol="▓" Tile="Wall7Full" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="c" Description="TigerMoth" />
+        <Object Symbol="x" Description="FlitterbugBrown" />
+        <Object Symbol="m" Description="Butterfly" />
+        <Object Symbol="j" Description="Joker" />
       </TileDefinitions>
       <FruitDefinitions>
         <FruitDef Type="Acorn" Quantity="64" Energy="16" />

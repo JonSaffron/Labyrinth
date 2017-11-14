@@ -14,7 +14,7 @@ namespace Labyrinth.Services.WorldBuilding
             this._layout = worldLayout;
             }
 
-        public int Height 
+        private int Height 
             {
             get
                 {
@@ -24,7 +24,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public int Width 
+        private int Width 
             {
             get
                 {
@@ -48,11 +48,11 @@ namespace Labyrinth.Services.WorldBuilding
         public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
             var result = new Dictionary<int, PlayerStartState>();
-            result.Add(0, new PlayerStartState());
+            result.Add(0, new PlayerStartState(new TilePos(), 100));
             return result;
             }
 
-        public void GetGameObjects(GameState gameState)
+        public void AddGameObjects(GameState gameState)
             {
             var lines = this._layout.Split(new [] { "\r\n" }, StringSplitOptions.None);
             for (int y = 0; y < lines.Count(); y++)
