@@ -36,9 +36,9 @@ namespace Labyrinth
             var gameObjectCollection = new GameObjectCollection();
             this._playerStartStates = worldLoader.GetPlayerStartStates();
             var gameState = new GameState(gameObjectCollection);
+            GlobalServices.SetGameState(gameState);
             worldLoader.AddGameObjects(gameState);
             this.Player = gameState.Player;
-            GlobalServices.SetGameState(gameState);
             }
 
         public void ResetLevelAfterLosingLife()

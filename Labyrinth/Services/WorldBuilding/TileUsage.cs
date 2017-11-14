@@ -32,6 +32,7 @@
             {
             this._symbol = symbol;
             this._description = description;
+            this.TileTypeByMap = TileTypeByMap.Object;
             }
 
         public void SetUsedByRandomDistribution()

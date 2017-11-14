@@ -204,8 +204,7 @@ namespace Labyrinth.GameObjects
             if (this.IsEgg && this._hatchingTimer != null)
                 this._hatchingTimer.Enabled = inSameRoom;
 
-            // if inactive and in same room then activate
-            if (!this.IsActive && inSameRoom)
+            if (inSameRoom)
                 this.IsActive = true;
 
             if (!this.IsActive)
@@ -248,7 +247,8 @@ namespace Labyrinth.GameObjects
                     DoMonsterActions();
                     }
 
-                this.TryToCompleteMoveToTarget(ref remainingTime);
+                if (this._isAbleToMove)
+                    this.TryToCompleteMoveToTarget(ref remainingTime);
                 result = true;
                 }
 

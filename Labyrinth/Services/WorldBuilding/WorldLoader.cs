@@ -287,7 +287,7 @@ namespace Labyrinth.Services.WorldBuilding
                         if (t.TileTypeByMap == TileTypeByMap.Object && !items.Any())
                             issues.Add(tp + ": Map had tile marked as occupied by an object " + t.Description + ", but nothing is there.");
                         else if (t.TileTypeByMap == TileTypeByMap.Floor && !t.IsUsedByRandomDistribution && items.Any())
-                            issues.Add(tp + ": Map had tile marked as unoccupied, but contains " + items.Count + " item(s).");
+                            issues.Add(tp + ": Map had tile marked as unoccupied, but contains " + items.Count + " item(s): " + string.Join(", ", items.Select(item => item.GetType().Name)) + ".");
                         }
                     }
 
