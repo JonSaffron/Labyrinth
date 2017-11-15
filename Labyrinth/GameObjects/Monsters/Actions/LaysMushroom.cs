@@ -4,10 +4,6 @@ namespace Labyrinth.GameObjects.Monsters.Actions
     {
     class LaysMushroom : BaseAction
         {
-        public LaysMushroom(Monster monster) : base(monster)
-            {
-            }
-
         public override void PerformAction()
             {
             if (!ShouldAttemptToLayMushroom())

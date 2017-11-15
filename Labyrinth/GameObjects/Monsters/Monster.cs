@@ -19,8 +19,6 @@ namespace Labyrinth.GameObjects
         public ChangeRooms ChangeRooms { get; set; }
         private MonsterState _monsterState = MonsterState.Normal;
         [CanBeNull] private GameTimer _hatchingTimer;
-        protected bool Flitters { private get; set; }
-        private bool _flitterFlag;
 
         public bool SplitsOnHit { get; set; }
         public bool IsActive { get; set; }
@@ -37,8 +35,8 @@ namespace Labyrinth.GameObjects
 
         public readonly int OriginalEnergy;
 
-        private bool _isAbleToMove;
-        private double _stepTime;
+        private readonly IEnumerator<bool> _movementIterator;
+        private double _remainingTime;
 
         protected Monster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
@@ -47,6 +45,8 @@ namespace Labyrinth.GameObjects
             
             this._eggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
             this._hatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
+
+            this._movementIterator = Move().GetEnumerator();
             }
             
         public MonsterMobility Mobility
@@ -193,14 +193,14 @@ namespace Labyrinth.GameObjects
             this.Move(d, this.StandardSpeed);
             return true;
             }
-        
+
         /// <summary>
         /// Handles input, performs physics, and animates the sprite.
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
             bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this);
-            
+
             if (this.IsEgg && this._hatchingTimer != null)
                 this._hatchingTimer.Enabled = inSameRoom;
 
@@ -210,49 +210,54 @@ namespace Labyrinth.GameObjects
             if (!this.IsActive)
                 return false;
 
-            bool result = false;
-            var remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
-            while (remainingTime > 0)
+            this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
+            this._movementIterator.MoveNext();
+            var result = this._movementIterator.Current;
+            return result;
+            }
+
+        private IEnumerable<bool> Move()
+            {
+            bool hasMovedSinceLastCall = false;
+            double timeStationary = 0;
+            while (true)
                 {
-                if (!this.IsMoving)
+                if (this.SetDirectionAndDestination())
                     {
-                    if (this.SetDirectionAndDestination())
+                    hasMovedSinceLastCall = true;
+                    timeStationary = 0;
+                    while (true)
                         {
-                        this._isAbleToMove = true;
-                        this._stepTime = 0;
-                        }
-                    else
-                        {
-                        // so when monster goes from moving to not moving we need to start timing
-                        // if it continues not to move we add the remainingTime on to the total
-                        // when the total goes above the time taken to reach the next tile
-                        // then do an action and toggle the flitter flag
-                        if (this._isAbleToMove)
-                            {
-                            this._isAbleToMove = false;
-                            this._stepTime = remainingTime;
-                            }
-                        else
-                            {
-                            this._stepTime += remainingTime;
-                            }
-                        var timeToReachNextTile = Constants.TileLength / (double) this.StandardSpeed;
-                        if (this._stepTime < timeToReachNextTile)  
+                        if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
                             break;
-
-                        remainingTime -= timeToReachNextTile;
+                        
+                        yield return true;  // we have moved
                         }
 
-                    this._flitterFlag = this.Flitters && !this._flitterFlag;
                     DoMonsterActions();
                     }
-
-                if (this._isAbleToMove)
-                    this.TryToCompleteMoveToTarget(ref remainingTime);
-                result = true;
+                else
+                    {
+                    timeStationary += this._remainingTime;
+                    DoActionsWhilstStationary(ref timeStationary);
+                    yield return hasMovedSinceLastCall;
+                    hasMovedSinceLastCall = false;
+                    }
                 }
+            // ReSharper disable once IteratorNeverReturns
+            }
 
-            return result;
+        private void DoActionsWhilstStationary(ref double timeStationary)
+            {
+            while (true)
+                {
+                var timeItWouldTakeToMakeAMove = Constants.TileLength / (double) this.StandardSpeed;
+                if (timeStationary < timeItWouldTakeToMakeAMove)
+                    break;
+
+                timeStationary -= timeItWouldTakeToMakeAMove;
+                DoMonsterActions();
+                }
             }
 
         private void DoMonsterActions()
@@ -268,6 +273,7 @@ namespace Labyrinth.GameObjects
             _weapon?.FireIfYouLike();
             }
 
+        /// <inheritdoc cref="MovingItem.TryToCompleteMoveToTarget" />
         protected override bool TryToCompleteMoveToTarget(ref double timeRemaining)
             {
             Rectangle currentRoom = World.GetContainingRoom(this.Position);
@@ -289,96 +295,60 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Gets an indication of how solid the object is
         /// </summary>
-        public override ObjectSolidity Solidity
-            {
-            get
-                {
-                var result = this.IsStatic ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
-                return result;
-                }
-            }
+        public override ObjectSolidity Solidity => this.IsStatic ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
 
-        protected override decimal StandardSpeed
-            {
-            get
-                {
-                var result = Constants.BaseSpeed * (this.Flitters && this._flitterFlag ? 2 : 1);
-                return result;
-                }
-            }
+        public int CurrentSpeed { get; set; }
+        protected override decimal StandardSpeed => this.CurrentSpeed;
 
+        public bool Flitters
+            {
+            get => this._actions != null && this._actions.OfType<Flitter>().Any();
+            set => SetAction<Flitter>(ref this._actions, value);
+            }
+        
         public bool LaysMushrooms
             {
-            get
-                {
-                var result = this._actions != null && this._actions.OfType<LaysMushroom>().Any();
-                return result;
-                }
-            set
-                {
-                if (value)
-                    AddAction(new LaysMushroom(this));
-                else
-                    RemoveAction<LaysMushroom>();
-                }
+            get => this._actions != null && this._actions.OfType<LaysMushroom>().Any();
+            set => SetAction<LaysMushroom>(ref this._actions, value);
             }
 
         public bool LaysEggs
             {
-            get
-                {
-                var result = this._actions != null && this._actions.OfType<LaysEgg>().Any();
-                return result;
-                }
-            set
-                {
-                if (value)
-                    AddAction(new LaysEgg(this));
-                else
-                    RemoveAction<LaysEgg>();
-                }
+            get => this._actions != null && this._actions.OfType<LaysEgg>().Any();
+            set => SetAction<LaysEgg>(ref this._actions, value);
             }
 
         public bool ShootsAtPlayer
             {
-            get
-                {
-                var result = this._actions != null && this._actions.OfType<ShootsAtPlayer>().Any();
-                return result;
-                }
+            get => this._actions != null && this._actions.OfType<ShootsAtPlayer>().Any();
 
             set
                 {
-                if (value)
-                    {
-                    AddAction(new ShootsAtPlayer(this));
-                    this._weapon = new StandardMonsterWeapon(this);
-                    }
-                else
-                    {
-                    RemoveAction<ShootsAtPlayer>();
-                    this._weapon = null;
-                    }
+                SetAction<ShootsAtPlayer>(ref this._actions, value);
+                this._weapon = value ? new StandardMonsterWeapon(this) : null;
                 }
             }
 
-        private void AddAction([NotNull] BaseAction action)
+        private void SetAction<T>(ref List<BaseAction> actionList, bool enable) where T : BaseAction, new()
             {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            if (this._actions == null)
-                this._actions = new List<BaseAction>();
+            if (enable)
+                AddAction<T>(ref actionList);
+            else
+                actionList?.RemoveAll(item => item is T);
+            }
+
+        private void AddAction<T>(ref List<BaseAction> actionList) where T: BaseAction, new() 
+            {
+            if (actionList == null)
+                actionList = new List<BaseAction>();
             else
                 {
-                Type t = action.GetType();
-                if (this._actions.Any(item => item.GetType() == t))
+                if (actionList.OfType<T>().Any())
                     return;
                 }
-            this._actions.Add(action);
-            }
-
-        private void RemoveAction<T>()
-            {
-            _actions?.RemoveAll(item => item is T);
+            var action = new T();
+            action.Init(this);
+            actionList.Add(action);
             }
         }
     }

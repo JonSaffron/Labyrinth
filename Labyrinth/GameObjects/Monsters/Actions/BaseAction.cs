@@ -8,11 +8,13 @@ namespace Labyrinth.GameObjects.Monsters.Actions
         {
         protected readonly Player Player = GlobalServices.GameState.Player;
         protected readonly IRandomess Random = GlobalServices.Randomess;
-        protected readonly Monster Monster;
+        private Monster _monster;
 
-        public BaseAction([NotNull] Monster monster)
+        protected Monster Monster => _monster;
+
+        public virtual void Init([NotNull] Monster monster)
             {
-            this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
         public abstract void PerformAction();

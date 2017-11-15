@@ -5,10 +5,11 @@ namespace Labyrinth.GameObjects.Monsters.Actions
     {
     class LaysEgg : BaseAction
         {
-        public LaysEgg(Monster monster) : base(monster)
+        public override void Init(Monster monster)
             {
             if (!(monster is ILayEggs))
-                throw new InvalidOperationException(string.Format("Cannot set a {0} as laying eggs because the ILayEggs interface is not implemented.", this.GetType().Name));
+                throw new InvalidOperationException($"Cannot set a {this.GetType().Name} as laying eggs because the ILayEggs interface is not implemented.");
+            base.Init(monster);
             }
 
         public override void PerformAction()

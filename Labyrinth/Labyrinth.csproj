@@ -127,6 +127,7 @@
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BaseAction.cs" />
+    <Compile Include="GameObjects\Monsters\Actions\Flitter.cs" />
     <Compile Include="GameObjects\Monsters\Actions\LaysEgg.cs" />
     <Compile Include="GameObjects\Monsters\Actions\LaysMushroom.cs" />
     <Compile Include="GameObjects\Monsters\Actions\ShootsAtPlayer.cs" />

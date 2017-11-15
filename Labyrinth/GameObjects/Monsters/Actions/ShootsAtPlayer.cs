@@ -4,10 +4,6 @@ namespace Labyrinth.GameObjects.Monsters.Actions
     {
     class ShootsAtPlayer : BaseAction
         {
-        public ShootsAtPlayer(Monster monster) : base(monster)
-            {
-            }
-
         public override void PerformAction()
             {
             if (!ShouldAttemptToFireAtPlayer())
