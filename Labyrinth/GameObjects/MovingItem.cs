@@ -31,7 +31,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <param name="position">The new position for this object</param>
         /// <remarks>The object will also be set to stationary</remarks>
-        public void ResetPosition(Vector2 position)
+        public virtual void ResetPosition(Vector2 position)
             {
             this.Position = position;
             this.CurrentMovement = Labyrinth.Movement.Still;

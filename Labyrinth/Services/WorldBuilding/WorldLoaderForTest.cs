@@ -34,6 +34,8 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
+        public TilePos WorldSize => new TilePos(this.Width, this.Height);
+
         public Tile[,] GetFloorTiles()
             {
             var result = new Tile[this.Width, this.Height];

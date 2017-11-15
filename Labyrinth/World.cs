@@ -20,22 +20,24 @@ namespace Labyrinth
         private int _levelUnlocked;
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
         private bool _doNotUpdate;
-        private readonly bool _restartInSameRoom;
         
-        [NotNull] public readonly Player Player;
-
+        private TilePos _worldSize;
         [NotNull] private readonly Tile[,] _tiles;
+        private readonly bool _restartInSameRoom;
         [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
+        [NotNull] public readonly Player Player;
 
         public Vector2 WindowPosition { get; private set; }
 
         public World([NotNull] IWorldLoader worldLoader, [NotNull] string level)
             {
             worldLoader.LoadWorld(level);
+            this._worldSize = worldLoader.WorldSize;
             this._tiles = worldLoader.GetFloorTiles();
             this._restartInSameRoom = worldLoader.RestartInSameRoom;
-            var gameObjectCollection = new GameObjectCollection();
             this._playerStartStates = worldLoader.GetPlayerStartStates();
+
+            var gameObjectCollection = new GameObjectCollection();
             var gameState = new GameState(gameObjectCollection);
             GlobalServices.SetGameState(gameState);
             worldLoader.AddGameObjects(gameState);
@@ -48,8 +50,8 @@ namespace Labyrinth
             {
             var tcv = new TileContentValidator();
             var issues = new List<string>();
-            var cy = this._tiles.GetLength(1);
-            var cx = this._tiles.GetLength(0);
+            var cy = this._worldSize.Y;
+            var cx = this._worldSize.X;
             for (int y = 0; y < cy; y++)
                 {
                 for (int x = 0; x < cx; x++)
@@ -80,12 +82,11 @@ namespace Labyrinth
             ResetLevelForStartingNewLife();
             }
 
-        private TilePos GetRestartLocation(TilePos lastPosition, TilePos levelStartPosition)
+        private static TilePos GetRestartLocation(TilePos lastPosition, TilePos levelStartPosition)
             {
             var topLeft = GetContainingRoom(lastPosition).TopLeft;
             var startPos = new TilePos(topLeft.X + 8, topLeft.Y + 5);
-            TilePos tilePos;
-            if (!GetFreeTileWithinRoom(startPos, out tilePos))
+            if (!GetFreeTileWithinRoom(startPos, out var tilePos))
                 {
                 if (!GetFreeTileWithinRoom(levelStartPosition, out tilePos))
                     throw new InvalidOperationException("Could not find a free tile to put the player on.");
@@ -282,17 +283,11 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Gets the collision mode of the tile at a particular location.
-        /// This method handles tiles outside of the levels boundries by making it
-        /// impossible to escape past the left or right edges, but allowing things
-        /// to jump beyond the top of the World and fall off the bottom.
+        /// Gets whether the specified tile is within the world area
         /// </summary>
         public bool IsTileWithinWorld(TilePos tp)
             {
-            var x = tp.X;
-            var y = tp.Y;
-            var result = !(x < 0 || x >= this._tiles.GetLength(0) || y < 0 || y >= this._tiles.GetLength(1));
-            return result;
+            return !(tp.X < 0 || tp.X >= this._worldSize.X || tp.Y < 0 || tp.Y >= this._worldSize.Y);
             }
 
         /// <summary>
@@ -313,7 +308,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="position">Specifies the position within the world</param>
         /// <returns>A rectangular structure which specifies the co-ordinates of the room containing the specified position</returns>
-        public static TileRect GetContainingRoom(TilePos position)
+        private static TileRect GetContainingRoom(TilePos position)
             {
             var roomx = (int)(position.X / Constants.RoomSizeInTiles.X);
             var roomy = (int)(position.Y / Constants.RoomSizeInTiles.Y);
@@ -400,8 +395,7 @@ namespace Labyrinth
                     {
                     int x = tr.TopLeft.X + i;
 
-                    var tp = new TilePos(x, y);
-                    Texture2D texture = this._tiles[tp.X, tp.Y].Floor;
+                    Texture2D texture = this._tiles[x, y].Floor;
                     if (texture != null)
                         {
                         Vector2 position = new Vector2(x, y) * Constants.TileSize;

@@ -35,13 +35,14 @@ namespace Labyrinth.GameObjects
 
         public readonly int OriginalEnergy;
 
-        private readonly IEnumerator<bool> _movementIterator;
+        private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
 
         protected Monster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
             this.Energy = energy;
             this.OriginalEnergy = energy;
+            this.CurrentSpeed = Constants.BaseSpeed;
             
             this._eggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
             this._hatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
@@ -214,6 +215,12 @@ namespace Labyrinth.GameObjects
             this._movementIterator.MoveNext();
             var result = this._movementIterator.Current;
             return result;
+            }
+
+        public override void ResetPosition(Vector2 position)
+            {
+            base.ResetPosition(position);
+            this._movementIterator = Move().GetEnumerator();
             }
 
         private IEnumerable<bool> Move()

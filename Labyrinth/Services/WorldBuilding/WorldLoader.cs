@@ -13,8 +13,8 @@ namespace Labyrinth.Services.WorldBuilding
         {
         private XmlElement _xmlRoot;
         private XmlNamespaceManager _xnm;
-        private TilePos _worldSize;
         private List<WorldArea> _worldAreas;
+        public TilePos WorldSize { get; private set; }
 
         public void LoadWorld(string levelName)
             {
@@ -39,7 +39,7 @@ namespace Labyrinth.Services.WorldBuilding
 
             int width = int.Parse(this._xmlRoot.GetAttribute("Width"));
             int height = int.Parse(this._xmlRoot.GetAttribute("Height"));
-            this._worldSize = new TilePos(width, height);
+            this.WorldSize = new TilePos(width, height);
 
             this._worldAreas = LoadAreas();
             }
@@ -136,7 +136,7 @@ namespace Labyrinth.Services.WorldBuilding
             var layout = GetLayout();
             ValidateLayout(layout);
 
-            var result = new Tile[this._worldSize.X, this._worldSize.Y];
+            var result = new Tile[this.WorldSize.X, this.WorldSize.Y];
             var spriteLibrary = GlobalServices.SpriteLibrary;
             foreach (WorldArea wa in this._worldAreas)
                 {
@@ -176,7 +176,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         private void ValidateLayout(string[] lines)
             {
-            TilePos size = this._worldSize;
+            TilePos size = this.WorldSize;
             int countOfLines = lines.GetLength(0);
             if (countOfLines != size.Y)
                 throw new InvalidOperationException(
@@ -196,8 +196,8 @@ namespace Labyrinth.Services.WorldBuilding
             var tileUsage = BuildTileUsageByMap();
 
             var issues = new List<string>();
-            var cy = this._worldSize.Y;
-            var cx = this._worldSize.X;
+            var cy = this.WorldSize.Y;
+            var cx = this.WorldSize.X;
             for (int y = 0; y < cy; y++)
                 {
                 for (int x = 0; x < cx; x++)
