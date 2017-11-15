@@ -1,11 +1,10 @@
 ﻿namespace Labyrinth.Services.WorldBuilding
     {
-    class TileUsage
+    struct TileUsage
         {
         public readonly TileTypeByMap TileTypeByMap;
         private readonly char _symbol;
         private readonly string _description;
-        public bool IsUsedByRandomDistribution { get; private set; }
 
         public static TileUsage Floor(char symbol)
             {
@@ -26,6 +25,7 @@
             {
             this.TileTypeByMap = tileTypeByMap;
             this._symbol = symbol;
+            this._description = tileTypeByMap.ToString();
             }
         
         private TileUsage(char symbol, string description)
@@ -33,11 +33,6 @@
             this._symbol = symbol;
             this._description = description;
             this.TileTypeByMap = TileTypeByMap.Object;
-            }
-
-        public void SetUsedByRandomDistribution()
-            {
-            this.IsUsedByRandomDistribution = true;
             }
 
         public string Description => $"'{this._symbol} {this._description}";

@@ -226,6 +226,7 @@
     <Compile Include="Services\Sound\SoundPlayer.cs" />
     <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
     <Compile Include="Services\WorldBuilding\MonsterDef.cs" />
+    <Compile Include="Services\WorldBuilding\ProcessGameObjects.cs" />
     <Compile Include="Services\WorldBuilding\RandomMonsterDistribution.cs" />
     <Compile Include="Services\WorldBuilding\TileContentValidator.cs" />
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />

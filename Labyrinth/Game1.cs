@@ -189,8 +189,7 @@ namespace Labyrinth
         internal void LoadLevel(string level)
             {
             // Load the World.
-            this._worldLoader.LoadWorld(level);
-            this.World = new World(this._worldLoader);
+            this.World = new World(this._worldLoader, level);
             this.World.ResetLevelForStartingNewLife();
             }
 

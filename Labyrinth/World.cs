@@ -29,8 +29,9 @@ namespace Labyrinth
 
         public Vector2 WindowPosition { get; private set; }
 
-        public World(IWorldLoader worldLoader)
+        public World([NotNull] IWorldLoader worldLoader, [NotNull] string level)
             {
+            worldLoader.LoadWorld(level);
             this._tiles = worldLoader.GetFloorTiles();
             this._restartInSameRoom = worldLoader.RestartInSameRoom;
             var gameObjectCollection = new GameObjectCollection();
@@ -39,6 +40,32 @@ namespace Labyrinth
             GlobalServices.SetGameState(gameState);
             worldLoader.AddGameObjects(gameState);
             this.Player = gameState.Player;
+
+            ValidateGameState(gameState);
+            }
+
+        private void ValidateGameState(GameState gameState)
+            {
+            var tcv = new TileContentValidator();
+            var issues = new List<string>();
+            var cy = this._tiles.GetLength(1);
+            var cx = this._tiles.GetLength(0);
+            for (int y = 0; y < cy; y++)
+                {
+                for (int x = 0; x < cx; x++)
+                    {
+                    var tp = new TilePos(x, y);
+                    var items = gameState.GetItemsOnTile(tp).ToList();
+                    if (!tcv.IsListOfObjectsValid(items, out string reason))
+                        issues.Add(tp + ": " + reason);
+                    }
+                }
+
+            if (issues.Count != 0)
+                {
+                var message = string.Join("\r\n", issues);
+                throw new InvalidOperationException(message);
+                }
             }
 
         public void ResetLevelAfterLosingLife()

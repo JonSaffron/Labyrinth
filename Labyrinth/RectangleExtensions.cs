@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -31,6 +32,16 @@ namespace Labyrinth
             {
             var p = new Point((int) point.X, (int) point.Y);
             var result = rect.Contains(p);
+            return result;
+            }
+
+        public static Rectangle GetRectangleFromDefinition(XmlElement area)
+            {
+            int x = int.Parse(area.GetAttribute("Left"));
+            int y = int.Parse(area.GetAttribute("Top"));
+            int width = int.Parse(area.GetAttribute("Width"));
+            int height = int.Parse(area.GetAttribute("Height"));
+            Rectangle result = new Rectangle(x, y, width, height);
             return result;
             }
         }

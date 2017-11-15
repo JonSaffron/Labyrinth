@@ -9,17 +9,13 @@ namespace Labyrinth.Services.WorldBuilding
     {
     class WorldArea : IEquatable<WorldArea>
         {
-        public int? Id; 
-        public Rectangle Area { get; }
-        public bool IsInitialArea { get; }
-
-        [CanBeNull] public PlayerStartState PlayerStartState { get; }
-
-        [CanBeNull] public Dictionary<char, TileDefinition> TileDefinitions { get; }
-
-        [CanBeNull] public Dictionary<FruitType, FruitDefinition> FruitDefinitions { get; }
-
-        [CanBeNull] public RandomMonsterDistribution RandomMonsterDistribution { get; }
+        public readonly int? Id;
+        public readonly Rectangle Area;
+        public readonly bool IsInitialArea;
+        [CanBeNull] public readonly PlayerStartState PlayerStartState;
+        [CanBeNull] public readonly Dictionary<char, TileDefinition> TileDefinitions;
+        [CanBeNull] public readonly Dictionary<FruitType, FruitDefinition> FruitDefinitions;
+        [CanBeNull] public readonly RandomMonsterDistribution RandomMonsterDistribution;
 
         public WorldArea(XmlElement area, XmlNamespaceManager xnm)
             {
@@ -27,7 +23,7 @@ namespace Labyrinth.Services.WorldBuilding
             if (!string.IsNullOrEmpty(id))
                 this.Id = int.Parse(id);
             
-            this.Area = GetRectangleFromDefinition(area);
+            this.Area = RectangleExtensions.GetRectangleFromDefinition(area);
             
             string worldStart = area.GetAttribute("WorldStart");
             this.IsInitialArea = !string.IsNullOrWhiteSpace(worldStart) && bool.Parse(worldStart);
@@ -49,16 +45,6 @@ namespace Labyrinth.Services.WorldBuilding
 
             var randomMonsterDistribution = (XmlElement) area.SelectSingleNode("ns:RandomMonsterDistribution", xnm);
             this.RandomMonsterDistribution = randomMonsterDistribution != null ? LoadRandomMonsterDistribution(randomMonsterDistribution, xnm) : new RandomMonsterDistribution();
-            }
-
-        public static Rectangle GetRectangleFromDefinition(XmlElement area)
-            {
-            int x = int.Parse(area.GetAttribute("Left"));
-            int y = int.Parse(area.GetAttribute("Top"));
-            int width = int.Parse(area.GetAttribute("Width"));
-            int height = int.Parse(area.GetAttribute("Height"));
-            Rectangle result = new Rectangle(x, y, width, height);
-            return result;
             }
 
         private static Dictionary<char, TileDefinition> LoadTileDefs(XmlNodeList tiledefs)
