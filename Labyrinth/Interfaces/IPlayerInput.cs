@@ -11,6 +11,7 @@ namespace Labyrinth
         /// <summary>
         /// Gets player movement and fire action
         /// </summary>
+        // todo this doesn't need the gameTime parameter (usually)
         void ProcessInput(GameTime gameTime);
         }
     }

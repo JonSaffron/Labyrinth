@@ -92,7 +92,7 @@ namespace Labyrinth.Services.WorldBuilding
             MonsterDef md = MonsterDef.FromXml(mdef);
             var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
             md.Position = tilePos.ToPosition();
-            this._gameState.CreateMonster(md);
+            this._gameState.AddMonster(md);
             }
 
         private void AddCrystal(XmlElement cdef)
@@ -146,7 +146,7 @@ namespace Labyrinth.Services.WorldBuilding
 
                     TilePos tp = GetFreeTile(item.Area);
                     monsterDef.Position = tp.ToPosition();
-                    this._gameState.CreateMonster(monsterDef);
+                    this._gameState.AddMonster(monsterDef);
 
                     i++;
                     }

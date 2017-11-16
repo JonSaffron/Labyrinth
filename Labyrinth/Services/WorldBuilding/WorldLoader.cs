@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 
 namespace Labyrinth.Services.WorldBuilding
     {
+    // todo is there a way to reduce the number of times the world layout is examined?
     public class WorldLoader : IWorldLoader
         {
         private XmlElement _xmlRoot;
@@ -60,6 +61,13 @@ namespace Labyrinth.Services.WorldBuilding
                 bool result = bool.Parse(text);
                 return result;
                 }
+            }
+
+        public Dictionary<int, PlayerStartState> GetPlayerStartStates()
+            {
+            var result = this._worldAreas.Where(item => item.Id.HasValue)
+                .ToDictionary(key => key.Id.GetValueOrDefault(), value => value.PlayerStartState);
+            return result;
             }
 
         public void AddGameObjects(GameState gameState)
@@ -124,13 +132,6 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        public Dictionary<int, PlayerStartState> GetPlayerStartStates()
-            {
-            var result = this._worldAreas.Where(item => item.Id.HasValue)
-                .ToDictionary(key => key.Id.GetValueOrDefault(), value => value.PlayerStartState);
-            return result;
-            }
-
         private Tile[,] GetFloorLayout()
             {
             var layout = GetLayout();
@@ -179,15 +180,13 @@ namespace Labyrinth.Services.WorldBuilding
             TilePos size = this.WorldSize;
             int countOfLines = lines.GetLength(0);
             if (countOfLines != size.Y)
-                throw new InvalidOperationException(
-                    $"The world layout has {countOfLines} lines whilst the Height property equals {size.Y}. The two should match.");
+                throw new InvalidOperationException($"The world layout has {countOfLines} lines whilst the Height property equals {size.Y}. The two should match.");
 
             for (int y = 0; y < size.Y; y++)
                 {
                 var lineLength = lines[y].Length;
                 if (lineLength != size.X)
-                    throw new InvalidOperationException(
-                        $"Line {y} has {lineLength} characters, whilst the Width property equals {size.X}. The two should match.");
+                    throw new InvalidOperationException($"Line {y} has {lineLength} characters, whilst the Width property equals {size.X}. The two should match.");
                 }
             }
 

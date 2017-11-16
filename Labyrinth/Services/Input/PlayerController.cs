@@ -7,7 +7,6 @@ namespace Labyrinth.Services.Input
     {
     class PlayerController : IPlayerInput
         {
-        public GameInput GameInput { get; set; }
         public Direction Direction { get; private set; }
         public FiringState FireStatus1 { get; private set; }
         public FiringState FireStatus2 { get; private set; }

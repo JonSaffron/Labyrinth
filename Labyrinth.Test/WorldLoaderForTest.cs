@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Labyrinth.Services.WorldBuilding;
 
-namespace Labyrinth.Services.WorldBuilding
+namespace Labyrinth.Test
     {
     class WorldLoaderForTest : IWorldLoader
         {
@@ -84,8 +85,10 @@ namespace Labyrinth.Services.WorldBuilding
                         case 'm':
                             var mdef = new MonsterDef();
                             mdef.Type = typeof(DummyMonster);
-
+                            mdef.Position = position;
+                            mdef.Energy = 100;
                             gameState.AddMonster(mdef);
+                            break;
                         default:
                             throw new InvalidOperationException();
                         }

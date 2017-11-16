@@ -16,6 +16,9 @@ namespace Labyrinth.GameObjects
         private double _timeToTravel;
         private readonly Dictionary<Direction, Rectangle> _boundingRectangles;
 
+        private IEnumerator<bool> _movementIterator;
+        private double _remainingTime;
+
         public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, StaticItem originator) : base(animationPlayer, position)
             {
             if (d == Direction.None)
@@ -25,7 +28,6 @@ namespace Labyrinth.GameObjects
             this.Originator = originator;
             this._directionOfTravel = d;
             this.Orientation = d.Orientation();
-            SetDirectionAndDestination();
 
             string textureName = originator is Player ? "Sprites/Shot/RedShot" : "Sprites/Shot/GreenShot";
             var staticImage = Animation.StaticAnimation(textureName);
@@ -53,15 +55,13 @@ namespace Labyrinth.GameObjects
         private void ResetTimeToTravel()
             {
             decimal distanceToTravel;
-            switch (this._directionOfTravel)
+            switch (this._directionOfTravel.Orientation())
                 {
-                case Direction.Left:
-                case Direction.Right:
+                case Orientation.Horizontal:
                     distanceToTravel = (decimal) (Constants.RoomSizeInPixels.X * 1.25);
                     Ap.Rotation = 0.0f;
                     break;
-                case Direction.Up:
-                case Direction.Down:
+                case Orientation.Vertical:
                     distanceToTravel = (decimal) (Constants.RoomSizeInPixels.Y * 1.25);
                     Ap.Rotation = (float)(Math.PI * 90.0f / 180f);
                     break;
@@ -100,27 +100,56 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            bool result = false;
-            var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
-            while (timeRemaining > 0 && this._timeToTravel > 0)
-                {
-                if (!base.IsMoving)
-                    SetDirectionAndDestination();
-
-                result = true;
-                var timeBeforeMove = timeRemaining;
-                bool moveCompleted = !this.TryToCompleteMoveToTarget(ref timeRemaining);
-                this._timeToTravel -= (timeBeforeMove - timeRemaining);
-                if (!moveCompleted)
-                    break;
-                }
-
+            this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
+            if (this._movementIterator == null)
+                this._movementIterator = this._movementIterator = Move().GetEnumerator();
+            this._movementIterator.MoveNext();
+            var result = this._movementIterator.Current;
             return result;
             }
 
-        private void SetDirectionAndDestination()
+        public override void ResetPosition(Vector2 position)
             {
-            this.Move(this._directionOfTravel, this.StandardSpeed);
+            base.ResetPosition(position);
+            // it's essential to reset the iterator 
+            this._movementIterator = null;
+            }
+        
+        private IEnumerable<bool> Move()
+            {
+            bool hasMovedSinceLastCall = false;
+            while (true)
+                {
+                if (this.SetDirectionAndDestination())
+                    {
+                    hasMovedSinceLastCall = true;
+                    while (true)
+                        {
+                        if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
+                            break;
+
+                        yield return true;  // we have moved
+                        }
+
+                    }
+                else
+                    {
+                    yield return hasMovedSinceLastCall;
+                    hasMovedSinceLastCall = false;
+                    }
+                }
+            // ReSharper disable once IteratorNeverReturns - this is deliberate
+            }
+
+        private bool SetDirectionAndDestination()
+            {
+            if (this._timeToTravel > 0)
+                {
+                this.Move(this._directionOfTravel, this.StandardSpeed);
+                this._timeToTravel -= Constants.TileLength / (double) this.StandardSpeed;
+                return true;
+                }
+            return false;
             }
 
         public void Reverse()

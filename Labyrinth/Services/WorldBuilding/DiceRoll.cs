@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    internal class DiceRoll
+    public class DiceRoll
         {
         public int NumberOfDice { get; }
         public int NumberOfSides { get; }

@@ -25,7 +25,7 @@ namespace Labyrinth.GameObjects.Monsters.Actions
                 md.IsEgg = true;
                 md.TimeBeforeHatching = (this.Random.Next(256) & 0x1f) + 8;
                 md.LaysEggs = false;
-                GlobalServices.GameState.CreateMonster(md);
+                GlobalServices.GameState.AddMonster(md);
                 }
             }
 

@@ -179,7 +179,7 @@ namespace Labyrinth
                 ChangeRooms = ChangeRooms.FollowsPlayer,
                 ShootsAtPlayer = true
                 };
-            CreateMonster(md);
+            AddMonster(md);
             }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Labyrinth
             this._gameObjectCollection.Add(m);
             }
 
-        public Monster CreateMonster(MonsterDef monsterDef)
+        public Monster AddMonster(MonsterDef monsterDef)
             {
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var constructorInfo = monsterDef.Type.GetConstructor(new[] {typeof (AnimationPlayer), typeof (Vector2), typeof (int)});

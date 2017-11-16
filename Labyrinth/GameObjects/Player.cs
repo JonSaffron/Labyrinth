@@ -48,6 +48,10 @@ namespace Labyrinth.GameObjects
 
         private bool _whichFootFlag;
 
+        private IEnumerator<bool> _movementIterator;
+        private double _remainingTime;
+        private GameTime _gameTime;
+
         /// <summary>
         /// Constructs a new player.
         /// </summary>
@@ -104,6 +108,13 @@ namespace Labyrinth.GameObjects
             this._countBeforeDecrementingEnergy = 0;
             }
 
+        public override void ResetPosition(Vector2 position)
+            {
+            base.ResetPosition(position);
+            // it's essential to reset the iterator 
+            this._movementIterator = null;
+            }
+
         public override bool IsExtant
             {
             get
@@ -116,35 +127,53 @@ namespace Labyrinth.GameObjects
         public override int DrawOrder => (int) SpriteDrawOrder.Player;
 
         /// <summary>
-        /// Handles input, performs physics, and animates the player sprite.
+        /// Handles input, performs physics
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            //System.Diagnostics.Trace.WriteLine(string.Format("Player update starts at {0}", this.Position));
-
-            bool result = false;
-            var timeRemaining = gameTime.ElapsedGameTime.TotalSeconds;
-            while (timeRemaining > 0)
-                {
-                if (!this.IsMoving && !this.SetDirectionAndDestination(gameTime))
-                    break;
-
-                result = true;
-                this.TryToCompleteMoveToTarget(ref timeRemaining);
-                if (CheckIfEnteredNewWorldArea())
-                    GlobalServices.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
-                }
-
-            //if (result)
-                //System.Diagnostics.Trace.WriteLine(string.Format("Player update finishes at {0}", this.Position));
-
             if (!IsExtant)
                 return false;
-            
+
+            // move the monster
+            this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
+            this._gameTime = gameTime;
+            if (this._movementIterator == null)
+                this._movementIterator = this._movementIterator = Move().GetEnumerator();
+            this._movementIterator.MoveNext();
+            var result = this._movementIterator.Current;
+
             SetAnimation(result);
             UpdateEnergy(gameTime);
 
             return result;
+            }
+
+        private IEnumerable<bool> Move()
+            {
+            bool hasMovedSinceLastCall = false;
+            while (true)
+                {
+                if (this.SetDirectionAndDestination())
+                    {
+                    hasMovedSinceLastCall = true;
+                    while (true)
+                        {
+                        if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
+                            break;
+
+                        yield return true;
+                        }
+
+                    if (CheckIfEnteredNewWorldArea())
+                        GlobalServices.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
+                    }
+                else
+                    {
+                    yield return hasMovedSinceLastCall;
+                    hasMovedSinceLastCall = false;
+                    }
+                }
+            // ReSharper disable once IteratorNeverReturns - this is deliberate
             }
 
         private void SetAnimation(bool isMoving)
@@ -199,12 +228,12 @@ namespace Labyrinth.GameObjects
             }
 
         /// <summary>
-        /// Updates the player's velocity and position based on input, gravity, etc.
+        /// Updates the player's velocity and position based on input
         /// </summary>
-        private bool SetDirectionAndDestination(GameTime gameTime)
+        private bool SetDirectionAndDestination()
             {
             IPlayerInput playerInput = GlobalServices.PlayerInput;
-            playerInput.ProcessInput(gameTime);
+            playerInput.ProcessInput(this._gameTime);
 
             this._weapon1.Fire(this, playerInput.FireStatus1, this._currentDirectionFaced);
             this._weapon2.Fire(this, playerInput.FireStatus2, this._currentDirectionFaced);
@@ -216,10 +245,10 @@ namespace Labyrinth.GameObjects
             if (requestedDirection != this._currentDirectionFaced)
                 {
                 this._currentDirectionFaced = requestedDirection;
-                this._whenCanMoveInDirectionFaced = gameTime.TotalGameTime.Add(this._delayBeforeMovingInDirectionFaced);
+                this._whenCanMoveInDirectionFaced = this._gameTime.TotalGameTime.Add(this._delayBeforeMovingInDirectionFaced);
                 return false;
                 }
-            if (gameTime.TotalGameTime < this._whenCanMoveInDirectionFaced)
+            if (this._gameTime.TotalGameTime < this._whenCanMoveInDirectionFaced)
                 return false;
             
             // start new movement

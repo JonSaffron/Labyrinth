@@ -149,10 +149,11 @@ namespace Labyrinth
                 return false;
             if (movingObject.Capability.CanMoveAnother())
                 {
-                var result = moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction;
-                return result;
+                var isMovingInDifferentDirection = moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction;
+                return isMovingInDifferentDirection;
                 }
-            return true;
+            var result = movingObject.Solidity == ObjectSolidity.Insubstantial;
+            return result;
             }
 
         private static bool InteractionInvolvesExplosion(Explosion explosion, MovingItem movingItem)

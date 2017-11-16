@@ -4,7 +4,7 @@ using Labyrinth.GameObjects.Movement;
 
 namespace Labyrinth.GameObjects.Monsters.Actions
     {
-    abstract class BaseAction
+    public abstract class BaseAction
         {
         protected readonly Player Player = GlobalServices.GameState.Player;
         protected readonly IRandomess Random = GlobalServices.Randomess;

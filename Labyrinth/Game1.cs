@@ -19,6 +19,7 @@ namespace Labyrinth
         private World _world;
         private int _lives;
         private bool _isGamePaused;
+        public static int Ticks { get; private set; }
 
         public Game1([NotNull] IServiceSetup services)
             {
@@ -96,6 +97,7 @@ namespace Labyrinth
                 gameTime = new GameTime();
 
             // allow registered components to update. this includes the GameTimers and the Keyboard handler.
+            Ticks += 1;
             base.Update(gameTime);
             GlobalServices.SoundPlayer.ActiveSoundService.Update();
 
@@ -167,7 +169,7 @@ namespace Labyrinth
         protected override void Draw(GameTime gameTime)
             {
             GraphicsDevice.Clear(Color.Black);
-
+            
             if (this._isGamePaused)
                 gameTime = new GameTime();
 

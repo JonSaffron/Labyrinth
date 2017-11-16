@@ -58,6 +58,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DummyMonster.cs" />
     <Compile Include="RepelObjectTests.cs" />
     <Compile Include="DummySoundEffectInstance.cs" />
     <Compile Include="DummySpriteLibrary.cs" />
@@ -69,11 +70,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SuppressDrawComponent.cs" />
     <Compile Include="TestActiveSoundService.cs" />
+    <Compile Include="TestMonsterMovement.cs" />
     <Compile Include="TestMortonCode.cs" />
     <Compile Include="TestInstanceCache.cs" />
     <Compile Include="TestScoreKeeper.cs" />
     <Compile Include="UnitTestServices.cs" />
     <Compile Include="TestStandardRandom.cs" />
+    <Compile Include="WorldLoaderForTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

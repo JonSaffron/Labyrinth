@@ -25,7 +25,7 @@ namespace Labyrinth.GameObjects
         public bool ShotsBounceOff { get; set; }
         public bool ShootsOnceProvoked { get; set; }
 
-        private List<BaseAction> _actions;
+        protected List<BaseAction> _actions;
 
         private IMonsterWeapon _weapon;
 
@@ -46,8 +46,6 @@ namespace Labyrinth.GameObjects
             
             this._eggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
             this._hatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
-
-            this._movementIterator = Move().GetEnumerator();
             }
             
         public MonsterMobility Mobility
@@ -196,7 +194,7 @@ namespace Labyrinth.GameObjects
             }
 
         /// <summary>
-        /// Handles input, performs physics, and animates the sprite.
+        /// Update the monster's position, and run its behaviours
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
@@ -211,7 +209,10 @@ namespace Labyrinth.GameObjects
             if (!this.IsActive)
                 return false;
 
+            // move the monster
             this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
+            if (this._movementIterator == null)
+                this._movementIterator = this._movementIterator = Move().GetEnumerator();
             this._movementIterator.MoveNext();
             var result = this._movementIterator.Current;
             return result;
@@ -220,7 +221,8 @@ namespace Labyrinth.GameObjects
         public override void ResetPosition(Vector2 position)
             {
             base.ResetPosition(position);
-            this._movementIterator = Move().GetEnumerator();
+            // it's essential to reset the iterator 
+            this._movementIterator = null;
             }
 
         private IEnumerable<bool> Move()
@@ -251,7 +253,7 @@ namespace Labyrinth.GameObjects
                     hasMovedSinceLastCall = false;
                     }
                 }
-            // ReSharper disable once IteratorNeverReturns
+            // ReSharper disable once IteratorNeverReturns - this is deliberate
             }
 
         private void DoActionsWhilstStationary(ref double timeStationary)
