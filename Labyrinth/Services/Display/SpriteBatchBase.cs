@@ -8,6 +8,8 @@ namespace Labyrinth.Services.Display
         {
         private readonly Texture2D _rectangleTexture;
         private Vector2 _windowPosition;
+        protected float Zoom;
+        protected int ScreenCentreWidth;
 
         protected SpriteBatch SpriteBatch { get; }
         
@@ -68,5 +70,11 @@ namespace Labyrinth.Services.Display
 
         protected abstract void DrawTexture(Texture2D texture, Rectangle absolutePosition, Color colour);
 
+        public void DrawCentredString(SpriteFont font, string text, int y, Color color)
+            {
+            Vector2 size = font.MeasureString(text) * this.Zoom;
+            Vector2 pos = new Vector2(this.ScreenCentreWidth - size.X / 2f, y * this.Zoom);
+            this.SpriteBatch.DrawString(spriteFont: font, text: text, position: pos, color: color, rotation: 0, origin: Vector2.Zero, scale: this.Zoom, effects: SpriteEffects.None, layerDepth: 0);
+            }
         }
     }

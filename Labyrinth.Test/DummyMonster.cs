@@ -20,6 +20,10 @@ namespace Labyrinth.Test
             var action = new DummyAction();
             action.Init(this);
             base._actions.Add(action);
+            
+            var action2 = new Flitter();
+            action2.Init(this);
+            base._actions.Add(action2);
             }
 
         public override void ResetPosition(Vector2 position)

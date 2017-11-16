@@ -5,11 +5,10 @@ namespace Labyrinth.Services.Display
     {
     public class SpriteBatchWindowed : SpriteBatchBase, ISpriteBatch
         {
-        public float Zoom { get; }
-
         public SpriteBatchWindowed(GraphicsDevice graphicsDevice, float zoom) : base(graphicsDevice)
             {
             this.Zoom = zoom;
+            this.ScreenCentreWidth = graphicsDevice.Viewport.Width / 2;
             }
 
         protected override void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects)
@@ -28,11 +27,5 @@ namespace Labyrinth.Services.Display
             var r = new Rectangle(x, y, width, height);
             this.SpriteBatch.Draw(texture, r, colour);
             }
-
-        public void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin)
-            {
-            this.SpriteBatch.DrawString(font, text, pos, color, 0, origin, this.Zoom, SpriteEffects.None, 0);
-            }
-
         }
     }

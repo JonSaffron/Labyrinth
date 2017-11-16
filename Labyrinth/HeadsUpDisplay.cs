@@ -27,20 +27,23 @@ namespace Labyrinth
             this._displayedEnergy = 0;
             }
 
-        public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, decimal score, int livesLeft, bool isGameRunningSlowly)
+        public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, decimal score, int livesLeft, bool isPaused, bool isGameRunningSlowly)
             {
-            if (score != this._displayedScore)
+            if (!isPaused)
                 {
-                double difference = (double) (score - this._displayedScore);
-                this._displayedScore += (int) Math.Ceiling(Math.Sqrt(difference));
-                }
-            if (playerEnergy > this._displayedEnergy)
-                {
-                this._displayedEnergy++;
-                }
-            else if (playerEnergy < this._displayedEnergy)
-                {
-                this._displayedEnergy = playerEnergy;
+                if (score != this._displayedScore)
+                    {
+                    double difference = (double) (score - this._displayedScore);
+                    this._displayedScore += (int) Math.Ceiling(Math.Sqrt(difference));
+                    }
+                if (playerEnergy > this._displayedEnergy)
+                    {
+                    this._displayedEnergy++;
+                    }
+                else if (playerEnergy < this._displayedEnergy)
+                    {
+                    this._displayedEnergy = playerEnergy;
+                    }
                 }
 
             DrawEnergyRect(spriteBatch, isGameRunningSlowly);
@@ -50,6 +53,11 @@ namespace Labyrinth
             DrawScoreAndLivesRect(spriteBatch);
             DrawScore(spriteBatch, this._displayedScore);
             DrawLives(spriteBatch, livesLeft);
+
+            if (isPaused)
+                {
+                DrawPausedMessage(spriteBatch);
+                }
             }
 
         private static void DrawEnergyRect(ISpriteBatch spriteBatch, bool isGameRunningSlowly)
@@ -118,16 +126,12 @@ namespace Labyrinth
                 }
             }
 
-        // todo this shouldn't need to know anything about zoom
-        public void DrawPausedMessage(ISpriteBatch spriteBatch)
+        private void DrawPausedMessage(ISpriteBatch spriteBatch)
             {
             this._green = (this._green + 1) % 512;
             var greenComponent = Math.Abs(255 - this._green);
             const string paused = "-> P A U S E D <-";
-            Vector2 size = this._statusFont.MeasureString(paused) * spriteBatch.Zoom;
-            Vector2 origin = Vector2.Zero;
-            Vector2 pos = new Vector2(Constants.RoomSizeInPixels.X * spriteBatch.Zoom / 2f - size.X / 2f, 200);
-            spriteBatch.DrawString(this._statusFont, paused, pos, new Color(0, greenComponent, 0), origin);
+            spriteBatch.DrawCentredString(this._statusFont, paused, 100, new Color(0, greenComponent, 0));
             }
         }
     }

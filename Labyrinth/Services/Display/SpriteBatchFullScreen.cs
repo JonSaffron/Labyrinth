@@ -7,12 +7,12 @@ namespace Labyrinth.Services.Display
     public class SpriteBatchFullScreen : SpriteBatchBase, ISpriteBatch
         {
         private readonly Vector2 _offset;
-        public float Zoom { get; }
         
         public SpriteBatchFullScreen(GraphicsDevice graphicsDevice) : base(graphicsDevice)
             {
             this.Zoom = GetFullScreenZoom(graphicsDevice.Viewport);
             this._offset = GetFullScreenOffset(graphicsDevice.Viewport, this.Zoom);
+            this.ScreenCentreWidth = graphicsDevice.Viewport.Width / 2;
             }
 
         protected override void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects)
@@ -48,11 +48,6 @@ namespace Labyrinth.Services.Display
             var offsety = (viewport.Height - viewy) / 2;
             var result = new Vector2((int) offsetx, (int) offsety);
             return result;
-            }
-
-        public void DrawString(SpriteFont font, string text, Vector2 pos, Color color, Vector2 origin)
-            {
-            this.SpriteBatch.DrawString(font, text, pos, color, 0, origin + this._offset, this.Zoom, SpriteEffects.None, 0);
             }
         }
     }
