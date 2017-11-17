@@ -58,7 +58,7 @@ namespace Labyrinth
         void DrawRectangle(Rectangle r, Color colour);
 
         /// <summary>
-        /// Draws text to the window
+        /// Draws text to the window with centred alignment
         /// </summary>
         /// <param name="font">The font to render the text in</param>
         /// <param name="text">The text to draw</param>

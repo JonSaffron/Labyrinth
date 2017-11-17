@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
-    public class SpriteBatchFullScreen : SpriteBatchBase, ISpriteBatch
+    public class SpriteBatchFullScreen : SpriteBatchBase
         {
         private readonly Vector2 _offset;
         

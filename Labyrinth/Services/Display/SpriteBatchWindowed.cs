@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
-    public class SpriteBatchWindowed : SpriteBatchBase, ISpriteBatch
+    public class SpriteBatchWindowed : SpriteBatchBase
         {
         public SpriteBatchWindowed(GraphicsDevice graphicsDevice, float zoom) : base(graphicsDevice)
             {
