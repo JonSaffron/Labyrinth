@@ -1,11 +1,10 @@
 ﻿using System;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    abstract class Flitterbug : Monster, ILayEggs
+    abstract class Flitterbug : Monster
         {
         protected Flitterbug(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
@@ -22,12 +21,6 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new ArgumentOutOfRangeException();
                 }
-            }
-
-        public MonsterDef LayAnEgg()
-            {
-            var result = MonsterDef.FromExistingMonster(this);
-            return result;
             }
         }
     }

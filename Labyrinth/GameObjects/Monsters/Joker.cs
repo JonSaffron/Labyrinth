@@ -1,11 +1,10 @@
 ﻿using System;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Joker : Monster, ILayEggs
+    class Joker : Monster
         {
         public Joker(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
@@ -28,12 +27,6 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new ArgumentOutOfRangeException();
                 }
-            }
-
-        public MonsterDef LayAnEgg()
-            {
-            var result = MonsterDef.FromExistingMonster(this);
-            return result;
             }
         }
     }

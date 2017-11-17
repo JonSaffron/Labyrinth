@@ -5,13 +5,6 @@ namespace Labyrinth.GameObjects.Monsters.Actions
     {
     class LaysEgg : BaseAction
         {
-        public override void Init(Monster monster)
-            {
-            if (!(monster is ILayEggs))
-                throw new InvalidOperationException($"Cannot set a {this.GetType().Name} as laying eggs because the ILayEggs interface is not implemented.");
-            base.Init(monster);
-            }
-
         public override void PerformAction()
             {
             if (!ShouldAttemptToLayEgg())
@@ -21,7 +14,7 @@ namespace Labyrinth.GameObjects.Monsters.Actions
             if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
                 {
                 this.PlaySound(GameSound.MonsterLaysEgg);
-                MonsterDef md = ((ILayEggs)this.Monster).LayAnEgg();
+                MonsterDef md = MonsterDef.FromExistingMonster(this.Monster);
                 md.IsEgg = true;
                 md.TimeBeforeHatching = (this.Random.Next(256) & 0x1f) + 8;
                 md.LaysEggs = false;

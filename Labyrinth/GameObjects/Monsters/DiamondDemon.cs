@@ -1,11 +1,10 @@
 ﻿using System;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class DiamondDemon : Monster, ILayEggs
+    class DiamondDemon : Monster
         {
         public DiamondDemon(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
@@ -29,12 +28,6 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new ArgumentOutOfRangeException();
                 }
-            }
-
-        public MonsterDef LayAnEgg()
-            {
-            var result = MonsterDef.FromExistingMonster(this);
-            return result;
             }
         }
     }

@@ -158,7 +158,6 @@
     <Compile Include="Movement.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
-    <Compile Include="Interfaces\ILayEggs.cs" />
     <Compile Include="Services\PathFinder\RepelObject.cs" />
     <Compile Include="Services\PathFinder\Path.cs" />
     <Compile Include="Services\PathFinder\PathFinder.cs" />
