@@ -12,18 +12,18 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerShootsBoulder()
             {
+            var services = new UnitTestServices();
+            var g = new Game1(services);
+
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.None, FiringState.Pulse, FiringState.None)),
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            var pc = new PlayerController(instructions);
+            services.PlayerController.Enqueue(instructions);
 
-            var services = new UnitTestServices(pc);
-            var g = new Game1(services);
             g.LoadLevel("# b p");
 
-            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
+            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -37,18 +37,18 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerShootsAdjacentBoulder()
             {
+            var services = new UnitTestServices();
+            var g = new Game1(services);
+
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.None, FiringState.Pulse, FiringState.None)),
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            var pc = new PlayerController(instructions);
+            services.PlayerController.Enqueue(instructions);
 
-            var services = new UnitTestServices(pc);
-            var g = new Game1(services);
             g.LoadLevel("# bp ");
 
-            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
+            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -62,18 +62,18 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotShootBoulder1()
             {
+            var services = new UnitTestServices();
+            var g = new Game1(services);
+
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.None, FiringState.Pulse, FiringState.None)),
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            var pc = new PlayerController(instructions);
+            services.PlayerController.Enqueue(instructions);
 
-            var services = new UnitTestServices(pc);
-            var g = new Game1(services);
             g.LoadLevel("#bp ");
 
-            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
+            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -88,18 +88,18 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotShootBoulder2()
             {
+            var services = new UnitTestServices();
+            var g = new Game1(services);
+
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.None, FiringState.Pulse, FiringState.None)),
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            var pc = new PlayerController(instructions);
+            services.PlayerController.Enqueue(instructions);
 
-            var services = new UnitTestServices(pc);
-            var g = new Game1(services);
             g.LoadLevel("#b p ");
 
-            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
+            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }
@@ -114,18 +114,18 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotShootBoulder3()
             {
+            var services = new UnitTestServices();
+            var g = new Game1(services);
+
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, new PlayerController.Instruction(Direction.None, FiringState.Pulse, FiringState.None)),
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            var pc = new PlayerController(instructions);
+            services.PlayerController.Enqueue(instructions);
 
-            var services = new UnitTestServices(pc);
-            var g = new Game1(services);
             g.LoadLevel("# bbp ");
 
-            while (!pc.HasFinishedQueue || Helpers.IsAnythingMoving())
+            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
                 g.Tick();
                 }

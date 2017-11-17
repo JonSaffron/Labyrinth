@@ -1,8 +1,6 @@
-﻿using System;
-using Labyrinth.Services.Input;
+﻿using Labyrinth.Services.Input;
 using Labyrinth.Services.ScoreKeeper;
 using Labyrinth.Services.Sound;
-using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth.Test
     {
@@ -10,12 +8,11 @@ namespace Labyrinth.Test
         {
         public IWorldLoader WorldLoader { get; }
 
-        private readonly PlayerController _pc;
+        public PlayerController PlayerController;
 
-        public UnitTestServices(PlayerController pc)
+        public UnitTestServices()
             {
             this.WorldLoader = new WorldLoaderForTest();
-            this._pc = pc ?? throw new ArgumentNullException(nameof(pc));
             }
 
         public void Setup(Game1 game)
@@ -23,7 +20,9 @@ namespace Labyrinth.Test
             var gameInput = new GameInput(game);
             GlobalServices.SetGameInput(gameInput);
 
-            GlobalServices.SetPlayerInput(this._pc);
+            this.PlayerController = new PlayerController(game);
+            game.Components.Add(this.PlayerController);
+            GlobalServices.SetPlayerInput(this.PlayerController);
 
             var soundPlayer = new NullSoundPlayer();
             GlobalServices.SetSoundPlayer(soundPlayer);

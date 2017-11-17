@@ -42,11 +42,11 @@ namespace Labyrinth
             ScoreKeeper = scoreKeeper;
             }
 
-        public static GameComponentCollection GameComponentCollection { get; private set; }
+        public static Game Game { get; private set; }
 
-        public static void SetGameComponentCollection(GameComponentCollection gameComponentCollection)
+        public static void SetGame(Game game)
             {
-            GameComponentCollection = gameComponentCollection;
+            Game = game;
             }
 
         public static World World { get; private set; }

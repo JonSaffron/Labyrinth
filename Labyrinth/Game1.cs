@@ -26,7 +26,7 @@ namespace Labyrinth
             services.Setup(this);
             this._worldLoader = services.WorldLoader ?? throw new ArgumentException("WorldLoader");
             GlobalServices.SetServiceProvider(this.Services);
-            GlobalServices.SetGameComponentCollection(this.Components);
+            GlobalServices.SetGame(this);
             
             this._gdm = new GraphicsDeviceManager(this)
                             {

@@ -24,8 +24,8 @@ namespace Labyrinth.GameObjects
     public class Player : MovingItem
         {
         // Movement
-        private Direction _currentDirectionFaced; // can't be none
-        private TimeSpan _whenCanMoveInDirectionFaced;
+        public Direction CurrentDirectionFaced { get; private set; } // can't be none
+        public TimeSpan WhenCanMoveInDirectionFaced { get; private set; }
         private readonly TimeSpan _delayBeforeMovingInDirectionFaced = TimeSpan.FromMilliseconds(75);
         
         [NotNull] private IPlayerWeapon _weapon1;
@@ -87,7 +87,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public void Reset()
             {
-            this._currentDirectionFaced = Direction.Left;
+            this.CurrentDirectionFaced = Direction.Left;
             this.CurrentMovement = Labyrinth.Movement.Still;
             Ap.PlayAnimation(_leftRightStaticAnimation);
             this._time = 0;
@@ -180,7 +180,7 @@ namespace Labyrinth.GameObjects
             {
             Animation a;
             SpriteEffects se;
-            switch (this._currentDirectionFaced)
+            switch (this.CurrentDirectionFaced)
                 {
                 case Direction.Left:
                     a = isMoving ? this._leftRightMovingAnimation : this._leftRightStaticAnimation;
@@ -233,22 +233,22 @@ namespace Labyrinth.GameObjects
         private bool SetDirectionAndDestination()
             {
             IPlayerInput playerInput = GlobalServices.PlayerInput;
-            playerInput.ProcessInput(this._gameTime);
+            playerInput.ProcessInput();
 
-            this._weapon1.Fire(this, playerInput.FireStatus1, this._currentDirectionFaced);
-            this._weapon2.Fire(this, playerInput.FireStatus2, this._currentDirectionFaced);
+            this._weapon1.Fire(this, playerInput.FireStatus1, this.CurrentDirectionFaced);
+            this._weapon2.Fire(this, playerInput.FireStatus2, this.CurrentDirectionFaced);
             var requestedDirection = playerInput.Direction;
             if (requestedDirection == Direction.None)
                 return false;
             
             // deal with changing which direction the player faces
-            if (requestedDirection != this._currentDirectionFaced)
+            if (requestedDirection != this.CurrentDirectionFaced)
                 {
-                this._currentDirectionFaced = requestedDirection;
-                this._whenCanMoveInDirectionFaced = this._gameTime.TotalGameTime.Add(this._delayBeforeMovingInDirectionFaced);
+                this.CurrentDirectionFaced = requestedDirection;
+                this.WhenCanMoveInDirectionFaced = this._gameTime.TotalGameTime.Add(this._delayBeforeMovingInDirectionFaced);
                 return false;
                 }
-            if (this._gameTime.TotalGameTime < this._whenCanMoveInDirectionFaced)
+            if (this._gameTime.TotalGameTime < this.WhenCanMoveInDirectionFaced)
                 return false;
             
             // start new movement

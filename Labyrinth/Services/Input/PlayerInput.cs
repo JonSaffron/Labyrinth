@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Labyrinth.Services.Input
@@ -28,7 +27,7 @@ namespace Labyrinth.Services.Input
         /// <summary>
         /// Gets player movement and fire action
         /// </summary>
-        public void ProcessInput(GameTime gameTime)
+        public void ProcessInput()
             {
             this._previousKeyboardState = this._currentKeyboardState;
             this._currentKeyboardState = this._gameInput.LastKeyboardState;

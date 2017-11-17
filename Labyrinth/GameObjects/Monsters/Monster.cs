@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects.Monsters.Actions;
+using Labyrinth.GameObjects.Monsters.Movement;
 using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
@@ -13,7 +14,7 @@ namespace Labyrinth.GameObjects
         {
         private MonsterMobility _mobility;
         protected abstract IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility);
-        private IMonsterMovement _determineDirection;
+        [NotNull] private IMonsterMovement _determineDirection = new Stationary();
         public Direction InitialDirection = Direction.None;
 
         public ChangeRooms ChangeRooms { get; set; }

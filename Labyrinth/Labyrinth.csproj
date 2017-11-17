@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="GameObjects\BoulderForTesting.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BaseAction.cs" />
     <Compile Include="GameObjects\Monsters\Actions\Flitter.cs" />
     <Compile Include="GameObjects\Monsters\Actions\LaysEgg.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameObjects\Monsters\Movement\FullPursuit.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\Stationary.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
