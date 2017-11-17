@@ -94,11 +94,12 @@ namespace Labyrinth
 
         private static void PlayerTakesCrystal(World world, Player player, Crystal crystal)
             {
+            // todo this didn't seem to end the world - test that checking IsExtant fixes the problem
             player.AddEnergy(crystal.Energy);
             GlobalServices.ScoreKeeper.CrystalTaken(crystal);
             player.CrystalCollected(crystal);
             crystal.SetTaken();
-            int howManyCrystalsRemain = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Count();
+            int howManyCrystalsRemain = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Count(c => c.IsExtant);
             if (howManyCrystalsRemain == 0)
                 {
                 GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,

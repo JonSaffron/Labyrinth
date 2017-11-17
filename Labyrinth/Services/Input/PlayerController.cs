@@ -62,23 +62,34 @@ namespace Labyrinth.Services.Input
             var p = GlobalServices.GameState.Player;
             if (ci.Direction != Direction.None)
                 {
-                if (ci.MoveType == MoveType.TurnToFace && p.CurrentDirectionFaced != ci.Direction)
+                if (ci.MoveType == MoveType.TurnToFace)
                     {
-                    this.Direction = ci.Direction;
+                    if (p.CurrentDirectionFaced != ci.Direction)
+                        {   // turn to face the required direction
+                        this.Direction = ci.Direction;
+                        }
                     ci.Direction = Direction.None;
-                    }
-                else if (ci.MoveType == MoveType.TurnAndMove && p.CurrentDirectionFaced != ci.Direction)
-                    {
-                    this.Direction = ci.Direction;
-                    }
-                else if (ci.MoveType == MoveType.TurnAndMove && p.WhenCanMoveInDirectionFaced >= this._totalGameTime)
-                    {
-                    this.Direction = ci.Direction;
                     }
                 else if (ci.MoveType == MoveType.TurnAndMove)
                     {
+                    if (p.CurrentDirectionFaced != ci.Direction)
+                        {   // turn to face the required direction
+                        this.Direction = ci.Direction;
+                        ci.MoveType = MoveType.WaitingToMove;
+                        }
+                    else 
+                        {
+                        this.Direction = ci.Direction;
+                        ci.Direction = Direction.None;
+                        }
+                    }
+                else if (ci.MoveType == MoveType.WaitingToMove)
+                    {
                     this.Direction = ci.Direction;
-                    ci.Direction = Direction.None;
+                    if (p.WhenCanMoveInDirectionFaced <= this._totalGameTime)
+                        {
+                        ci.Direction = Direction.None;
+                        }
                     }
                 }
                 
@@ -127,7 +138,7 @@ namespace Labyrinth.Services.Input
         public class Instruction
             {
             public Direction Direction;
-            public readonly MoveType MoveType;
+            public MoveType MoveType;
             public FiringState FireStatus1;
             public FiringState FireStatus2;
 
@@ -187,6 +198,7 @@ namespace Labyrinth.Services.Input
     public enum MoveType
         {
         TurnAndMove,
-        TurnToFace
+        TurnToFace,
+        WaitingToMove
         }
     }

@@ -230,6 +230,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Updates the player's velocity and position based on input
         /// </summary>
+        // todo should we change direction before firing?
         private bool SetDirectionAndDestination()
             {
             IPlayerInput playerInput = GlobalServices.PlayerInput;

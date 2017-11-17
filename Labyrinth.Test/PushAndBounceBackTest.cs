@@ -17,8 +17,7 @@ namespace Labyrinth.Test
 
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left)),
-                new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(200), PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
             services.PlayerController.Enqueue(instructions);
 
@@ -48,8 +47,7 @@ namespace Labyrinth.Test
 
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left)),
-                new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(200), PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
             services.PlayerController.Enqueue(instructions);
 
@@ -101,8 +99,7 @@ namespace Labyrinth.Test
 
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left)),
-                new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(200), PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
 
             services.PlayerController.Enqueue(instructions);
@@ -160,8 +157,7 @@ namespace Labyrinth.Test
 
             var instructions = new[] 
                 { 
-                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left)),
-                new PlayerController.TimedInstruction(TimeSpan.FromMilliseconds(200), PlayerController.Instruction.DoNothingInstruction())
+                new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
             services.PlayerController.Enqueue(instructions);
 
