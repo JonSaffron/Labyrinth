@@ -81,10 +81,10 @@ namespace Labyrinth.Services.Display
         /// <inheritdoc />
         public void DrawCentredString(SpriteFont font, string text, int y, Color color)
             {
-            // todo can the same effect be achieved by setting the origin to the middle of the text?
-            Vector2 size = font.MeasureString(text) * this.Zoom;
-            Vector2 pos = new Vector2(this.ScreenCentreWidth - size.X / 2f, y * this.Zoom);
-            this.SpriteBatch.DrawString(spriteFont: font, text: text, position: pos, color: color, rotation: 0, origin: Vector2.Zero, scale: this.Zoom, effects: SpriteEffects.None, layerDepth: 0);
+            float textWidth = font.MeasureString(text).X;
+            Vector2 pos = new Vector2(this.ScreenCentreWidth, y);
+            Vector2 origin = new Vector2(textWidth / 2, 0);
+            this.SpriteBatch.DrawString(spriteFont: font, text: text, position: pos, color: color, rotation: 0, origin: origin, scale: this.Zoom, effects: SpriteEffects.None, layerDepth: 0);
             }
         }
     }
