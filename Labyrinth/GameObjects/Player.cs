@@ -236,12 +236,20 @@ namespace Labyrinth.GameObjects
             IPlayerInput playerInput = GlobalServices.PlayerInput;
             playerInput.ProcessInput();
 
+            var result = SetDirection(playerInput);            
+
             this._weapon1.Fire(this, playerInput.FireStatus1, this.CurrentDirectionFaced);
             this._weapon2.Fire(this, playerInput.FireStatus2, this.CurrentDirectionFaced);
+            
+            return result;
+            }
+
+        private bool SetDirection(IPlayerInput playerInput)
+            {
             var requestedDirection = playerInput.Direction;
             if (requestedDirection == Direction.None)
                 return false;
-            
+
             // deal with changing which direction the player faces
             if (requestedDirection != this.CurrentDirectionFaced)
                 {
