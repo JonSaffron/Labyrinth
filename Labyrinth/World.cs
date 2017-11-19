@@ -195,6 +195,12 @@ namespace Labyrinth
             {
             // todo in the 2nd world an acorn is randomly dropped every so often - 280e onwards
 
+            //var fruitList = GlobalServices.GameState.DistinctItemsOfType<Fruit>();
+            //var fruitCountByArea =
+            //    (from f in fruitList
+            //    group f by this._tiles[f.TilePosition.X, f.TilePosition.Y].WorldAreaId into worldAreaId
+            //    select new { key = worldAreaId.Key, count = worldAreaId.Count() })
+            //    .ToDictionary(key => key, count => count);
 
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
             while (this._time > Constants.GameClockResolution)
