@@ -11,6 +11,7 @@
       <xs:attribute name="Height" type="xs:int" use="required" />
       <xs:attribute name="Width" type="xs:int" use="required" />
       <xs:attribute name="RestartInSameRoom" type="xs:boolean" use="optional" default="false" />
+      <xs:attribute name="ReplenishFruit" type="xs:boolean" use="optional" default="false" />
     </xs:complexType>
   </xs:element>
   
@@ -119,8 +120,6 @@
     <xs:attribute name="Height" type="xs:int" use="required" />
     
     <xs:attribute name="WorldStart" type="xs:boolean" use="optional" default="false" />
-
-    <xs:attribute name="ReplenishFruit" type="xs:boolean" use="optional" default="false" />
   </xs:complexType>
   
   <xs:complexType name="Objects">
