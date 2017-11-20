@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -17,7 +18,8 @@ namespace Labyrinth.GameObjects
             switch (mobility)
                 {
                 case MonsterMobility.Placid:
-                    return GlobalServices.MonsterMovementFactory.StandardRolling(this.InitialDirection);
+                    //return GlobalServices.MonsterMovementFactory.StandardRolling(this.InitialDirection);
+                    return new PatrolPerimeter(MonsterMovement.RandomDirection());
                 case MonsterMobility.Patrolling:
                     return GlobalServices.MonsterMovementFactory.StandardPatrolling(this.InitialDirection);
                 case MonsterMobility.Aggressive:

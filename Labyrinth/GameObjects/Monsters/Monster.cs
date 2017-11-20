@@ -16,7 +16,7 @@ namespace Labyrinth.GameObjects
         {
         private MonsterMobility _mobility;
         protected abstract IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility);
-        [NotNull] private IMonsterMovement _determineDirection = new Stationary();
+        [NotNull] protected IMonsterMovement _determineDirection = new Stationary();
         public Direction InitialDirection = Direction.None;
 
         public ChangeRooms ChangeRooms { get; set; }
@@ -185,7 +185,7 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Determine Direction object reference not set.");
             
             Direction d = this._determineDirection.DetermineDirection(this);
-            if (!CanMoveInDirection(d))
+            if (d != Direction.None && !CanMoveInDirection(d))
                 d = Direction.None;
 
             if (d == Direction.None)

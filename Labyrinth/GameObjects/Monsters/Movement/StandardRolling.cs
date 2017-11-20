@@ -2,7 +2,7 @@
     {
     class StandardRolling : IMonsterMovement
         {
-        protected Direction CurrentDirection;
+        public Direction CurrentDirection { get; protected set; }
 
         public StandardRolling()
             {

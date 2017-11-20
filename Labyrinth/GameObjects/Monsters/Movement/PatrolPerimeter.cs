@@ -48,6 +48,7 @@ namespace Labyrinth.GameObjects.Movement
                     return false;
                     }
 
+return true;
                 // check if there are any walls as we don't want to end up travelling in a small circle
                 while (directions.MoveNext())
                     {

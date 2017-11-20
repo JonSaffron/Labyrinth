@@ -11,28 +11,10 @@ namespace Labyrinth.GameObjects
             this.Ap.PlayAnimation(a);
             }
 
-        public override bool IsExtant
-            {
-            get
-                {
-                return true;
-                }
-            }
+        public override bool IsExtant { get; } = true;
 
-        public override ObjectSolidity Solidity
-            {
-            get
-                {
-                return ObjectSolidity.Impassable;
-                }
-            }
+        public override ObjectSolidity Solidity { get; } = ObjectSolidity.Impassable;
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.Wall;
-                }
-            }
+        public override int DrawOrder { get; } = (int) SpriteDrawOrder.Wall;
         }
     }
