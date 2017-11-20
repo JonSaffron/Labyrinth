@@ -8,6 +8,8 @@ using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
+// todo should monsters be a combination of the generic monster class and a breed class?
+
 namespace Labyrinth.GameObjects
     {
     public abstract class Monster : MovingItem, IMonster
@@ -183,6 +185,8 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Determine Direction object reference not set.");
             
             Direction d = this._determineDirection.DetermineDirection(this);
+            if (!CanMoveInDirection(d))
+                d = Direction.None;
 
             if (d == Direction.None)
                 {

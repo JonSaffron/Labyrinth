@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Labyrinth</RootNamespace>
     <AssemblyName>Labyrinth</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
     <XnaCrossPlatformGroupID>48e5f382-3575-4f08-9c09-7c0f5e445faf</XnaCrossPlatformGroupID>
@@ -20,7 +20,6 @@
     </XnaUpgrade>
     <XnaOutputType>Game</XnaOutputType>
     <XnaProfile>Reach</XnaProfile>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -135,6 +134,7 @@
     <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameObjects\Monsters\Movement\FullPursuit.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\PatrolPerimeter.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Stationary.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
     <Compile Include="GameState.cs" />
@@ -231,6 +231,7 @@
     <Compile Include="Services\WorldBuilding\RandomMonsterDistribution.cs" />
     <Compile Include="Services\WorldBuilding\TileContentValidator.cs" />
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />
+    <Compile Include="Services\WorldBuilding\WorldAreaCollection.cs" />
     <Compile Include="Services\WorldBuilding\WorldValidator.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
     <Compile Include="GameObjects\Monsters\Movement\StandardPatrolling.cs" />

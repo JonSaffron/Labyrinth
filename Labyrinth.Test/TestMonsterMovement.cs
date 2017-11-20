@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Input;
 using NUnit.Framework;
 
@@ -8,6 +9,15 @@ namespace Labyrinth.Test
     [TestFixture]
     class TestMovement
         {
+        [Test]
+        public void TestPatrolPerimeterDirection()
+            {
+            Assert.IsTrue(PatrolPerimeter.GetPreferredDirections(Direction.Left).SequenceEqual(new [] { Direction.Up, Direction.Left, Direction.Down, Direction.Right}));
+            Assert.IsTrue(PatrolPerimeter.GetPreferredDirections(Direction.Up).SequenceEqual(new[] { Direction.Right, Direction.Up, Direction.Left, Direction.Down }));
+            Assert.IsTrue(PatrolPerimeter.GetPreferredDirections(Direction.Right).SequenceEqual(new[] { Direction.Down, Direction.Right, Direction.Up, Direction.Left }));
+            Assert.IsTrue(PatrolPerimeter.GetPreferredDirections(Direction.Down).SequenceEqual(new[] { Direction.Left, Direction.Down, Direction.Right, Direction.Up }));
+            }
+
         [Test]
         public void Test()
             {
