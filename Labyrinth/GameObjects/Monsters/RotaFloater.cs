@@ -6,6 +6,8 @@ namespace Labyrinth.GameObjects
     {
     abstract class RotaFloater : Monster
         {
+        // todo see if rotafloater can be better animated
+
         protected RotaFloater(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             }
