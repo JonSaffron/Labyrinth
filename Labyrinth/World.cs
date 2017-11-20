@@ -136,9 +136,7 @@ namespace Labyrinth
                     searchParameters.StartLocation = monster.TilePosition;
 
                     var pf = new PathFinder(searchParameters);
-                    // ReSharper disable once NotAccessedVariable
-                    IList<TilePos> path;
-                    if (pf.TryFindPath(out path))
+                    if (pf.TryFindPath(out _))
                         result.Add(monster);
                     }
                 }
@@ -176,8 +174,7 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Updates all objects in the world, performs collision between them,
-        /// and handles the time limit with scoring.
+        /// Updates the world in accordance to how much time has passed
         /// </summary>
         public LevelReturnType Update(GameTime gameTime)
             {
@@ -195,13 +192,14 @@ namespace Labyrinth
             {
             // todo in the 2nd world an acorn is randomly dropped every so often - 280e onwards
 
-            //var fruitList = GlobalServices.GameState.DistinctItemsOfType<Fruit>();
-            //var fruitCountByArea =
-            //    (from f in fruitList
-            //    group f by this._tiles[f.TilePosition.X, f.TilePosition.Y].WorldAreaId into worldAreaId
-            //    select new { key = worldAreaId.Key, count = worldAreaId.Count() })
-            //    .ToDictionary(key => key, count => count);
-
+            var fruitList = GlobalServices.GameState.DistinctItemsOfType<Fruit>();
+            var fruitCountByArea =
+                (from f in fruitList
+                 group f by new { this._tiles[f.TilePosition.X, f.TilePosition.Y].WorldAreaId, f.FruitType } into grp
+                 select new { key = grp.Key, count = grp.Count() })
+                .ToDictionary(item => item.key, item => item.count);
+            
+            
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
             while (this._time > Constants.GameClockResolution)
                 {
