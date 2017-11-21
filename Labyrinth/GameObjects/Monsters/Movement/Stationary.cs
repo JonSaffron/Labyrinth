@@ -1,4 +1,4 @@
-﻿namespace Labyrinth.GameObjects.Monsters.Movement
+﻿namespace Labyrinth.GameObjects.Movement
     {
     class Stationary : IMonsterMovement
         {

@@ -14,8 +14,14 @@ namespace Labyrinth.Services.WorldBuilding
         {
         private XmlElement _xmlRoot;
         private XmlNamespaceManager _xnm;
-        private List<WorldArea> _worldAreas;
+
+        private PlayerStartStateCollection playerStartStates;
+        private List<TileDefinitionCollection> tileDefinitionCollections;
+        private List<RandomMonsterDistribution> randomMonsterDistributions;
+        private List<RandomFruitDistribution> randomFruitDistributions;
+
         public TilePos WorldSize { get; private set; }
+        
 
         public void LoadWorld(string levelName)
             {
@@ -42,12 +48,12 @@ namespace Labyrinth.Services.WorldBuilding
             int height = int.Parse(this._xmlRoot.GetAttribute("Height"));
             this.WorldSize = new TilePos(width, height);
 
-            this._worldAreas = LoadAreas();
+            LoadAreas();
             }
 
         public Tile[,] GetFloorTiles()
             {
-            var result = GetFloorLayout();
+            var result = GetFloorLayout(this.playerStartStates);
             return result;
             }
 
@@ -65,8 +71,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
-            var result = this._worldAreas.Where(item => item.Id.HasValue)
-                .ToDictionary(key => key.Id.GetValueOrDefault(), value => value.PlayerStartState);
+            var result = this.playerStartStates.StartStates;
             return result;
             }
 
@@ -74,21 +79,23 @@ namespace Labyrinth.Services.WorldBuilding
             {
             var layout = GetLayout();
 
-            var x = new ProcessGameObjects(gameState);
-            x.AddWalls(this._worldAreas, layout);
-            x.AddPlayerAndStartPositions(this._worldAreas);
+            var pgo = new ProcessGameObjects(gameState);
+            pgo.AddWalls(this.tileDefinitionCollections, layout);
+            pgo.AddPlayerAndStartPositions(this.playerStartStates.StartStates.Values);
 
             var objects = this._xmlRoot.SelectNodes(@"ns:Objects/ns:*", this._xnm);
             if (objects != null)
                 {
                 var objectList = objects.Cast<XmlElement>();
-                x.AddGameObjects(objectList);
+                pgo.AddGameObjects(objectList);
                 }
 
             ValidateGameState(gameState);
 
-            x.AddMonstersFromRandomDistribution(this._worldAreas);
-            x.AddFruit(this._worldAreas);
+            if (this.randomMonsterDistributions != null)
+                pgo.AddMonstersFromRandomDistributions(this.randomMonsterDistributions);
+            if (this.randomFruitDistributions != null)
+                pgo.AddFruitFromRandomDistributions(this.randomFruitDistributions);
             }
 
         private string[] GetLayout()
@@ -101,7 +108,7 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        private List<WorldArea> LoadAreas()
+        private void LoadAreas()
             {
             var areas = this._xmlRoot.SelectSingleNode("ns:Areas", this._xnm);
             if (areas == null)
@@ -129,28 +136,24 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             if (result.Count(wa => wa.IsInitialArea) != 1)
                 throw new InvalidOperationException("One and only one world area should be marked as the initial area.");
-            return result;
             }
 
-        private Tile[,] GetFloorLayout()
+        private Tile[,] GetFloorLayout(PlayerStartStateCollection playerStartStateCollection)
             {
             var layout = GetLayout();
             ValidateLayout(layout);
 
             var result = new Tile[this.WorldSize.X, this.WorldSize.Y];
             var spriteLibrary = GlobalServices.SpriteLibrary;
-            foreach (WorldArea wa in this._worldAreas)
+            foreach (var tdc in this.tileDefinitionCollections)
                 {
-                if (wa.TileDefinitions == null || wa.TileDefinitions.Count == 0)
-                    continue;
-
-                string defaultFloorName = GetDefaultFloor(wa.TileDefinitions.Values);
-                foreach (TilePos p in wa.Area.PointsInside())
+                string defaultFloorName = tdc.GetDefaultFloor();
+                foreach (TilePos tp in tdc.Area.PointsInside())
                     {
-                    char symbol = layout[p.Y][p.X];
-                    if (!wa.TileDefinitions.TryGetValue(symbol, out var td))
+                    char symbol = layout[tp.Y][tp.X];
+                    if (!tdc.Definitions.TryGetValue(symbol, out var td))
                         {
-                        string text = $"Don't know what symbol {symbol} indicates in world area {wa.Id}";
+                        string text = $"Don't know what symbol {symbol} indicates in world area {tdc.Area}";
                         throw new InvalidOperationException(text);
                         }
 
@@ -160,20 +163,14 @@ namespace Labyrinth.Services.WorldBuilding
                             : defaultFloorName;
                     var floor = spriteLibrary.GetSprite("Tiles/" + textureName);
 
-                    if (!wa.Id.HasValue)
-                        throw new InvalidOperationException("Area with tile definitions needs an id.");
-                    result[p.X, p.Y] = new Tile(floor, wa.Id.Value);
+                    if (!playerStartStateCollection.TryGetStartState(tp, out PlayerStartState pss))
+                        throw new InvalidOperationException();
+                    result[tp.X, tp.Y] = new Tile(floor, pss.Id);
                     }
                 }
             return result;
             }
 
-        private static string GetDefaultFloor([NotNull] ICollection<TileDefinition> tileDefinitions)
-            {
-            var defaultFloorDef = tileDefinitions.OfType<TileFloorDefinition>().SingleOrDefault()
-                                  ?? tileDefinitions.OfType<TileFloorDefinition>().Single();
-            return defaultFloorDef.TextureName;
-            }
 
         private void ValidateLayout(string[] lines)
             {
@@ -227,31 +224,27 @@ namespace Labyrinth.Services.WorldBuilding
             var lines = layout.Trim().Replace("\r\n", "\t").Split('\t').Select(line => line.Trim()).ToArray();
 
             var result = new Dictionary<TilePos, TileUsage>();
-            foreach (WorldArea wa in this._worldAreas)
+            foreach (var tdc in this.tileDefinitionCollections)
                 {
-                var tileDefs = wa.TileDefinitions;
-                if (tileDefs == null || tileDefs.Count == 0)
-                    continue;
-
-                foreach (TilePos p in wa.Area.PointsInside())
+                foreach (TilePos tp in tdc.Area.PointsInside())
                     {
-                    char symbol = lines[p.Y][p.X];
-                    if (!tileDefs.TryGetValue(symbol, out var td))
+                    char symbol = lines[tp.Y][tp.X];
+                    if (!tdc.Definitions.TryGetValue(symbol, out var td))
                         {
-                        string text = $"Don't know what symbol {symbol} indicates in world area {(wa.Id.HasValue ? (object) wa.Id.Value : "(no number)")}";
+                        string text = $"Don't know what symbol {symbol} indicates in world area {tdc.Area}";
                         throw new InvalidOperationException(text);
                         }
                     if (td is TileWallDefinition)
                         {
-                        result.Add(p, TileUsage.Wall(symbol));
+                        result.Add(tp, TileUsage.Wall(symbol));
                         }
                     else if (td is TileFloorDefinition)
                         {
-                        result.Add(p, TileUsage.Floor(symbol));
+                        result.Add(tp, TileUsage.Floor(symbol));
                         }
                     else if (td is TileObjectDefinition objectDef)
                         {
-                        result.Add(p, TileUsage.Object(symbol, objectDef.Description));
+                        result.Add(tp, TileUsage.Object(symbol, objectDef.Description));
                         }
                     else
                         {

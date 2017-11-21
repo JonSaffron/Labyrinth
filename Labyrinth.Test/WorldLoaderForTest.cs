@@ -51,7 +51,7 @@ namespace Labyrinth.Test
         public Dictionary<int, PlayerStartState> GetPlayerStartStates()
             {
             var result = new Dictionary<int, PlayerStartState>();
-            result.Add(0, new PlayerStartState(new TilePos(), 100));
+            result.Add(0, new PlayerStartState(1, true, new TilePos(), 100));
             return result;
             }
 

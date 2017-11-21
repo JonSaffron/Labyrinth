@@ -217,6 +217,8 @@
     <Compile Include="Services\StandardRandom.cs" />
     <Compile Include="Services\WorldBuilding\DiceRoll.cs" />
     <Compile Include="Services\WorldBuilding\FruitDefinition.cs" />
+    <Compile Include="Services\WorldBuilding\PlayerStartStateCollection.cs" />
+    <Compile Include="Services\WorldBuilding\RandomFruitDistribution.cs" />
     <Compile Include="GameObjects\Grave.cs" />
     <Compile Include="Services\Input\PlayerInput.cs" />
     <Compile Include="GameObjects\Monsters\Joker.cs" />
@@ -230,6 +232,7 @@
     <Compile Include="Services\WorldBuilding\ProcessGameObjects.cs" />
     <Compile Include="Services\WorldBuilding\RandomMonsterDistribution.cs" />
     <Compile Include="Services\WorldBuilding\TileContentValidator.cs" />
+    <Compile Include="Services\WorldBuilding\TileDefinitionCollection.cs" />
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />
     <Compile Include="Services\WorldBuilding\WorldAreaCollection.cs" />
     <Compile Include="Services\WorldBuilding\WorldValidator.cs" />

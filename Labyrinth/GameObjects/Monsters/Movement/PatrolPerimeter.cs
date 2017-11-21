@@ -6,6 +6,8 @@ namespace Labyrinth.GameObjects.Movement
     class PatrolPerimeter : IMonsterMovement
         {
         private Direction _lastDirection;
+        private bool _turnType;
+        private bool _isDetached;
 
         public PatrolPerimeter(Direction initialDirection)
             {
@@ -16,7 +18,11 @@ namespace Labyrinth.GameObjects.Movement
 
         public Direction DetermineDirection(Monster monster)
             {
-            if (TryDetermineDirection(monster, this._lastDirection, out Direction newDirection))
+            Direction newDirection;
+            bool willMove = !this._isDetached 
+                            ? TryDetermineDirection(monster, this._lastDirection, out newDirection) 
+                            : TryToDetermineDirectionWhenDetached(monster, this._lastDirection, out newDirection);
+            if (willMove)
                 {
                 this._lastDirection = newDirection;
                 return newDirection;
@@ -24,9 +30,9 @@ namespace Labyrinth.GameObjects.Movement
             return Direction.None;
             }
 
-        private static bool TryDetermineDirection(Monster monster, Direction currentDirection, out Direction newDirection)
+        private bool TryDetermineDirection(Monster monster, Direction currentDirection, out Direction newDirection)
             {
-            using (var directions = GetPreferredDirections(currentDirection).GetEnumerator())
+            using (var directions = GetPreferredDirections(currentDirection, this._turnType).GetEnumerator())
                 {
                 directions.MoveNext();
                 newDirection = directions.Current;
@@ -48,7 +54,6 @@ namespace Labyrinth.GameObjects.Movement
                     return false;
                     }
 
-return true;
                 // check if there are any walls as we don't want to end up travelling in a small circle
                 while (directions.MoveNext())
                     {
@@ -60,20 +65,51 @@ return true;
 
                 // monster could go in any direction as it's not next to any wall - continue current direction
                 newDirection = currentDirection;
+                this._isDetached = true;
                 return true;
                 }
             }
 
-        public static IEnumerable<Direction> GetPreferredDirections(Direction direction)
+        public static IEnumerable<Direction> GetPreferredDirections(Direction direction, bool turnDirection)
             {
-            var start = Array.IndexOf(Clockwise, direction);
+            var dirs = turnDirection ? Clockwise : Anticlockwise;
+            var start = Array.IndexOf(dirs, direction);
             for (int i = 0; i < 4; i++)
                 {
                 var elementIndex = (start + 5 - i) % 4;
-                yield return Clockwise[elementIndex];
+                yield return dirs[elementIndex];
                 }
             }
 
+        private bool TryToDetermineDirectionWhenDetached(Monster monster, Direction currentDirection, out Direction newDirection)
+            {
+            if (monster.CanMoveInDirection(currentDirection))
+                {
+                newDirection = currentDirection;
+                return true;
+                }
+
+            using (var directions = GetPreferredDirections(currentDirection, this._turnType).GetEnumerator())
+                {
+                while (directions.MoveNext())
+                    {
+                    newDirection = directions.Current;
+                    if (monster.CanMoveInDirection(newDirection))
+                        {
+                        this._turnType = !this._turnType;
+                        this._isDetached = false;
+                        return true;
+                        }
+                    }
+                }
+
+            // can't go in any direction
+            newDirection = Direction.None;
+            return false;
+            }
+
         private static readonly Direction[] Clockwise = { Direction.Left, Direction.Up, Direction.Right, Direction.Down };
+        private static readonly Direction[] Anticlockwise = { Direction.Left, Direction.Down, Direction.Right, Direction.Up };
+
         }
     }

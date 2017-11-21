@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
@@ -16,20 +17,16 @@ namespace Labyrinth.Services.WorldBuilding
             this._gameState = gameState;
             }
 
-        public void AddWalls(IEnumerable<WorldArea> worldAreas, string[] layout)
+        public void AddWalls(IEnumerable<TileDefinitionCollection> tileDefinitionCollections, string[] layout)
             {
-            foreach (WorldArea wa in worldAreas)
+            foreach (var tdc in tileDefinitionCollections)
                 {
-                var tileDefs = wa.TileDefinitions;
-                if (tileDefs == null || tileDefs.Count == 0)
-                    continue;
-                
-                foreach (TilePos p in wa.Area.PointsInside())
+                foreach (TilePos p in tdc.Area.PointsInside())
                     {
                     char symbol = layout[p.Y][p.X];
-                    if (!tileDefs.TryGetValue(symbol, out var td))
+                    if (!tdc.Definitions.TryGetValue(symbol, out var td))
                         {
-                        string text = $"Don't know what symbol {symbol} indicates in world area {(wa.Id.HasValue ? (object) wa.Id.Value : "(no number)")}";
+                        string text = $"Don't know what symbol {symbol} indicates in world area {tdc.Area}";
                         throw new InvalidOperationException(text);
                         }
                     if (td is TileWallDefinition wall)
@@ -40,23 +37,21 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public void AddPlayerAndStartPositions(IEnumerable<WorldArea> worldAreas)
+        public void AddPlayerAndStartPositions(IEnumerable<PlayerStartState> playerStartStates)
             {
             bool playerAdded = false;
-            foreach (var wa in worldAreas)
+            foreach (var pss in playerStartStates)
                 {
-                if (wa.IsInitialArea)
+                if (pss.IsInitialArea)
                     {
-                    if (wa.PlayerStartState == null)
-                        throw new InvalidOperationException("Initial world area should have a player start state.");
                     if (playerAdded)
                         throw new InvalidOperationException("Player has already been addded.");
-                    this._gameState.AddPlayer(wa.PlayerStartState.Position.ToPosition(), wa.PlayerStartState.Energy, wa.Id);
+                    this._gameState.AddPlayer(pss.Position.ToPosition(), pss.Energy, pss.Id);
                     playerAdded = true;
                     }
-                else if (wa.PlayerStartState != null)
+                else
                     {
-                    this._gameState.AddTileReservation(wa.PlayerStartState.Position.ToPosition());
+                    this._gameState.AddTileReservation(pss.Position.ToPosition());
                     }
                 }
             }
@@ -131,42 +126,34 @@ namespace Labyrinth.Services.WorldBuilding
             this._gameState.AddCrumblyWall(position, "Tiles/" + textureName, energy);
             }
 
-        public void AddMonstersFromRandomDistribution(IEnumerable<WorldArea> worldAreas)
+        public void AddMonstersFromRandomDistributions([NotNull] IEnumerable<RandomMonsterDistribution> randomMonsterDistributions)
             {
+            if (randomMonsterDistributions == null) throw new ArgumentNullException(nameof(randomMonsterDistributions));
             var rnd = GlobalServices.Randomess;
-            var dists = 
-                worldAreas.Where(wa => wa.RandomMonsterDistribution != null)
-                    .Select(wa => new { wa.Area, Dist = wa.RandomMonsterDistribution});
-            foreach (var item in dists)
+            foreach (var dist in randomMonsterDistributions)
                 {
-                for (int i = 0; i < item.Dist.CountOfMonsters; i++)
+                for (int i = 0; i < dist.CountOfMonsters; i++)
                     {
-                    var monsterIndex = rnd.DiceRoll(item.Dist.DiceRoll);
-                    var monsterDef = item.Dist.Templates[monsterIndex];
-
-                    TilePos tp = GetFreeTile(item.Area);
-                    monsterDef.Position = tp.ToPosition();
+                    var monsterIndex = rnd.DiceRoll(dist.DiceRoll);
+                    var monsterDef = dist.Templates[monsterIndex];
+                    monsterDef.Position = GetFreeTile(dist.Area).ToPosition();
                     this._gameState.AddMonster(monsterDef);
-
-                    i++;
                     }
                 }
             }
 
-        public void AddFruit(IEnumerable<WorldArea> worldAreas)
+        public void AddFruitFromRandomDistributions([NotNull] IEnumerable<RandomFruitDistribution> randomFruitDistributions)
             {
-            var fruitDefinitions =
-                worldAreas.Where(wa => wa.FruitDefinitions != null)
-                    .SelectMany(wa => wa.FruitDefinitions.Values, (wa, fd) => new {wa.Area, FruitDefinition = fd});
-            foreach (var item in fruitDefinitions)
+            if (randomFruitDistributions == null) throw new ArgumentNullException(nameof(randomFruitDistributions));
+            foreach (var dist in randomFruitDistributions)
                 {
-                for (int i = 0; i < item.FruitDefinition.FruitQuantity;)
+                foreach (var def in dist.Definitions)
                     {
-                    TilePos tp = GetFreeTile(item.Area);
-                    Vector2 position = tp.ToPosition();
-                    this._gameState.AddFruit(position, item.FruitDefinition.FruitType, item.FruitDefinition.Energy);
-
-                    i++;
+                    for (int i = 0; i < def.FruitQuantity; i++)
+                        {
+                        var position = GetFreeTile(dist.Area).ToPosition();
+                        this._gameState.AddFruit(position, def.FruitType, def.Energy);
+                        }
                     }
                 }
             }

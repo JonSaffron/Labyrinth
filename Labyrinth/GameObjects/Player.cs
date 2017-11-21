@@ -134,7 +134,9 @@ namespace Labyrinth.GameObjects
             if (!IsExtant)
                 return false;
 
-            // move the monster
+            // todo should the player shooting be dealt with here?
+
+            // move the player
             this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
             this._gameTime = gameTime;
             if (this._movementIterator == null)
@@ -230,7 +232,6 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Updates the player's velocity and position based on input
         /// </summary>
-        // todo should we change direction before firing?
         private bool SetDirectionAndDestination()
             {
             IPlayerInput playerInput = GlobalServices.PlayerInput;
