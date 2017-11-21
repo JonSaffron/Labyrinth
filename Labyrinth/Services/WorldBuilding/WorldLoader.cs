@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using JetBrains.Annotations;
+using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
     {
@@ -15,10 +16,10 @@ namespace Labyrinth.Services.WorldBuilding
         private XmlElement _xmlRoot;
         private XmlNamespaceManager _xnm;
 
-        private PlayerStartStateCollection playerStartStates;
-        private List<TileDefinitionCollection> tileDefinitionCollections;
-        private List<RandomMonsterDistribution> randomMonsterDistributions;
-        private List<RandomFruitDistribution> randomFruitDistributions;
+        private PlayerStartStateCollection playerStartStates = new PlayerStartStateCollection();
+        private List<TileDefinitionCollection> tileDefinitionCollections = new List<TileDefinitionCollection>();
+        private List<RandomMonsterDistribution> randomMonsterDistributions = new List<RandomMonsterDistribution>();
+        private List<RandomFruitDistribution> randomFruitDistributions = new List<RandomFruitDistribution>();
 
         public TilePos WorldSize { get; private set; }
         
@@ -113,28 +114,61 @@ namespace Labyrinth.Services.WorldBuilding
             var areas = this._xmlRoot.SelectSingleNode("ns:Areas", this._xnm);
             if (areas == null)
                 throw new InvalidOperationException();
-            var result = new List<WorldArea>();
+
             XmlNodeList areaList = areas.SelectNodes("ns:Area", this._xnm);
             if (areaList == null)
                 throw new InvalidOperationException();
-            foreach (XmlElement a in areaList)
+
+            foreach (XmlElement area in areaList)
                 {
-                var wa = new WorldArea(a, this._xnm);
-                if (wa.TileDefinitions != null && wa.TileDefinitions.Count != 0)
+                var areaRect = RectangleExtensions.GetRectangleFromDefinition(area);
+
+                var startPos = (XmlElement) area.SelectSingleNode("ns:PlayerStartState", this._xnm);
+                if (startPos != null)
                     {
-                    WorldArea intersectingArea =
-                    (from WorldArea r in result
-                        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-                        where r.Area.Intersects(wa.Area) && r.TileDefinitions != null && r.TileDefinitions.Count != 0
-                        select r).FirstOrDefault();
-                    if (intersectingArea != null)
-                        throw new InvalidOperationException(
-                            $"The area {wa.Area} intersects with another area {intersectingArea.Area} (this is a problem because there are multiple tile definitions).");
+                    var pss = PlayerStartState.FromXml(startPos);
+                    pss.Area = areaRect;
+                    if (!areaRect.ContainsTile(pss.Position))
+                        throw new InvalidOperationException("Invalid player start position - co-ordinate is not within the area.");
+                    this.playerStartStates.Add(pss);
                     }
 
-                result.Add(wa);
+                var tileDefinitions = area.SelectNodes("ns:TileDefinitions/ns:*", this._xnm);
+                if (tileDefinitions != null && tileDefinitions.Count != 0)
+                    {
+                    var td = TileDefinitionCollection.FromXml(tileDefinitions);
+                    td.Area = areaRect;
+                    this.tileDefinitionCollections.Add(td);
+                    }
+
+                var fruitPopulation = area.SelectNodes("ns:FruitDefinitions/ns:FruitDef", this._xnm);
+                if (fruitPopulation != null && fruitPopulation.Count != 0)
+                    {
+                    var fd = RandomFruitDistribution.FromXml(fruitPopulation);
+                    fd.Area = areaRect;
+                    this.randomFruitDistributions.Add(fd);
+                    }
+
+                var randomMonsterDistribution = (XmlElement) area.SelectSingleNode("ns:RandomMonsterDistribution", this._xnm);
+                if (randomMonsterDistribution != null)
+                    {
+                    var md = RandomMonsterDistribution.FromXml(randomMonsterDistribution, this._xnm);
+                    md.Area = areaRect;
+                    this.randomMonsterDistributions.Add(md);
+                    }
+
                 }
-            if (result.Count(wa => wa.IsInitialArea) != 1)
+
+            // todo check for overlapping areas
+            //WorldArea intersectingArea =
+            //(from WorldArea r in result
+            //    // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+            //    where r.Area.Intersects(wa.Area) && r.TileDefinitions != null && r.TileDefinitions.Count != 0
+            //    select r).FirstOrDefault();
+            //if (intersectingArea != null)
+            //    throw new InvalidOperationException(
+            //        $"The area {wa.Area} intersects with another area {intersectingArea.Area} (this is a problem because there are multiple tile definitions).");
+            if (this.playerStartStates.StartStates.Values.Count(wa => wa.IsInitialArea) != 1)
                 throw new InvalidOperationException("One and only one world area should be marked as the initial area.");
             }
 

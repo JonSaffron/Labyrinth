@@ -234,7 +234,6 @@
     <Compile Include="Services\WorldBuilding\TileContentValidator.cs" />
     <Compile Include="Services\WorldBuilding\TileDefinitionCollection.cs" />
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />
-    <Compile Include="Services\WorldBuilding\WorldAreaCollection.cs" />
     <Compile Include="Services\WorldBuilding\WorldValidator.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
     <Compile Include="GameObjects\Monsters\Movement\StandardPatrolling.cs" />
@@ -267,7 +266,6 @@
     <Compile Include="Services\WorldBuilding\Tile.cs" />
     <Compile Include="Services\WorldBuilding\TileDefinition.cs" />
     <Compile Include="TilePos.cs" />
-    <Compile Include="Services\WorldBuilding\WorldArea.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoader.cs" />
   </ItemGroup>
   <ItemGroup>

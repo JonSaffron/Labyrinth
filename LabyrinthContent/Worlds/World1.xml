@@ -85,8 +85,8 @@ O              OO              OO              OO              OO              O
 
   <Areas>
     <!-- Level 1 -->
-    <Area Id="1" Top="40" Left="0" Width="64" Height="40" WorldStart="true">
-      <PlayerStartState Left="8" Top="75" Energy="50" />
+    <Area Top="40" Left="0" Width="64" Height="40">
+      <PlayerStartState Id="1" Left="8" Top="75" Energy="50" WorldStart="true" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor1" />
         <Wall Symbol="©" Tile="MBM1984" />
@@ -103,8 +103,8 @@ O              OO              OO              OO              OO              O
     </Area>
 
     <!-- Level 2 -->
-    <Area Id="2" Top="40" Left="64" Width="64" Height="40">
-      <PlayerStartState Left="72" Top="45" Energy="100" />
+    <Area Top="40" Left="64" Width="64" Height="40">
+      <PlayerStartState Id="2" Left="72" Top="45" Energy="100" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor2" />
         <Wall Symbol="O" Tile="Wall2" />
@@ -122,8 +122,8 @@ O              OO              OO              OO              OO              O
     </Area>
 
     <!-- Level 3 -->
-    <Area Id="3" Top="40" Left="128" Width="64" Height="40">
-      <PlayerStartState Left="136" Top="77" Energy="150" />
+    <Area Top="40" Left="128" Width="64" Height="40">
+      <PlayerStartState Id="3" Left="136" Top="77" Energy="150" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor3" />
         <Wall Symbol="▓" Tile="Wall3Full" />
@@ -148,8 +148,8 @@ O              OO              OO              OO              OO              O
     </Area>
 
     <!-- Level 4 -->
-    <Area Id="5" Top="0" Left="192" Width="64" Height="80">
-      <PlayerStartState Left="200" Top="65" Energy="200" />
+    <Area Top="0" Left="192" Width="64" Height="80">
+      <PlayerStartState Id="4" Left="200" Top="65" Energy="200" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor4" />
         <Wall Symbol="□" Tile="Wall4" />
@@ -180,8 +180,8 @@ O              OO              OO              OO              OO              O
     </Area>
 
     <!-- Level 5 -->
-    <Area Id="6" Top="0" Left="128" Width="64" Height="40">
-      <PlayerStartState Left="183" Top="15" Energy="200" />
+    <Area Top="0" Left="128" Width="64" Height="40">
+      <PlayerStartState Id="5" Left="183" Top="15" Energy="200" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor5" />
         <Wall Symbol="▓" Tile="Wall5Full" />
@@ -206,8 +206,8 @@ O              OO              OO              OO              OO              O
     </Area>
 
     <!-- Level 6 -->
-    <Area Id="7" Top="0" Left="64" Width="64" Height="40">
-      <PlayerStartState Left="119" Top="35" Energy="255" />
+    <Area Top="0" Left="64" Width="64" Height="40">
+      <PlayerStartState Id="6" Left="119" Top="35" Energy="255" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor6" />
         <Wall Symbol="▓" Tile="Wall6Full" />
@@ -236,8 +236,8 @@ O              OO              OO              OO              OO              O
     </Area>
 
     <!-- Level 7 -->
-    <Area Id="8" Top="0" Left="0" Width="64" Height="40">
-      <PlayerStartState Left="56" Top="5" Energy="255" />
+    <Area Top="0" Left="0" Width="64" Height="40">
+      <PlayerStartState Id="8" Left="56" Top="5" Energy="255" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor4" />
         <Wall Symbol="▓" Tile="Wall7Full" />

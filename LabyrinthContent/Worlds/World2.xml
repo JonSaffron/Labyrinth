@@ -85,8 +85,8 @@
 
   <Areas>
     <!-- Single Level -->
-    <Area Id="1" Top="0" Left="0" Width="256" Height="80" WorldStart="true">
-      <PlayerStartState Left="8" Top="75" Energy="255" />
+    <Area Top="0" Left="0" Width="256" Height="80">
+      <PlayerStartState Id="1" Left="8" Top="75" Energy="255" WorldStart="true" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor2" />
 
