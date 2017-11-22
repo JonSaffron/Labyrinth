@@ -105,6 +105,13 @@ namespace Labyrinth.GameObjects
             // todo here is the place to check whether a monster can leave the room
             if (!GlobalServices.World.IsTileWithinWorld(proposedDestination))
                 return false;
+            if (!this.CanChangeRooms)
+                {
+                var currentRoom = World.GetContainingRoom(this.Position);
+                var potentialRoom = World.GetContainingRoom(proposedDestination.ToPosition());
+                if (currentRoom != potentialRoom)
+                    return false;
+                }
             var objectsOnTile = GlobalServices.GameState.GetItemsOnTile(proposedDestination);
             foreach (var item in objectsOnTile)
                 {
@@ -175,7 +182,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <param name="direction">The direction to move in</param>
         /// <param name="speed">The speed to move at</param>
-        protected void Move(Direction direction, decimal speed)
+        public void Move(Direction direction, decimal speed)
             {
             var movingTowardsTilePos = this.TilePosition.GetPositionAfterOneMove(direction);
             var movingTowards = movingTowardsTilePos.ToPosition();
@@ -186,7 +193,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Makes this object stationary
         /// </summary>
-        protected void StandStill()
+        public void StandStill()
             {
             this.CurrentMovement = Labyrinth.Movement.Still;
             //System.Diagnostics.Trace.WriteLine(string.Format("{0}: Standing still at {1}", this.GetType().Name, this.TilePosition));
@@ -258,12 +265,14 @@ namespace Labyrinth.GameObjects
         /// Gets the normal speed this object moves at
         /// </summary>
         /// <remarks>Measured in pixels per second</remarks>
-        protected virtual decimal StandardSpeed => Constants.BaseSpeed;
+        public virtual decimal StandardSpeed => Constants.BaseSpeed;
 
         /// <summary>
         /// Gets the speed this object moves at when bouncing back
         /// </summary>
         /// <remarks>Measured in pixels per second</remarks>
         protected virtual decimal BounceBackSpeed => Constants.BounceBackSpeed;
+
+        protected virtual bool CanChangeRooms => false;
         }
     }

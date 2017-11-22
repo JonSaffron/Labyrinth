@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    class RandomMonsterDistribution
+    class RandomMonsterDistribution : IHasArea
         {
         public Rectangle Area { get; set; }
         public DiceRoll DiceRoll { get; set; }
@@ -15,12 +15,13 @@ namespace Labyrinth.Services.WorldBuilding
         public static RandomMonsterDistribution FromXml(XmlElement node, XmlNamespaceManager xnm)
             {
             var result = new RandomMonsterDistribution
-                    {
-                    DiceRoll = new DiceRoll(node.GetAttribute("DiceToRoll")),
-                    CountOfMonsters = int.Parse(node.GetAttribute("CountOfMonsters"))
-                    };
-                // ReSharper disable once PossibleNullReferenceException
-                foreach (XmlElement mdef in node.SelectNodes("ns:MonsterTemplates/ns:Monster", xnm))
+                {
+                DiceRoll = new DiceRoll(node.GetAttribute("DiceToRoll")),
+                CountOfMonsters = int.Parse(node.GetAttribute("CountOfMonsters"))
+                };
+
+            // ReSharper disable once PossibleNullReferenceException
+            foreach (XmlElement mdef in node.SelectNodes("ns:MonsterTemplates/ns:Monster", xnm))
                 {
                 var md = MonsterDef.FromXml(mdef);
                 int matchingDiceRoll = int.Parse(mdef.GetAttribute("MatchingDiceRoll"));

@@ -1,20 +1,14 @@
+using JetBrains.Annotations;
+
 namespace Labyrinth.GameObjects.Movement
     {
     class KillerCubeRedMovement : StandardRolling
         {
-        public override Direction DetermineDirection(Monster monster)
+        public KillerCubeRedMovement([NotNull] Monster monster) : base(monster)
             {
-            var intendedDirection = 
-                ShouldMakeAnAggressiveMove(monster)
-                    ? GetIntendedDirection(monster)
-                    : base.DetermineDirection(monster);
-
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
-            this.CurrentDirection = result;
-            return result;
             }
 
-        private new Direction GetIntendedDirection(Monster monster)
+        private Direction GetIntendedDirection(Monster monster)
             {
             TilePos tp = monster.TilePosition;
                 
@@ -42,6 +36,15 @@ namespace Labyrinth.GameObjects.Movement
                 newDirection = this.CurrentDirection;
                 
             return newDirection;
+            }
+
+        public override Direction DetermineDirection()
+            {
+            var result = 
+                ShouldMakeAnAggressiveMove(this.Monster)
+                    ? GetIntendedDirection(this.Monster)
+                    : base.DetermineDirection();
+            return result;
             }
 
         private static bool ShouldMakeMoveToAvoidTrouble()

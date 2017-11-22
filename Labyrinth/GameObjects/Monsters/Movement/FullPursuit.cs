@@ -1,20 +1,39 @@
+using JetBrains.Annotations;
+
 namespace Labyrinth.GameObjects.Movement
     {
-    class FullPursuit : IMonsterMovement
+    class FullPursuit : MonsterMotionBase
         {
-        public Direction DetermineDirection(Monster monster)
+        public FullPursuit([NotNull] Monster monster) : base(monster)
             {
-            Direction intendedDirection = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
-            var alternativeDirectionWhenBlocked = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
+            }
+
+        public override Direction DetermineDirection()
+            {
+            Direction intendedDirection = MonsterMovement.DetermineDirectionTowardsPlayer(this.Monster);
+            var alternativeDirectionWhenBlocked = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, intendedDirection);
             if (alternativeDirectionWhenBlocked == Direction.None || alternativeDirectionWhenBlocked != intendedDirection)
                 return alternativeDirectionWhenBlocked;
 
-            TilePos potentiallyMovingTowards = monster.TilePosition.GetPositionAfterOneMove(intendedDirection);
+            TilePos potentiallyMovingTowards = this.Monster.TilePosition.GetPositionAfterOneMove(intendedDirection);
             if (potentiallyMovingTowards == GlobalServices.GameState.Player.TilePosition)
                 intendedDirection = MonsterMovement.AlterDirection(intendedDirection);
 
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
+            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, intendedDirection);
             return result;
+            }
+
+        public override bool SetDirectionAndDestination()
+            {
+            Direction direction = DetermineDirection();
+            if (direction == Direction.None)
+                {
+                this.Monster.StandStill();
+                return false;
+                }
+
+            this.Monster.Move(direction, this.Monster.StandardSpeed);
+            return true;
             }
         }
     }

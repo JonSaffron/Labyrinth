@@ -1,29 +1,41 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Labyrinth.GameObjects.Movement
     {
-    class StandardPatrolling : IMonsterMovement
+    class StandardPatrolling : MonsterMotionBase
         {
-        private readonly Direction _initialPatrollingDirection;
         private Direction _currentDirection;
 
-        public StandardPatrolling(Direction initialDirection)
+        public StandardPatrolling([NotNull] Monster monster, Direction initialDirection) : base(monster)
             {
             if (initialDirection == Direction.None)
                 throw new ArgumentOutOfRangeException(nameof(initialDirection), "May not be None");
-            this._initialPatrollingDirection = initialDirection;
+            this._currentDirection = initialDirection;
             }
 
-        public Direction DetermineDirection(Monster monster)
+        public override Direction DetermineDirection()
             {
-            if (this._currentDirection == Direction.None)
-                this._currentDirection = this._initialPatrollingDirection;
+            if (this.Monster.CanMoveInDirection(this._currentDirection))
+                return this._currentDirection;
+            var reversed = this._currentDirection.Reversed();
+            if (this.Monster.CanMoveInDirection(reversed))
+                return reversed;
+            return Direction.None;
+            }
 
-            var intendedDirection = MonsterMovement.ContinueOrReverseWithinRoom(monster, this._currentDirection);
-            
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
-            this._currentDirection = result;
-            return result;
+        public override bool SetDirectionAndDestination()
+            {
+            Direction direction = DetermineDirection();
+            if (direction == Direction.None)
+                {
+                this.Monster.StandStill();
+                return false;
+                }
+
+            this.Monster.Move(direction, this.Monster.StandardSpeed);
+            this._currentDirection = direction;
+            return true;
             }
         }
     }

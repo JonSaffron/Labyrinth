@@ -1,60 +1,55 @@
-﻿using Labyrinth.GameObjects.Movement;
+﻿using Labyrinth.GameObjects;
+using Labyrinth.GameObjects.Movement;
 
 namespace Labyrinth
     {
     class MonsterMovementFactory : IMonsterMovementFactory
         {
-        // These can be single instance movement classes because they don't maintain any state
-        private IMonsterMovement _fullPursuit;
-        private IMonsterMovement _cautiousPursuit;
-        private IMonsterMovement _semiAggressive;
-        private IMonsterMovement _placid;
-
-        public IMonsterMovement StandardPatrolling(Direction initialDirection)
+        public IMonsterMotion StandardPatrolling(Monster monster, Direction initialDirection)
             {
-            var result = new StandardPatrolling(initialDirection);
+            var result = new StandardPatrolling(monster, initialDirection);
             return result;
             }
 
-        public IMonsterMovement StandardRolling(Direction initialDirection)
+        public IMonsterMotion StandardRolling(Monster monster, Direction initialDirection)
             {
-            var result = initialDirection != Direction.None ? new StandardRolling(initialDirection) : new StandardRolling();
+            var result = initialDirection != Direction.None ? new StandardRolling(monster, initialDirection) : new StandardRolling(monster);
             return result;
             }
 
-        public IMonsterMovement FullPursuit()
+        public IMonsterMotion FullPursuit(Monster monster)
             {
-            var result = this._fullPursuit ?? (this._fullPursuit = new FullPursuit());
+            var result = new FullPursuit(monster);
             return result;
             }
 
-        public IMonsterMovement Cautious()
+        public IMonsterMotion Cautious(Monster monster)
             {
-            var result = this._cautiousPursuit ?? (this._cautiousPursuit = new CautiousPursuit());
+            var result = new CautiousPursuit(monster);
             return result;
             }
 
-        public IMonsterMovement SemiAggressive()
+        public IMonsterMotion SemiAggressive(Monster monster)
             {
-            var result = this._semiAggressive ?? (this._semiAggressive = new SemiAggressive());
+            var result = new SemiAggressive(monster);
             return result;
             }
 
-        public IMonsterMovement Placid()
+        public IMonsterMotion Placid(Monster monster)
             {
-            var result = this._placid ?? (this._placid = new Placid());
+            var result = new Placid(monster);
             return result;
             }
 
-        public IMonsterMovement KillerCubeRedMovement()
+        public IMonsterMotion KillerCubeRedMovement(Monster monster)
             {
-            var result = new KillerCubeRedMovement();
+            var result = new KillerCubeRedMovement(monster);
             return result;
             }
 
-        public IMonsterMovement RotaFloaterCyanMovement()
+        public IMonsterMotion RotaFloaterCyanMovement(Monster monster)
             {
-            var result = new RotaFloatCyanMovement();
+            var result = new RotaFloatCyanMovement(monster);
             return result;
             }
         }

@@ -167,6 +167,6 @@ namespace Labyrinth.GameObjects
 
         public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
 
-        protected override decimal StandardSpeed => Constants.BaseSpeed * 4;
+        public override decimal StandardSpeed => Constants.BaseSpeed * 4;
         }
     }

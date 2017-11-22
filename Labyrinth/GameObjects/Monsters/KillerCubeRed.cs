@@ -14,16 +14,16 @@ namespace Labyrinth.GameObjects
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
             }
         
-        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
                 case MonsterMobility.Patrolling:
-                    return GlobalServices.MonsterMovementFactory.StandardPatrolling(this.InitialDirection);
+                    return GlobalServices.MonsterMovementFactory.StandardPatrolling(this, this.InitialDirection);
                 case MonsterMobility.Placid:
-                    return GlobalServices.MonsterMovementFactory.StandardRolling(this.InitialDirection);
+                    return GlobalServices.MonsterMovementFactory.StandardRolling(this, this.InitialDirection);
                 case MonsterMobility.Aggressive:
-                    return GlobalServices.MonsterMovementFactory.KillerCubeRedMovement();
+                    return GlobalServices.MonsterMovementFactory.KillerCubeRedMovement(this);
                 default:
                     throw new ArgumentOutOfRangeException();
                 }

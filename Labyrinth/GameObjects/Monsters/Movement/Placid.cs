@@ -1,11 +1,16 @@
-﻿namespace Labyrinth.GameObjects.Movement
+﻿using JetBrains.Annotations;
+
+namespace Labyrinth.GameObjects.Movement
     {
-    class Placid : IMonsterMovement
+    class Placid : MonsterMotionBase
         {
-        public Direction DetermineDirection(Monster monster)
+        public Placid([NotNull] Monster monster) : base(monster)
             {
-            var intendedDirection = MonsterMovement.RandomDirection();
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
+            }
+
+        public override Direction DetermineDirection()
+            {
+            var result = MonsterMovement.RandomDirection();
             return result;
             }
         }

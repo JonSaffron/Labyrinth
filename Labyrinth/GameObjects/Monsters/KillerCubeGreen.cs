@@ -10,12 +10,12 @@ namespace Labyrinth.GameObjects
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/KillerCubeGreen", 3));
             
-            this.Mobility = MonsterMobility.Static;
+            this.Mobility = MonsterMobility.Stationary;
             }
 
-        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
-            if (mobility != MonsterMobility.Static)
+            if (mobility != MonsterMobility.Stationary)
                 throw new ArgumentOutOfRangeException();
             return null;
             }

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    public class RandomFruitDistribution
+    public class RandomFruitDistribution : IHasArea
         {
         public Rectangle Area { get; set; }
         private readonly Dictionary<FruitType, FruitDefinition> _definitions = new Dictionary<FruitType, FruitDefinition>();

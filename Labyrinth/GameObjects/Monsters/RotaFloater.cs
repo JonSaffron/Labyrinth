@@ -10,16 +10,16 @@ namespace Labyrinth.GameObjects
             {
             }
 
-        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
             switch (mobility)
                 {
                 case MonsterMobility.Placid:
-                    return GlobalServices.MonsterMovementFactory.StandardRolling(this.InitialDirection);
+                    return GlobalServices.MonsterMovementFactory.StandardRolling(this, this.InitialDirection);
                 case MonsterMobility.Patrolling:
-                    return GlobalServices.MonsterMovementFactory.StandardPatrolling(this.InitialDirection);
+                    return GlobalServices.MonsterMovementFactory.StandardPatrolling(this, this.InitialDirection);
                 case MonsterMobility.Aggressive:
-                    return GlobalServices.MonsterMovementFactory.RotaFloaterCyanMovement();
+                    return GlobalServices.MonsterMovementFactory.RotaFloaterCyanMovement(this);
                 default:
                     throw new ArgumentOutOfRangeException();
                 }

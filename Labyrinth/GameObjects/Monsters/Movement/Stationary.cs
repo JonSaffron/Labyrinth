@@ -1,10 +1,18 @@
-﻿namespace Labyrinth.GameObjects.Movement
+﻿using System;
+using JetBrains.Annotations;
+
+namespace Labyrinth.GameObjects.Movement
     {
-    class Stationary : IMonsterMovement
+    class Stationary : MonsterMotionBase
         {
-        public Direction DetermineDirection(Monster monster)
+        public Stationary([NotNull] Monster monster) : base(monster)
             {
-            return Direction.None;
+            }
+
+        public override bool SetDirectionAndDestination()
+            {
+            this.Monster.StandStill();
+            return false;
             }
         }
     }

@@ -35,5 +35,9 @@ namespace Labyrinth.Services.WorldBuilding
             this.NumberOfDice = numberOfDice;
             this.NumberOfSides = numberOfSides;
             }
+
+        public int MinValue => this.NumberOfDice;
+
+        public int MaxValue => this.NumberOfDice * this.NumberOfSides;
         }
     }

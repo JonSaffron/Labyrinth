@@ -59,6 +59,10 @@ namespace Labyrinth.GameObjects.Movement
             {
             if (!GlobalServices.GameState.Player.IsAlive())
                 return false;
+            if (monster.ChangeRooms != ChangeRooms.FollowsPlayer && !IsPlayerInSameRoomAsMonster(monster))
+                {
+                return false;
+                }
             var distance = Vector2.Distance(monster.Position, GlobalServices.GameState.Player.Position) / Constants.TileLength;
             var result = distance <= 20;
             return result;
@@ -141,24 +145,12 @@ namespace Labyrinth.GameObjects.Movement
             return result;
             }
 
-        public static Direction ContinueOrReverseWithinRoom(Monster monster, Direction currentDirection)
+        public static Direction ContinueOrReverse(Monster monster, Direction currentDirection)
             {
-            if (CanMoveWithinRoom(monster, currentDirection))
+            if (monster.CanMoveInDirection(currentDirection))
                 return currentDirection;
             var reversed = currentDirection.Reversed();
             return reversed;
-            }
-
-        public static bool CanMoveWithinRoom(Monster monster, Direction direction)
-            {
-            if (!monster.CanMoveInDirection(direction))
-                return false;
-
-            TilePos tp = monster.TilePosition;
-            TilePos pp = tp.GetPositionAfterOneMove(direction);
-            Vector2 potentiallyMovingTowards = pp.ToPosition();
-            bool isInSameRoom = IsInSameRoom(monster.Position, potentiallyMovingTowards);
-            return isInSameRoom;
             }
         }
     }

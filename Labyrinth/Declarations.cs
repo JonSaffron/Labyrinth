@@ -133,7 +133,7 @@ namespace Labyrinth
         /// <summary>
         /// Not moving
         /// </summary>
-        Static,
+        Stationary,
 
         /// <summary>
         /// Moving without reference to the player's position

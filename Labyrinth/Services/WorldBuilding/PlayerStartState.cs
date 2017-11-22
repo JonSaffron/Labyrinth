@@ -3,11 +3,11 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    public class PlayerStartState
+    public class PlayerStartState : IHasArea
         {
         public Rectangle Area { get; set; }
-        public int Id { get; set; }
-        public bool IsInitialArea { get; set; }
+        public int Id { get; }
+        public bool IsInitialArea { get; }
         public readonly TilePos Position;
         public readonly int Energy;
 

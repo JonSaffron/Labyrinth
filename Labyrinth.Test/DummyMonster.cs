@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Labyrinth.GameObjects;
 using Labyrinth.GameObjects.Monsters.Actions;
+using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -31,9 +32,9 @@ namespace Labyrinth.Test
             // ignore this
             }
 
-        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
-            return new DummyMonsterMovement();
+            return new DummyMonsterMovement(this);
             }
 
         public List<PositionAndTime> Log
@@ -46,17 +47,35 @@ namespace Labyrinth.Test
             }
         }
 
-    internal class DummyMonsterMovement : IMonsterMovement
+    internal class DummyMonsterMovement : MonsterMotionBase
         {
-        public Direction DetermineDirection(Monster monster)
+        public DummyMonsterMovement(Monster monster) : base(monster)
+            {
+            }
+
+        public override Direction DetermineDirection()
             {
             if (Game1.Ticks < 100)
                 {
-                if (monster.TilePosition.X < 5)
+                if (this.Monster.TilePosition.X < 5)
                     return Direction.Right;
                 return Direction.None;
                 }
-            return monster.CanMoveInDirection(Direction.Right) ? Direction.Right : Direction.None;
+            return this.Monster.CanMoveInDirection(Direction.Right) ? Direction.Right : Direction.None;
+            }
+
+        public override bool SetDirectionAndDestination()
+            {
+            Direction direction = DetermineDirection();
+
+            if (direction == Direction.None)
+                {
+                this.Monster.StandStill();
+                return false;
+                }
+
+            this.Monster.Move(direction, this.Monster.StandardSpeed);
+            return true;
             }
         }
 

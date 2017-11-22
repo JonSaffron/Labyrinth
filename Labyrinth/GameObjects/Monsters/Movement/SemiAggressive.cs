@@ -1,23 +1,26 @@
-﻿namespace Labyrinth.GameObjects.Movement
+﻿using JetBrains.Annotations;
+
+namespace Labyrinth.GameObjects.Movement
     {
-    class SemiAggressive : IMonsterMovement
+    class SemiAggressive : MonsterMotionBase
         {
-        public Direction DetermineDirection(Monster monster)
+        public SemiAggressive([NotNull] Monster monster) : base(monster)
             {
-            var intendedDirection = 
-                ShouldMakeAnAggressiveMove(monster) 
-                    ? MonsterMovement.DetermineDirectionTowardsPlayer(monster) 
+            }
+
+        public override Direction DetermineDirection()
+            {
+            var result = 
+                ShouldMakeAnAggressiveMove(this.Monster) 
+                    ? MonsterMovement.DetermineDirectionTowardsPlayer(this.Monster) 
                     : MonsterMovement.RandomDirection();
             
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
             return result;
             }
 
         private static bool ShouldMakeAnAggressiveMove(Monster monster)
             {
             bool result = GlobalServices.Randomess.Test(1) && MonsterMovement.IsPlayerNearby(monster);
-            if (monster.ChangeRooms != ChangeRooms.FollowsPlayer && !MonsterMovement.IsPlayerInSameRoomAsMonster(monster))
-                result = false;
             return result;
             }   
         }

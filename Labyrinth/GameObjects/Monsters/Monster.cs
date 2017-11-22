@@ -14,8 +14,8 @@ namespace Labyrinth.GameObjects
     public abstract class Monster : MovingItem, IMonster
         {
         private MonsterMobility _mobility;
-        protected abstract IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility);
-        [NotNull] private IMonsterMovement _determineDirection = new Stationary();
+        protected abstract IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility);
+        [CanBeNull] private IMonsterMotion _determineDirection;
         public Direction InitialDirection = Direction.None;
 
         public ChangeRooms ChangeRooms { get; set; }
@@ -32,35 +32,37 @@ namespace Labyrinth.GameObjects
         private IMonsterWeapon _weapon;
 
         private Animation _normalAnimation;
-        private readonly Animation _eggAnimation;
-        private readonly Animation _hatchingAnimation;
+        private static readonly Animation EggAnimation;
+        private static readonly Animation HatchingAnimation;
 
         public readonly int OriginalEnergy;
 
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
 
+        static Monster()
+            {
+            EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
+            HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
+            }
+
         protected Monster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
             this.Energy = energy;
             this.OriginalEnergy = energy;
             this.CurrentSpeed = Constants.BaseSpeed;
-            
-            this._eggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
-            this._hatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
             }
             
         public MonsterMobility Mobility
             {
             get
                 {
-                var result = this._mobility;
-                return result;
+                return this._mobility;
                 }
             set
                 {
-                this._determineDirection = GetMethodForDeterminingDirection(value);
                 this._mobility = value;
+                SetMonsterMotion();
                 }
             }
 
@@ -118,10 +120,10 @@ namespace Labyrinth.GameObjects
                 switch (value)
                     {
                     case MonsterState.Egg:
-                        animation = this._eggAnimation;
+                        animation = EggAnimation;
                         break;
                     case MonsterState.Hatching:
-                        animation = this._hatchingAnimation;
+                        animation = HatchingAnimation;
                         break;
                     case MonsterState.Normal:
                         animation = this._normalAnimation;
@@ -130,11 +132,17 @@ namespace Labyrinth.GameObjects
                         throw new ArgumentOutOfRangeException();
                     }
                 this.Ap.PlayAnimation(animation);
+                SetMonsterMotion();
                 this._monsterState = value;
                 }
             }
-        
-        public bool IsStatic => this.Mobility == MonsterMobility.Static || this.IsEgg;
+
+        private void SetMonsterMotion()
+            {
+            this._determineDirection = this.IsEgg || this.Mobility == MonsterMobility.Stationary ? new Stationary(this) : GetMethodForDeterminingDirection(this.Mobility);
+            }
+
+        public bool IsStatic => this.Mobility == MonsterMobility.Stationary || this.IsEgg;
 
         public override void ReduceEnergy(int energyToRemove)
             {
@@ -174,27 +182,11 @@ namespace Labyrinth.GameObjects
 
         private bool SetDirectionAndDestination()
             {
-            if (this.Mobility == MonsterMobility.Static || this.IsEgg)
-                {
-                this.StandStill();
-                return false;
-                }   
-
             if (this._determineDirection == null)
                 throw new InvalidOperationException("Determine Direction object reference not set.");
-            
-            Direction d = this._determineDirection.DetermineDirection(this);
-            if (d != Direction.None && !CanMoveInDirection(d))
-                d = Direction.None;
 
-            if (d == Direction.None)
-                {
-                this.StandStill();
-                return false;
-                }
-
-            this.Move(d, this.StandardSpeed);
-            return true;
+            var result = this._determineDirection.SetDirectionAndDestination();
+            return result;
             }
 
         /// <summary>
@@ -311,7 +303,7 @@ namespace Labyrinth.GameObjects
         public override ObjectSolidity Solidity => this.IsStatic ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
 
         public int CurrentSpeed { get; set; }
-        protected override decimal StandardSpeed => this.CurrentSpeed;
+        public override decimal StandardSpeed => this.CurrentSpeed;
 
         public bool Flitters
             {

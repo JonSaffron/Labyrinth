@@ -15,6 +15,8 @@ namespace Labyrinth.Services.WorldBuilding
             this.StartStates.Add(pss.Id, pss);
             }
 
+        public IList<PlayerStartState> Values => this.StartStates.Values.ToList();
+
         public bool TryGetStartState(TilePos tp, out PlayerStartState pss)
             {
             pss = this.StartStates.Values.SingleOrDefault(item => item.Area.ContainsTile(tp));

@@ -10,13 +10,13 @@ namespace Labyrinth.GameObjects
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/DeathCube", 3));
             
-            this.Mobility = MonsterMobility.Static;
+            this.Mobility = MonsterMobility.Stationary;
             this.ShotsBounceOff = true;
             }
 
-        protected override IMonsterMovement GetMethodForDeterminingDirection(MonsterMobility mobility)
+        protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
-            if (mobility != MonsterMobility.Static)
+            if (mobility != MonsterMobility.Stationary)
                 throw new ArgumentOutOfRangeException();
             return null;
             }

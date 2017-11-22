@@ -13,7 +13,7 @@ namespace Labyrinth.GameObjects
             this.Mobility = MonsterMobility.Placid;
             }
 
-        protected override decimal StandardSpeed
+        public override decimal StandardSpeed
             {
             get
                 {

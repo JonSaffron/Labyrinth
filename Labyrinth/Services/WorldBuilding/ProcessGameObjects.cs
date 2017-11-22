@@ -24,11 +24,7 @@ namespace Labyrinth.Services.WorldBuilding
                 foreach (TilePos p in tdc.Area.PointsInside())
                     {
                     char symbol = layout[p.Y][p.X];
-                    if (!tdc.Definitions.TryGetValue(symbol, out var td))
-                        {
-                        string text = $"Don't know what symbol {symbol} indicates in world area {tdc.Area}";
-                        throw new InvalidOperationException(text);
-                        }
+                    var td = tdc[symbol];
                     if (td is TileWallDefinition wall)
                         { 
                         this._gameState.AddWall(p.ToPosition(), "Tiles/" + wall.TextureName);

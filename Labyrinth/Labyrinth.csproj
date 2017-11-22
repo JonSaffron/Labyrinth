@@ -134,6 +134,7 @@
     <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameObjects\Monsters\Movement\FullPursuit.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\MonsterMotionBase.cs" />
     <Compile Include="GameObjects\Monsters\Movement\PatrolPerimeter.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Stationary.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
@@ -142,7 +143,9 @@
     <Compile Include="InteractiveServices.cs" />
     <Compile Include="Interfaces\IGameObjectCollection.cs" />
     <Compile Include="HeadsUpDisplay.cs" />
+    <Compile Include="Interfaces\IHasArea.cs" />
     <Compile Include="Interfaces\IHeadsUpDisplay.cs" />
+    <Compile Include="Interfaces\IMonsterMotion.cs" />
     <Compile Include="Interfaces\IMonsterMovementFactory.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="Interfaces\IMonster.cs" />

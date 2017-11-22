@@ -1,35 +1,53 @@
-﻿namespace Labyrinth.GameObjects.Movement
+﻿using JetBrains.Annotations;
+
+namespace Labyrinth.GameObjects.Movement
     {
-    class StandardRolling : IMonsterMovement
+    class StandardRolling : MonsterMotionBase
         {
         public Direction CurrentDirection { get; protected set; }
 
-        public StandardRolling()
+        public StandardRolling([NotNull] Monster monster) : base(monster)
             {
             }
 
-        public StandardRolling(Direction initialDirection)
+        public StandardRolling([NotNull] Monster monster, Direction initialDirection) : base(monster)
             {
             this.CurrentDirection = initialDirection;
             }
 
-        public virtual Direction DetermineDirection(Monster monster)
-            {
-            var intendedDirection = GetIntendedDirection(monster);
-
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(monster, intendedDirection);
-            this.CurrentDirection = result;
-            return result;
-            }
-
-        protected Direction GetIntendedDirection(Monster monster)
+        public override Direction DetermineDirection()
             {
             if (this.CurrentDirection == Direction.None)
                 this.CurrentDirection = MonsterMovement.RandomDirection();
 
             bool changeDirection = GlobalServices.Randomess.Test(7);
-            var result = changeDirection ? MonsterMovement.AlterDirection(this.CurrentDirection) : MonsterMovement.ContinueOrReverseWithinRoom(monster, this.CurrentDirection);
-            return result;
+            if (changeDirection)
+                {
+                var result = MonsterMovement.AlterDirection(this.CurrentDirection);
+                return result;
+                }
+
+            if (this.Monster.CanMoveInDirection(this.CurrentDirection))
+                return this.CurrentDirection;
+
+            var reversed = this.CurrentDirection.Reversed();
+            return reversed;
+            }
+
+        public override bool SetDirectionAndDestination()
+            {
+            Direction direction = DetermineDirection();
+            direction = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, direction);
+
+            if (direction == Direction.None)
+                {
+                this.Monster.StandStill();
+                return false;
+                }
+
+            this.Monster.Move(direction, this.Monster.StandardSpeed);
+            this.CurrentDirection = direction;
+            return true;
             }
         }
     }

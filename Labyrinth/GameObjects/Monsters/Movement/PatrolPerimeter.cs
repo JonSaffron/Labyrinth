@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Labyrinth.GameObjects.Movement
     {
+    // todo
     class PatrolPerimeter : IMonsterMovement
         {
         private Direction _lastDirection;
