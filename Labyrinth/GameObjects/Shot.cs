@@ -8,5 +8,7 @@ namespace Labyrinth.GameObjects
         protected Shot(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             }
+
+        protected override bool CanChangeRooms => true;
         }
     }

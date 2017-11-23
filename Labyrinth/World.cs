@@ -24,7 +24,9 @@ namespace Labyrinth
         private TilePos _worldSize;
         [NotNull] private readonly Tile[,] _tiles;
         private readonly bool _restartInSameRoom;
+        private readonly bool _replenishFruit;
         [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
+        [NotNull] private readonly List<RandomFruitDistribution> _fruitDistributions;
         [NotNull] public readonly Player Player;
 
         public Vector2 WindowPosition { get; private set; }
@@ -33,9 +35,11 @@ namespace Labyrinth
             {
             worldLoader.LoadWorld(level);
             this._worldSize = worldLoader.WorldSize;
-            this._tiles = worldLoader.GetFloorTiles();
+            this._tiles = worldLoader.FloorTiles;
             this._restartInSameRoom = worldLoader.RestartInSameRoom;
-            this._playerStartStates = worldLoader.GetPlayerStartStates();
+            this._replenishFruit = worldLoader.ReplenishFruit;
+            this._playerStartStates = worldLoader.PlayerStartStates;
+            this._fruitDistributions = worldLoader.FruitDistributions;
 
             var gameObjectCollection = new GameObjectCollection();
             var gameState = new GameState(gameObjectCollection);
@@ -190,16 +194,37 @@ namespace Labyrinth
 
         private void UpdateGameClock(GameTime gameTime)
             {
-            // todo in the 2nd world an acorn is randomly dropped every so often - 280e onwards
+            if (this._replenishFruit)
+                {
+                var fruitList = GlobalServices.GameState.DistinctItemsOfType<Fruit>();
+                var fruitCountByArea =
+                    (from f in fruitList
+                        let dist = this._fruitDistributions.SingleOrDefault(item => item.Area.ContainsTile(f.TilePosition))
+                        where dist != null
+                        group f by new {dist, f.FruitType}
+                        into grp
+                        select new {Dist = grp.Key.dist, grp.Key.FruitType, Count = grp.Count()})
+                    .ToList();
 
-            var fruitList = GlobalServices.GameState.DistinctItemsOfType<Fruit>();
-            var fruitCountByArea =
-                (from f in fruitList
-                 group f by new { this._tiles[f.TilePosition.X, f.TilePosition.Y].WorldAreaId, f.FruitType } into grp
-                 select new { key = grp.Key, count = grp.Count() })
-                .ToDictionary(item => item.key, item => item.count);
-            
-            
+                var fruitThatNeedsToppingUp =
+                    (from item in fruitCountByArea
+                    let fd = item.Dist[item.FruitType]
+                    where fd.FruitQuantity > item.Count
+                    let fruitDefinition = new FruitDefinition { FruitType = item.FruitType, FruitQuantity = fd.FruitQuantity - item.Count, Energy = fd.Energy }
+                    select new { item.Dist.Area, FruitDefinition = fruitDefinition }).ToList();
+
+                var fruitDistList = new List<RandomFruitDistribution>(fruitThatNeedsToppingUp.Count);
+                foreach (var item in fruitThatNeedsToppingUp)
+                    {
+                    var rfd = new RandomFruitDistribution {Area = item.Area};
+                    rfd.Add(item.FruitDefinition);
+                    fruitDistList.Add(rfd);
+                    }
+
+                var pgo = new ProcessGameObjects(GlobalServices.GameState);
+                pgo.AddFruitFromRandomDistributions(fruitDistList);
+                }
+
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
             while (this._time > Constants.GameClockResolution)
                 {

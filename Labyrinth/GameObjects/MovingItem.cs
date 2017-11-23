@@ -102,7 +102,6 @@ namespace Labyrinth.GameObjects
         private bool CanMoveInDirection(Direction direction, bool isBounceBackPossible)
             {
             TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
-            // todo here is the place to check whether a monster can leave the room
             if (!GlobalServices.World.IsTileWithinWorld(proposedDestination))
                 return false;
             if (!this.CanChangeRooms)

@@ -49,5 +49,7 @@ namespace Labyrinth.GameObjects
         public override int DrawOrder => (int) SpriteDrawOrder.Boulder;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 2.5m;
+
+        protected override bool CanChangeRooms => true;
         }
     }

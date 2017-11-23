@@ -51,10 +51,13 @@ namespace Labyrinth.Services.WorldBuilding
             ValidateAreas();
             }
 
-        public Tile[,] GetFloorTiles()
+        public Tile[,] FloorTiles
             {
-            var result = GetFloorLayout(this._playerStartStates);
-            return result;
+            get
+                {
+                var result = GetFloorLayout(this._playerStartStates);
+                return result;
+                }
             }
 
         public bool RestartInSameRoom
@@ -69,11 +72,21 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public Dictionary<int, PlayerStartState> GetPlayerStartStates()
+        public bool ReplenishFruit
             {
-            var result = this._playerStartStates.StartStates;
-            return result;
+            get
+                {
+                var text = this._xmlRoot.GetAttribute("ReplenishFruit");
+                if (string.IsNullOrWhiteSpace(text))
+                    return false;
+                bool result = bool.Parse(text);
+                return result;
+                }
             }
+
+        public Dictionary<int, PlayerStartState> PlayerStartStates => this._playerStartStates.StartStates;
+
+        public List<RandomFruitDistribution> FruitDistributions => this._randomFruitDistributions;
 
         public void AddGameObjects(GameState gameState)
             {
@@ -287,21 +300,19 @@ namespace Labyrinth.Services.WorldBuilding
                     var td = tdc[symbol];
 
                     TileUsage tu;
-                    if (td is TileWallDefinition)
+                    switch (td)
                         {
-                        tu = TileUsage.Wall(symbol);
-                        }
-                    else if (td is TileFloorDefinition)
-                        {
-                        tu = TileUsage.Floor(symbol);
-                        }
-                    else if (td is TileObjectDefinition objectDef)
-                        {
-                        tu = TileUsage.Object(symbol, objectDef.Description);
-                        }
-                    else
-                        {
-                        throw new InvalidOperationException();
+                        case TileWallDefinition _:
+                            tu = TileUsage.Wall(symbol);
+                            break;
+                        case TileFloorDefinition _:
+                            tu = TileUsage.Floor(symbol);
+                            break;
+                        case TileObjectDefinition objectDef:
+                            tu = TileUsage.Object(symbol, objectDef.Description);
+                            break;
+                        default:
+                            throw new InvalidOperationException();
                         }
 
                     result.Add(tp, tu);

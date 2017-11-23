@@ -335,5 +335,7 @@ namespace Labyrinth.GameObjects
         public override ObjectCapability Capability => ObjectCapability.CanPushOrCauseBounceBack;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 2;
+
+        protected override bool CanChangeRooms => true;
         }
     }

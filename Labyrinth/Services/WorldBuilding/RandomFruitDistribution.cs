@@ -19,6 +19,16 @@ namespace Labyrinth.Services.WorldBuilding
 
         public IEnumerable<FruitDefinition> Definitions => this._definitions.Values;
 
+        public FruitDefinition this[FruitType fruitType]
+            {
+            get
+                {
+                if (!this._definitions.TryGetValue(fruitType, out var fd))
+                    fd = new FruitDefinition {Energy = 0, FruitQuantity = 0, FruitType = fruitType};
+                return fd;
+                }
+            }
+
         public static RandomFruitDistribution FromXml(XmlNodeList fruitDefs)
             {
             var result = new RandomFruitDistribution();

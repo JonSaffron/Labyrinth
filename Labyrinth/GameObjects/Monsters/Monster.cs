@@ -355,5 +355,7 @@ namespace Labyrinth.GameObjects
             action.Init(this);
             actionList.Add(action);
             }
+
+        protected override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;
         }
     }

@@ -1,77 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Labyrinth.GameObjects.Movement
     {
-    // todo
-    class PatrolPerimeter : IMonsterMovement
+    class PatrolPerimeter : MonsterMotionBase
         {
         private Direction _lastDirection;
         private bool _turnType;
         private bool _isDetached;
 
-        public PatrolPerimeter(Direction initialDirection)
+        private static readonly Direction[] Clockwise = { Direction.Left, Direction.Up, Direction.Right, Direction.Down };
+        private static readonly Direction[] Anticlockwise = { Direction.Left, Direction.Down, Direction.Right, Direction.Up };
+
+        public PatrolPerimeter([NotNull] Monster monster, Direction initialDirection) : base(monster)
             {
             if (initialDirection == Direction.None)
                 throw new ArgumentOutOfRangeException(nameof(initialDirection), "May not be None");
             this._lastDirection = initialDirection;
             }
 
-        public Direction DetermineDirection(Monster monster)
+        public override Direction DetermineDirection()
             {
-            Direction newDirection;
-            bool willMove = !this._isDetached 
-                            ? TryDetermineDirection(monster, this._lastDirection, out newDirection) 
-                            : TryToDetermineDirectionWhenDetached(monster, this._lastDirection, out newDirection);
-            if (willMove)
-                {
-                this._lastDirection = newDirection;
-                return newDirection;
-                }
-            return Direction.None;
+            Direction result = !this._isDetached
+                ? DetermineDirectionWhenAttached()
+                : DetermineDirectionWhenDetached();
+            return result;
             }
 
-        private bool TryDetermineDirection(Monster monster, Direction currentDirection, out Direction newDirection)
-            {
-            using (var directions = GetPreferredDirections(currentDirection, this._turnType).GetEnumerator())
+        private Direction DetermineDirectionWhenAttached()
+            { 
+            using (var directions = GetPreferredDirections(this._lastDirection, this._turnType).GetEnumerator())
                 {
                 directions.MoveNext();
-                newDirection = directions.Current;
+                var newDirection = directions.Current;
 
-                var canGoInNewDirection = monster.CanMoveInDirection(newDirection);
+                var canGoInNewDirection = this.Monster.CanMoveInDirection(newDirection);
                 if (!canGoInNewDirection)
                     {
                     // so there's definitely one or more walls. Just need to get the first direction we can go in.
                     while (directions.MoveNext())
                         {
                         newDirection = directions.Current;
-                        if (monster.CanMoveInDirection(newDirection))
+                        if (this.Monster.CanMoveInDirection(newDirection))
                             {
-                            return true;
+                            return newDirection;
                             }
                         }
                     // can't go in any direction
-                    newDirection = Direction.None;
-                    return false;
+                    return Direction.None;
                     }
 
                 // check if there are any walls as we don't want to end up travelling in a small circle
                 while (directions.MoveNext())
                     {
-                    if (!monster.CanMoveInDirection(directions.Current))
+                    if (!this.Monster.CanMoveInDirection(directions.Current))
                         {
-                        return true;
+                        return newDirection;
                         }
                     }
 
                 // monster could go in any direction as it's not next to any wall - continue current direction
-                newDirection = currentDirection;
                 this._isDetached = true;
-                return true;
+                return this._lastDirection;
                 }
             }
 
-        public static IEnumerable<Direction> GetPreferredDirections(Direction direction, bool turnDirection)
+        private Direction DetermineDirectionWhenDetached()
+            {
+            if (this.Monster.CanMoveInDirection(this._lastDirection))
+                {
+                return this._lastDirection;
+                }
+
+            // Aha. We have bumped into something so we need to re-attach.
+            using (var directions = GetPreferredDirections(this._lastDirection, this._turnType).GetEnumerator())
+                {
+                while (directions.MoveNext())
+                    {
+                    var newDirection = directions.Current;
+                    if (this.Monster.CanMoveInDirection(newDirection))
+                        {
+                        // Upon attaching, we need to reverse the rotation that the monster uses to plan its next move
+                        this._turnType = !this._turnType;
+                        this._isDetached = false;
+                        return newDirection;
+                        }
+                    }
+                }
+
+            // can't go in any direction
+            return Direction.None;
+            }
+
+         public static IEnumerable<Direction> GetPreferredDirections(Direction direction, bool turnDirection)
             {
             var dirs = turnDirection ? Clockwise : Anticlockwise;
             var start = Array.IndexOf(dirs, direction);
@@ -82,35 +104,19 @@ namespace Labyrinth.GameObjects.Movement
                 }
             }
 
-        private bool TryToDetermineDirectionWhenDetached(Monster monster, Direction currentDirection, out Direction newDirection)
+       public override bool SetDirectionAndDestination()
             {
-            if (monster.CanMoveInDirection(currentDirection))
+            Direction direction = DetermineDirection();
+
+            if (direction == Direction.None)
                 {
-                newDirection = currentDirection;
-                return true;
+                this.Monster.StandStill();
+                return false;
                 }
 
-            using (var directions = GetPreferredDirections(currentDirection, this._turnType).GetEnumerator())
-                {
-                while (directions.MoveNext())
-                    {
-                    newDirection = directions.Current;
-                    if (monster.CanMoveInDirection(newDirection))
-                        {
-                        this._turnType = !this._turnType;
-                        this._isDetached = false;
-                        return true;
-                        }
-                    }
-                }
-
-            // can't go in any direction
-            newDirection = Direction.None;
-            return false;
+            this.Monster.Move(direction, this.Monster.StandardSpeed);
+            this._lastDirection = direction;
+            return true;
             }
-
-        private static readonly Direction[] Clockwise = { Direction.Left, Direction.Up, Direction.Right, Direction.Down };
-        private static readonly Direction[] Anticlockwise = { Direction.Left, Direction.Down, Direction.Right, Direction.Up };
-
         }
     }

@@ -37,23 +37,33 @@ namespace Labyrinth.Test
 
         public TilePos WorldSize => new TilePos(this.Width, this.Height);
 
-        public Tile[,] GetFloorTiles()
+        public Tile[,] FloorTiles
             {
-            var result = new Tile[this.Width, this.Height];
-            for (int x = 0; x < this.Width; x++)
+            get
+                {
+                var result = new Tile[this.Width, this.Height];
+                for (int x = 0; x < this.Width; x++)
                 for (int y = 0; y < this.Height; y++)
                     result[x, y] = new Tile(null, 0);
-            return result;
+                return result;
+                }
             }
 
         public bool RestartInSameRoom => false;
 
-        public Dictionary<int, PlayerStartState> GetPlayerStartStates()
+        public bool ReplenishFruit => false;
+
+        public Dictionary<int, PlayerStartState> PlayerStartStates
             {
-            var result = new Dictionary<int, PlayerStartState>();
-            result.Add(0, new PlayerStartState(1, true, new TilePos(), 100));
-            return result;
+            get
+                {
+                var result = new Dictionary<int, PlayerStartState>();
+                result.Add(0, new PlayerStartState(1, true, new TilePos(), 100));
+                return result;
+                }
             }
+
+        public List<RandomFruitDistribution> FruitDistributions => new List<RandomFruitDistribution>();
 
         public void AddGameObjects(GameState gameState)
             {
