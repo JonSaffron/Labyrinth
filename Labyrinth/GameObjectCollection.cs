@@ -145,34 +145,35 @@ namespace Labyrinth
             if (previousMortonCode == newMortonCode)
                 return;
 
-            var previousList = this._allGameItems[previousMortonCode];
+            ref var previousList = ref this._allGameItems[previousMortonCode];
             if (previousList == null)
                 throw new InvalidOperationException();
             int countOfItems = previousList.Count;
             if (countOfItems == 0)
                 throw new InvalidOperationException();
-            if (countOfItems == 1)
-                {
-                this._allGameItems[previousMortonCode] = null;
-                }
-            else
+            if (countOfItems != 1)
                 {
                 previousList.Remove(item);
                 }
-            
+
             EnsureArrayIsLargeEnough(item.TilePosition);
-            var newList = this._allGameItems[newMortonCode];
+            ref var newList = ref this._allGameItems[newMortonCode];
             if (newList == null && countOfItems == 1)
                 {
-                this._allGameItems[newMortonCode] = previousList;
+                newList = previousList;
                 }
             else if (newList == null)
                 {
-                this._allGameItems[newMortonCode] = new List<StaticItem> { item };
+                newList = new List<StaticItem> { item };
                 }
             else
                 {
                 newList.Add(item);
+                }
+
+            if (countOfItems == 1)
+                {
+                previousList = null;
                 }
 
             item.OriginalPosition = item.Position;
