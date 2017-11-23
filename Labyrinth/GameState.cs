@@ -108,9 +108,13 @@ namespace Labyrinth
             {
             foreach (var item in this._gameObjectCollection.DistinctItems())
                 {
-                if (item is Bang || item is Shot)
+                switch (item)
                     {
-                    item.InstantlyExpire();
+                    case Bang _:
+                    case Shot _:
+                    case TileReservation _:
+                        item.InstantlyExpire();
+                        break;
                     }
                 }
             }

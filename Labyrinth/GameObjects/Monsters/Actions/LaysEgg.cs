@@ -1,5 +1,4 @@
-﻿using System;
-using Labyrinth.Services.WorldBuilding;
+﻿using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth.GameObjects.Monsters.Actions
     {

@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
@@ -75,13 +74,6 @@ namespace Labyrinth
         public static void SetCentrePointProvider(ICentrePointProvider centrePointProvider)
             {
             CentrePointProvider = centrePointProvider;
-            }
-
-        public static IServiceProvider ServiceProvider { get; private set; }
-
-        public static void SetServiceProvider(IServiceProvider serviceProvider)
-            {
-            ServiceProvider = serviceProvider;
             }
 
         public static IMonsterMovementFactory MonsterMovementFactory { get; private set; }

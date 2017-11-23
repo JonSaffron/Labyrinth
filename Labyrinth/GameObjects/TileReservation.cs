@@ -9,7 +9,7 @@ namespace Labyrinth.GameObjects
         public TileReservation([NotNull] AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
             this.DrawOrder = 0;
-            this.IsExtant = false;
+            this.IsExtant = true;
             this.Solidity = ObjectSolidity.Stationary;
             }
 

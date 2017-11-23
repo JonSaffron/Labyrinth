@@ -35,6 +35,6 @@
             this.TileTypeByMap = TileTypeByMap.Object;
             }
 
-        public string Description => $"'{this._symbol} {this._description}";
+        public string Description => $"{this._symbol} {this._description}";
         }
     }

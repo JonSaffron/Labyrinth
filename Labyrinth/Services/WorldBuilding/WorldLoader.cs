@@ -271,7 +271,7 @@ namespace Labyrinth.Services.WorldBuilding
                     TileUsage t = tileUsage[tp];
                     if (t.TileTypeByMap == TileTypeByMap.Object && !hasItems)
                         {
-                        issues.Add(tp + ": Map had tile marked as occupied by an object " + t.Description + ", but nothing is there.");
+                        issues.Add(tp + ": Map had tile marked as occupied by an object '" + t.Description + "', but nothing is there.");
                         }
                     else if (t.TileTypeByMap == TileTypeByMap.Floor && hasItems)
                         {
@@ -281,6 +281,9 @@ namespace Labyrinth.Services.WorldBuilding
                         }
                     }
                 }
+
+            if (issues.Count == 0)
+                return;
 
             var message = string.Join("\r\n", issues);
             Trace.WriteLine(message);

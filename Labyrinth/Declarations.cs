@@ -41,9 +41,9 @@ namespace Labyrinth
 
     public enum Orientation
         {
+        None,
         Vertical,
-        Horizontal,
-        None
+        Horizontal
         }
 
     /// <summary>
@@ -52,15 +52,15 @@ namespace Labyrinth
     public enum ObjectSolidity
         {
         /// <summary>
-        /// An object that does not move such as a crystal or grave. Only a single stationary object can occupy a given space. Insubstatial objects can move into the same space though.
-        /// </summary>
-        Stationary,
-
-        /// <summary>
         /// An object that is typically on the move like the player. Any number of insubstantial objects can occupy the same space.
         /// </summary>
         Insubstantial,
         
+        /// <summary>
+        /// An object that does not move such as a crystal or grave. Only a single stationary object can occupy a given space. Insubstatial objects can move into the same space though.
+        /// </summary>
+        Stationary,
+
         /// <summary>
         /// A solid object that can be moved such as the boulder. It may occupy the same position as a stationary object.
         /// </summary>
@@ -177,7 +177,7 @@ namespace Labyrinth
     public enum MonsterState
         {
         /// <summary>
-        /// Monster is in it's normal state
+        /// Monster is in its normal state
         /// </summary>
         Normal,
 
