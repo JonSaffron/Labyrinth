@@ -8,13 +8,11 @@ namespace Labyrinth.GameObjects.Monsters.Actions
         {
         protected readonly Player Player = GlobalServices.GameState.Player;
         protected readonly IRandomess Random = GlobalServices.Randomess;
-        private Monster _monster;
-
-        protected Monster Monster => _monster;
+        protected Monster Monster { get; private set; }
 
         public virtual void Init([NotNull] Monster monster)
             {
-            this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
         public abstract void PerformAction();
@@ -29,6 +27,5 @@ namespace Labyrinth.GameObjects.Monsters.Actions
             var result = MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster);
             return result;
             }
-
         }
     }

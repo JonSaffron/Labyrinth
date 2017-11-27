@@ -132,8 +132,8 @@ namespace Labyrinth.GameObjects
                         throw new ArgumentOutOfRangeException();
                     }
                 this.Ap.PlayAnimation(animation);
-                SetMonsterMotion();
                 this._monsterState = value;
+                SetMonsterMotion();
                 }
             }
 
