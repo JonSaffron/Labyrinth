@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -10,10 +11,10 @@ namespace Labyrinth.GameObjects
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/Butterfly", 3));
             
-            this.Flitters = true;
+            this.MovementBehaviours.Add<Flitter>();
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
-            this.LaysEggs = true;
+            this.MovementBehaviours.Add<LaysEgg>();
             this.ShootsAtPlayer = true;
             }
 

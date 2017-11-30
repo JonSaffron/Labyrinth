@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Labyrinth.GameObjects;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -260,9 +261,9 @@ namespace Labyrinth
             if (monsterDef.IsEgg.GetValueOrDefault() && monsterDef.TimeBeforeHatching.HasValue)
                 result.SetDelayBeforeHatching(monsterDef.TimeBeforeHatching.Value);
             if (monsterDef.LaysMushrooms.HasValue)
-                result.LaysMushrooms = monsterDef.LaysMushrooms.Value;
+                result.MovementBehaviours.Set<LaysMushroom>(monsterDef.LaysMushrooms.Value);
             if (monsterDef.LaysEggs.HasValue)
-                result.LaysEggs = monsterDef.LaysEggs.Value;
+                result.MovementBehaviours.Set<LaysEgg>(monsterDef.LaysEggs.Value);
             if (monsterDef.SplitsOnHit.HasValue)
                 result.SplitsOnHit = monsterDef.SplitsOnHit.Value;
             if (monsterDef.ShootsAtPlayer.HasValue)

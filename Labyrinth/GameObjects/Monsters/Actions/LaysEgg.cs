@@ -1,10 +1,10 @@
 ﻿using Labyrinth.Services.WorldBuilding;
 
-namespace Labyrinth.GameObjects.Monsters.Actions
+namespace Labyrinth.GameObjects.Actions
     {
-    class LaysEgg : BaseAction
+    class LaysEgg : BaseBehaviour
         {
-        public override void PerformAction()
+        public override void Perform()
             {
             if (!ShouldAttemptToLayEgg())
                 return;

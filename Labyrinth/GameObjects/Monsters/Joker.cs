@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -9,11 +10,11 @@ namespace Labyrinth.GameObjects
         public Joker(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/Joker", 4));
-            
-            this.Flitters = true;
+
+            this.MovementBehaviours.Add<Flitter>();
             this.Mobility = MonsterMobility.Cautious;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
-            this.LaysEggs = true;
+            this.MovementBehaviours.Add<LaysEgg>();
             this.SplitsOnHit = true;
             this.ShootsAtPlayer = true;
             }

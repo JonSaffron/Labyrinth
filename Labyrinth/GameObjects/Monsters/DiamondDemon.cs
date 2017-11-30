@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -11,8 +12,8 @@ namespace Labyrinth.GameObjects
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/DiamondDemon", 4));
             
             this.Mobility = MonsterMobility.Aggressive;
-            this.Flitters = true;
-            this.LaysEggs = true;
+            this.MovementBehaviours.Add<Flitter>();
+            this.MovementBehaviours.Add<LaysEgg>();
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
             this.ShootsAtPlayer = true;
             }

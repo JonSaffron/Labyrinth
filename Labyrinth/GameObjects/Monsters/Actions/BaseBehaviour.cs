@@ -2,20 +2,22 @@
 using JetBrains.Annotations;
 using Labyrinth.GameObjects.Movement;
 
-namespace Labyrinth.GameObjects.Monsters.Actions
+namespace Labyrinth.GameObjects.Actions
     {
-    public abstract class BaseAction
+    public abstract class BaseBehaviour : IBehaviour
         {
         protected readonly Player Player = GlobalServices.GameState.Player;
         protected readonly IRandomess Random = GlobalServices.Randomess;
-        protected Monster Monster { get; private set; }
+        private Monster _monster;
+
+        protected Monster Monster => _monster;
 
         public virtual void Init([NotNull] Monster monster)
             {
-            this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
-        public abstract void PerformAction();
+        public abstract void Perform();
 
         protected void PlaySound(GameSound gameSound)
             {
@@ -27,5 +29,6 @@ namespace Labyrinth.GameObjects.Monsters.Actions
             var result = MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster);
             return result;
             }
+
         }
     }

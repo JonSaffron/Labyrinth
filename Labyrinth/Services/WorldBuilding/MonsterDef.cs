@@ -2,6 +2,7 @@
 using System.Xml;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects;
+using Labyrinth.GameObjects.Actions;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
@@ -62,10 +63,10 @@ namespace Labyrinth.Services.WorldBuilding
                 InitialDirection = monster.InitialDirection,
                 ChangeRooms = monster.ChangeRooms,
                 IsEgg = false,
-                LaysMushrooms = monster.LaysMushrooms,
-                LaysEggs = monster.LaysEggs,
+                LaysMushrooms = monster.MovementBehaviours.Has<LaysMushroom>(),
+                LaysEggs = monster.MovementBehaviours.Has<LaysEgg>(),
                 SplitsOnHit = monster.SplitsOnHit,
-                ShootsAtPlayer = monster.ShootsAtPlayer,
+                ShootsAtPlayer = monster.MovementBehaviours.Has<ShootsAtPlayer>(),
                 ShootsOnceProvoked = monster.ShootsOnceProvoked,
                 ShotsBounceOff = monster.ShotsBounceOff,
                 IsActive = monster.IsActive

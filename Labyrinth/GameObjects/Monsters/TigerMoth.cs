@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -12,7 +13,7 @@ namespace Labyrinth.GameObjects
             
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.MovesRoom;
-            this.LaysMushrooms = true;
+            this.MovementBehaviours.Add<LaysMushroom>();
             this.ShootsOnceProvoked = true;
             }
 

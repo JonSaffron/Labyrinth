@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
-using Labyrinth.GameObjects.Monsters.Actions;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
@@ -27,9 +26,7 @@ namespace Labyrinth.GameObjects
         public bool ShotsBounceOff { get; set; }
         public bool ShootsOnceProvoked { get; set; }
 
-        protected List<BaseAction> _actions;
-
-        private IMonsterWeapon _weapon;
+        [NotNull] private readonly BehaviourCollection _movementBehaviours;
 
         private Animation _normalAnimation;
         private static readonly Animation EggAnimation;
@@ -51,6 +48,7 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             this.OriginalEnergy = energy;
             this.CurrentSpeed = Constants.BaseSpeed;
+            this._movementBehaviours = new BehaviourCollection(this);
             }
             
         public MonsterMobility Mobility
@@ -139,10 +137,10 @@ namespace Labyrinth.GameObjects
 
         private void SetMonsterMotion()
             {
-            this._determineDirection = this.IsEgg || this.Mobility == MonsterMobility.Stationary ? new Stationary(this) : GetMethodForDeterminingDirection(this.Mobility);
+            this._determineDirection = !this.IsActive || this.IsEgg || this.Mobility == MonsterMobility.Stationary ? new Stationary(this) : GetMethodForDeterminingDirection(this.Mobility);
             }
 
-        public bool IsStatic => this.Mobility == MonsterMobility.Stationary || this.IsEgg;
+        public bool IsStatic => this._determineDirection is Stationary;
 
         public override void ReduceEnergy(int energyToRemove)
             {
@@ -239,7 +237,7 @@ namespace Labyrinth.GameObjects
                         yield return true;  // we have moved
                         }
 
-                    DoMonsterActions();
+                    this.MovementBehaviours.PerformAll();
                     }
                 else
                     {
@@ -261,21 +259,8 @@ namespace Labyrinth.GameObjects
                     break;
 
                 timeStationary -= timeItWouldTakeToMakeAMove;
-                DoMonsterActions();
+                this.MovementBehaviours.PerformAll();
                 }
-            }
-
-        private void DoMonsterActions()
-            {
-            if (this._actions == null)
-                return;
-            foreach (var action in this._actions)
-                action.PerformAction();
-            }
-
-        public void FireWeapon()
-            {
-            _weapon?.FireIfYouLike();
             }
 
         /// <inheritdoc cref="MovingItem.TryToCompleteMoveToTarget" />
@@ -305,55 +290,24 @@ namespace Labyrinth.GameObjects
         public int CurrentSpeed { get; set; }
         public override decimal StandardSpeed => this.CurrentSpeed;
 
-        public bool Flitters
-            {
-            get => this._actions != null && this._actions.OfType<Flitter>().Any();
-            set => SetAction<Flitter>(ref this._actions, value);
-            }
-        
-        public bool LaysMushrooms
-            {
-            get => this._actions != null && this._actions.OfType<LaysMushroom>().Any();
-            set => SetAction<LaysMushroom>(ref this._actions, value);
-            }
-
-        public bool LaysEggs
-            {
-            get => this._actions != null && this._actions.OfType<LaysEgg>().Any();
-            set => SetAction<LaysEgg>(ref this._actions, value);
-            }
+        [NotNull] public BehaviourCollection MovementBehaviours => this._movementBehaviours;
 
         public bool ShootsAtPlayer
             {
-            get => this._actions != null && this._actions.OfType<ShootsAtPlayer>().Any();
+            get => this.MovementBehaviours.Has<ShootsAtPlayer>();
 
             set
                 {
-                SetAction<ShootsAtPlayer>(ref this._actions, value);
-                this._weapon = value ? new StandardMonsterWeapon(this) : null;
+                if (value)
+                    {
+                    var behaviour = new ShootsAtPlayer(new StandardMonsterWeapon(this));
+                    this.MovementBehaviours.Add(behaviour);
+                    }
+                else
+                    {
+                    this.MovementBehaviours.Remove<ShootsAtPlayer>();
+                    }
                 }
-            }
-
-        private void SetAction<T>(ref List<BaseAction> actionList, bool enable) where T : BaseAction, new()
-            {
-            if (enable)
-                AddAction<T>(ref actionList);
-            else
-                actionList?.RemoveAll(item => item is T);
-            }
-
-        private void AddAction<T>(ref List<BaseAction> actionList) where T: BaseAction, new() 
-            {
-            if (actionList == null)
-                actionList = new List<BaseAction>();
-            else
-                {
-                if (actionList.OfType<T>().Any())
-                    return;
-                }
-            var action = new T();
-            action.Init(this);
-            actionList.Add(action);
             }
 
         protected override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;

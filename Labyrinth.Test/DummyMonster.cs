@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Labyrinth.GameObjects;
-using Labyrinth.GameObjects.Monsters.Actions;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
@@ -14,14 +14,13 @@ namespace Labyrinth.Test
             this.Mobility = MonsterMobility.Placid;
             this.IsActive = true;
 
-            base._actions = new List<BaseAction>();
             var action = new DummyAction();
             action.Init(this);
-            base._actions.Add(action);
+            base.MovementBehaviours.Add(action);
             
             var action2 = new Flitter();
             action2.Init(this);
-            base._actions.Add(action2);
+            base.MovementBehaviours.Add(action2);
             }
 
         public override void ResetPosition(Vector2 position)
@@ -38,7 +37,7 @@ namespace Labyrinth.Test
             {
             get
                 {
-                var dummyAction = (DummyAction) base._actions[0];
+                var dummyAction = (DummyAction) base.MovementBehaviours[0];
                 return dummyAction._calls;
                 }
             }
@@ -76,17 +75,17 @@ namespace Labyrinth.Test
             }
         }
 
-    class DummyAction : BaseAction
+    class DummyAction : BaseBehaviour
         {
         public List<PositionAndTime> _calls = new List<PositionAndTime>();
 
         public override void Init(Monster monster)
             {
             base.Init(monster);
-            PerformAction();
+            Perform();
             }
 
-        public override void PerformAction()
+        public override void Perform()
             {
             var pat = new PositionAndTime {Position = this.Monster.Position};
             this._calls.Add(pat);

@@ -1,15 +1,24 @@
-﻿using Labyrinth.GameObjects.Movement;
+﻿using System;
+using JetBrains.Annotations;
+using Labyrinth.GameObjects.Movement;
 
-namespace Labyrinth.GameObjects.Monsters.Actions
+namespace Labyrinth.GameObjects.Actions
     {
-    class ShootsAtPlayer : BaseAction
+    class ShootsAtPlayer : BaseBehaviour
         {
-        public override void PerformAction()
+        private readonly IMonsterWeapon _weapon;
+
+        public ShootsAtPlayer([NotNull] IMonsterWeapon weapon)
+            {
+            _weapon = weapon ?? throw new ArgumentNullException(nameof(weapon));
+            }
+
+        public override void Perform()
             {
             if (!ShouldAttemptToFireAtPlayer())
                 return;
 
-            this.Monster.FireWeapon();
+            this._weapon.FireIfYouLike();
             }
 
         private bool ShouldAttemptToFireAtPlayer()

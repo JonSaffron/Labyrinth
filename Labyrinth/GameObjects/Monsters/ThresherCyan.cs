@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.Display;
+﻿using Labyrinth.GameObjects.Actions;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -10,7 +11,7 @@ namespace Labyrinth.GameObjects
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/ThresherCyan", 4));
             
             this.Mobility = MonsterMobility.Aggressive;
-            this.LaysMushrooms = true;
+            this.MovementBehaviours.Add<LaysMushroom>();
             }
         }
     }

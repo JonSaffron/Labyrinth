@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Labyrinth.GameObjects.Monsters.Actions
+namespace Labyrinth.GameObjects.Actions
     {
-    class LaysMushroom : BaseAction
+    class LaysMushroom : BaseBehaviour
         {
-        public override void PerformAction()
+        public override void Perform()
             {
             if (!ShouldAttemptToLayMushroom())
                 return;

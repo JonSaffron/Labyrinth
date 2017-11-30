@@ -11,7 +11,6 @@ namespace Labyrinth.GameObjects
             
             this.Mobility = MonsterMobility.Cautious;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
-            this.Flitters = true;
             }
         }
     }

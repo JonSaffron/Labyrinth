@@ -127,7 +127,8 @@
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="GameObjects\BoulderForTesting.cs" />
-    <Compile Include="GameObjects\Monsters\Actions\BaseAction.cs" />
+    <Compile Include="GameObjects\Monsters\Actions\BaseBehaviour.cs" />
+    <Compile Include="GameObjects\Monsters\Actions\BehaviourCollection.cs" />
     <Compile Include="GameObjects\Monsters\Actions\Flitter.cs" />
     <Compile Include="GameObjects\Monsters\Actions\LaysEgg.cs" />
     <Compile Include="GameObjects\Monsters\Actions\LaysMushroom.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
     <Compile Include="InteractiveServices.cs" />
+    <Compile Include="Interfaces\IBehaviour.cs" />
     <Compile Include="Interfaces\IGameObjectCollection.cs" />
     <Compile Include="HeadsUpDisplay.cs" />
     <Compile Include="Interfaces\IHasArea.cs" />
