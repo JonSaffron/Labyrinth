@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this.Mobility = MonsterMobility.Cautious;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
             this.MovementBehaviours.Add<LaysEgg>();
-            this.SplitsOnHit = true;
+            this.DeathBehaviours.Add<SpawnsUponDeath>();
             this.ShootsAtPlayer = true;
             }
 

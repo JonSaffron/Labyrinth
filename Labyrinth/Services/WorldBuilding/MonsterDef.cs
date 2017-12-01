@@ -65,7 +65,7 @@ namespace Labyrinth.Services.WorldBuilding
                 IsEgg = false,
                 LaysMushrooms = monster.MovementBehaviours.Has<LaysMushroom>(),
                 LaysEggs = monster.MovementBehaviours.Has<LaysEgg>(),
-                SplitsOnHit = monster.SplitsOnHit,
+                SplitsOnHit = monster.DeathBehaviours.Has<SpawnsUponDeath>(),
                 ShootsAtPlayer = monster.MovementBehaviours.Has<ShootsAtPlayer>(),
                 ShootsOnceProvoked = monster.ShootsOnceProvoked,
                 ShotsBounceOff = monster.ShotsBounceOff,

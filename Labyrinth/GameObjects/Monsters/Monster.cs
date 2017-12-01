@@ -21,12 +21,12 @@ namespace Labyrinth.GameObjects
         private MonsterState _monsterState = MonsterState.Normal;
         [CanBeNull] private GameTimer _hatchingTimer;
 
-        public bool SplitsOnHit { get; set; }
         public bool IsActive { get; set; }
         public bool ShotsBounceOff { get; set; }
-        public bool ShootsOnceProvoked { get; set; }
 
         [NotNull] private readonly BehaviourCollection _movementBehaviours;
+        [NotNull] private readonly BehaviourCollection _injuryBehaviours;
+        [NotNull] private readonly BehaviourCollection _deathBehaviours;
 
         private Animation _normalAnimation;
         private static readonly Animation EggAnimation;
@@ -49,6 +49,8 @@ namespace Labyrinth.GameObjects
             this.OriginalEnergy = energy;
             this.CurrentSpeed = Constants.BaseSpeed;
             this._movementBehaviours = new BehaviourCollection(this);
+            this._injuryBehaviours = new BehaviourCollection(this);
+            this._deathBehaviours = new BehaviourCollection(this);
             }
             
         public MonsterMobility Mobility
@@ -147,26 +149,14 @@ namespace Labyrinth.GameObjects
             base.ReduceEnergy(energyToRemove);
             if (this.IsAlive())
                 {
-                if (!this.IsActive)
-                    this.IsActive = true;
-
-                if (this.ShootsOnceProvoked)
-                    this.ShootsAtPlayer = true;
-
-                if (this.Mobility == MonsterMobility.Patrolling)
-                    this.Mobility = MonsterMobility.Placid;
+                this._injuryBehaviours.PerformAll();
                 return;
                 }
 
             var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             bang.PlaySound(GameSound.MonsterDies);
             
-            if (this.SplitsOnHit && !this.IsEgg)
-                {
-                for (int i = 1; i <= 2; i++)
-                    GlobalServices.GameState.AddDiamondDemon(this.Position);
-                bang.PlaySound(GameSound.MonsterShattersIntoNewLife);
-                }
+            this.DeathBehaviours.PerformAll();
             }
 
         public override int DrawOrder
@@ -292,6 +282,10 @@ namespace Labyrinth.GameObjects
 
         [NotNull] public BehaviourCollection MovementBehaviours => this._movementBehaviours;
 
+        [NotNull] public BehaviourCollection InjuryBehaviours => this._injuryBehaviours;
+
+        [NotNull] public BehaviourCollection DeathBehaviours => this._deathBehaviours;
+
         public bool ShootsAtPlayer
             {
             get => this.MovementBehaviours.Has<ShootsAtPlayer>();
@@ -308,6 +302,13 @@ namespace Labyrinth.GameObjects
                     this.MovementBehaviours.Remove<ShootsAtPlayer>();
                     }
                 }
+            }
+
+        public bool ShootsOnceProvoked
+            {
+            get => this.InjuryBehaviours.Has<StartsShootingWhenHurt>();
+
+            set => this.InjuryBehaviours.Set<StartsShootingWhenHurt>(value);
             }
 
         protected override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;

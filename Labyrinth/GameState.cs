@@ -172,7 +172,7 @@ namespace Labyrinth
             return result;
             }
         
-        public void AddDiamondDemon(Vector2 p)
+        public Monster AddDiamondDemon(Vector2 p)
             {
             MonsterDef md = new MonsterDef
                 {
@@ -184,7 +184,8 @@ namespace Labyrinth
                 ChangeRooms = ChangeRooms.FollowsPlayer,
                 ShootsAtPlayer = true
                 };
-            AddMonster(md);
+            var result = AddMonster(md);
+            return result;
             }
 
         /// <summary>
@@ -265,7 +266,7 @@ namespace Labyrinth
             if (monsterDef.LaysEggs.HasValue)
                 result.MovementBehaviours.Set<LaysEgg>(monsterDef.LaysEggs.Value);
             if (monsterDef.SplitsOnHit.HasValue)
-                result.SplitsOnHit = monsterDef.SplitsOnHit.Value;
+                result.DeathBehaviours.Set<SpawnsUponDeath>(monsterDef.SplitsOnHit.Value);
             if (monsterDef.ShootsAtPlayer.HasValue)
                 result.ShootsAtPlayer = monsterDef.ShootsAtPlayer.Value;
             if (monsterDef.ShootsOnceProvoked.HasValue)

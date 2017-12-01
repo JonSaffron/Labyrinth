@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.Display;
+﻿using Labyrinth.GameObjects.Actions;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -11,7 +12,7 @@ namespace Labyrinth.GameObjects
             
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.MovesRoom;
-            this.SplitsOnHit = true;
+            this.DeathBehaviours.Add<SpawnsUponDeath>();
             }
         }
     }
