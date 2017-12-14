@@ -21,7 +21,7 @@ namespace Labyrinth.Services.WorldBuilding
                 var result = list.Count == 1;
                 if (!result)
                     {
-                    reason = "Multiple impassable objects.";
+                    reason = "Multiple impassable objects: " + string.Join(", ", list.Where(item => item.Solidity == ObjectSolidity.Impassable).Select(item => item.GetType().Name));
                     return false;
                     }
                 }
@@ -29,20 +29,20 @@ namespace Labyrinth.Services.WorldBuilding
             var countOfMoveableObjects = list.Count(item => item.Solidity == ObjectSolidity.Moveable);
             if (countOfMoveableObjects > 1)
                 {
-                reason = "Multiple moveable objects";
+                reason = "Multiple moveable objects: " + string.Join(", ", list.Where(item => item.Solidity == ObjectSolidity.Moveable).Select(item => item.GetType().Name));
                 return false;
                 }
 
             var countOfStationaryObjects = list.Count(item => item.Solidity == ObjectSolidity.Stationary);
             if (countOfStationaryObjects > 1)
                 {
-                reason = "Multiple stationary objects";
+                reason = "Multiple stationary objects: " + string.Join(", ", list.Where(item => item.Solidity == ObjectSolidity.Stationary).Select(item => item.GetType().Name));
                 return false;
                 }
 
             if (countOfMoveableObjects != 0 && list.Any(item => item.Solidity == ObjectSolidity.Insubstantial))
                 {
-                reason = "A moveable object and an insubstantial object.";
+                reason = "A moveable object and an insubstantial object: " + list.Single(item => item.Solidity == ObjectSolidity.Moveable).GetType().Name + ", " + list.Where(item => item.Solidity == ObjectSolidity.Insubstantial).Select(item => item.GetType().Name);
                 return false;
                 }
 

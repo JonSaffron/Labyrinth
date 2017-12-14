@@ -10,7 +10,7 @@ namespace Labyrinth
 
         public StandardMonsterWeapon([NotNull] Monster monster)
             {
-            _monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
         public void FireIfYouLike()

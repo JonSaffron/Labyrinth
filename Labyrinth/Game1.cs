@@ -173,16 +173,16 @@ namespace Labyrinth
                 gameTime = new GameTime();
 
             // Draw the sprite.
-            _spriteBatch.Begin(this.World.WindowPosition);
             if (this.World != null)
                 {
+                this._spriteBatch.Begin(this.World.WindowPosition);
+
                 this.World.Draw(gameTime, _spriteBatch);
                 this._headsUpDisplay.DrawStatus(_spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, GlobalServices.ScoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
+                
+                base.Draw(gameTime);
+                this._spriteBatch.End();
                 }
-
-            _spriteBatch.End();
-
-            base.Draw(gameTime);
             }
             
         internal void LoadLevel(string level)

@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.ScoreKeeper;
 using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 
@@ -34,11 +35,20 @@ namespace Labyrinth
             GameState = gameState;
             }
 
-        public static IScoreKeeper ScoreKeeper { get; private set; }
+        private static IScoreKeeper _scoreKeeper;
+        private static readonly IScoreKeeper NullScoreKeeper = new NullScoreKeeper();
+
+        public static IScoreKeeper ScoreKeeper
+            {
+            get
+                {
+                return _scoreKeeper ?? NullScoreKeeper;
+                }
+            }
 
         public static void SetScoreKeeper(IScoreKeeper scoreKeeper)
             {
-            ScoreKeeper = scoreKeeper;
+            _scoreKeeper = scoreKeeper;
             }
 
         public static Game Game { get; private set; }

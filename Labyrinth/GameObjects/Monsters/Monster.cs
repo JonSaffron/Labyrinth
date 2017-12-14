@@ -187,8 +187,11 @@ namespace Labyrinth.GameObjects
             if (this.IsEgg && this._hatchingTimer != null)
                 this._hatchingTimer.Enabled = inSameRoom;
 
-            if (inSameRoom)
+            if (inSameRoom && !this.IsActive)
+                {
                 this.IsActive = true;
+                SetMonsterMotion();
+                }
 
             if (!this.IsActive)
                 return false;
@@ -275,7 +278,8 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Gets an indication of how solid the object is
         /// </summary>
-        public override ObjectSolidity Solidity => this.IsStatic ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
+        /// <remarks>This cannot check IsStatic because that may mislead the TileContentValidator due to the currrent IsActive setting</remarks>
+        public override ObjectSolidity Solidity => (this.IsEgg || this.Mobility == MonsterMobility.Stationary) ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
 
         public int CurrentSpeed { get; set; }
         public override decimal StandardSpeed => this.CurrentSpeed;
@@ -295,6 +299,7 @@ namespace Labyrinth.GameObjects
                 if (value)
                     {
                     var behaviour = new ShootsAtPlayer(new StandardMonsterWeapon(this));
+                    behaviour.Init(this);
                     this.MovementBehaviours.Add(behaviour);
                     }
                 else

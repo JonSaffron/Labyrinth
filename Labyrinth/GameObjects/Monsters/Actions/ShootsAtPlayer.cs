@@ -10,7 +10,7 @@ namespace Labyrinth.GameObjects.Actions
 
         public ShootsAtPlayer([NotNull] IMonsterWeapon weapon)
             {
-            _weapon = weapon ?? throw new ArgumentNullException(nameof(weapon));
+            this._weapon = weapon ?? throw new ArgumentNullException(nameof(weapon));
             }
 
         public override void Perform()

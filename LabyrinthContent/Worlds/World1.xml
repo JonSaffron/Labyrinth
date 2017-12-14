@@ -237,7 +237,7 @@ O              OO              OO              OO              OO              O
 
     <!-- Level 7 -->
     <Area Top="0" Left="0" Width="64" Height="40">
-      <PlayerStartState Id="8" Left="56" Top="5" Energy="255" />
+      <PlayerStartState Id="7" Left="56" Top="5" Energy="255" />
       <TileDefinitions>
         <Floor Symbol=" " Tile="Floor4" />
         <Wall Symbol="▓" Tile="Wall7Full" />

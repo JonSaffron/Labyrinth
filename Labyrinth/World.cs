@@ -393,8 +393,7 @@ namespace Labyrinth
                 return;
 
             int currentWorldAreaId = this.GetWorldAreaIdForTilePos(this._player.TilePosition);
-            int maxId = this._playerStartStates.Max(item => item.Key);
-            var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._playerStartStates[i]).FirstOrDefault(startState => startState != null);
+            var newState = this._playerStartStates.Values.Where(item => item.Id > currentWorldAreaId).OrderBy(item => item.Id).FirstOrDefault();
             if (newState == null)
                 return;
 
