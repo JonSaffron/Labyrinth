@@ -62,6 +62,17 @@ namespace Labyrinth
             return false;
             }
 
+        public static bool WillReplenish(this FruitPopulationMethod populationMethod)
+            {
+            switch (populationMethod)
+                {
+                case FruitPopulationMethod.GradualPopulation:
+                case FruitPopulationMethod.InitialPopulationWithReplenishment:
+                    return true;
+                }
+            return false;
+            }
+
         internal static bool IsAlive(this MovingItem mi)
             {
             var result = mi.IsExtant;

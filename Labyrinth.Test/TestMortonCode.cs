@@ -53,7 +53,7 @@ namespace Labyrinth.Test
             services.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("p ");
-            var w = g.World;
+            var p = GlobalServices.GameState.Player;
 
             while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
                 {
@@ -63,7 +63,7 @@ namespace Labyrinth.Test
             Assert.IsEmpty(GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)));
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.IsNotEmpty(list);
-            Assert.IsTrue(list.SequenceEqual(new List<StaticItem> {w.Player}));
+            Assert.IsTrue(list.SequenceEqual(new List<StaticItem> {p}));
             }
 
         [Test]

@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoulderForTesting.cs" />
     <Compile Include="GameObjects\Monsters\Actions\ActivateWhenHurt.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BaseBehaviour.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="GlobalServices.cs" />
     <Compile Include="InteractiveServices.cs" />
     <Compile Include="Interfaces\IBehaviour.cs" />
+    <Compile Include="Interfaces\IClockEvent.cs" />
     <Compile Include="Interfaces\IGameObjectCollection.cs" />
     <Compile Include="HeadsUpDisplay.cs" />
     <Compile Include="Interfaces\IHasArea.cs" />
@@ -168,6 +170,7 @@
     <Compile Include="GameObjects\Monsters\Movement\RotaFloatCyanMovement.cs" />
     <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
     <Compile Include="Movement.cs" />
+    <Compile Include="ClockEvents\ReplenishFruit.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Services\PathFinder\RepelObject.cs" />
@@ -251,6 +254,7 @@
     <Compile Include="GameObjects\Wall.cs" />
     <Compile Include="GameObjects\Monsters\Movement\StandardRolling.cs" />
     <Compile Include="TileRect.cs" />
+    <Compile Include="ClockEvents\UnlockLevel.cs" />
     <Compile Include="World.cs" />
     <Compile Include="GameObjects\Monsters\Monster.cs" />
     <Compile Include="GameObjects\Monsters\Movement\MonsterMovement.cs" />
@@ -277,6 +281,7 @@
     <Compile Include="Services\WorldBuilding\TileDefinition.cs" />
     <Compile Include="TilePos.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoader.cs" />
+    <Compile Include="ClockEvents\WorldClock.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Documentation\_ReadMe.txt" />

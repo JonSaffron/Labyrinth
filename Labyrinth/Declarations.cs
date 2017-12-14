@@ -243,4 +243,22 @@ namespace Labyrinth
         Shot = 8,
         Bang = 9
         }
+
+    public enum FruitPopulationMethod
+        {
+        /// <summary>
+        /// The population of fruit is performed once when the world is created
+        /// </summary>
+        InitialPopulationOnly,
+
+        /// <summary>
+        /// Fruit is gradually populated and kept replenished
+        /// </summary>
+        GradualPopulation,
+
+        /// <summary>
+        /// Fruit is given an initial population and kept replenished
+        /// </summary>
+        InitialPopulationWithReplenishment
+        }
     }

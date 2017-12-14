@@ -177,7 +177,7 @@ namespace Labyrinth
             if (this.World != null)
                 {
                 this.World.Draw(gameTime, _spriteBatch);
-                this._headsUpDisplay.DrawStatus(_spriteBatch, this.World.Player.IsExtant, this.World.Player.Energy, GlobalServices.ScoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
+                this._headsUpDisplay.DrawStatus(_spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, GlobalServices.ScoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
                 }
 
             _spriteBatch.End();

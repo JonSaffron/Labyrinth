@@ -15,6 +15,8 @@ namespace Labyrinth
 
         public Player Player { get; private set; }
 
+        public event EventHandler<GameObjectEventArgs> GameObjectRemoved;
+
         public GameState(IGameObjectCollection gameObjectCollection)
             {
             this._gameObjectCollection = gameObjectCollection ?? throw new ArgumentNullException(nameof(gameObjectCollection));
@@ -50,8 +52,14 @@ namespace Labyrinth
 
             foreach (var item in itemsToRemove)
                 {
+                OnGameObjectRemoved(new GameObjectEventArgs(item));
                 this._gameObjectCollection.Remove(item);
                 }
+            }
+
+        private void OnGameObjectRemoved(GameObjectEventArgs args)
+            {
+            this.GameObjectRemoved?.Invoke(this, args);
             }
 
         /// <summary>

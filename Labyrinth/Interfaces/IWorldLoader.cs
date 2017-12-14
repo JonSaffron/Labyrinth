@@ -10,7 +10,7 @@ namespace Labyrinth
         TilePos WorldSize { get; }
         Tile[,] FloorTiles { get; }
         bool RestartInSameRoom { get; }
-        bool ReplenishFruit { get; }
+        bool UnlockLevels { get; }
         Dictionary<int, PlayerStartState> PlayerStartStates { get; }
         List<RandomFruitDistribution> FruitDistributions { get; }
 

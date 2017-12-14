@@ -10,7 +10,8 @@ namespace Labyrinth.Services.WorldBuilding
         {
         public Rectangle Area { get; set; }
         private readonly Dictionary<FruitType, FruitDefinition> _definitions = new Dictionary<FruitType, FruitDefinition>();
-
+        public FruitPopulationMethod PopulationMethod;
+        
         public void Add([NotNull] FruitDefinition fd)
             {
             if (fd == null) throw new ArgumentNullException(nameof(fd));
@@ -29,10 +30,15 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public static RandomFruitDistribution FromXml(XmlNodeList fruitDefs)
+        public static RandomFruitDistribution FromXml(XmlElement fruitDistribution)
             {
             var result = new RandomFruitDistribution();
-            foreach (XmlElement fruitDef in fruitDefs)
+            if (!Enum.TryParse(fruitDistribution.GetAttribute("PopulationMethod"), out FruitPopulationMethod populationMethod))
+                {
+                throw new InvalidOperationException("Invalid PopulationMethod value.");
+                }
+            result.PopulationMethod = populationMethod;
+            foreach (XmlElement fruitDef in fruitDistribution.ChildNodes)
                 {
                 var fd = FruitDefinition.FromXml(fruitDef);
                 result.Add(fd);

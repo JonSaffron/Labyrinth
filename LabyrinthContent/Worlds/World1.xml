@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<World Name="OriginalFirstWorld" Height="80" Width="256" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
+<World Name="OriginalFirstWorld" Height="80" Width="256" UnlockLevels="true" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
   <Layout>
 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓╚╝╚╝╚╝╚╝╚╝╚╝╚╝▓▓╚╝▓▓╚╝╚╝╚╝▓▓╚╝▓▓╚╝▓▓╚╝╚╝╚╝▓▓╚╝▓▓╚╝╚╝╚╝╚╝╚╝╚╝╚╝▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓▓╝╚╝╚╝╚╝╚╝╚╝╚╝╚▓□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□
 ▓▓ ▓▓      ▓▓ ▓▓▓▓ ▓▓      ▓▓ ▓▓▓▓c▓▓      ▓▓ ▓▓▓▓ ▓▓      ▓▓ ▓▓╝              ╚╝  └┘      └┘  ╚╝  └┘      └┘  ╚╝     k      k ╚╝              ╚╝              ╚╝              ╚╝              ╚□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□
@@ -97,7 +97,7 @@ O              OO              OO              OO              OO              O
         <Object Symbol="B" Description="Boulder" />
         <Object Symbol="#" Description="ForceField" />
       </TileDefinitions>
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Apple" Quantity="8" Energy="6" />
       </FruitDefinitions>
     </Area>
@@ -115,7 +115,7 @@ O              OO              OO              OO              OO              O
         <Object Symbol="X" Description="DeathCube" />
         <Object Symbol="#" Description="ForceField" />
       </TileDefinitions>
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Apple" Quantity="8" Energy="6" />
         <FruitDef Type="Watermelon" Quantity="8" Energy="8" />
       </FruitDefinitions>
@@ -141,7 +141,7 @@ O              OO              OO              OO              OO              O
         <Object Symbol="X" Description="DeathCube" />
         <Object Symbol="#" Description="ForceField" />
       </TileDefinitions>
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Watermelon" Quantity="12" Energy="8" />
         <FruitDef Type="Pineapple" Quantity="12" Energy="10" />
       </FruitDefinitions>
@@ -166,14 +166,14 @@ O              OO              OO              OO              OO              O
     </Area>
 
     <Area Top="40" Left="192" Width="64" Height="40">
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Pineapple" Quantity="16" Energy="10" />
         <FruitDef Type="Strawberry" Quantity="16" Energy="12" />
       </FruitDefinitions>
     </Area>
 
     <Area Top="0" Left="192" Width="64" Height="40">
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Pineapple" Quantity="20" Energy="10" />
         <FruitDef Type="Strawberry" Quantity="20" Energy="12" />
       </FruitDefinitions>
@@ -199,7 +199,7 @@ O              OO              OO              OO              OO              O
         <Object Symbol="K" Description="KillerCubeGreen" />
         <Object Symbol="d" Description="DiamondDemon" />
       </TileDefinitions>
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Strawberry" Quantity="24" Energy="12" />
         <FruitDef Type="Cherries" Quantity="24" Energy="14" />
       </FruitDefinitions>
@@ -229,7 +229,7 @@ O              OO              OO              OO              OO              O
         <Object Symbol="b" Description="CrazyCrawler" />
         <Object Symbol="c" Description="TigerMoth" />
       </TileDefinitions>
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Cherries" Quantity="28" Energy="14" />
         <FruitDef Type="Acorn" Quantity="28" Energy="16" />
       </FruitDefinitions>
@@ -248,7 +248,7 @@ O              OO              OO              OO              OO              O
         <Object Symbol="m" Description="Butterfly" />
         <Object Symbol="j" Description="Joker" />
       </TileDefinitions>
-      <FruitDefinitions>
+      <FruitDefinitions PopulationMethod="InitialPopulationOnly">
         <FruitDef Type="Acorn" Quantity="64" Energy="16" />
       </FruitDefinitions>
     </Area>

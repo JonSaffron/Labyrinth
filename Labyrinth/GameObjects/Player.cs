@@ -28,8 +28,8 @@ namespace Labyrinth.GameObjects
         public TimeSpan WhenCanMoveInDirectionFaced { get; private set; }
         private readonly TimeSpan _delayBeforeMovingInDirectionFaced = TimeSpan.FromMilliseconds(75);
         
-        [NotNull] private IPlayerWeapon _weapon1;
-        [NotNull] private IPlayerWeapon _weapon2;
+        [NotNull] private readonly IPlayerWeapon _weapon1;
+        [NotNull] private readonly IPlayerWeapon _weapon2;
 
         // Animations
         private readonly Animation _leftRightMovingAnimation;

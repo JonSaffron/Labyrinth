@@ -80,14 +80,14 @@ namespace Labyrinth.Test
             var g = new Game1(services);
 
             g.LoadLevel("#bp#");
-            var w = g.World;
+            var p = GlobalServices.GameState.Player;
 
-            Assert.IsFalse(w.Player.CanMoveInDirection(Direction.Left));
+            Assert.IsFalse(p.CanMoveInDirection(Direction.Left));
 
             var boulder = (Boulder) GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ElementAt(0);
-            boulder.PushOrBounce(w.Player, Direction.Left);
+            boulder.PushOrBounce(p, Direction.Left);
 
-            Assert.AreEqual(Direction.None, w.Player.CurrentMovement.Direction);
+            Assert.AreEqual(Direction.None, p.CurrentMovement.Direction);
             Assert.AreEqual(Direction.None, boulder.CurrentMovement.Direction);
             }
 
@@ -138,13 +138,13 @@ namespace Labyrinth.Test
             var g = new Game1(services);
 
             g.LoadLevel("#bpb#");
-            var w = g.World;
+            var p = GlobalServices.GameState.Player;
 
-            Assert.IsFalse(w.Player.CanMoveInDirection(Direction.Left));
+            Assert.IsFalse(p.CanMoveInDirection(Direction.Left));
 
             var boulder1 = (Boulder) GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ElementAt(0);
-            boulder1.PushOrBounce(w.Player, Direction.Left);
-            Assert.AreEqual(Direction.None, w.Player.CurrentMovement.Direction);
+            boulder1.PushOrBounce(p, Direction.Left);
+            Assert.AreEqual(Direction.None, p.CurrentMovement.Direction);
 
             Assert.AreEqual(Direction.None, boulder1.CurrentMovement.Direction);
             }

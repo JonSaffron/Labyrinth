@@ -51,7 +51,7 @@ namespace Labyrinth.Test
 
         public bool RestartInSameRoom => false;
 
-        public bool ReplenishFruit => false;
+        public bool UnlockLevels => false;
 
         public Dictionary<int, PlayerStartState> PlayerStartStates
             {

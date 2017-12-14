@@ -72,11 +72,11 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public bool ReplenishFruit
+        public bool UnlockLevels
             {
             get
                 {
-                var text = this._xmlRoot.GetAttribute("ReplenishFruit");
+                var text = this._xmlRoot.GetAttribute("UnlockLevels");
                 if (string.IsNullOrWhiteSpace(text))
                     return false;
                 bool result = bool.Parse(text);
@@ -149,8 +149,8 @@ namespace Labyrinth.Services.WorldBuilding
                     this._tileDefinitionCollections.Add(td);
                     }
 
-                var fruitPopulation = area.SelectNodes("ns:FruitDefinitions/ns:FruitDef", this._xnm);
-                if (fruitPopulation != null && fruitPopulation.Count != 0)
+                var fruitPopulation = (XmlElement) area.SelectSingleNode("ns:FruitDefinitions", this._xnm);
+                if (fruitPopulation != null && fruitPopulation.ChildNodes.Count != 0)
                     {
                     var fd = RandomFruitDistribution.FromXml(fruitPopulation);
                     fd.Area = areaRect;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using Labyrinth.ClockEvents;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,19 +16,15 @@ namespace Labyrinth
         {
         private readonly Vector2 _centreOfRoom = Constants.RoomSizeInPixels / 2.0f;
 
-        private int _gameClock;
-        private double _time;
-        private int _levelUnlocked;
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
         private bool _doNotUpdate;
         
         private TilePos _worldSize;
         [NotNull] private readonly Tile[,] _tiles;
         private readonly bool _restartInSameRoom;
-        private readonly bool _replenishFruit;
         [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
-        [NotNull] private readonly List<RandomFruitDistribution> _fruitDistributions;
-        [NotNull] public readonly Player Player;
+        [NotNull] private readonly Player _player;
+        [NotNull] private readonly WorldClock _worldClock;
 
         public Vector2 WindowPosition { get; private set; }
 
@@ -37,15 +34,22 @@ namespace Labyrinth
             this._worldSize = worldLoader.WorldSize;
             this._tiles = worldLoader.FloorTiles;
             this._restartInSameRoom = worldLoader.RestartInSameRoom;
-            this._replenishFruit = worldLoader.ReplenishFruit;
             this._playerStartStates = worldLoader.PlayerStartStates;
-            this._fruitDistributions = worldLoader.FruitDistributions;
 
             var gameObjectCollection = new GameObjectCollection();
             var gameState = new GameState(gameObjectCollection);
             GlobalServices.SetGameState(gameState);
             worldLoader.AddGameObjects(gameState);
-            this.Player = gameState.Player;
+            this._player = gameState.Player;
+
+            this._worldClock = new WorldClock();
+            if (worldLoader.UnlockLevels)
+                this._worldClock.AddEventHandler(new UnlockLevel());
+            foreach (var dist in worldLoader.FruitDistributions.Where(item => item.PopulationMethod.WillReplenish()))
+                {
+                var replenishFruit = new ReplenishFruit(dist);
+                this._worldClock.AddEventHandler(replenishFruit);
+                }
 
             ValidateGameState(gameState);
             }
@@ -78,10 +82,10 @@ namespace Labyrinth
             {
             GlobalServices.GameState.RemoveBangsAndShots();
 
-            var worldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
+            var worldAreaId = this.GetWorldAreaIdForTilePos(this._player.TilePosition);
             var pss = this._playerStartStates[worldAreaId];
-            var resetPosition = this._restartInSameRoom ? GetRestartLocation(this.Player.TilePosition, pss.Position) : pss.Position;
-            this.Player.ResetPositionAndEnergy(resetPosition.ToPosition(), pss.Energy);
+            var resetPosition = this._restartInSameRoom ? GetRestartLocation(this._player.TilePosition, pss.Position) : pss.Position;
+            this._player.ResetPositionAndEnergy(resetPosition.ToPosition(), pss.Energy);
 
             ResetLevelForStartingNewLife();
             }
@@ -100,9 +104,9 @@ namespace Labyrinth
 
         public void ResetLevelForStartingNewLife()
             {
-            Point roomStart = GetContainingRoom(this.Player.Position).Location;
+            Point roomStart = GetContainingRoom(this._player.Position).Location;
             this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
-            this.Player.Reset();
+            this._player.Reset();
 
             MoveNearbyMonstersToASafeDistance();
 
@@ -120,10 +124,10 @@ namespace Labyrinth
 
         private IEnumerable<Monster> GetNearbyMonsters()
             {
-            var area = new TileRect(new TilePos(this.Player.TilePosition.X - 16, this.Player.TilePosition.Y - 16), 32, 32);
+            var area = new TileRect(new TilePos(this._player.TilePosition.X - 16, this._player.TilePosition.Y - 16), 32, 32);
             var searchParameters = new SearchParameters
                 {
-                EndLocation = this.Player.TilePosition,
+                EndLocation = this._player.TilePosition,
                 MaximumLengthOfPath = 20,
                 CanBeOccupied = tp => !GlobalServices.GameState.IsImpassableItemOnTile(tp)
                 };
@@ -153,7 +157,7 @@ namespace Labyrinth
             var repelParameters = new RepelParameters
                 {
                 StartLocation = monster.TilePosition,
-                RepelLocation = Player.TilePosition,
+                RepelLocation = _player.TilePosition,
                 CanBeOccupied = tp => !GlobalServices.GameState.IsImpassableItemOnTile(tp),
                 MaximumLengthOfPath = 24,
                 MinimumDistanceToMoveAway = 16
@@ -185,74 +189,13 @@ namespace Labyrinth
             if (this._doNotUpdate)
                 return this._levelReturnType;
             
-            UpdateGameClock(gameTime);
+            this._worldClock.Update(gameTime);
             
             UpdateGameItems(gameTime);
             
             return this._levelReturnType;
             }
 
-        private void UpdateGameClock(GameTime gameTime)
-            {
-            if (this._replenishFruit)
-                {
-                var fruitList = GlobalServices.GameState.DistinctItemsOfType<Fruit>();
-                var fruitCountByArea =
-                    (from f in fruitList
-                        let dist = this._fruitDistributions.SingleOrDefault(item => item.Area.ContainsTile(f.TilePosition))
-                        where dist != null
-                        group f by new {dist, f.FruitType}
-                        into grp
-                        select new {Dist = grp.Key.dist, grp.Key.FruitType, Count = grp.Count()})
-                    .ToList();
-
-                var fruitThatNeedsToppingUp =
-                    (from item in fruitCountByArea
-                    let fd = item.Dist[item.FruitType]
-                    where fd.FruitQuantity > item.Count
-                    let fruitDefinition = new FruitDefinition { FruitType = item.FruitType, FruitQuantity = fd.FruitQuantity - item.Count, Energy = fd.Energy }
-                    select new { item.Dist.Area, FruitDefinition = fruitDefinition }).ToList();
-
-                var fruitDistList = new List<RandomFruitDistribution>(fruitThatNeedsToppingUp.Count);
-                foreach (var item in fruitThatNeedsToppingUp)
-                    {
-                    var rfd = new RandomFruitDistribution {Area = item.Area};
-                    rfd.Add(item.FruitDefinition);
-                    fruitDistList.Add(rfd);
-                    }
-
-                var pgo = new ProcessGameObjects(GlobalServices.GameState);
-                pgo.AddFruitFromRandomDistributions(fruitDistList);
-                }
-
-            this._time += gameTime.ElapsedGameTime.TotalSeconds;
-            while (this._time > Constants.GameClockResolution)
-                {
-                this._time -= Constants.GameClockResolution;
-                if (this._gameClock < int.MaxValue)
-                    this._gameClock++; 
-
-                int levelToUnlock = this._gameClock >> 13;
-                while (this._levelUnlocked < levelToUnlock)
-                    {
-                    this._levelUnlocked++;
-                    UnlockLevel(this._levelUnlocked);
-                    }
-                }
-            }
-
-        private void UnlockLevel(int levelThatPlayerShouldHaveReached)
-            {
-            foreach (Monster m in GlobalServices.GameState.DistinctItemsOfType<Monster>())
-                {
-                if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
-                    continue;
-                
-                int worldAreaId = this.GetWorldAreaIdForTilePos(m.TilePosition);
-                if (worldAreaId < levelThatPlayerShouldHaveReached)
-                    m.IsActive = true;
-                }
-            }
 
         private void UpdateGameItems(GameTime gameTime)
             {
@@ -351,7 +294,7 @@ namespace Labyrinth
             {
             const float currentVelocity = 750;
             
-            var roomRectangle = GetContainingRoom(this.Player.Position);
+            var roomRectangle = GetContainingRoom(this._player.Position);
             var movingTowards = new Vector2(roomRectangle.Left, roomRectangle.Top);
             Vector2 position = this.WindowPosition;
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -446,10 +389,10 @@ namespace Labyrinth
 
         public void MoveUpALevel()
             {
-            if (!this.Player.IsAlive())
+            if (!this._player.IsAlive())
                 return;
 
-            int currentWorldAreaId = this.GetWorldAreaIdForTilePos(this.Player.TilePosition);
+            int currentWorldAreaId = this.GetWorldAreaIdForTilePos(this._player.TilePosition);
             int maxId = this._playerStartStates.Max(item => item.Key);
             var newState = Enumerable.Range(currentWorldAreaId + 1, maxId - currentWorldAreaId).Select(i => this._playerStartStates[i]).FirstOrDefault(startState => startState != null);
             if (newState == null)
@@ -458,11 +401,11 @@ namespace Labyrinth
             var crystals = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Where(c => this.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
             foreach (var c in crystals)
                 {
-                var i = new InteractionWithStaticItems(this, c, this.Player);
+                var i = new InteractionWithStaticItems(this, c, this._player);
                 i.Collide();
                 }
-            this.Player.ResetPositionAndEnergy(newState.Position.ToPosition(), newState.Energy);
-            GlobalServices.GameState.UpdatePosition(this.Player);
+            this._player.ResetPositionAndEnergy(newState.Position.ToPosition(), newState.Energy);
+            GlobalServices.GameState.UpdatePosition(this._player);
             var boulder = GlobalServices.GameState.DistinctItemsOfType<Boulder>().FirstOrDefault();
             if (boulder != null)
                 {
@@ -472,7 +415,7 @@ namespace Labyrinth
                     boulder.ResetPosition(boulderPosition.ToPosition());
                     }
                 }
-            Point roomStart = GetContainingRoom(this.Player.Position).Location;
+            Point roomStart = GetContainingRoom(this._player.Position).Location;
             this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
             }
 

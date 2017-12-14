@@ -96,7 +96,7 @@ current monster data 400 to 7bf
 0bd4			-- internal key number for fire
 bd5 bd6 bd7		-- score
 
-bd9 bda bdb		-- ticks since start of game. bd9 is incremented every game loop.
+bd9 bda bdb		-- ticks since start of game. bd9 is incremented every time the game loop has covered all animation slots
 
 bdc				-- delay until game's main loop ends
 
@@ -2628,6 +2628,7 @@ static object injured (b)
 1FAC 8D CE 0B  STA 0BCE                 
 
 		-- main game loop
+		-- X will be incremented by 10 each time round to point to each animation slot in turn within 0c00 -> 0cff
 
 1FAF A9 FF     LDA #FF                  -- set initial state for flags
 1FB1 85 88     STA 88                   
@@ -2651,34 +2652,46 @@ static object injured (b)
 1FD2 C6 72     DEC 72                   
 1FD4 D0 F8     BNE 1FCE                 
 
-		-- continue 
+		-- continue sprite update
 
 1FD6 20 6B 36  JSR 366B                 -- get input from keyboard or joystick
 1FD9 A5 89     LDA 89                   -- get contents of tile that sprite is moving towards
 1FDB 8D FF 0D  STA 0DFF                 
 1FDE 20 CD 20  JSR 20CD                 -- collision detection
+
+		-- if X = 0 (which indicates the animation slot for the player)
+
 1FE1 8A        TXA                      
 1FE2 D0 03     BNE 1FE7                 -- skip over if not animating player
-1FE4 20 8E 20  JSR 208E                 -- process sound, update game clock, check for getting fruit/mushroom, do player firing, move off-screen monsters
+1FE4 20 8E 20  JSR 208E                 -- tick game clock, update player, move offscreen monsters
 
-1FE7 E0 70     CPX #70                  -- at half way through the loop the player gets animated a second time
-1FE9 D0 20     BNE 200B                 
+		-- if X = 70 (halfway point for animating all the animation slots - player is updated again)
+
+1FE7 E0 70     CPX #70                  
+1FE9 D0 20     BNE 200B                 -- skip over animating player
+
+		-- player specific updates within the main loop
 
 1FEB 20 50 1D  JSR 1D50                 -- process playing sounds
-1FEE A2 00     LDX #00                  
+1FEE A2 00     LDX #00                  -- temporarily set current animation slot back to 0
 1FF0 BD 00 0C  LDA 0C00,X               -- get player status
 1FF3 F0 14     BEQ 2009                 -- branch if not alive
 1FF5 20 00 19  JSR 1900                 -- update animation, draw sprite and determine new direction
 1FF8 A5 89     LDA 89                   
 1FFA 8D FE 0D  STA 0DFE                 
 1FFD 20 CD 20  JSR 20CD                 -- collision detection
-2000 20 94 20  JSR 2094                 -- check for getting fruit/mushroom, do player firing, move off-screen monsters
+2000 20 94 20  JSR 2094                 -- update player, move offscreen monsters
 2003 AD FE 0D  LDA 0DFE                 
 2006 20 E9 20  JSR 20E9                 -- check for block movement
-2009 A2 70     LDX #70                  -- reset loop counter before continuing
+2009 A2 70     LDX #70                  -- reset X to the animation slot 70 before continuing
+
+		-- continue sprite update
 
 200B AD FF 0D  LDA 0DFF                 -- get contents of tile
 200E 20 E9 20  JSR 20E9                 -- deal with possibility that sprite may now be off screen
+
+		-- deal with sound of player movement
+
 2011 8A        TXA                      
 2012 D0 0C     BNE 2020                 -- branch if not animating player
 2014 AD 04 0C  LDA 0C04                 -- get player direction
@@ -2686,6 +2699,8 @@ static object injured (b)
 2019 F0 05     BEQ 2020                 -- branch if so
 201B A9 0A     LDA #0A                  
 201D 20 D6 2D  JSR 2DD6                 -- play movement sound
+
+		-- continue sprite update
 
 2020 8A        TXA                      
 2021 18        CLC                      
@@ -2780,7 +2795,7 @@ static object injured (b)
 20A2 A9 00     LDA #00                  
 20A4 8D C7 0B  STA 0BC7                 -- reset firing flag
 20A7 20 7A 2A  JSR 2A7A                 -- deal with control key presses
-20AA 4C 91 27  JMP 2791                 -- jump to routine that moves off-screen monsters between rooms
+20AA 4C 91 27  JMP 2791                 -- move off-screen monsters between rooms, add acorns
 
 20AD 20 DD 21  JSR 21DD                 -- fire
 20B0 4C A7 20  JMP 20A7                 
