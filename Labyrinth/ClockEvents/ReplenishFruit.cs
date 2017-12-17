@@ -30,6 +30,9 @@ namespace Labyrinth.ClockEvents
 
         public void Update(int ticks)
             {
+            if (GlobalServices.Randomess.Next(4) == 0)
+                return;
+
             foreach (var fd in this._fruitDistList.Definitions)
                 {
                 int slotNumber = (ticks % fd.FruitQuantity);

@@ -282,6 +282,7 @@
     <Compile Include="TilePos.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoader.cs" />
     <Compile Include="ClockEvents\WorldClock.cs" />
+    <Compile Include="WorldWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Documentation\_ReadMe.txt" />

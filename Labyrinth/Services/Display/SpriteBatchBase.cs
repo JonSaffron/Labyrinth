@@ -26,7 +26,6 @@ namespace Labyrinth.Services.Display
             this.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             }
 
-
         /// <inheritdoc />
         public virtual void End()
             {

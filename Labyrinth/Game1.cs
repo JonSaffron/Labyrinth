@@ -56,24 +56,18 @@ namespace Labyrinth
         /// </summary>
         protected override void UnloadContent()
             {
-            if (this.World == null) 
+            if (this._world == null) 
                 return;
             
             this._spriteBatch.Dispose();
             this.World = null;
             }
 
-        internal World World
+        private World World
             {
-            get
+            set
                 {
-                return _world;
-                }
-
-            private set
-                {
-                _world = value;
-                GlobalServices.SetCentrePointProvider(value);
+                this._world = value;
                 GlobalServices.SetWorld(value);
                 }
             }
@@ -85,7 +79,7 @@ namespace Labyrinth
         /// <param name="gameTime">Time passed since the last call to Update</param>
         protected override void Update(GameTime gameTime)
             {
-            if (this.World == null)
+            if (this._world == null)
                 {
                 LoadLevel("World1.xml");
                 }
@@ -103,7 +97,7 @@ namespace Labyrinth
             if (!this._isGamePaused)
                 {
                 // ReSharper disable once PossibleNullReferenceException
-                LevelReturnType lrt = this.World.Update(gameTime);
+                LevelReturnType lrt = this._world.Update(gameTime);
                 switch (lrt)
                     {
                     case LevelReturnType.FinishedWorld:
@@ -119,7 +113,7 @@ namespace Labyrinth
                             return;
                             }
                         this._lives--;
-                        this.World.ResetLevelAfterLosingLife();
+                        this._world.ResetLevelAfterLosingLife();
                         break;
                     }
                 }
@@ -157,7 +151,7 @@ namespace Labyrinth
 
             if (gameInput.HasMoveToNextLevelBeenTriggered)
                 {
-                this.World?.MoveUpALevel();
+                this._world?.MoveUpALevel();
                 }
             }
 
@@ -173,11 +167,11 @@ namespace Labyrinth
                 gameTime = new GameTime();
 
             // Draw the sprite.
-            if (this.World != null)
+            if (this._world != null)
                 {
-                this._spriteBatch.Begin(this.World.WindowPosition);
+                this._spriteBatch.Begin(this._world.WorldWindow.WindowPosition);
 
-                this.World.Draw(gameTime, _spriteBatch);
+                this._world.Draw(gameTime, _spriteBatch);
                 this._headsUpDisplay.DrawStatus(_spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, GlobalServices.ScoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
                 
                 base.Draw(gameTime);
@@ -189,7 +183,7 @@ namespace Labyrinth
             {
             // Load the World.
             this.World = new World(this._worldLoader, level);
-            this.World.ResetLevelForStartingNewLife();
+            this._world.ResetLevelForStartingNewLife();
             }
 
         private void ToggleFullScreen()

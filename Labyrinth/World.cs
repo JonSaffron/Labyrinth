@@ -12,10 +12,8 @@ using Labyrinth.Services.PathFinder;
 
 namespace Labyrinth
     {
-    public class World : ICentrePointProvider
+    public class World
         {
-        private readonly Vector2 _centreOfRoom = Constants.RoomSizeInPixels / 2.0f;
-
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
         private bool _doNotUpdate;
         
@@ -26,7 +24,7 @@ namespace Labyrinth
         [NotNull] private readonly Player _player;
         [NotNull] private readonly WorldClock _worldClock;
 
-        public Vector2 WindowPosition { get; private set; }
+        public readonly WorldWindow WorldWindow;
 
         public World([NotNull] IWorldLoader worldLoader, [NotNull] string level)
             {
@@ -50,6 +48,9 @@ namespace Labyrinth
                 var replenishFruit = new ReplenishFruit(dist);
                 this._worldClock.AddEventHandler(replenishFruit);
                 }
+
+            this.WorldWindow = new WorldWindow();
+            GlobalServices.SetCentrePointProvider(this.WorldWindow);
 
             ValidateGameState(gameState);
             }
@@ -105,7 +106,7 @@ namespace Labyrinth
         public void ResetLevelForStartingNewLife()
             {
             Point roomStart = GetContainingRoom(this._player.Position).Location;
-            this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
+            this.WorldWindow.ResetPosition(new Vector2(roomStart.X, roomStart.Y));
             this._player.Reset();
 
             MoveNearbyMonstersToASafeDistance();
@@ -290,41 +291,14 @@ namespace Labyrinth
             return result;
             }
 
-        private void RecalculateWindow(GameTime gameTime)
-            {
-            const float currentVelocity = 750;
-            
-            var roomRectangle = GetContainingRoom(this._player.Position);
-            var movingTowards = new Vector2(roomRectangle.Left, roomRectangle.Top);
-            Vector2 position = this.WindowPosition;
-            var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            float remainingMovement = currentVelocity * elapsed;
-
-            var distanceToDestination = Vector2.Distance(position, movingTowards);
-            bool hasArrivedAtDestination = (distanceToDestination <= remainingMovement);
-            if (hasArrivedAtDestination)
-                {
-                position = movingTowards;
-                }
-            else
-                {
-                var vectorBetweenPoints = movingTowards - position;
-                var unitVectorOfTravel = Vector2.Normalize(vectorBetweenPoints);
-                var displacement = unitVectorOfTravel * remainingMovement;
-                position += displacement;
-                }
-            
-            this.WindowPosition = position;
-            }
-
         /// <summary>
         /// Draw everything in the World from background to foreground.
         /// </summary>
         public void Draw(GameTime gameTime, [NotNull] ISpriteBatch spriteBatch)
             {
-            RecalculateWindow(gameTime);
+            var windowPosition = this.WorldWindow.RecalculateWindow(gameTime);
             
-            var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(this.WindowPosition);
+            var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(windowPosition);
             DrawFloorTiles(spriteBatch, tileRect);
 
             var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(tileRect);
@@ -378,15 +352,6 @@ namespace Labyrinth
                 }
             }
 
-        public Vector2 CentrePoint
-            {
-            get
-                {
-                var result = this.WindowPosition + _centreOfRoom;
-                return result;
-                }
-            }
-
         public void MoveUpALevel()
             {
             if (!this._player.IsAlive())
@@ -415,7 +380,7 @@ namespace Labyrinth
                     }
                 }
             Point roomStart = GetContainingRoom(this._player.Position).Location;
-            this.WindowPosition = new Vector2(roomStart.X, roomStart.Y);
+            this.WorldWindow.ResetPosition(new Vector2(roomStart.X, roomStart.Y));
             }
 
         private static bool GetFreeTileWithinRoom(TilePos startPos, out TilePos tilePos)
