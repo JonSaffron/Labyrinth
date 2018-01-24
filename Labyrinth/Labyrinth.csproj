@@ -173,6 +173,9 @@
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
+    <Compile Include="Services\Messaging\IMessanger.cs" />
+    <Compile Include="Services\Messaging\Messenger.cs" />
+    <Compile Include="Services\Messaging\WeakAction.cs" />
     <Compile Include="Services\PathFinder\RepelObject.cs" />
     <Compile Include="Services\PathFinder\Path.cs" />
     <Compile Include="Services\PathFinder\PathFinder.cs" />
