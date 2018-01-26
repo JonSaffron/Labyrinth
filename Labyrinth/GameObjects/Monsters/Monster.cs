@@ -66,6 +66,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
+        /// <inheritdoc cref="IMonster" />
         public bool IsEgg
             {
             get
@@ -142,7 +143,8 @@ namespace Labyrinth.GameObjects
             this._determineDirection = !this.IsActive || this.IsEgg || this.Mobility == MonsterMobility.Stationary ? new Stationary(this) : GetMethodForDeterminingDirection(this.Mobility);
             }
 
-        public bool IsStatic => this._determineDirection is Stationary;
+        /// <inheritdoc cref="IMonster" />
+        public bool IsStationary => this._determineDirection is Stationary;
 
         public override void ReduceEnergy(int energyToRemove)
             {
@@ -163,7 +165,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                var result = this.IsStatic ? SpriteDrawOrder.StaticMonster : SpriteDrawOrder.MovingMonster;
+                var result = this.IsMoving ? SpriteDrawOrder.MovingMonster : SpriteDrawOrder.StaticMonster;
                 return (int) result;
                 }
             }
@@ -278,7 +280,9 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Gets an indication of how solid the object is
         /// </summary>
-        /// <remarks>This cannot check IsStatic because that may mislead the TileContentValidator due to the currrent IsActive setting</remarks>
+        /// <remarks>The implementation of this must be consistent with the type of monster and its current state (egg/normal).
+        /// It cannot look at the current movement class being used because that inactive monsters will be stationary.
+        /// The TileContentValidator needs this value to be reflective of the general state of the monster, not its current ephemeral state.</remarks>
         public override ObjectSolidity Solidity => (this.IsEgg || this.Mobility == MonsterMobility.Stationary) ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
 
         public int CurrentSpeed { get; set; }
@@ -290,30 +294,10 @@ namespace Labyrinth.GameObjects
 
         [NotNull] public BehaviourCollection DeathBehaviours => this._deathBehaviours;
 
-        public bool ShootsAtPlayer
+        public bool HasBehaviour<T>() where T : IBehaviour
             {
-            get => this.MovementBehaviours.Has<ShootsAtPlayer>();
-
-            set
-                {
-                if (value)
-                    {
-                    var behaviour = new ShootsAtPlayer(new StandardMonsterWeapon(this));
-                    behaviour.Init(this);
-                    this.MovementBehaviours.Add(behaviour);
-                    }
-                else
-                    {
-                    this.MovementBehaviours.Remove<ShootsAtPlayer>();
-                    }
-                }
-            }
-
-        public bool ShootsOnceProvoked
-            {
-            get => this.InjuryBehaviours.Has<StartsShootingWhenHurt>();
-
-            set => this.InjuryBehaviours.Set<StartsShootingWhenHurt>(value);
+            var result = this.MovementBehaviours.Has<T>() || this.InjuryBehaviours.Has<T>() || this.DeathBehaviours.Has<T>();
+            return result;
             }
 
         protected override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;

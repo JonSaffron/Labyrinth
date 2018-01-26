@@ -42,7 +42,7 @@ namespace Labyrinth
 
             this._worldClock = new WorldClock();
             if (worldLoader.UnlockLevels)
-                this._worldClock.AddEventHandler(new UnlockLevel());
+                this._worldClock.AddEventHandler(new UnlockLevel(this));
             foreach (var dist in worldLoader.FruitDistributions.Where(item => item.PopulationMethod.WillReplenish()))
                 {
                 var replenishFruit = new ReplenishFruit(dist);
@@ -140,7 +140,7 @@ namespace Labyrinth
                     {
                     monster.EggHatches(monster, new EventArgs());
                     }
-                if (!monster.IsStatic)
+                if (!monster.IsStationary)
                     {
                     searchParameters.StartLocation = monster.TilePosition;
 

@@ -67,7 +67,7 @@ namespace Labyrinth.Services.WorldBuilding
                 LaysEggs = monster.MovementBehaviours.Has<LaysEgg>(),
                 SplitsOnHit = monster.DeathBehaviours.Has<SpawnsUponDeath>(),
                 ShootsAtPlayer = monster.MovementBehaviours.Has<ShootsAtPlayer>(),
-                ShootsOnceProvoked = monster.ShootsOnceProvoked,
+                ShootsOnceProvoked = monster.GetShootsOnceProvoked(),
                 ShotsBounceOff = monster.ShotsBounceOff,
                 IsActive = monster.IsActive
                 };

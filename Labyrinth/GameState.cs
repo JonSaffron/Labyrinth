@@ -276,9 +276,9 @@ namespace Labyrinth
             if (monsterDef.SplitsOnHit.HasValue)
                 result.DeathBehaviours.Set<SpawnsUponDeath>(monsterDef.SplitsOnHit.Value);
             if (monsterDef.ShootsAtPlayer.HasValue)
-                result.ShootsAtPlayer = monsterDef.ShootsAtPlayer.Value;
+                result.SetShootsAtPlayer(monsterDef.ShootsAtPlayer.Value);
             if (monsterDef.ShootsOnceProvoked.HasValue)
-                result.ShootsOnceProvoked = monsterDef.ShootsOnceProvoked.Value;
+                result.SetShootsOnceProvoked(monsterDef.ShootsOnceProvoked.Value);
             if (monsterDef.ShotsBounceOff.HasValue)
                 result.ShotsBounceOff = monsterDef.ShotsBounceOff.Value;
             if (monsterDef.IsActive.HasValue)
@@ -296,7 +296,7 @@ namespace Labyrinth
             return shot;
             }
 
-        public Player AddPlayer(Vector2 position, int energy, int? initialWorldAreaId)
+        public Player AddPlayer(Vector2 position, int energy, int initialWorldAreaId)
             {
             if (this.Player != null)
                 throw new InvalidOperationException("Cannot add more than one Player.");

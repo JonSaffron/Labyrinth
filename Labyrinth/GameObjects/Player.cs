@@ -39,8 +39,8 @@ namespace Labyrinth.GameObjects
         private readonly Animation _upStaticAnimation;
         private readonly Animation _downStaticAnimation;
 
-        private readonly List<int> _crystalsCollected = new List<int>();
-        private readonly List<int> _listOfWorldAreaIdsVisited = new List<int>();
+        private readonly HashSet<int> _crystalsCollected = new HashSet<int>();
+        private readonly HashSet<int> _worldAreaIdsVisited = new HashSet<int>();
 
         private double _time;
         private int _countBeforeDecrementingEnergy;
@@ -55,7 +55,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new player.
         /// </summary>
-        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy, int? initialWorldAreaId) : base(animationPlayer, position)
+        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy, int initialWorldAreaId) : base(animationPlayer, position)
             {
             // Load animated textures.
             this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 1);
@@ -70,8 +70,7 @@ namespace Labyrinth.GameObjects
             this._weapon1 = new StandardPlayerWeapon();
             this._weapon2 = new MineLayer();
             this.Energy = energy;
-            if (initialWorldAreaId.HasValue)
-                this._listOfWorldAreaIdsVisited.Add(initialWorldAreaId.Value);
+            this._worldAreaIdsVisited.Add(initialWorldAreaId);
             Reset();
             }
 
@@ -79,7 +78,7 @@ namespace Labyrinth.GameObjects
             {
             var playerMoves = _whichFootFlag ? GameSound.PlayerMovesFirstFoot : GameSound.PlayerMovesSecondFoot;
             this.PlaySound(playerMoves);
-            _whichFootFlag = !_whichFootFlag;
+            this._whichFootFlag = !(this._whichFootFlag);
             }
 
         /// <summary>
@@ -166,7 +165,7 @@ namespace Labyrinth.GameObjects
                         yield return true;
                         }
 
-                    if (CheckIfEnteredNewWorldArea())
+                    if (HasPlayerEnteredNewWorldArea())
                         GlobalServices.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
                     }
                 else
@@ -268,27 +267,24 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private bool CheckIfEnteredNewWorldArea()
+        private bool HasPlayerEnteredNewWorldArea()
             {
             int worldAreaId = GlobalServices.World.GetWorldAreaIdForTilePos(this.TilePosition);
-            if (this._listOfWorldAreaIdsVisited.Contains(worldAreaId))
-                return false;
-
-            this._listOfWorldAreaIdsVisited.Add(worldAreaId);
-            return true;
+            bool result = this._worldAreaIdsVisited.Add(worldAreaId);
+            return result;
             }
 
         public void AddEnergy(int energy)
             {
             if (energy <= 0)
-                throw new ArgumentOutOfRangeException("energy", energy, "Must be above 0.");
+                throw new ArgumentOutOfRangeException(nameof(energy), energy, "Must be above 0.");
             this.Energy = Math.Min(this.Energy + energy, 255);
             }
 
         public override void ReduceEnergy(int energyToRemove)
             {
             if (energyToRemove <= 0)
-                throw new ArgumentOutOfRangeException("energyToRemove", energyToRemove, "Must be above 0.");
+                throw new ArgumentOutOfRangeException(nameof(energyToRemove), energyToRemove, "Must be above 0.");
             
             if (energyToRemove > this.Energy)
                 UponDeath();

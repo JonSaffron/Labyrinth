@@ -272,6 +272,7 @@ namespace Labyrinth.GameObjects
         /// <remarks>Measured in pixels per second</remarks>
         protected virtual decimal BounceBackSpeed => Constants.BounceBackSpeed;
 
+        // todo: get rid of this. replace with a boundries property which equals the world rect if the object can change rooms, and the room rect if it cannot.
         protected virtual bool CanChangeRooms => false;
         }
     }

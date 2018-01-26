@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
-    public struct Movement
+    public readonly struct Movement
         {
         public static Movement Still { get; } = new Movement();
         public Direction Direction { get; }
