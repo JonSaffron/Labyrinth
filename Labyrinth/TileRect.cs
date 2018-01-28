@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth
     {
-    public struct TileRect
+    public readonly struct TileRect
         {
         public readonly TilePos TopLeft;
         public readonly int Width;

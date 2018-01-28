@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.ScoreKeeper;
 using NUnit.Framework;
 using Moq;
@@ -26,7 +27,7 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyShoots()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.ShootsAtPlayer).Returns(true);
+            monster.Setup(monsterShoots => monsterShoots.HasBehaviour<ShootsAtPlayer>()).Returns(true);
 
             var scoreKeeper = new ScoreKeeper();
             Assert.Throws<ArgumentNullException>(() => scoreKeeper.EnemyCrushed(null, 99));
@@ -39,7 +40,7 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyMoves()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterMoves => monsterMoves.IsStatic).Returns(false);
+            monster.Setup(monsterMoves => monsterMoves.IsStationary).Returns(false);
 
             var scoreKeeper = new ScoreKeeper();
             scoreKeeper.EnemyCrushed(monster.Object, 10);
@@ -51,8 +52,8 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyIsEgg()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterIsEgg => monsterIsEgg.ShootsAtPlayer).Returns(false);
-            monster.Setup(monsterIsEgg => monsterIsEgg.IsStatic).Returns(true);
+            monster.Setup(monsterIsEgg => monsterIsEgg.HasBehaviour<ShootsAtPlayer>()).Returns(false);
+            monster.Setup(monsterIsEgg => monsterIsEgg.IsStationary).Returns(true);
             monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(true);
 
             var scoreKeeper = new ScoreKeeper();
@@ -65,8 +66,8 @@ namespace Labyrinth.Test
         public void TestEnemyCrushedWhenEnemyIsNotDangerous()
             {
             var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.ShootsAtPlayer).Returns(false);
-            monster.Setup(monsterMoves => monsterMoves.IsStatic).Returns(true);
+            monster.Setup(monsterShoots => monsterShoots.HasBehaviour<ShootsAtPlayer>()).Returns(false);
+            monster.Setup(monsterMoves => monsterMoves.IsStationary).Returns(true);
             monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(false);
 
             var scoreKeeper = new ScoreKeeper();

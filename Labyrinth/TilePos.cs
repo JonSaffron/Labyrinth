@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
-    public struct TilePos
+    public readonly struct TilePos
         {
         public readonly int X;
         public readonly int Y;

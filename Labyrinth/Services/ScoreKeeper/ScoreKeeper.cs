@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
 using Labyrinth.Services.Messages;
+using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
@@ -53,9 +54,9 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private static bool IsMonsterDangerous(IMonster monster)
             {
-            if (monster.ShootsAtPlayer || monster.ShootsOnceProvoked)
+            if (monster.IsArmed())
                 return true;
-            if (!monster.IsStatic)
+            if (!monster.IsStationary)
                 return true;
             if (monster.IsEgg)
                 return true;

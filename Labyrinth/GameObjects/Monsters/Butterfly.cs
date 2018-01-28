@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
             this.MovementBehaviours.Add<LaysEgg>();
-            this.ShootsAtPlayer = true;
+            this.SetShootsAtPlayer(true);
             }
 
         protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)

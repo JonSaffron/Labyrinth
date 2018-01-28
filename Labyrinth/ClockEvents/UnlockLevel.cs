@@ -1,10 +1,18 @@
-﻿using Labyrinth.GameObjects;
+﻿using System;
+using JetBrains.Annotations;
+using Labyrinth.GameObjects;
 
 namespace Labyrinth.ClockEvents
     {
     public class UnlockLevel : IClockEvent
         {
+        private readonly World _world;
         private int _levelUnlocked;
+
+        public UnlockLevel([NotNull] World world)
+            {
+            this._world = world ?? throw new ArgumentNullException(nameof(world));
+            }
 
         public void Update(int ticks)
             {
@@ -18,14 +26,12 @@ namespace Labyrinth.ClockEvents
 
         private void Unlock(int levelThatPlayerShouldHaveReached)
             {
-            World world = GlobalServices.World;
-
             foreach (Monster m in GlobalServices.GameState.DistinctItemsOfType<Monster>())
                 {
                 if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
 
-                int worldAreaId = world.GetWorldAreaIdForTilePos(m.TilePosition);
+                int worldAreaId = this._world.GetWorldAreaIdForTilePos(m.TilePosition);
                 if (worldAreaId < levelThatPlayerShouldHaveReached)
                     m.IsActive = true;
                 }
