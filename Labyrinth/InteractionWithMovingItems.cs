@@ -1,6 +1,8 @@
 ﻿using System;
+using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects;
+using Labyrinth.Services.Messages;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -135,7 +137,9 @@ namespace Labyrinth
                     if (movingObject is Monster monster)
                         {
                         b.PlaySound(GameSound.MonsterDies);
-                        GlobalServices.ScoreKeeper.EnemyCrushed(monster, energy);
+                        var monsterCrushed = new MonsterCrushed { Monster = monster, CrushedBy = moveableObject, EnergyRemoved = energy};
+                        Messenger.Default.Send(monsterCrushed);
+                        //GlobalServices.ScoreKeeper.EnemyCrushed(monster, energy);
                         }
                     return true;
                     }
@@ -216,7 +220,8 @@ namespace Labyrinth
             if (!shot.HasRebounded && shot.Originator is Player && monster != null)
                 {
                 var energyRemovedForScoringPurposes = Math.Min(shot.Energy, monster.Energy);
-                GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemovedForScoringPurposes);
+                var monsterKilledByShot = new MonsterShot { Monster = monster, Shot = shot, EnergyRemoved = energyRemovedForScoringPurposes };
+                Messenger.Default.Send(monsterKilledByShot);
                 }
 
             playerOrMonster.ReduceEnergy(shot.Energy);

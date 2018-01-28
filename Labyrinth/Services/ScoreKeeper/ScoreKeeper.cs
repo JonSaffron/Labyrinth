@@ -1,15 +1,29 @@
 ﻿using System;
+using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
+using Labyrinth.Services.Messages;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
-    class ScoreKeeper : IScoreKeeper
+    class ScoreKeeper
         {
         private decimal _score;
+
+        public ScoreKeeper()
+            {
+            Messenger.Default.Register<MonsterShot>(this, EnemyShot);
+            Messenger.Default.Register<MonsterCrushed>(this, EnemyCrushed);
+            Messenger.Default.Register<CrystalTaken>(this, CrystalTaken);
+            }
 
         public void Reset()
             {
             this._score = 0;
+            }
+
+        private void EnemyShot(MonsterShot monsterKilledByShot)
+            {
+            EnemyShot(monsterKilledByShot.Monster, monsterKilledByShot.EnergyRemoved);
             }
 
         public void EnemyShot([NotNull] IMonster monster, int energyRemoved)
@@ -19,6 +33,11 @@ namespace Labyrinth.Services.ScoreKeeper
 
             var increaseToScore = (energyRemoved >> 1) + 1;
             this._score += increaseToScore;
+            }
+
+        private void EnemyCrushed(MonsterCrushed monsterCrushed)
+            {
+            EnemyCrushed(monsterCrushed.Monster, monsterCrushed.EnergyRemoved);
             }
 
         public void EnemyCrushed([NotNull] IMonster monster, int energyRemoved)
@@ -41,6 +60,11 @@ namespace Labyrinth.Services.ScoreKeeper
             if (monster.IsEgg)
                 return true;
             return false;
+            }
+
+        private void CrystalTaken(CrystalTaken crystalTaken)
+            {
+            CrystalTaken(crystalTaken.Crystal);
             }
 
         public void CrystalTaken([NotNull] IValuable crystal)

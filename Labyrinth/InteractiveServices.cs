@@ -1,6 +1,5 @@
 ﻿using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
-using Labyrinth.Services.ScoreKeeper;
 using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 
@@ -31,8 +30,8 @@ namespace Labyrinth
             var spriteLibrary = new SpriteLibrary(game);
             GlobalServices.SetSpriteLibrary(spriteLibrary);
 
-            var scoreKeeper = new ScoreKeeper();
-            GlobalServices.SetScoreKeeper(scoreKeeper);
+            // var scoreKeeper = new ScoreKeeper();
+            // GlobalServices.SetScoreKeeper(scoreKeeper);
             }
         }
     }

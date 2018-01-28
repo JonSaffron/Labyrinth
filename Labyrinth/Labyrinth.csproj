@@ -53,6 +53,7 @@
     <XnaCompressContent>false</XnaCompressContent>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -173,11 +174,9 @@
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
-    <Compile Include="Services\Messaging\IExecuteWithObject.cs" />
-    <Compile Include="Services\Messaging\IMessenger.cs" />
-    <Compile Include="Services\Messaging\Messenger.cs" />
-    <Compile Include="Services\Messaging\WeakAction.cs" />
-    <Compile Include="Services\Messaging\WeakActionGeneric.cs" />
+    <Compile Include="Services\Messages\CrystalTaken.cs" />
+    <Compile Include="Services\Messages\MonsterCrushed.cs" />
+    <Compile Include="Services\Messages\MonsterShot.cs" />
     <Compile Include="Services\PathFinder\RepelObject.cs" />
     <Compile Include="Services\PathFinder\Path.cs" />
     <Compile Include="Services\PathFinder\PathFinder.cs" />
@@ -345,6 +344,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GalaSoft.MvvmLight\GalaSoft.MvvmLight.csproj">
+      <Project>{ff1b8fd1-3c1e-4644-bc7b-7f48b0671715}</Project>
+      <Name>GalaSoft.MvvmLight</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LabyrinthContent\LabyrinthContent.contentproj">
       <Project>{69FCCD2B-FCCB-412A-848A-7115013C42A9}</Project>
       <Name>LabyrinthContent %28Content%29</Name>
