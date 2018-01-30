@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public abstract class MovingItem : StaticItem
+    public abstract class MovingItem : StaticItem, IMovingItem
         {
         /// <inheritdoc />
         /// <summary>
@@ -61,7 +61,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <param name="byWhom">The object that is acting on this object</param>
         /// <param name="direction">The direction that the specified object is directing this object</param>
-        public void PushOrBounce(MovingItem byWhom, Direction direction)
+        public void PushOrBounce(IMovingItem byWhom, Direction direction)
             {
             var ps = CanBePushedOrBounced(byWhom, direction, true);
             switch (ps)
@@ -99,7 +99,7 @@ namespace Labyrinth.GameObjects
         /// <returns>True if the object can start to move in the specified direction</returns>
         /// <remarks>In order to move, the target tile must not be occupied by an impassable object, and 
         /// a moveable object must be able to move off the target tile in the same direction.</remarks>
-        private bool CanMoveInDirection(Direction direction, bool isBounceBackPossible)
+        public bool CanMoveInDirection(Direction direction, bool isBounceBackPossible)
             {
             TilePos proposedDestination = this.TilePosition.GetPositionAfterOneMove(direction);
             if (!GlobalServices.World.IsTileWithinWorld(proposedDestination))
@@ -152,7 +152,7 @@ namespace Labyrinth.GameObjects
         /// <param name="isBounceBackPossible">Sets whether bounceback should be considered</param>
         /// <returns>An indication of whether this object will move and if so, how it will react</returns>
         /// <remarks>Currently only the boulder is moveable</remarks>
-        private PushStatus CanBePushedOrBounced(MovingItem byWhom, Direction direction, bool isBounceBackPossible)
+        private PushStatus CanBePushedOrBounced(IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
             {
             // if this object is not moveable then the answer's no
             if (this.Solidity != ObjectSolidity.Moveable)
@@ -204,7 +204,7 @@ namespace Labyrinth.GameObjects
         /// <param name="direction">The direction to move in</param>
         /// <param name="speed">The speed to move at</param>
         /// <remarks>This is used by an object that can move another, currently this will only be the player</remarks>
-        protected void BounceBack(Direction direction, decimal speed)
+        public void BounceBack(Direction direction, decimal speed)
             {
             var originallyMovingTowards = TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards);
             var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);

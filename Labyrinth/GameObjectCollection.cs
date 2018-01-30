@@ -10,9 +10,9 @@ namespace Labyrinth
     /// </summary>
     public class GameObjectCollection : IGameObjectCollection
         {
-        private List<StaticItem>[] _allGameItems;
-        private readonly LinkedList<MovingItem> _interactiveGameItems; 
-        private static readonly IEnumerable<StaticItem> EmptyItemList = Enumerable.Empty<StaticItem>();
+        private List<IGameObject>[] _allGameItems;
+        private readonly LinkedList<IMovingItem> _interactiveGameItems; 
+        private static readonly IEnumerable<IGameObject> EmptyItemList = Enumerable.Empty<StaticItem>();
         private int _maxWidth;
         private int _maxHeight;
 
@@ -24,59 +24,59 @@ namespace Labyrinth
         /// </summary>
         public GameObjectCollection()
             {
-            this._allGameItems = new List<StaticItem>[1];
-            this._interactiveGameItems = new LinkedList<MovingItem>();
+            this._allGameItems = new List<IGameObject>[1];
+            this._interactiveGameItems = new LinkedList<IMovingItem>();
             }
 
         /// <inheritdoc />
-        public void Add(StaticItem gameObject)
+        public void Add(IGameObject gameObject)
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
 
             InsertIntoAllGameItemsArray(gameObject);
-            if (!(gameObject is MovingItem mi)) 
+            if (!(gameObject is IMovingItem mi)) 
                 return;
 
             mi.OriginalPosition = mi.Position;
             this._interactiveGameItems.AddLast(mi);
-            if (mi is Shot)
+            if (mi is IShot)
                 this.CountOfShots++;
             }
 
         /// <inheritdoc />
-        public void Remove(StaticItem gameObject)
+        public void Remove(IGameObject gameObject)
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
 
-            if (gameObject is MovingItem movingItem)
+            if (gameObject is IMovingItem movingItem)
                 {
                 bool wasItemRemoved = this._interactiveGameItems.Remove(movingItem);
                 if (!wasItemRemoved)
                     throw new ArgumentOutOfRangeException(nameof(gameObject));
                 }
 
-            if (gameObject is Shot)
+            if (gameObject is IShot)
                 this.CountOfShots--;
 
             int mortonPosition = gameObject.TilePosition.MortonCode;
-            List<StaticItem> listOfStaticItem = this._allGameItems[mortonPosition];
+            List<IGameObject> listOfStaticItem = this._allGameItems[mortonPosition];
             if (listOfStaticItem == null || listOfStaticItem.Count == 0)
                 throw new InvalidOperationException("The allGameItems collection where the gameObject was expected to be was null.");
             if (!listOfStaticItem.Remove(gameObject))
                 throw new InvalidOperationException("The gameObject could not be found in the allGameItems list, or could not be removed.");
             }
 
-        private void InsertIntoAllGameItemsArray(StaticItem gameObject)
+        private void InsertIntoAllGameItemsArray(IGameObject gameObject)
             {
             EnsureArrayIsLargeEnough(gameObject.TilePosition);
 
             int mortonPosition = gameObject.TilePosition.MortonCode;
-            List<StaticItem> listOfStaticItem = this._allGameItems[mortonPosition];
+            List<IGameObject> listOfStaticItem = this._allGameItems[mortonPosition];
             if (listOfStaticItem == null)
                 {
-                listOfStaticItem = new List<StaticItem>();
+                listOfStaticItem = new List<IGameObject>();
                 this._allGameItems[mortonPosition] = listOfStaticItem;
                 }
             listOfStaticItem.Add(gameObject);
@@ -97,18 +97,18 @@ namespace Labyrinth
             }
 
         /// <inheritdoc />
-        public IEnumerable<MovingItem> InteractiveGameItems
+        public IEnumerable<IMovingItem> InteractiveGameItems
             {
             get
                 {
-                var result = new MovingItem[this._interactiveGameItems.Count];
+                var result = new IMovingItem[this._interactiveGameItems.Count];
                 this._interactiveGameItems.CopyTo(result, 0);
                 return result;
                 }
             }
 
         /// <inheritdoc />
-        public IEnumerable<StaticItem> ItemsAtPosition(TilePos tp)
+        public IEnumerable<IGameObject> ItemsAtPosition(TilePos tp)
             {
             if (tp.X < 0 || tp.Y < 0)
                 return EmptyItemList;
@@ -120,9 +120,9 @@ namespace Labyrinth
             }
 
         /// <inheritdoc />
-        public IEnumerable<StaticItem> DistinctItems()
+        public IEnumerable<IGameObject> DistinctItems()
             {
-            var set = new HashSet<StaticItem>();
+            var set = new HashSet<IGameObject>();
             // ReSharper disable once LoopCanBeConvertedToQuery (leads to slow delegate)
             foreach (var list in this._allGameItems.WhereNotNull())
                 {
@@ -135,7 +135,7 @@ namespace Labyrinth
             }
 
         /// <inheritdoc />
-        public void UpdatePosition(MovingItem item)
+        public void UpdatePosition(IMovingItem item)
             {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
@@ -164,7 +164,7 @@ namespace Labyrinth
                 }
             else if (newList == null)
                 {
-                newList = new List<StaticItem> { item };
+                newList = new List<IGameObject> { item };
                 }
             else
                 {
@@ -179,7 +179,7 @@ namespace Labyrinth
             item.OriginalPosition = item.Position;
             }
 
-        public void FindItem(MovingItem itemToFind)
+        public void FindItem(IMovingItem itemToFind)
             {
             System.Diagnostics.Trace.WriteLine(string.Format("Previous {0}    Actual {1}", TilePos.TilePosFromPosition(itemToFind.OriginalPosition), TilePos.TilePosFromPosition(itemToFind.Position)));
             int max = this._allGameItems.GetLength(0);

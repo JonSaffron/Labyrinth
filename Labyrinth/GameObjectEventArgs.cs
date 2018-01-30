@@ -1,16 +1,15 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
     public class GameObjectEventArgs : EventArgs
         {
-        public GameObjectEventArgs([NotNull] StaticItem gameObject)
+        public GameObjectEventArgs([NotNull] IGameObject gameObject)
             {
             this.GameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             }
 
-        public StaticItem GameObject { get; }
+        public IGameObject GameObject { get; }
         }
     }

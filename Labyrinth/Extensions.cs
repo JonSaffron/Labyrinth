@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -73,7 +72,7 @@ namespace Labyrinth
             return false;
             }
 
-        internal static bool IsAlive(this MovingItem mi)
+        internal static bool IsAlive(this IMovingItem mi)
             {
             var result = mi.IsExtant;
             return result;

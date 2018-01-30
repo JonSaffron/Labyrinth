@@ -26,7 +26,7 @@ namespace Labyrinth.GameObjects
 
         public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
-        public void SteppedOnBy(MovingItem movingItem)
+        public void SteppedOnBy(IMovingItem movingItem)
             {
             this._mineState.SteppedOnBy(movingItem);
             }
@@ -70,7 +70,7 @@ namespace Labyrinth.GameObjects
                 this.Mine = mine;
                 }
 
-            public abstract void SteppedOnBy(MovingItem movingItem);
+            public abstract void SteppedOnBy(IMovingItem movingItem);
             public abstract bool Update(GameTime gameTime);
             public abstract void Draw(GameTime gt, ISpriteBatch spriteBatch);
             public abstract bool IsExtant();
@@ -90,7 +90,7 @@ namespace Labyrinth.GameObjects
                 this.Mine._countdown = TimeSpan.Zero;
                 }
 
-            public override void SteppedOnBy(MovingItem movingItem)
+            public override void SteppedOnBy(IMovingItem movingItem)
                 {
                 if (movingItem is Player)
                     this.Mine._countdown = TimeSpan.Zero;
@@ -129,7 +129,7 @@ namespace Labyrinth.GameObjects
                 {
                 }
 
-            public override void SteppedOnBy(MovingItem movingItem)
+            public override void SteppedOnBy(IMovingItem movingItem)
                 {
                 if (movingItem is Player)
                     this.Mine._mineState = new InactiveState(this.Mine);
@@ -166,7 +166,7 @@ namespace Labyrinth.GameObjects
                 {
                 }
 
-            public override void SteppedOnBy(MovingItem movingItem)
+            public override void SteppedOnBy(IMovingItem movingItem)
                 {
                 this.Mine._mineState = new FiredState(this.Mine);
                 }
@@ -204,7 +204,7 @@ namespace Labyrinth.GameObjects
                 this.Mine.PlaySound(GameSound.MonsterDies);
                 }
 
-            public override void SteppedOnBy(MovingItem movingItem)
+            public override void SteppedOnBy(IMovingItem movingItem)
                 {
                 // nothing to do
                 }

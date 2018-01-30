@@ -26,9 +26,9 @@ namespace Labyrinth
         /// Returns a list of all extant game objects that could interact with other game objects
         /// </summary>
         /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<MovingItem> GetSurvivingInteractiveItems()
+        public IEnumerable<IMovingItem> GetSurvivingInteractiveItems()
             {
-            List<MovingItem> itemsToRemove = null;
+            List<IMovingItem> itemsToRemove = null;
 
             foreach (var item in this._gameObjectCollection.InteractiveGameItems)
                 {
@@ -42,7 +42,7 @@ namespace Labyrinth
                     continue;
 
                 if (itemsToRemove == null)
-                    itemsToRemove = new List<MovingItem> {item};
+                    itemsToRemove = new List<IMovingItem> {item};
                 else
                     itemsToRemove.Add(item);
                 }
@@ -78,7 +78,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="tp">Specifes the tile position to inspect</param>
         /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<StaticItem> GetItemsOnTile(TilePos tp)
+        public IEnumerable<IGameObject> GetItemsOnTile(TilePos tp)
             {
             var listOfItems = this._gameObjectCollection.ItemsAtPosition(tp);
             var result = listOfItems.Where(gi => gi.IsExtant && gi.TilePosition == tp);
@@ -90,7 +90,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="tr">Top left starting point for the rectangle</param>
         /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<StaticItem> AllItemsInRectangle(TileRect tr)
+        public IEnumerable<IGameObject> AllItemsInRectangle(TileRect tr)
             {
             for (int j = 0; j < tr.Height; j++)
                 {
@@ -120,7 +120,7 @@ namespace Labyrinth
                 switch (item)
                     {
                     case Bang _:
-                    case Shot _:
+                    case IShot _:
                     case TileReservation _:
                         item.InstantlyExpire();
                         break;
@@ -164,7 +164,7 @@ namespace Labyrinth
             return result;
             }
 
-        public void UpdatePosition(MovingItem gameObject)
+        public void UpdatePosition(IMovingItem gameObject)
             {
             this._gameObjectCollection.UpdatePosition(gameObject);
             }
@@ -173,7 +173,7 @@ namespace Labyrinth
         /// Place short bang at a shot's position and remove the shot
         /// </summary>
         /// <param name="s">An instance of a shot to convert</param>
-        public Bang ConvertShotToBang(Shot s)
+        public Bang ConvertShotToBang(IShot s)
             {
             var result = AddBang(s.Position, BangType.Short);
             s.InstantlyExpire();

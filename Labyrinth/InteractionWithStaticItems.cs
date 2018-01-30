@@ -7,17 +7,17 @@ namespace Labyrinth
     class InteractionWithStaticItems : IInteraction
         {
         private readonly World _world;
-        private readonly StaticItem _staticItem;
-        private readonly MovingItem _movingItem;
+        private readonly IGameObject _staticItem;
+        private readonly IMovingItem _movingItem;
 
-        public InteractionWithStaticItems(World world, StaticItem staticItem, MovingItem movingItem)
+        public InteractionWithStaticItems(World world, IGameObject staticItem, IMovingItem movingItem)
             {
             this._world = world ?? throw new ArgumentNullException(nameof(world));
 
             if (staticItem == null)
                 throw new ArgumentNullException(nameof(staticItem));
 
-            if (staticItem is MovingItem)
+            if (staticItem is IMovingItem)
                 throw new ArgumentOutOfRangeException(nameof(staticItem));
 
             this._staticItem = staticItem;
@@ -42,14 +42,14 @@ namespace Labyrinth
                 return;
                 }
 
-            if (this._movingItem is Shot shot)
+            if (this._movingItem is IShot shot)
                 {
                 InteractionInvolvesShot(shot, this._staticItem);
                 // return;
                 }
             }
 
-        private static void InteractionInvolvesPlayer(World world, Player player, StaticItem staticItem)
+        private static void InteractionInvolvesPlayer(World world, Player player, IGameObject staticItem)
             {
             if (staticItem is Crystal crystal)
                 {
@@ -110,7 +110,7 @@ namespace Labyrinth
                 GlobalServices.SoundPlayer.Play(GameSound.PlayerCollectsCrystal);
             }
 
-        private static void InteractionInvolvesShot(Shot shot, StaticItem staticItem)
+        private static void InteractionInvolvesShot(IShot shot, IGameObject staticItem)
             {
             if (staticItem is Wall)
                 {
@@ -144,7 +144,7 @@ namespace Labyrinth
 
             }
 
-        private static void InteractionInvolvesExplosion(Explosion explosion, StaticItem staticItem)
+        private static void InteractionInvolvesExplosion(Explosion explosion, IGameObject staticItem)
             {
             if (staticItem is Wall)
                 {

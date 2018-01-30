@@ -161,8 +161,10 @@
     <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="Interfaces\IMonster.cs" />
     <Compile Include="Interfaces\IMonsterMovement.cs" />
+    <Compile Include="Interfaces\IMovingItem.cs" />
     <Compile Include="Interfaces\IRandomess.cs" />
     <Compile Include="Interfaces\IScoreKeeper.cs" />
+    <Compile Include="Interfaces\IShot.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Interfaces\IValuable.cs" />
     <Compile Include="GameObjects\Monsters\Movement\KillerCubeRedMovement.cs" />
@@ -240,7 +242,6 @@
     <Compile Include="GameObjects\Monsters\KillerCube.cs" />
     <Compile Include="GameObjects\Monsters\KillerCubeGreen.cs" />
     <Compile Include="GameObjects\Monsters\KillerCubeRed.cs" />
-    <Compile Include="GameObjects\Shot.cs" />
     <Compile Include="Services\Sound\SoundPlayer.cs" />
     <Compile Include="Services\Display\SpriteBatchFullScreen.cs" />
     <Compile Include="Services\WorldBuilding\MonsterDef.cs" />
