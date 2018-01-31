@@ -83,7 +83,8 @@ namespace Labyrinth
 
         private static void PlayerAndMonsterCollide(Player player, Monster monster)
             {
-            int monsterEnergy = monster.InstantlyExpire();
+            int monsterEnergy = monster.Energy;
+            monster.InstantlyExpire();
             player.ReduceEnergy(monsterEnergy);
             GlobalServices.GameState.AddBang(monster.Position, BangType.Long, GameSound.PlayerCollidesWithMonster);
             }
@@ -132,15 +133,14 @@ namespace Labyrinth
                 var moveableObjectTile = TilePos.TilePosFromPosition(moveableObject.CurrentMovement.MovingTowards);
                 if (movingObjectTile == moveableObjectTile)
                     {
-                    var energy = movingObject.InstantlyExpire();
                     var b = GlobalServices.GameState.AddBang(movingObject.Position, BangType.Long);
                     if (movingObject is Monster monster)
                         {
                         b.PlaySound(GameSound.MonsterDies);
-                        var monsterCrushed = new MonsterCrushed { Monster = monster, CrushedBy = moveableObject, EnergyRemoved = energy};
+                        var monsterCrushed = new MonsterCrushed(monster, moveableObject);
                         Messenger.Default.Send(monsterCrushed);
-                        //GlobalServices.ScoreKeeper.EnemyCrushed(monster, energy);
                         }
+                    movingObject.InstantlyExpire();
                     return true;
                     }
                 }
@@ -170,8 +170,8 @@ namespace Labyrinth
 
             if (movingItem is Monster monster)
                 {
-                var energyRemoved = Math.Min(explosion.Energy, monster.Energy);
-                GlobalServices.ScoreKeeper.EnemyShot(monster, energyRemoved);
+                var monsterShot = new MonsterShot(monster, movingItem);
+                Messenger.Default.Send(monsterShot);
                 monster.ReduceEnergy(explosion.Energy);
                 return true;
                 }
@@ -216,13 +216,8 @@ namespace Labyrinth
                 return false;
                 }
 
-            // no score from a rebound or from an enemy shot
-            if (!shot.HasRebounded && shot.Originator is Player && monster != null)
-                {
-                var energyRemovedForScoringPurposes = Math.Min(shot.Energy, monster.Energy);
-                var monsterKilledByShot = new MonsterShot { Monster = monster, Shot = shot, EnergyRemoved = energyRemovedForScoringPurposes };
-                Messenger.Default.Send(monsterKilledByShot);
-                }
+            var monsterKilledByShot = new MonsterShot(monster, shot);
+            Messenger.Default.Send(monsterKilledByShot);
 
             playerOrMonster.ReduceEnergy(shot.Energy);
             GlobalServices.GameState.ConvertShotToBang(shot);

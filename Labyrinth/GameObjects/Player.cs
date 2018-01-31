@@ -292,13 +292,12 @@ namespace Labyrinth.GameObjects
                 this.Energy -= energyToRemove;
             }
         
-        public override int InstantlyExpire()
+        public override void InstantlyExpire()
             {
             if (!this.IsExtant)
-                return 0;
+                return;
 
             UponDeath();
-            return 0;
             }
 
         private void UponDeath()

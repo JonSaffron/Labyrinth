@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using GalaSoft.MvvmLight.Messaging;
 using Labyrinth.GameObjects;
+using Labyrinth.Services.Messages;
 
 namespace Labyrinth
     {
@@ -96,7 +98,8 @@ namespace Labyrinth
             {
             // todo this didn't seem to end the world - test that checking IsExtant fixes the problem
             player.AddEnergy(crystal.Energy);
-            GlobalServices.ScoreKeeper.CrystalTaken(crystal);
+            var crystalTaken = new CrystalTaken(crystal);
+            Messenger.Default.Send(crystalTaken);
             player.CrystalCollected(crystal);
             crystal.SetTaken();
             int howManyCrystalsRemain = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Count(c => c.IsExtant);

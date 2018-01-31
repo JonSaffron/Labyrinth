@@ -90,6 +90,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GalaSoft.MvvmLight\GalaSoft.MvvmLight.csproj">
+      <Project>{FF1B8FD1-3C1E-4644-BC7B-7F48B0671715}</Project>
+      <Name>GalaSoft.MvvmLight</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Labyrinth\Labyrinth.csproj">
       <Project>{F462AC55-20C5-4202-A82A-E389428BFD02}</Project>
       <Name>Labyrinth</Name>

@@ -6,6 +6,7 @@ namespace Labyrinth
         {
         Vector2 Position { get; }
         TilePos TilePosition { get; }
+        int Energy { get; }
         bool IsExtant { get; }
         }
     }

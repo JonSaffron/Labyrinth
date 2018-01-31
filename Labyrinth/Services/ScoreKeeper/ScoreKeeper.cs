@@ -6,13 +6,13 @@ using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
-    class ScoreKeeper
+    class ScoreKeeper : IScoreKeeper
         {
         private decimal _score;
 
         public ScoreKeeper()
             {
-            Messenger.Default.Register<MonsterShot>(this, EnemyShot);
+            Messenger.Default.Register<MonsterShot>(this, MonsterShot);
             Messenger.Default.Register<MonsterCrushed>(this, EnemyCrushed);
             Messenger.Default.Register<CrystalTaken>(this, CrystalTaken);
             }
@@ -22,33 +22,22 @@ namespace Labyrinth.Services.ScoreKeeper
             this._score = 0;
             }
 
-        private void EnemyShot(MonsterShot monsterKilledByShot)
+        private void MonsterShot(MonsterShot monsterShot)
             {
-            EnemyShot(monsterKilledByShot.Monster, monsterKilledByShot.EnergyRemoved);
-            }
+            // no score from a rebound or from an enemy shot
+            if (monsterShot.Shot.HasRebounded || !(shot.Originator is Player) || monster == null) 
+                return;
 
-        public void EnemyShot([NotNull] IMonster monster, int energyRemoved)
-            {
-            if (monster == null)
-                throw new ArgumentNullException(nameof(monster));
-
+            var energyRemoved = Math.Min(monsterShot.Monster.Energy, monsterShot.Shot.Energy );
             var increaseToScore = (energyRemoved >> 1) + 1;
             this._score += increaseToScore;
             }
 
         private void EnemyCrushed(MonsterCrushed monsterCrushed)
             {
-            EnemyCrushed(monsterCrushed.Monster, monsterCrushed.EnergyRemoved);
-            }
-
-        public void EnemyCrushed([NotNull] IMonster monster, int energyRemoved)
-            {
-            if (monster == null)
-                throw new ArgumentNullException(nameof(monster));
-
-            if (!IsMonsterDangerous(monster))
+            if (!IsMonsterDangerous(monsterCrushed.Monster))
                 return;
-            var increaseToScore = ((energyRemoved >> 1) + 1) << 1;
+            var increaseToScore = ((monsterCrushed.Monster.Energy >> 1) + 1) << 1;
             this._score += increaseToScore;
             }
 
@@ -65,14 +54,7 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private void CrystalTaken(CrystalTaken crystalTaken)
             {
-            CrystalTaken(crystalTaken.Crystal);
-            }
-
-        public void CrystalTaken([NotNull] IValuable crystal)
-            {
-            if (crystal == null)
-                throw new ArgumentNullException(nameof(crystal));
-            this._score += crystal.Score;
+            this._score += crystalTaken.Crystal.Score;
             }
 
         public decimal CurrentScore

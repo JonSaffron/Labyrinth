@@ -3,7 +3,7 @@
     /// <summary>
     /// Bit of a hack to enable score-keeping
     /// </summary>
-    public interface IMonster
+    public interface IMonster : IGameObject
         {
         /// <summary>
         /// Returns true if the monster has the specified behaviour

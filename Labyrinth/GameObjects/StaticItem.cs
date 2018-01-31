@@ -96,15 +96,12 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Reduce the object's energy to zero
         /// </summary>
-        /// <returns>The amount of energy the object had before it expired</returns>
-        public virtual int InstantlyExpire()
+        public virtual void InstantlyExpire()
             {
             if (!this.IsExtant)
-                return 0;
+                return;
             
-            int result = this.Energy;
             this.Energy = 0;
-            return result;
             }
 
         /// <summary>
