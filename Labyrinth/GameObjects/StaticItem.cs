@@ -1,6 +1,5 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -15,7 +14,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <param name="animationPlayer">An instance of the animation player to use for animating this object</param>
         /// <param name="position">The initial position of the object</param>
-        protected StaticItem([NotNull] AnimationPlayer animationPlayer, Vector2 position)
+        protected StaticItem([NotNull] IAnimationPlayer animationPlayer, Vector2 position)
             {
             this.Ap = animationPlayer ?? throw new ArgumentNullException(nameof(animationPlayer));
             this.Position = position;
@@ -44,7 +43,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Gets the animation player associated with the object
         /// </summary>
-        protected AnimationPlayer Ap { get; }
+        protected IAnimationPlayer Ap { get; }
 
         /// <summary>
         /// Gets or sets how much energy the object has
@@ -89,22 +88,36 @@ namespace Labyrinth.GameObjects
             {
             if (energyToRemove <= 0)
                 throw new ArgumentOutOfRangeException(nameof(energyToRemove), energyToRemove, "Must be above 0.");
+            if (!this.IsExtant)
+                return;
 
             this.Energy = (this.Energy > energyToRemove) ? this.Energy - energyToRemove : 0;
+            if (this.IsExtant)
+                UponInjury();
+            else
+                UponDeath();
             }
 
         /// <summary>
         /// Reduce the object's energy to zero
         /// </summary>
-        /// <returns>The amount of energy the object had before it expired</returns>
-        public virtual int InstantlyExpire()
+        public virtual void InstantlyExpire()
             {
             if (!this.IsExtant)
-                return 0;
+                return;
             
-            int result = this.Energy;
             this.Energy = 0;
-            return result;
+            UponDeath();
+            }
+
+        protected virtual void UponInjury()
+            {
+            // override as necessary
+            }
+
+        protected virtual void UponDeath()
+            {
+            // override as necessary
             }
 
         /// <summary>
@@ -129,16 +142,6 @@ namespace Labyrinth.GameObjects
         public void PlaySound(GameSound gameSound)
             {
             GlobalServices.SoundPlayer.PlayForObject(gameSound, this, GlobalServices.CentrePointProvider);
-            }
-
-        /// <summary>
-        /// Plays a sound which is centred on this instance and triggers a specified callback when the sound completes
-        /// </summary>
-        /// <param name="gameSound">Sets which sound to play</param>
-        /// <param name="callback">The routine to call when the sound finishes playing</param>
-        protected void PlaySoundWithCallback(GameSound gameSound, EventHandler callback)
-            {
-            GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, this, GlobalServices.CentrePointProvider, callback);
             }
 
         private void SetBoundingRectangle(Vector2 position)

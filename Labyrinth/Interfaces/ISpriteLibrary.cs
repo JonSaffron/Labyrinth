@@ -5,5 +5,6 @@ namespace Labyrinth
     public interface ISpriteLibrary
         {
         Texture2D GetSprite(string name);
+        IAnimationPlayer BuildAnimationPlayer();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -31,6 +32,11 @@ namespace Labyrinth.Test
 
             var result = new Texture2D(this._graphicsDevice, 1, 1, false, SurfaceFormat.Color);
             return result;
+            }
+
+        public IAnimationPlayer BuildAnimationPlayer()
+            {
+            return new AnimationPlayer(this);
             }
         }
     }

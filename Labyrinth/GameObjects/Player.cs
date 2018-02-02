@@ -44,7 +44,6 @@ namespace Labyrinth.GameObjects
 
         private double _time;
         private int _countBeforeDecrementingEnergy;
-        private const double TicksOfClock = 0.05f;
 
         private bool _whichFootFlag;
 
@@ -209,21 +208,20 @@ namespace Labyrinth.GameObjects
         private void UpdateEnergy(GameTime gameTime)
             {
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
-            while (this._time > TicksOfClock)
+            while (this._time > Constants.GameClockResolution)
                 {
-                this._time -= TicksOfClock;
-
+                this._time -= Constants.GameClockResolution;
                 this._countBeforeDecrementingEnergy--;
                 if (this._countBeforeDecrementingEnergy > 0) 
                     continue;
-                _countBeforeDecrementingEnergy = (((this.Energy >> 1) ^ 0xFF) & 0x7F) + 1;
 
-                if (this.Energy == 0)
+                if (!this.IsAlive())
                     {
                     UponDeath();
                     return;
                     }
 
+                this._countBeforeDecrementingEnergy = ((this.Energy >> 1) ^ 0xFF) & 0x7F;
                 ReduceEnergy(1);
                 }
             }
@@ -281,32 +279,18 @@ namespace Labyrinth.GameObjects
             this.Energy = Math.Min(this.Energy + energy, 255);
             }
 
-        public override void ReduceEnergy(int energyToRemove)
-            {
-            if (energyToRemove <= 0)
-                throw new ArgumentOutOfRangeException(nameof(energyToRemove), energyToRemove, "Must be above 0.");
-            
-            if (energyToRemove > this.Energy)
-                UponDeath();
-            else
-                this.Energy -= energyToRemove;
-            }
-        
-        public override int InstantlyExpire()
+        public override void InstantlyExpire()
             {
             if (!this.IsExtant)
-                return 0;
-
-            UponDeath();
-            return 0;
-            }
-
-        private void UponDeath()
-            {
-            System.Diagnostics.Trace.WriteLine("*** Player Died ***");
+                return;
+            
             this.Energy = 0;
             this._countBeforeDecrementingEnergy = 0;
+            UponDeath();
+            }
 
+        protected override void UponDeath()
+            {
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, SoundEffectFinished);
             GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             GlobalServices.GameState.AddGrave(this.TilePosition);

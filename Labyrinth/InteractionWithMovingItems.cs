@@ -81,7 +81,8 @@ namespace Labyrinth
 
         private static void PlayerAndMonsterCollide(Player player, Monster monster)
             {
-            int monsterEnergy = monster.InstantlyExpire();
+            var monsterEnergy = monster.Energy;
+            monster.InstantlyExpire();
             player.ReduceEnergy(monsterEnergy);
             GlobalServices.GameState.AddBang(monster.Position, BangType.Long, GameSound.PlayerCollidesWithMonster);
             }
@@ -130,7 +131,8 @@ namespace Labyrinth
                 var moveableObjectTile = TilePos.TilePosFromPosition(moveableObject.CurrentMovement.MovingTowards);
                 if (movingObjectTile == moveableObjectTile)
                     {
-                    var energy = movingObject.InstantlyExpire();
+                    int energy = movingObject.Energy;
+                    movingObject.InstantlyExpire();
                     var b = GlobalServices.GameState.AddBang(movingObject.Position, BangType.Long);
                     if (movingObject is Monster monster)
                         {

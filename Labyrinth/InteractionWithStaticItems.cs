@@ -99,15 +99,17 @@ namespace Labyrinth
             GlobalServices.ScoreKeeper.CrystalTaken(crystal);
             player.CrystalCollected(crystal);
             crystal.SetTaken();
-            int howManyCrystalsRemain = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Count(c => c.IsExtant);
-            if (howManyCrystalsRemain == 0)
+            bool doAnyCrystalsRemain = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Any(c => c.IsExtant);
+            if (doAnyCrystalsRemain)
+                {
+                GlobalServices.SoundPlayer.Play(GameSound.PlayerCollectsCrystal);
+                }
+            else
                 {
                 GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
                     (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedWorld));
                 world.SetDoNotUpdate();
                 }
-            else
-                GlobalServices.SoundPlayer.Play(GameSound.PlayerCollectsCrystal);
             }
 
         private static void InteractionInvolvesShot(IShot shot, IGameObject staticItem)
