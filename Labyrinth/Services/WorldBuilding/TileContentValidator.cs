@@ -6,9 +6,9 @@ namespace Labyrinth.Services.WorldBuilding
     {
     class TileContentValidator
         {
-        public bool IsListOfObjectsValid(IEnumerable<StaticItem> objects, out string reason)
+        public bool IsListOfObjectsValid(IEnumerable<IGameObject> objects, out string reason)
             {
-            var list = new List<StaticItem>(objects ?? Enumerable.Empty<StaticItem>());
+            var list = new List<IGameObject>(objects ?? Enumerable.Empty<StaticItem>());
 
             if (list.Count == 0)
                 {

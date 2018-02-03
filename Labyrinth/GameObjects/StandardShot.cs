@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public class StandardShot : Shot
+    public class StandardShot : MovingItem, IShot
         {
-        public StaticItem Originator { get; }
+        public IGameObject Originator { get; }
         public bool HasRebounded { get; private set; }
         public Orientation Orientation { get; }
         
@@ -19,15 +19,15 @@ namespace Labyrinth.GameObjects
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
 
-        public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction d, int energy, StaticItem originator) : base(animationPlayer, position)
+        public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction direction, int energy, IGameObject originator) : base(animationPlayer, position)
             {
-            if (d == Direction.None)
-                throw new ArgumentOutOfRangeException("d");
+            if (direction == Direction.None)
+                throw new ArgumentOutOfRangeException(nameof(direction));
 
             this.Energy = energy;
             this.Originator = originator;
-            this._directionOfTravel = d;
-            this.Orientation = d.Orientation();
+            this._directionOfTravel = direction;
+            this.Orientation = direction.Orientation();
 
             string textureName = originator is Player ? "Sprites/Shot/RedShot" : "Sprites/Shot/GreenShot";
             var staticImage = Animation.StaticAnimation(textureName);
@@ -168,5 +168,8 @@ namespace Labyrinth.GameObjects
         public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 4;
+
+        protected override bool CanChangeRooms => true;
+
         }
     }

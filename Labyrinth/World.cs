@@ -248,9 +248,9 @@ namespace Labyrinth
         /// <param name="updatedItem">An object that has just moved position</param>
         /// <param name="thatGameItem">An object whose position overlaps the first object</param>
         /// <returns>An instance of an interaction object</returns>
-        private IInteraction BuildInteraction(MovingItem updatedItem, StaticItem thatGameItem)
+        private IInteraction BuildInteraction(IMovingItem updatedItem, IGameObject thatGameItem)
             {
-            var result = thatGameItem is MovingItem secondMovingItem
+            var result = thatGameItem is IMovingItem secondMovingItem
                 ? (IInteraction) new InteractionWithMovingItems(updatedItem, secondMovingItem)
                 : new InteractionWithStaticItems(this, thatGameItem, updatedItem);
             return result;
@@ -302,7 +302,7 @@ namespace Labyrinth
             DrawFloorTiles(spriteBatch, tileRect);
 
             var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(tileRect);
-            var drawQueue = new PriorityQueue<int, StaticItem>(100);
+            var drawQueue = new PriorityQueue<int, IGameObject>(100);
             foreach (var item in itemsToDraw)
                 {
                 drawQueue.Enqueue(item.DrawOrder, item);

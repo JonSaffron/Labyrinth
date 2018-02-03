@@ -5,6 +5,7 @@ using Labyrinth.Services.ScoreKeeper;
 using NUnit.Framework;
 using Moq;
 using GalaSoft.MvvmLight.Messaging;
+using Labyrinth.GameObjects;
 
 // ReSharper disable AssignNullToNotNullAttribute
 
@@ -17,13 +18,23 @@ namespace Labyrinth.Test
         public void TestEnemyShot()
             {
             var monster = new Mock<IMonster>();
+            monster.Setup(m => m.Energy).Returns(5);
+            var shot = new Mock<IShot>();
+            shot.Setup(s => s.Energy).Returns(10);
+            var player = new Mock<IPlayer>();
+            shot.Setup(s => s.Originator).Returns(player.Object);
 
             var scoreKeeper = new ScoreKeeper();
-            Assert.Throws<ArgumentNullException>(() => scoreKeeper.EnemyShot(null, 99));
-            scoreKeeper.EnemyShot(monster.Object, 10);
+            MonsterShot monsterShot;
+            Assert.Throws<ArgumentNullException>(() => monsterShot = new MonsterShot(monster.Object, null));
+            Assert.Throws<ArgumentNullException>(() => monsterShot = new MonsterShot(null, shot.Object));
+            monsterShot = new MonsterShot(monster.Object, shot.Object);
+            Messenger.Default.Send(monsterShot);
 
-            Assert.AreEqual(60, scoreKeeper.CurrentScore);
+            Assert.AreEqual(30, scoreKeeper.CurrentScore);
             }
+
+        ///////////////////////////////
 
         [Test]
         public void TestEnemyCrushedWhenEnemyShoots()
@@ -89,6 +100,8 @@ namespace Labyrinth.Test
             Assert.AreEqual(0, scoreKeeper.CurrentScore);
             }
 
+        ///////////////////////////////
+
         [Test]
         public void TestValuableTaken()
             {
@@ -96,8 +109,8 @@ namespace Labyrinth.Test
             valuable.Setup(valuableWithScore => valuableWithScore.Score).Returns(100);
 
             var scoreKeeper = new ScoreKeeper();
-            Assert.Throws<ArgumentNullException>(() => scoreKeeper.CrystalTaken(null));
-            scoreKeeper.CrystalTaken(valuable.Object);
+            //Assert.Throws<ArgumentNullException>(() => scoreKeeper.CrystalTaken(null));
+            //scoreKeeper.CrystalTaken(valuable.Object);
 
             Assert.AreEqual(1000, scoreKeeper.CurrentScore);
             }
@@ -109,7 +122,7 @@ namespace Labyrinth.Test
             valuable.Setup(valuableWithScore => valuableWithScore.Score).Returns(100);
 
             var scoreKeeper = new ScoreKeeper();
-            scoreKeeper.CrystalTaken(valuable.Object);
+            //scoreKeeper.CrystalTaken(valuable.Object);
             Assert.AreNotEqual(0, scoreKeeper.CurrentScore);
             scoreKeeper.Reset();
 

@@ -12,14 +12,14 @@ namespace Labyrinth
         /// <summary>
         /// This game object will have just moved its position (or at least returned true from its update method)
         /// </summary>
-        private readonly MovingItem _primaryItem;
+        private readonly IMovingItem _primaryItem;
 
         /// <summary>
         /// A second game object that is touching the first
         /// </summary>
-        private readonly MovingItem _secondaryItem;
+        private readonly IMovingItem _secondaryItem;
 
-        public InteractionWithMovingItems([NotNull] MovingItem primaryItem, [NotNull] MovingItem secondaryItem)
+        public InteractionWithMovingItems([NotNull] IMovingItem primaryItem, [NotNull] IMovingItem secondaryItem)
             {
             this._primaryItem = primaryItem ?? throw new ArgumentNullException(nameof(primaryItem));
             this._secondaryItem = secondaryItem ?? throw new ArgumentNullException(nameof(secondaryItem));
@@ -95,7 +95,7 @@ namespace Labyrinth
         /// <param name="moveableObject">An item such as the boulder</param>
         /// <param name="movingObject">An item that is capable of moving another item such as the player or a shot</param>
         /// <returns></returns>
-        private static bool PushOrBounceObject([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
+        private static bool PushOrBounceObject([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
             {
             var result = ShouldStartPushOrBounce(moveableObject, movingObject);
             if (result)
@@ -107,7 +107,7 @@ namespace Labyrinth
             return result;            
             }
 
-        private static bool ShouldStartPushOrBounce([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
+        private static bool ShouldStartPushOrBounce([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
             {
             bool isMoveableObjectAlreadyInMotion = moveableObject.CurrentMovement.IsMoving;
             bool isMovingObjectMotionless = !movingObject.CurrentMovement.IsMoving;
@@ -124,7 +124,7 @@ namespace Labyrinth
             return isGettingCloser;
             }
 
-        private static bool CrushObject([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
+        private static bool CrushObject([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
             {
             if (IsCrushingPossible(moveableObject, movingObject))
                 {
@@ -147,7 +147,7 @@ namespace Labyrinth
             return false;
             }
 
-        private static bool IsCrushingPossible([NotNull] MovingItem moveableObject, [NotNull] MovingItem movingObject)
+        private static bool IsCrushingPossible([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
             {
             if (!moveableObject.CurrentMovement.IsMoving)
                 return false;
@@ -160,9 +160,9 @@ namespace Labyrinth
             return result;
             }
 
-        private static bool InteractionInvolvesExplosion(Explosion explosion, MovingItem movingItem)
+        private static bool InteractionInvolvesExplosion(Explosion explosion, IMovingItem movingItem)
             {
-            if (movingItem is Shot shot)
+            if (movingItem is IShot shot)
                 {
                 shot.ReduceEnergy(explosion.Energy);
                 return true;
@@ -170,7 +170,7 @@ namespace Labyrinth
 
             if (movingItem is Monster monster)
                 {
-                var monsterShot = new MonsterShot(monster, movingItem);
+                var monsterShot = new MonsterShot(monster, explosion);
                 Messenger.Default.Send(monsterShot);
                 monster.ReduceEnergy(explosion.Energy);
                 return true;
@@ -188,7 +188,7 @@ namespace Labyrinth
             return false;
             }
 
-        private static bool InteractionInvolvingShot(StandardShot shot, MovingItem movingItem)
+        private static bool InteractionInvolvingShot(StandardShot shot, IMovingItem movingItem)
             {
             if ((movingItem is Player || movingItem is Monster) && (shot.Originator != movingItem || shot.HasRebounded))
                 {
@@ -205,7 +205,7 @@ namespace Labyrinth
             return false;
             }
 
-        private static bool ShotHitsPlayerOrMonster(StandardShot shot, MovingItem playerOrMonster)
+        private static bool ShotHitsPlayerOrMonster(StandardShot shot, IMovingItem playerOrMonster)
             {
             Monster monster = playerOrMonster as Monster;
             if (monster != null && monster.ShotsBounceOff)

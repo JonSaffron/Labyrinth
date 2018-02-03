@@ -1,15 +1,14 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.Messages
     {
     class MonsterShot
         {
         public readonly IMonster Monster;
-        public readonly Shot Shot;
+        public readonly IShot Shot;
 
-        public MonsterShot([NotNull] IMonster monster, [NotNull] Shot shot)
+        public MonsterShot([NotNull] IMonster monster, [NotNull] IShot shot)
             {
             this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
             this.Shot = shot ?? throw new ArgumentNullException(nameof(shot));

@@ -1,6 +1,5 @@
 ﻿using System;
 using GalaSoft.MvvmLight.Messaging;
-using JetBrains.Annotations;
 using Labyrinth.Services.Messages;
 using Labyrinth.GameObjects;
 
@@ -25,7 +24,7 @@ namespace Labyrinth.Services.ScoreKeeper
         private void MonsterShot(MonsterShot monsterShot)
             {
             // no score from a rebound or from an enemy shot
-            if (monsterShot.Shot.HasRebounded || !(shot.Originator is Player) || monster == null) 
+            if (monsterShot.Shot.HasRebounded || !(monsterShot.Shot.Originator is IPlayer)) 
                 return;
 
             var energyRemoved = Math.Min(monsterShot.Monster.Energy, monsterShot.Shot.Energy );

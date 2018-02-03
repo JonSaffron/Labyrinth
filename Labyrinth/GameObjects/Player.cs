@@ -21,7 +21,7 @@ namespace Labyrinth.GameObjects
     /// <summary>
     /// Our fearless adventurer!
     /// </summary>
-    public class Player : MovingItem
+    public class Player : MovingItem, IPlayer
         {
         // Movement
         public Direction CurrentDirectionFaced { get; private set; } // can't be none
