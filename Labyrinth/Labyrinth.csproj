@@ -176,6 +176,7 @@
     <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
     <Compile Include="Movement.cs" />
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
+    <Compile Include="Interfaces\IAnimationPlayer.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Services\Messages\CrystalTaken.cs" />

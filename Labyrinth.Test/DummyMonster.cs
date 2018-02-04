@@ -38,7 +38,7 @@ namespace Labyrinth.Test
             get
                 {
                 var dummyAction = (DummyAction) base.MovementBehaviours[0];
-                return dummyAction._calls;
+                return dummyAction.Calls;
                 }
             }
         }
@@ -77,7 +77,9 @@ namespace Labyrinth.Test
 
     class DummyAction : BaseBehaviour
         {
-        public List<PositionAndTime> _calls = new List<PositionAndTime>();
+        private readonly List<PositionAndTime> _calls = new List<PositionAndTime>();
+
+        public List<PositionAndTime> Calls => this._calls;
 
         public override void Init(Monster monster)
             {

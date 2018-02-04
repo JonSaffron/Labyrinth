@@ -105,5 +105,26 @@ namespace Labyrinth
             var result = (attributes.Length > 0) ? (T)attributes[0] : null;
             return result;
             }
+
+        /// <summary>
+        /// Plays a sound which is centred on this instance
+        /// </summary>
+        /// <param name="gameObject">The gameobject to attach the sound to</param>
+        /// <param name="gameSound">Sets which sound to play</param>
+        public static void PlaySound(this IGameObject gameObject, GameSound gameSound)
+            {
+            GlobalServices.SoundPlayer.PlayForObject(gameSound, gameObject, GlobalServices.CentrePointProvider);
+            }
+
+        /// <summary>
+        /// Plays a sound which is centred on this instance and triggers a specified callback when the sound completes
+        /// </summary>
+        /// <param name="gameObject">The gameobject to attach the sound to</param>
+        /// <param name="gameSound">Sets which sound to play</param>
+        /// <param name="callback">The routine to call when the sound finishes playing</param>
+        public static void PlaySoundWithCallback(this IGameObject gameObject, GameSound gameSound, EventHandler callback)
+            {
+            GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, gameObject, GlobalServices.CentrePointProvider, callback);
+            }
         }
     }

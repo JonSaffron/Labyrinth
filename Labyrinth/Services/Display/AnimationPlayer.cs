@@ -8,7 +8,7 @@ namespace Labyrinth.Services.Display
     /// <summary>
     /// Controls playback of an Animation.
     /// </summary>
-    public class AnimationPlayer
+    public class AnimationPlayer : IAnimationPlayer
         {
         /// <summary>
         /// The animation which is currently playing.
@@ -75,7 +75,7 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// Begins or continues playback of an animation.
         /// </summary>
-        public void PlayAnimation([NotNull] Animation animation)
+        public void PlayAnimation(Animation animation)
             {
             if (animation == null)
                 throw new ArgumentNullException(nameof(animation));

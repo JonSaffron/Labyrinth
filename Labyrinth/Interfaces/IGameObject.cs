@@ -69,11 +69,5 @@ namespace Labyrinth
         /// <param name="spriteBatch">The spritebatch to draw to</param>
         void Draw(GameTime gt, ISpriteBatch spriteBatch);
         
-        /// <summary>
-        /// Plays a sound which is centred on this instance
-        /// </summary>
-        /// <param name="gameSound">Sets which sound to play</param>
-        // todo this shouldn't be part of this interface (or part of its implementation): move to an extension method
-        void PlaySound(GameSound gameSound);
         }
     }

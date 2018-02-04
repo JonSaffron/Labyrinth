@@ -5,7 +5,7 @@ using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
-    class ScoreKeeper : IScoreKeeper
+    class ScoreKeeper : IScoreKeeper, IDisposable
         {
         private decimal _score;
 
@@ -53,6 +53,7 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private void CrystalTaken(CrystalTaken crystalTaken)
             {
+            // todo check isextant
             this._score += crystalTaken.Crystal.Score;
             }
 
@@ -63,6 +64,13 @@ namespace Labyrinth.Services.ScoreKeeper
                 var result = this._score * 10m;
                 return result;
                 }
+            }
+
+        public void Dispose()
+            {
+            Messenger.Default.Unregister<MonsterShot>(this);
+            Messenger.Default.Unregister<MonsterCrushed>(this);
+            Messenger.Default.Unregister<CrystalTaken>(this);
             }
         }
     }

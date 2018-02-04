@@ -136,9 +136,9 @@ namespace Labyrinth
                     var b = GlobalServices.GameState.AddBang(movingObject.Position, BangType.Long);
                     if (movingObject is Monster monster)
                         {
-                        b.PlaySound(GameSound.MonsterDies);
                         var monsterCrushed = new MonsterCrushed(monster, moveableObject);
                         Messenger.Default.Send(monsterCrushed);
+                        b.PlaySound(GameSound.MonsterDies);
                         }
                     movingObject.InstantlyExpire();
                     return true;
@@ -216,8 +216,11 @@ namespace Labyrinth
                 return false;
                 }
 
-            var monsterKilledByShot = new MonsterShot(monster, shot);
-            Messenger.Default.Send(monsterKilledByShot);
+            if (monster != null)
+                {
+                var monsterKilledByShot = new MonsterShot(monster, shot);
+                Messenger.Default.Send(monsterKilledByShot);
+                }
 
             playerOrMonster.ReduceEnergy(shot.Energy);
             GlobalServices.GameState.ConvertShotToBang(shot);

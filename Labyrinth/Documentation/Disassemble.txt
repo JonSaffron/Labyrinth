@@ -5848,9 +5848,11 @@ static object injured (b)
 3552 CD CD 0B  CMP 0BCD                 -- compare to highest level achieved
 3555 F0 32     BEQ 3589                 -- equal, so skip next section
 3557 90 30     BCC 3589                 -- less, so skip next section
+
+		-- unlock level
+
 3559 8D CD 0B  STA 0BCD                 -- update highest level achieved
 355C 20 E0 2A  JSR 2AE0                 -- load fruit
-
 355F A0 BF     LDY #BF                  -- initialise loop counter
 3561 B9 00 07  LDA 0700,Y               -- get monster type
 3564 30 1E     BMI 3584                 -- skip eggs
@@ -5870,12 +5872,15 @@ static object injured (b)
 3585 C0 FF     CPY #FF                  -- finish loop?
 3587 D0 D8     BNE 3561                 -- go around
 
+		-- continue time passes with regular player energy reduction
+
 3589 AD 00 0C  LDA 0C00                 -- get player status
 358C C9 05     CMP #05                  
 358E D0 21     BNE 35B1                 -- branch if not alive
 
 3590 CE D9 08  DEC 08D9                 -- decrement counter 
 3593 10 1C     BPL 35B1                 -- not zero, so branch
+
 3595 AD 0E 0C  LDA 0C0E                 -- get current energy
 3598 4A        LSR A                    -- multiply by 2
 3599 49 FF     EOR #FF                  -- reverse bits
@@ -5888,6 +5893,8 @@ static object injured (b)
 
 35AB CE 0E 0C  DEC 0C0E                 -- decrement energy due to time
 35AE 20 E9 33  JSR 33E9                 -- redraw energy bar
+
+		-- continue time passes, possibly end main loop
 
 35B1 AD DC 0B  LDA 0BDC                 -- get delay to end of main loop
 35B4 10 18     BPL 35CE                 -- +ve so RTS

@@ -202,17 +202,17 @@ namespace Labyrinth
             {
             //const float minimumDistance = (Constants.TileLength * 2;
 
-            int countOfGameItemsThatMoved = 0;
-            int countOfGameItems = 0;
-            int countOfInteractions = 0;
+            //int countOfGameItemsThatMoved = 0;
+            //int countOfGameItems = 0;
+            //int countOfInteractions = 0;
             foreach (var currentItem in GlobalServices.GameState.GetSurvivingInteractiveItems())
                 {
-                countOfGameItems++;
+                //countOfGameItems++;
 
                 if (!currentItem.Update(gameTime))
                     continue;
                 GlobalServices.GameState.UpdatePosition(currentItem);
-                countOfGameItemsThatMoved++;
+                //countOfGameItemsThatMoved++;
 
                 Rectangle? bounds = null;
                 var tileRect = currentItem.TilePosition.GetRectAroundPosition(1);
@@ -230,7 +230,7 @@ namespace Labyrinth
                             }
                         if (bounds.Value.Intersects(si.BoundingRectangle))
                             {
-                            countOfInteractions++;
+                            //countOfInteractions++;
                             //Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
                             var interaction = BuildInteraction(currentItem, si);
                             interaction?.Collide();

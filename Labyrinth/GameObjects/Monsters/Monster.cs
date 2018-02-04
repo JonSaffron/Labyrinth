@@ -93,7 +93,7 @@ namespace Labyrinth.GameObjects
             {
             this.MonsterState = MonsterState.Hatching;
             if (this.IsExtant)
-                PlaySoundWithCallback(GameSound.EggHatches, EggHatches);
+                this.PlaySoundWithCallback(GameSound.EggHatches, EggHatches);
             }
 
         public void EggHatches(object sender, EventArgs args)
@@ -146,18 +146,15 @@ namespace Labyrinth.GameObjects
         /// <inheritdoc cref="IMonster" />
         public bool IsStationary => this._determineDirection is Stationary;
 
-        public override void ReduceEnergy(int energyToRemove)
+        protected override void UponInjury()
             {
-            base.ReduceEnergy(energyToRemove);
-            if (this.IsAlive())
-                {
-                this._injuryBehaviours.PerformAll();
-                return;
-                }
+            this._injuryBehaviours.PerformAll();
+            }
 
+        protected override void UponDeath()
+            {
             var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             bang.PlaySound(GameSound.MonsterDies);
-            
             this.DeathBehaviours.PerformAll();
             }
 
