@@ -12,7 +12,7 @@
         public override void Perform()
             {
             this.Monster.Mobility = this._mobilityToChangeTo;
-            this.Monster.InjuryBehaviours.Remove<ChangeMovementWhenHurt>();
+            this.Monster.Behaviours.Remove<ChangeMovementWhenHurt>();
             }
         }
     }

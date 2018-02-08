@@ -12,7 +12,7 @@ namespace Labyrinth.GameObjects
             
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.MovesRoom;
-            this.DeathBehaviours.Add<SpawnsUponDeath>();
+            this.Behaviours.Add<SpawnsUponDeath>();
             }
         }
     }

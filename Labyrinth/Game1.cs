@@ -12,7 +12,8 @@ namespace Labyrinth
     public class Game1 : Game
         {
         private readonly GraphicsDeviceManager _gdm;
-        private readonly IWorldLoader _worldLoader;
+        [NotNull] private readonly IWorldLoader _worldLoader;
+        [NotNull] private readonly IScoreKeeper _scoreKeeper;
         private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
         private ISpriteBatch _spriteBatch;
 
@@ -25,6 +26,7 @@ namespace Labyrinth
             {
             services.Setup(this);
             this._worldLoader = services.WorldLoader ?? throw new ArgumentException("WorldLoader");
+            this._scoreKeeper = services.ScoreKeeper ?? throw new ArgumentException("ScoreKeeper");
             GlobalServices.SetGame(this);
             
             this._gdm = new GraphicsDeviceManager(this)
@@ -36,7 +38,7 @@ namespace Labyrinth
             this.Content.RootDirectory = "Content";
             this._lives = 2;
             this._headsUpDisplay.Reset();
-            GlobalServices.ScoreKeeper?.Reset();
+            this._scoreKeeper.Reset();
             }
 
         /// <summary>
@@ -172,7 +174,7 @@ namespace Labyrinth
                 this._spriteBatch.Begin(this._world.WorldWindow.WindowPosition);
 
                 this._world.Draw(gameTime, _spriteBatch);
-                this._headsUpDisplay.DrawStatus(_spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, GlobalServices.ScoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
+                this._headsUpDisplay.DrawStatus(_spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, this._scoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
                 
                 base.Draw(gameTime);
                 this._spriteBatch.End();

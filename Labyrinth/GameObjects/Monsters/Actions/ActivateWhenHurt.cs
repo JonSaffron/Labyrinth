@@ -5,7 +5,7 @@
         public override void Perform()
             {
             this.Monster.IsActive = true;
-            this.Monster.InjuryBehaviours.Remove<ActivateWhenHurt>();
+            this.Monster.Behaviours.Remove<ActivateWhenHurt>();
             }
         }
     }

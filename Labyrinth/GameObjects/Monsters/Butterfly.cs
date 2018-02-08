@@ -11,11 +11,11 @@ namespace Labyrinth.GameObjects
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/Butterfly", 3));
             
-            this.MovementBehaviours.Add<Flitter>();
+            this.Behaviours.Add<Flitter>();
             this.Mobility = MonsterMobility.Aggressive;
             this.ChangeRooms = ChangeRooms.FollowsPlayer;
-            this.MovementBehaviours.Add<LaysEgg>();
-            this.SetShootsAtPlayer(true);
+            this.Behaviours.Add<LaysEgg>();
+            this.AddShootsAtPlayerBehaviour();
             }
 
         protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)

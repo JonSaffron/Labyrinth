@@ -14,9 +14,9 @@ namespace Labyrinth.GameObjects.Actions
             _monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
-        public void PerformAll()
+        public void Perform<T>() where T : IBehaviour
             {
-            foreach (var action in this.Items)
+            foreach (var action in this.Items.OfType<T>())
                 action.Perform();
             }
 

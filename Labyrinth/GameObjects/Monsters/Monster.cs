@@ -24,9 +24,7 @@ namespace Labyrinth.GameObjects
         public bool IsActive { get; set; }
         public bool ShotsBounceOff { get; set; }
 
-        [NotNull] private readonly BehaviourCollection _movementBehaviours;
-        [NotNull] private readonly BehaviourCollection _injuryBehaviours;
-        [NotNull] private readonly BehaviourCollection _deathBehaviours;
+        [NotNull] private readonly BehaviourCollection _behaviours;
 
         private Animation _normalAnimation;
         private static readonly Animation EggAnimation;
@@ -48,9 +46,7 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             this.OriginalEnergy = energy;
             this.CurrentSpeed = Constants.BaseSpeed;
-            this._movementBehaviours = new BehaviourCollection(this);
-            this._injuryBehaviours = new BehaviourCollection(this);
-            this._deathBehaviours = new BehaviourCollection(this);
+            this._behaviours = new BehaviourCollection(this);
             }
             
         public MonsterMobility Mobility
@@ -148,14 +144,14 @@ namespace Labyrinth.GameObjects
 
         protected override void UponInjury()
             {
-            this._injuryBehaviours.PerformAll();
+            this._behaviours.Perform<IInjuryBehaviour>();
             }
 
         protected override void UponDeath()
             {
             var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             bang.PlaySound(GameSound.MonsterDies);
-            this.DeathBehaviours.PerformAll();
+            this._behaviours.Perform<IDeathBehaviour>();
             }
 
         public override int DrawOrder
@@ -229,7 +225,7 @@ namespace Labyrinth.GameObjects
                         yield return true;  // we have moved
                         }
 
-                    this.MovementBehaviours.PerformAll();
+                    this._behaviours.Perform<IMovementBehaviour>();
                     }
                 else
                     {
@@ -251,7 +247,7 @@ namespace Labyrinth.GameObjects
                     break;
 
                 timeStationary -= timeItWouldTakeToMakeAMove;
-                this.MovementBehaviours.PerformAll();
+                this._behaviours.Perform<IMovementBehaviour>();
                 }
             }
 
@@ -285,18 +281,14 @@ namespace Labyrinth.GameObjects
         public int CurrentSpeed { get; set; }
         public override decimal StandardSpeed => this.CurrentSpeed;
 
-        [NotNull] public BehaviourCollection MovementBehaviours => this._movementBehaviours;
-
-        [NotNull] public BehaviourCollection InjuryBehaviours => this._injuryBehaviours;
-
-        [NotNull] public BehaviourCollection DeathBehaviours => this._deathBehaviours;
+        public BehaviourCollection Behaviours => this._behaviours;
 
         public bool HasBehaviour<T>() where T : IBehaviour
             {
-            var result = this.MovementBehaviours.Has<T>() || this.InjuryBehaviours.Has<T>() || this.DeathBehaviours.Has<T>();
+            var result = this._behaviours.Has<T>();
             return result;
             }
 
-        protected override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;
+        public override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;
         }
     }

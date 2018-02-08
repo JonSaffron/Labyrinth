@@ -11,7 +11,7 @@ namespace Labyrinth.GameObjects
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/ThresherCyan", 4));
             
             this.Mobility = MonsterMobility.Aggressive;
-            this.MovementBehaviours.Add<LaysMushroom>();
+            this.Behaviours.Add<LaysMushroom>();
             }
         }
     }

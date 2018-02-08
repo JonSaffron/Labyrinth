@@ -7,12 +7,14 @@ namespace Labyrinth.Test
     class UnitTestServices : IServiceSetup
         {
         public IWorldLoader WorldLoader { get; }
+        public IScoreKeeper ScoreKeeper { get; }
 
         public PlayerController PlayerController;
 
         public UnitTestServices()
             {
             this.WorldLoader = new WorldLoaderForTest();
+            this.ScoreKeeper = new ScoreKeeper();
             }
 
         public void Setup(Game1 game)
@@ -29,9 +31,6 @@ namespace Labyrinth.Test
 
             var spriteLibrary = new DummySpriteLibrary();
             GlobalServices.SetSpriteLibrary(spriteLibrary);
-
-            var scoreKeeper = new NullScoreKeeper();
-            GlobalServices.SetScoreKeeper(scoreKeeper);
 
             game.Components.Add(new SuppressDrawComponent(game));
             }

@@ -270,15 +270,15 @@ namespace Labyrinth
             if (monsterDef.IsEgg.GetValueOrDefault() && monsterDef.TimeBeforeHatching.HasValue)
                 result.SetDelayBeforeHatching(monsterDef.TimeBeforeHatching.Value);
             if (monsterDef.LaysMushrooms.HasValue)
-                result.MovementBehaviours.Set<LaysMushroom>(monsterDef.LaysMushrooms.Value);
+                result.Behaviours.Set<LaysMushroom>(monsterDef.LaysMushrooms.Value);
             if (monsterDef.LaysEggs.HasValue)
-                result.MovementBehaviours.Set<LaysEgg>(monsterDef.LaysEggs.Value);
+                result.Behaviours.Set<LaysEgg>(monsterDef.LaysEggs.Value);
             if (monsterDef.SplitsOnHit.HasValue)
-                result.DeathBehaviours.Set<SpawnsUponDeath>(monsterDef.SplitsOnHit.Value);
+                result.Behaviours.Set<SpawnsUponDeath>(monsterDef.SplitsOnHit.Value);
             if (monsterDef.ShootsAtPlayer.HasValue)
                 result.SetShootsAtPlayer(monsterDef.ShootsAtPlayer.Value);
             if (monsterDef.ShootsOnceProvoked.HasValue)
-                result.SetShootsOnceProvoked(monsterDef.ShootsOnceProvoked.Value);
+                result.Behaviours.Set<StartsShootingWhenHurt>(monsterDef.ShootsOnceProvoked.Value);
             if (monsterDef.ShotsBounceOff.HasValue)
                 result.ShotsBounceOff = monsterDef.ShotsBounceOff.Value;
             if (monsterDef.IsActive.HasValue)

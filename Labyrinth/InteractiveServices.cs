@@ -1,5 +1,6 @@
 ﻿using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.ScoreKeeper;
 using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
 
@@ -8,10 +9,12 @@ namespace Labyrinth
     class InteractiveServices : IServiceSetup
         {
         public IWorldLoader WorldLoader { get; }
+        public IScoreKeeper ScoreKeeper { get; }
 
         public InteractiveServices()
             {
             this.WorldLoader = new WorldLoader();
+            this.ScoreKeeper = new ScoreKeeper();
             }
 
         public void Setup(Game1 game)
@@ -29,9 +32,6 @@ namespace Labyrinth
 
             var spriteLibrary = new SpriteLibrary(game);
             GlobalServices.SetSpriteLibrary(spriteLibrary);
-
-            // var scoreKeeper = new ScoreKeeper();
-            // GlobalServices.SetScoreKeeper(scoreKeeper);
             }
         }
     }

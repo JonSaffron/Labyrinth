@@ -63,11 +63,11 @@ namespace Labyrinth.Services.WorldBuilding
                 InitialDirection = monster.InitialDirection,
                 ChangeRooms = monster.ChangeRooms,
                 IsEgg = false,
-                LaysMushrooms = monster.MovementBehaviours.Has<LaysMushroom>(),
-                LaysEggs = monster.MovementBehaviours.Has<LaysEgg>(),
-                SplitsOnHit = monster.DeathBehaviours.Has<SpawnsUponDeath>(),
-                ShootsAtPlayer = monster.MovementBehaviours.Has<ShootsAtPlayer>(),
-                ShootsOnceProvoked = monster.GetShootsOnceProvoked(),
+                LaysMushrooms = monster.Behaviours.Has<LaysMushroom>(),
+                LaysEggs = monster.Behaviours.Has<LaysEgg>(),
+                SplitsOnHit = monster.Behaviours.Has<SpawnsUponDeath>(),
+                ShootsAtPlayer = monster.Behaviours.Has<ShootsAtPlayer>(),
+                ShootsOnceProvoked = monster.Behaviours.Has<StartsShootingWhenHurt>(),
                 ShotsBounceOff = monster.ShotsBounceOff,
                 IsActive = monster.IsActive
                 };

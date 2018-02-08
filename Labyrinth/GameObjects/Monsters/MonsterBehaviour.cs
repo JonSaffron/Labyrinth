@@ -4,33 +4,23 @@ namespace Labyrinth.GameObjects
     {
     static class MonsterBehaviour
         {
-        public static bool GetShootsAtPlayer(this Monster monster)
+        public static void AddShootsAtPlayerBehaviour(this Monster monster)
             {
-            return monster.MovementBehaviours.Has<ShootsAtPlayer>();
+            var behaviour = new ShootsAtPlayer(new StandardMonsterWeapon(monster));
+            behaviour.Init(monster);
+            monster.Behaviours.Add(behaviour);
             }
 
         public static void SetShootsAtPlayer(this Monster monster, bool value)
             {
             if (value)
                 {
-                var behaviour = new ShootsAtPlayer(new StandardMonsterWeapon(monster));
-                behaviour.Init(monster);
-                monster.MovementBehaviours.Add(behaviour);
+                AddShootsAtPlayerBehaviour(monster);
                 }
             else
                 {
-                monster.MovementBehaviours.Remove<ShootsAtPlayer>();
+                monster.Behaviours.Remove<ShootsAtPlayer>();
                 }
-            }
-
-        public static bool GetShootsOnceProvoked(this Monster monster)
-            {
-            return monster.InjuryBehaviours.Has<StartsShootingWhenHurt>();
-            }
-
-        public static void SetShootsOnceProvoked(this Monster monster, bool value)
-            { 
-            monster.InjuryBehaviours.Set<StartsShootingWhenHurt>(value);
             }
 
         public static bool IsArmed(this IMonster monster)

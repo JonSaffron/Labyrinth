@@ -9,7 +9,7 @@ namespace Labyrinth.GameObjects
         {
         protected Flitterbug(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
             {
-            this.MovementBehaviours.Add<Flitter>();
+            this.Behaviours.Add<Flitter>();
             }
 
         protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)

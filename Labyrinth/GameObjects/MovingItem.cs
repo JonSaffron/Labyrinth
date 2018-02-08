@@ -46,24 +46,14 @@ namespace Labyrinth.GameObjects
         public abstract bool Update(GameTime gameTime);
 
         /// <summary>
-        /// Determines whether an object can move in the specified direction
-        /// </summary>
-        /// <param name="direction">The direction to test for</param>
-        /// <returns>True if the object is able to begin a movement in the specified direction, even if it might then bounce backwards</returns>
-        public bool CanMoveInDirection(Direction direction)
-            {
-            var result = this.CanMoveInDirection(direction, true);
-            return result;
-            }
-
-        /// <summary>
         /// Initiates a push or bounce involving this object
         /// </summary>
         /// <param name="byWhom">The object that is acting on this object</param>
         /// <param name="direction">The direction that the specified object is directing this object</param>
         public void PushOrBounce(IMovingItem byWhom, Direction direction)
             {
-            var ps = CanBePushedOrBounced(byWhom, direction, true);
+            bool canCauseBounceBack = this.Capability == ObjectCapability.CanPushOrCauseBounceBack;
+            var ps = CanBePushedOrBounced(byWhom, direction, canCauseBounceBack);
             switch (ps)
                 {
                 case PushStatus.No:
@@ -71,14 +61,12 @@ namespace Labyrinth.GameObjects
 
                 case PushStatus.Yes:
                     {
-                    System.Diagnostics.Trace.WriteLine(string.Format("{0} is pushing {1}", byWhom.GetType().Name, this.GetType().Name));
                     this.Move(direction, this.StandardSpeed);
                     return;
                     }
 
                 case PushStatus.Bounce:
                     {
-                    System.Diagnostics.Trace.WriteLine(string.Format("{0} is bouncing {1}", byWhom.GetType().Name, this.GetType().Name));
                     var reverseDirection = direction.Reversed();
                     this.Move(reverseDirection, this.BounceBackSpeed);
                     byWhom.BounceBack(reverseDirection, this.BounceBackSpeed);
@@ -89,6 +77,18 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new InvalidOperationException();
                 }
+            }
+
+        /// <summary>
+        /// Determines whether this object can move in the specified direction
+        /// </summary>
+        /// <param name="direction">The direction to test for</param>
+        /// <returns>True if the object is able to begin a movement in the specified direction, even if it might then bounce backwards</returns>
+        public bool CanMoveInDirection(Direction direction)
+            {
+            bool canCauseBounceBack = this.Capability == ObjectCapability.CanPushOrCauseBounceBack;
+            var result = this.CanMoveInDirection(direction, canCauseBounceBack);
+            return result;
             }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace Labyrinth.GameObjects
                 return PushStatus.No;
 
             // this object will be able to bounceback only if the object that is pushing it can move backwards
-            var willBounceBack = byWhom.CanMoveInDirection(direction.Reversed(), false);
+            var willBounceBack = this.CanMoveInDirection(direction.Reversed(), false);
             var result = willBounceBack ? PushStatus.Bounce : PushStatus.No;
             return result;
             }
@@ -186,7 +186,6 @@ namespace Labyrinth.GameObjects
             var movingTowardsTilePos = this.TilePosition.GetPositionAfterOneMove(direction);
             var movingTowards = movingTowardsTilePos.ToPosition();
             this.CurrentMovement = new Labyrinth.Movement(direction, movingTowards, speed);
-            //System.Diagnostics.Trace.WriteLine(string.Format("{0}: Moving {1} from {2} to {3} ({4}) at {5}p/s", this.GetType().Name, direction, this.Position, movingTowards, movingTowardsTilePos, speed));
             }
 
         /// <summary>
@@ -195,7 +194,6 @@ namespace Labyrinth.GameObjects
         public void StandStill()
             {
             this.CurrentMovement = Labyrinth.Movement.Still;
-            //System.Diagnostics.Trace.WriteLine(string.Format("{0}: Standing still at {1}", this.GetType().Name, this.TilePosition));
             }
 
         /// <summary>
@@ -210,7 +208,6 @@ namespace Labyrinth.GameObjects
             var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);
             var movingTowards = movingTowardsTilePos.ToPosition();
             this.CurrentMovement = new Labyrinth.Movement(direction, movingTowards, speed);
-            //System.Diagnostics.Trace.WriteLine(string.Format("{0}: Bouncing back {1} from {2} to {3} ({4}) at {5}p/s", this.GetType().Name, direction, this.Position, movingTowards, movingTowardsTilePos, speed));
             }
 
         /// <summary>
@@ -273,6 +270,6 @@ namespace Labyrinth.GameObjects
         protected virtual decimal BounceBackSpeed => Constants.BounceBackSpeed;
 
         // todo: get rid of this. replace with a boundries property which equals the world rect if the object can change rooms, and the room rect if it cannot.
-        protected virtual bool CanChangeRooms => false;
+        public virtual bool CanChangeRooms => false;
         }
     }

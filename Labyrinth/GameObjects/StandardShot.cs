@@ -169,7 +169,7 @@ namespace Labyrinth.GameObjects
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 4;
 
-        protected override bool CanChangeRooms => true;
+        public override bool CanChangeRooms => true;
 
         }
     }

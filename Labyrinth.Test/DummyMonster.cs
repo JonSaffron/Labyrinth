@@ -16,11 +16,11 @@ namespace Labyrinth.Test
 
             var action = new DummyAction();
             action.Init(this);
-            base.MovementBehaviours.Add(action);
+            this.Behaviours.Add(action);
             
             var action2 = new Flitter();
             action2.Init(this);
-            base.MovementBehaviours.Add(action2);
+            this.Behaviours.Add(action2);
             }
 
         public override void ResetPosition(Vector2 position)
@@ -37,7 +37,7 @@ namespace Labyrinth.Test
             {
             get
                 {
-                var dummyAction = (DummyAction) base.MovementBehaviours[0];
+                var dummyAction = (DummyAction) this.Behaviours[0];
                 return dummyAction.Calls;
                 }
             }
