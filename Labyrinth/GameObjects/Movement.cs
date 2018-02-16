@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     class MovementChecker
         {
-        private readonly IMovingItem _source;
+        protected readonly IMovingItem _source;
 
         public MovementChecker([NotNull] IMovingItem source)
             {
@@ -88,7 +88,8 @@ namespace Labyrinth.GameObjects
                 return PushStatus.No;
 
             // if the moving object cannot move other objects then the answer's no
-            if (!byWhom.Capability.CanMoveAnother())
+            // the moving object cannot be a moveable object - moveable objects can't push other moveable objects
+            if (!byWhom.Capability.CanMoveAnother() || byWhom.Solidity == ObjectSolidity.Moveable)
                 return PushStatus.No;
 
             // check if this object can move in the specified direction

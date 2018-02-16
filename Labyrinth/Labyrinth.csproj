@@ -147,6 +147,7 @@
     <Compile Include="GameObjects\Monsters\Movement\PatrolPerimeter.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Stationary.cs" />
     <Compile Include="GameObjects\Movement.cs" />
+    <Compile Include="GameObjects\MovementOfAnother.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />

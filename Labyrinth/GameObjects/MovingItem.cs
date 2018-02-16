@@ -46,40 +46,6 @@ namespace Labyrinth.GameObjects
         public abstract bool Update(GameTime gameTime);
 
         /// <summary>
-        /// Initiates a push or bounce involving this object
-        /// </summary>
-        /// <param name="byWhom">The object that is acting on this object</param>
-        /// <param name="direction">The direction that the specified object is directing this object</param>
-        public void PushOrBounce(IMovingItem byWhom, Direction direction)
-            {
-            bool canCauseBounceBack = this.Capability == ObjectCapability.CanPushOrCauseBounceBack;
-            var ps = CanBePushedOrBounced(byWhom, direction, canCauseBounceBack);
-            switch (ps)
-                {
-                case PushStatus.No:
-                    return;
-
-                case PushStatus.Yes:
-                    {
-                    this.Move(direction, this.StandardSpeed);
-                    return;
-                    }
-
-                case PushStatus.Bounce:
-                    {
-                    var reverseDirection = direction.Reversed();
-                    this.Move(reverseDirection, this.BounceBackSpeed);
-                    byWhom.BounceBack(reverseDirection, this.BounceBackSpeed);
-                    this.PlaySound(GameSound.BoulderBounces);
-                    return;
-                    }
-
-                default:
-                    throw new InvalidOperationException();
-                }
-            }
-
-        /// <summary>
         /// Determines whether this object can move in the specified direction
         /// </summary>
         /// <param name="direction">The direction to test for</param>
