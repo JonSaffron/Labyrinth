@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -125,6 +126,19 @@ namespace Labyrinth
         public static void PlaySoundWithCallback(this IGameObject gameObject, GameSound gameSound, EventHandler callback)
             {
             GlobalServices.SoundPlayer.PlayForObjectWithCallback(gameSound, gameObject, GlobalServices.CentrePointProvider, callback);
+            }
+
+        public static bool CanMoveInDirection(this IMovingItem gameObject, Direction direction)
+            {
+            var mc = new MovementChecker(gameObject);
+            var result = mc.CanMove(direction);
+            return result;
+            }
+
+        public static void PushOrBounce(this IMovingItem objectDoingThePushing, IMovingItem objectBeingPushed, Direction direction)
+            {
+            var moa = new MovementOfAnother(objectDoingThePushing);
+            moa.PushOrBounce(objectBeingPushed, direction);
             }
         }
     }
