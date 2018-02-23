@@ -73,6 +73,13 @@ namespace Labyrinth
             return false;
             }
 
+        public static bool CanChangeRooms(this ChangeRooms changeRooms)
+            {
+            if (changeRooms == ChangeRooms.FollowsPlayer || changeRooms == ChangeRooms.MovesRoom)
+                return true;
+            return false;
+            }
+
         internal static bool IsAlive(this IMovingItem mi)
             {
             var result = mi.IsExtant;

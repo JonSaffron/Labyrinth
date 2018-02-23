@@ -132,13 +132,9 @@ namespace Labyrinth.GameObjects
         /// <remarks>Measured in pixels per second</remarks>
         public virtual decimal StandardSpeed => Constants.BaseSpeed;
 
-        /// <summary>
-        /// Gets the speed this object moves at when bouncing back
-        /// </summary>
-        /// <remarks>Measured in pixels per second</remarks>
-        protected virtual decimal BounceBackSpeed => Constants.BounceBackSpeed;
-
         // todo: get rid of this. replace with a boundries property which equals the world rect if the object can change rooms, and the room rect if it cannot.
         public virtual bool CanChangeRooms => false;
+
+        public IBoundMovement MovementBoundary { get; protected set; }
         }
     }

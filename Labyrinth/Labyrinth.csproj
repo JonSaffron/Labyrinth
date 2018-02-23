@@ -129,6 +129,8 @@
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoulderForTesting.cs" />
+    <Compile Include="GameObjects\BoundaryFixed.cs" />
+    <Compile Include="GameObjects\BoundMovementFactory.cs" />
     <Compile Include="GameObjects\Monsters\Actions\ActivateWhenHurt.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BaseBehaviour.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BehaviourCollection.cs" />
@@ -153,6 +155,8 @@
     <Compile Include="GlobalServices.cs" />
     <Compile Include="InteractiveServices.cs" />
     <Compile Include="Interfaces\IBehaviour.cs" />
+    <Compile Include="Interfaces\IBoundMovement.cs" />
+    <Compile Include="Interfaces\IBoundMovementFactory.cs" />
     <Compile Include="Interfaces\IClockEvent.cs" />
     <Compile Include="Interfaces\IGameObjectCollection.cs" />
     <Compile Include="HeadsUpDisplay.cs" />

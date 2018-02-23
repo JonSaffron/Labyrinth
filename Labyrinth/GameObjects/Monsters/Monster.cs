@@ -17,7 +17,6 @@ namespace Labyrinth.GameObjects
         [CanBeNull] private IMonsterMotion _determineDirection;
         public Direction InitialDirection = Direction.None;
 
-        public ChangeRooms ChangeRooms { get; set; }
         private MonsterState _monsterState = MonsterState.Normal;
         [CanBeNull] private GameTimer _hatchingTimer;
 
@@ -34,6 +33,7 @@ namespace Labyrinth.GameObjects
 
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
+        private ChangeRooms _changeRooms;
 
         static Monster()
             {
@@ -287,6 +287,19 @@ namespace Labyrinth.GameObjects
             {
             var result = this._behaviours.Has<T>();
             return result;
+            }
+
+        public ChangeRooms ChangeRooms
+            {
+            get => _changeRooms;
+            set
+                {
+                this._changeRooms = value;
+                if (value.CanChangeRooms())
+                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetExplicitBoundary();
+                else
+                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom();
+                }
             }
 
         public override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;

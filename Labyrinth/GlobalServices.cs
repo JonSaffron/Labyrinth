@@ -82,5 +82,12 @@ namespace Labyrinth
             {
             Randomess = randomess;
             }
+
+        public static void SetBoundMovementFactory(IBoundMovementFactory boundMovementFactory)
+            {
+            BoundMovementFactory = boundMovementFactory;
+            }
+
+        public static IBoundMovementFactory BoundMovementFactory { get; private set; }
         }
     }

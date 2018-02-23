@@ -1,4 +1,6 @@
-﻿namespace Labyrinth
+﻿using JetBrains.Annotations;
+
+namespace Labyrinth
     {
     public readonly struct TileRect
         {
@@ -13,6 +15,7 @@
             this.Height = height;
             }
 
+        [Pure]
         public bool Contains(TilePos tp)
             {
             var result = 

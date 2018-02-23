@@ -145,6 +145,7 @@ namespace Labyrinth.GameObjects.Movement
             return result;
             }
 
+        // todo confirm that this can be deleted
         public static Direction ContinueOrReverse(Monster monster, Direction currentDirection)
             {
             if (monster.CanMoveInDirection(currentDirection))
