@@ -1,26 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Labyrinth.GameObjects
+﻿namespace Labyrinth.GameObjects
     {
     public class BoundMovementFactory : IBoundMovementFactory
         {
-        public BoundMovementFactory()
-            {
+        private readonly TileRect _worldBoundary;
 
+        public BoundMovementFactory(TileRect worldBoundary)
+            {
+            this._worldBoundary = worldBoundary;
             }
 
-        public IBoundMovement GetExplicitBoundary()
+        public IBoundMovement GetWorldBoundary()
             {
-            throw new NotImplementedException();
+            return new BoundaryFixed(this._worldBoundary);
             }
 
-        public IBoundMovement GetBoundedInRoom()
+        public IBoundMovement GetExplicitBoundary(TileRect boundary)
             {
-            throw new NotImplementedException();
+            return new BoundaryFixed(boundary);
+            }
+
+        public IBoundMovement GetBoundedInRoom(TilePos tilePos)
+            {
+            var boundary = World.GetContainingRoom(tilePos);
+            return new BoundaryFixed(boundary);
             }
         }
     }

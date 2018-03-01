@@ -23,7 +23,7 @@ namespace Labyrinth.GameObjects
         private bool CanMove(IMovingItem objectToCheck, Direction direction, bool isBounceBackPossible)
             {
             TilePos proposedDestination = objectToCheck.TilePosition.GetPositionAfterOneMove(direction);
-            if (!IsPositionWithinMovementBoundaries(proposedDestination))
+            if (this.Source.MovementBoundary == null || !this.Source.MovementBoundary.IsPositionWithinMovementBoundaries(proposedDestination))
                 {
                 return false;
                 }
@@ -31,20 +31,6 @@ namespace Labyrinth.GameObjects
             var objectsOnTile = GlobalServices.GameState.GetItemsOnTile(proposedDestination);
             var result = CanObjectOccupySameTile(objectToCheck, objectsOnTile, direction, isBounceBackPossible);
             return result;
-            }
-
-        private bool IsPositionWithinMovementBoundaries(TilePos proposedDestination)
-            {
-            if (!GlobalServices.World.IsTileWithinWorld(proposedDestination))
-                return false;
-            if (!this.Source.CanChangeRooms)
-                {
-                var currentRoom = World.GetContainingRoom(this.Source.Position);
-                var potentialRoom = World.GetContainingRoom(proposedDestination.ToPosition());
-                if (currentRoom != potentialRoom)
-                    return false;
-                }
-            return true;
             }
 
         private bool CanObjectOccupySameTile(IMovingItem gameObject, IEnumerable<IGameObject> objectsOnTile, Direction direction, bool isBounceBackPossible)

@@ -296,9 +296,9 @@ namespace Labyrinth.GameObjects
                 {
                 this._changeRooms = value;
                 if (value.CanChangeRooms())
-                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetExplicitBoundary();
+                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
                 else
-                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom();
+                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom(this.TilePosition);
                 }
             }
 

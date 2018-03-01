@@ -52,6 +52,9 @@ namespace Labyrinth
             this.WorldWindow = new WorldWindow();
             GlobalServices.SetCentrePointProvider(this.WorldWindow);
 
+            var boundMovementFactory = new BoundMovementFactory(this._worldSize);
+            GlobalServices.SetBoundMovementFactory(boundMovementFactory);
+
             ValidateGameState(gameState);
             }
 
@@ -282,7 +285,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="position">Specifies the position within the world</param>
         /// <returns>A rectangular structure which specifies the co-ordinates of the room containing the specified position</returns>
-        private static TileRect GetContainingRoom(TilePos position)
+        public static TileRect GetContainingRoom(TilePos position)
             {
             var roomx = (int)(position.X / Constants.RoomSizeInTiles.X);
             var roomy = (int)(position.Y / Constants.RoomSizeInTiles.Y);

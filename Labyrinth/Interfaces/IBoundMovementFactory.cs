@@ -2,7 +2,8 @@
     {
     public interface IBoundMovementFactory
         {
-        IBoundMovement GetExplicitBoundary();
-        IBoundMovement GetBoundedInRoom();
+        IBoundMovement GetWorldBoundary();
+        IBoundMovement GetExplicitBoundary(TileRect boundary);
+        IBoundMovement GetBoundedInRoom(TilePos tilePos);
         }
     }
