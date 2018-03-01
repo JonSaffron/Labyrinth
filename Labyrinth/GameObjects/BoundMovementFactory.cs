@@ -4,8 +4,9 @@
         {
         private readonly TileRect _worldBoundary;
 
-        public BoundMovementFactory(TileRect worldBoundary)
+        public BoundMovementFactory(TilePos worldSize)
             {
+            var worldBoundary = new TileRect(new TilePos(0, 0), worldSize.X, worldSize.Y);
             this._worldBoundary = worldBoundary;
             }
 
