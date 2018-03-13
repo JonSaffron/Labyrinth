@@ -71,6 +71,7 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             this._worldAreaIdsVisited.Add(initialWorldAreaId);
             Reset();
+            this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
             }
 
         private void PlayerSpriteNewFrame(object sender, EventArgs e)
@@ -315,7 +316,5 @@ namespace Labyrinth.GameObjects
         public override ObjectCapability Capability => ObjectCapability.CanPushOrCauseBounceBack;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 2;
-
-        public override bool CanChangeRooms => true;
         }
     }

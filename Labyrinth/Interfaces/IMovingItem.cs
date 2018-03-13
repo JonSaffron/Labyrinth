@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
 namespace Labyrinth
     {
@@ -9,8 +8,8 @@ namespace Labyrinth
         Vector2 OriginalPosition { get; set; }
         bool IsMoving { get; }
         ObjectCapability Capability { get; }
-        [Obsolete] bool CanChangeRooms { get; }
         decimal StandardSpeed { get; }
+        IBoundMovement MovementBoundary { get; set; } 
 
         bool Update(GameTime gameTime);
 
@@ -18,7 +17,5 @@ namespace Labyrinth
         void Move(Direction direction, decimal speed);
         void BounceBack(Direction direction, decimal speed);
         //void StandStill();
-
-        IBoundMovement MovementBoundary { get; }
         }
     }

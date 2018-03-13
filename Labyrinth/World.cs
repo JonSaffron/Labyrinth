@@ -34,6 +34,9 @@ namespace Labyrinth
             this._restartInSameRoom = worldLoader.RestartInSameRoom;
             this._playerStartStates = worldLoader.PlayerStartStates;
 
+            var boundMovementFactory = new BoundMovementFactory(this._worldSize);
+            GlobalServices.SetBoundMovementFactory(boundMovementFactory);
+
             var gameObjectCollection = new GameObjectCollection();
             var gameState = new GameState(gameObjectCollection);
             GlobalServices.SetGameState(gameState);
@@ -51,9 +54,6 @@ namespace Labyrinth
 
             this.WorldWindow = new WorldWindow();
             GlobalServices.SetCentrePointProvider(this.WorldWindow);
-
-            var boundMovementFactory = new BoundMovementFactory(this._worldSize);
-            GlobalServices.SetBoundMovementFactory(boundMovementFactory);
 
             ValidateGameState(gameState);
             }

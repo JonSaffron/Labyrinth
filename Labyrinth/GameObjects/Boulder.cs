@@ -15,6 +15,7 @@ namespace Labyrinth.GameObjects
             {
             LoadContent();
             Ap.PlayAnimation(_staticImage);
+            this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
             }
         
         /// <summary>
@@ -49,7 +50,5 @@ namespace Labyrinth.GameObjects
         public override int DrawOrder => (int) SpriteDrawOrder.Boulder;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 2.5m;
-
-        public override bool CanChangeRooms => true;
         }
     }

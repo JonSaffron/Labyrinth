@@ -107,8 +107,7 @@ namespace Labyrinth.Test
             Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.IsNotEmpty(list);
-            Assert.AreEqual(1, list.Count);
-            Assert.IsTrue(list[0] is Boulder);
+            Assert.IsTrue(list.OfType<Boulder>().Any());
             }
 
         [Test]

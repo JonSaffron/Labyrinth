@@ -301,7 +301,5 @@ namespace Labyrinth.GameObjects
                     this.MovementBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom(this.TilePosition);
                 }
             }
-
-        public override bool CanChangeRooms => this.ChangeRooms == ChangeRooms.FollowsPlayer || this.ChangeRooms == ChangeRooms.MovesRoom;
         }
     }

@@ -100,7 +100,7 @@ namespace Labyrinth
             var result = ShouldStartPushOrBounce(moveableObject, movingObject);
             if (result)
                 {
-                moveableObject.PushOrBounce(movingObject, movingObject.CurrentMovement.Direction);
+                movingObject.PushOrBounce(moveableObject, movingObject.CurrentMovement.Direction);
                 if (movingObject is StandardShot standardShot)
                     GlobalServices.GameState.ConvertShotToBang(standardShot);
                 }

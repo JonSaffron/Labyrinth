@@ -35,6 +35,7 @@ namespace Labyrinth.GameObjects
             ResetTimeToTravel();
 
             this._boundingRectangles = GetBoundingRectangles();
+            this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
             }
 
         private Dictionary<Direction, Rectangle> GetBoundingRectangles()
@@ -168,8 +169,5 @@ namespace Labyrinth.GameObjects
         public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 4;
-
-        public override bool CanChangeRooms => true;
-
         }
     }
