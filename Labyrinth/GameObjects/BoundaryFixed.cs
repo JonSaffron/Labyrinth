@@ -9,12 +9,7 @@
             this._boundary = boundary;
             }
 
-        public static BoundaryFixed FromSize(TilePos size)
-            {
-            return new BoundaryFixed(new TileRect(new TilePos(0, 0), size.X, size.Y));
-            }
-
-        public bool IsPositionWithinMovementBoundaries(TilePos tilePos)
+        public bool IsPositionWithinBoundary(TilePos tilePos)
             {
             var result = this._boundary.Contains(tilePos);
             return result;

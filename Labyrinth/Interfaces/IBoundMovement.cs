@@ -2,6 +2,6 @@
     {
     public interface IBoundMovement
         {
-        bool IsPositionWithinMovementBoundaries(TilePos tilePos);
+        bool IsPositionWithinBoundary(TilePos tilePos);
         }
     }

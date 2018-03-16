@@ -22,6 +22,7 @@ namespace Labyrinth.GameObjects
 
         public bool IsActive { get; set; }
         public bool ShotsBounceOff { get; set; }
+        public IBoundMovement SightBoundary { get; set; }
 
         [NotNull] private readonly BehaviourCollection _behaviours;
 
@@ -296,9 +297,24 @@ namespace Labyrinth.GameObjects
                 {
                 this._changeRooms = value;
                 if (value.CanChangeRooms())
-                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
+                    {
+                    var worldBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
+                    this.MovementBoundary = worldBoundary;
+                    if (value == ChangeRooms.FollowsPlayer)
+                        {
+                        this.SightBoundary = worldBoundary;
+                        }
+                    else
+                        {
+                        this.SightBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom(this);
+                        }
+                    }
                 else
-                    this.MovementBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom(this.TilePosition);
+                    {
+                    var roomBoundary = GlobalServices.BoundMovementFactory.GetExplicitBoundary(World.GetContainingRoom(this.TilePosition));
+                    this.MovementBoundary = roomBoundary;
+                    this.SightBoundary = roomBoundary;
+                    }
                 }
             }
         }

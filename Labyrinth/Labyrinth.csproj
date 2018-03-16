@@ -129,6 +129,7 @@
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoulderForTesting.cs" />
+    <Compile Include="GameObjects\BoundaryCurrentRoom.cs" />
     <Compile Include="GameObjects\BoundaryFixed.cs" />
     <Compile Include="GameObjects\BoundMovementFactory.cs" />
     <Compile Include="GameObjects\Monsters\Actions\ActivateWhenHurt.cs" />

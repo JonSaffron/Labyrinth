@@ -42,27 +42,18 @@ namespace Labyrinth.GameObjects.Movement
 
         public static bool IsPlayerInWeaponSights(Monster m)
             {
-            if (!GlobalServices.GameState.Player.IsAlive())
+            if (!GlobalServices.GameState.Player.IsAlive() || !IsPlayerInSameRoomAsMonster(m))
                 return false;
 
-            var absDiffX = Math.Abs(m.TilePosition.X - GlobalServices.GameState.Player.TilePosition.X);
-            var absDiffY = Math.Abs(m.TilePosition.Y - GlobalServices.GameState.Player.TilePosition.Y);
-            
-            var result = 
-                    (absDiffX == 0 && absDiffY <= Constants.RoomSizeInTiles.Y)
-                ||
-                    (absDiffY == 0 && absDiffX <= Constants.RoomSizeInTiles.X);
+            var result = (m.TilePosition.X == GlobalServices.GameState.Player.TilePosition.X)
+                    ||  (m.TilePosition.Y == GlobalServices.GameState.Player.TilePosition.Y);
             return result;
             }
 
         public static bool IsPlayerNearby(Monster monster)
             {
-            if (!GlobalServices.GameState.Player.IsAlive())
+            if (!GlobalServices.GameState.Player.IsAlive() || !monster.SightBoundary.IsPositionWithinBoundary(GlobalServices.GameState.Player.TilePosition))
                 return false;
-            if (monster.ChangeRooms != ChangeRooms.FollowsPlayer && !IsPlayerInSameRoomAsMonster(monster))
-                {
-                return false;
-                }
             var distance = Vector2.Distance(monster.Position, GlobalServices.GameState.Player.Position) / Constants.TileLength;
             var result = distance <= 20;
             return result;
@@ -78,7 +69,7 @@ namespace Labyrinth.GameObjects.Movement
             return result;
             }
 
-        public static bool IsInSameRoom(Vector2 p1, Vector2 p2)
+        private static bool IsInSameRoom(Vector2 p1, Vector2 p2)
             {
             Rectangle room1 = World.GetContainingRoom(p1);
             bool result = room1.ContainsPosition(p2);
@@ -143,15 +134,6 @@ namespace Labyrinth.GameObjects.Movement
                 result = diffY > 0 ? Direction.Up : Direction.Down;
                 }
             return result;
-            }
-
-        // todo confirm that this can be deleted
-        public static Direction ContinueOrReverse(Monster monster, Direction currentDirection)
-            {
-            if (monster.CanMoveInDirection(currentDirection))
-                return currentDirection;
-            var reversed = currentDirection.Reversed();
-            return reversed;
             }
         }
     }

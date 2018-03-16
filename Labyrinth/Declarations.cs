@@ -161,19 +161,19 @@ namespace Labyrinth
         /// <summary>
         /// Monster always stays in the same room
         /// </summary>
-        /// <remarks>Its movement boundries are the room it inhabits</remarks>
+        /// <remarks>Its movement boundaries are the room it inhabits</remarks>
         StaysWithinRoom,
 
         /// <summary>
         /// Monster is capable of moving to a different room
         /// </summary>
-        /// <remarks>Its movement boundries are the world, but it only "sees" the player when they are in the same room</remarks>
+        /// <remarks>Its movement boundaries are the world, but it only "sees" the player when they are in the same room</remarks>
         MovesRoom,
 
         /// <summary>
         /// Monster will follow the player, if the player leaves the room the monster's in
         /// </summary>
-        /// <remarks>Its movement boundries are the world, and it "sees" the player across room boundries and can move towards it</remarks>
+        /// <remarks>Its movement boundaries are the world, and it "sees" the player across room boundaries and can move towards it</remarks>
         FollowsPlayer
         }
 

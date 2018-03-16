@@ -20,10 +20,9 @@
             return new BoundaryFixed(boundary);
             }
 
-        public IBoundMovement GetBoundedInRoom(TilePos tilePos)
+        public IBoundMovement GetBoundedInRoom(IMovingItem gameObject)
             {
-            var boundary = World.GetContainingRoom(tilePos);
-            return new BoundaryFixed(boundary);
+            return new BoundaryCurrentRoom(gameObject);
             }
         }
     }

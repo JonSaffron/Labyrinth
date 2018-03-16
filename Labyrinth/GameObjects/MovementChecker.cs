@@ -23,7 +23,7 @@ namespace Labyrinth.GameObjects
         private bool CanMove(IMovingItem objectToCheck, Direction direction, bool isBounceBackPossible)
             {
             TilePos proposedDestination = objectToCheck.TilePosition.GetPositionAfterOneMove(direction);
-            if (this.Source.MovementBoundary == null || !this.Source.MovementBoundary.IsPositionWithinMovementBoundaries(proposedDestination))
+            if (this.Source.MovementBoundary == null || !this.Source.MovementBoundary.IsPositionWithinBoundary(proposedDestination))
                 {
                 return false;
                 }
