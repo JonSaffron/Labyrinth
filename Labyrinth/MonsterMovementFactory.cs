@@ -52,5 +52,11 @@ namespace Labyrinth
             var result = new RotaFloatCyanMovement(monster);
             return result;
             }
+
+        public IMonsterMotion PatrolPerimiter(Monster monster, Direction initialDirection)
+            {
+            var result = new PatrolPerimeter(monster, initialDirection);
+            return result;
+            }
         }
     }

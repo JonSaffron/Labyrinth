@@ -7,30 +7,60 @@ namespace Labyrinth.GameObjects.Movement
     class PatrolPerimeter : MonsterMotionBase
         {
         private Direction _lastDirection;
-        private bool _turnType;
-        private bool _isDetached;
+        private AttachmentToWall _attachment;
+        private AttachmentMode _attachmentMode;
 
-        private static readonly Direction[] Clockwise = { Direction.Left, Direction.Up, Direction.Right, Direction.Down };
-        private static readonly Direction[] Anticlockwise = { Direction.Left, Direction.Down, Direction.Right, Direction.Up };
+        public enum AttachmentToWall
+            {
+            FollowWallOnLeft = -1,
+            FollowWallOnRight = 1
+            }
 
+        public enum AttachmentMode
+            {
+            Attached,
+            TurningCorner,
+            Detached
+            }
+
+        private static readonly Direction[] FollowWallOnLeft = { Direction.Left, Direction.Down, Direction.Right, Direction.Up };
+        private static readonly Direction[] FollowWallOnRight = { Direction.Left, Direction.Up, Direction.Right, Direction.Down };
+            
         public PatrolPerimeter([NotNull] Monster monster, Direction initialDirection) : base(monster)
             {
             if (initialDirection == Direction.None)
                 throw new ArgumentOutOfRangeException(nameof(initialDirection), "May not be None");
             this._lastDirection = initialDirection;
+            this._attachment = AttachmentToWall.FollowWallOnLeft;
             }
 
         public override Direction DetermineDirection()
             {
-            Direction result = !this._isDetached
-                ? DetermineDirectionWhenAttached()
-                : DetermineDirectionWhenDetached();
+            Direction result;
+
+            switch (this._attachmentMode)
+                {
+                case AttachmentMode.Attached:
+                    result = DetermineDirectionWhenAttached();
+                    break;
+
+                case AttachmentMode.TurningCorner:
+                    result = DetermineDirectionWhenTurningCorner();
+                    break;
+
+                case AttachmentMode.Detached:
+                    result = DetermineDirectionWhenDetached();
+                    break;
+
+                default:
+                    throw new InvalidOperationException();
+                }
             return result;
             }
 
         private Direction DetermineDirectionWhenAttached()
             { 
-            using (var directions = GetPreferredDirections(this._lastDirection, this._turnType).GetEnumerator())
+            using (var directions = GetPreferredDirections(this._lastDirection, this._attachment).GetEnumerator())
                 {
                 directions.MoveNext();
                 var newDirection = directions.Current;
@@ -39,6 +69,7 @@ namespace Labyrinth.GameObjects.Movement
                 if (!canGoInNewDirection)
                     {
                     // so there's definitely one or more walls. Just need to get the first direction we can go in.
+                    this._attachmentMode = AttachmentMode.Attached;
                     while (directions.MoveNext())
                         {
                         newDirection = directions.Current;
@@ -51,18 +82,32 @@ namespace Labyrinth.GameObjects.Movement
                     return Direction.None;
                     }
 
-                // check if there are any walls as we don't want to end up travelling in a small circle
+                // monster could go in any direction as it's not next to any wall - continue current direction
+                this._attachmentMode = AttachmentMode.TurningCorner;
+                return newDirection;
+                }
+            }
+
+        private Direction DetermineDirectionWhenTurningCorner()
+            {
+            using (var directions = GetPreferredDirections(this._lastDirection, this._attachment).GetEnumerator())
+                {
+                directions.MoveNext();
+                var newDirection = directions.Current;
+
+                var hasWallVanished = this.Monster.CanMoveInDirection(newDirection);
+                this._attachmentMode = hasWallVanished ? AttachmentMode.Detached : AttachmentMode.Attached;
                 while (directions.MoveNext())
                     {
-                    if (!this.Monster.CanMoveInDirection(directions.Current))
+                    newDirection = directions.Current;
+                    if (this.Monster.CanMoveInDirection(newDirection))
                         {
                         return newDirection;
                         }
+                    this._attachmentMode = AttachmentMode.Attached;
                     }
-
-                // monster could go in any direction as it's not next to any wall - continue current direction
-                this._isDetached = true;
-                return this._lastDirection;
+                // can't go in any direction
+                return Direction.None;
                 }
             }
 
@@ -74,7 +119,10 @@ namespace Labyrinth.GameObjects.Movement
                 }
 
             // Aha. We have bumped into something so we need to re-attach.
-            using (var directions = GetPreferredDirections(this._lastDirection, this._turnType).GetEnumerator())
+            SwitchDirection();
+            this._attachmentMode = AttachmentMode.Attached;
+
+            using (var directions = GetPreferredDirections(this._lastDirection.Reversed(), this._attachment).GetEnumerator())
                 {
                 while (directions.MoveNext())
                     {
@@ -82,20 +130,35 @@ namespace Labyrinth.GameObjects.Movement
                     if (this.Monster.CanMoveInDirection(newDirection))
                         {
                         // Upon attaching, we need to reverse the rotation that the monster uses to plan its next move
-                        this._turnType = !this._turnType;
-                        this._isDetached = false;
                         return newDirection;
                         }
                     }
                 }
 
             // can't go in any direction
+            this._attachmentMode = AttachmentMode.Detached;
             return Direction.None;
             }
 
-         public static IEnumerable<Direction> GetPreferredDirections(Direction direction, bool turnDirection)
+        private void SwitchDirection()
             {
-            var dirs = turnDirection ? Clockwise : Anticlockwise;
+            if (this._attachment == AttachmentToWall.FollowWallOnLeft)
+                this._attachment = AttachmentToWall.FollowWallOnRight;
+            else if (this._attachment == AttachmentToWall.FollowWallOnRight)
+                this._attachment = AttachmentToWall.FollowWallOnLeft;
+            else
+                throw new InvalidOperationException();
+            }
+
+         public static IEnumerable<Direction> GetPreferredDirections(Direction direction, AttachmentToWall attachment)
+            {
+            Direction[] dirs;
+            if (attachment == AttachmentToWall.FollowWallOnLeft)
+                dirs = FollowWallOnLeft;
+            else if (attachment == AttachmentToWall.FollowWallOnRight)
+                dirs = FollowWallOnRight;
+            else
+                throw new InvalidOperationException();
             var start = Array.IndexOf(dirs, direction);
             for (int i = 0; i < 4; i++)
                 {
@@ -118,5 +181,9 @@ namespace Labyrinth.GameObjects.Movement
             this._lastDirection = direction;
             return true;
             }
+
+        public AttachmentToWall CurrentAttachmentToWall => this._attachment;
+
+        public AttachmentMode CurrentAttachmentMode => this._attachmentMode;
         }
     }
