@@ -24,12 +24,6 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.ForceField;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.ForceField;
         }
     }

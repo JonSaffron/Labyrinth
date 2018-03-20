@@ -33,12 +33,6 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.Wall;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.Wall;
         }
     }

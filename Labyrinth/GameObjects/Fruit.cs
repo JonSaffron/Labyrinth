@@ -18,13 +18,7 @@ namespace Labyrinth.GameObjects
             this.Ap.PlayAnimation(a);
             }
 
-        public FruitType FruitType
-            {
-            get
-                {
-                return this._fruitType;
-                }
-            }
+        public FruitType FruitType => this._fruitType;
 
         public override bool IsExtant
             {
@@ -35,13 +29,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.StaticItem;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
         public void SetTaken()
             {

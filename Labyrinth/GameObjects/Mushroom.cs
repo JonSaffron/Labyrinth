@@ -23,13 +23,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.StaticItem;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
         public void SetTaken()
             {

@@ -13,12 +13,6 @@ namespace Labyrinth.GameObjects
             this.Ap.PlayAnimation(a);
             }
 
-        public override int DrawOrder
-            {
-            get
-                {
-                return (int) SpriteDrawOrder.StaticItem;
-                }
-            }
+        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
         }
     }
