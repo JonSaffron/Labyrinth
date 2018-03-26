@@ -89,7 +89,7 @@ namespace Labyrinth.Services.Display
             this._texture = this._spriteLibrary.GetSprite(animation.TextureName);
             this._frameTime = animation.BaseMovementsPerFrame * Constants.BaseDistance / (double)Constants.BaseSpeed;
             this._frameIndex = 0;
-            this.FrameCount = (_animation.BaseMovementsPerFrame == 0) ? 1 : (this._texture.Width / Constants.TileLength);
+            this.FrameCount = (this._texture.Width / Constants.TileLength);
             this._time = 0.0f;
 
             // setup the advance routine
@@ -108,7 +108,7 @@ namespace Labyrinth.Services.Display
             set
                 {
                 if (value < 0 || value >= this.FrameCount)
-                    throw new ArgumentOutOfRangeException("value");
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 this._frameIndex = value;
                 this._time = 0;
                 }

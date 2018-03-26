@@ -20,6 +20,7 @@ namespace Labyrinth.GameObjects
                 case MonsterMobility.Patrolling:
                     {
                     var result = GlobalServices.MonsterMovementFactory.PatrolPerimiter(this, this.InitialDirection);
+                    GlobalServices.Game.Services.RemoveService(typeof(PatrolPerimeter));
                     GlobalServices.Game.Services.AddService(typeof(PatrolPerimeter), result);
                     return result;
                     }

@@ -22,5 +22,10 @@ namespace Labyrinth.Services.WorldBuilding
             pss = this.StartStates.Values.SingleOrDefault(item => item.Area.ContainsTile(tp));
             return pss != null;
             }
+
+        public void Clear()
+            {
+            this.StartStates.Clear();
+            }
         }
     }

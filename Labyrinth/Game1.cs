@@ -83,7 +83,7 @@ namespace Labyrinth
             {
             if (this._world == null)
                 {
-                LoadLevel("World1.xml");
+                LoadLevel("TestWorld.xml");
                 }
 
             // Must process keyboard input before checking pause status
@@ -96,7 +96,7 @@ namespace Labyrinth
             base.Update(gameTime);
             GlobalServices.SoundPlayer.ActiveSoundService.Update();
 
-            if (!this._isGamePaused)
+            if (!this._isGamePaused && gameTime.ElapsedGameTime != TimeSpan.Zero)
                 {
                 // ReSharper disable once PossibleNullReferenceException
                 LevelReturnType lrt = this._world.Update(gameTime);

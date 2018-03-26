@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<World Name="TestWorld" Height="20" Width="32" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
+  <Layout>
+    OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+    OS       #     OO              O
+    O        #P    OO              O
+    O        ######OO              O
+    O                              O
+    O                              O
+    O              OO              O
+    O              OO              O
+    O              OO              O
+    OOOOOO    OOOOOOOOOOO    OOOOOOO
+    OOOOOO    OOOOOOOOOOO    OOOOOOO
+    O              OO              O
+    O              OO              O
+    O              OO              O
+    O                              O
+    O                              O
+    O              OO              O
+    O              OO              O
+    O              OO             CO
+    OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+  </Layout>
+  <Areas>
+    <Area Top="0" Left="0" Width="32" Height="20">
+      <PlayerStartState Id="1" Left="1" Top="1" Energy="50" WorldStart="true"/>
+      <TileDefinitions>
+        <Wall Symbol="O" Tile="Wall3Full" />
+        <Floor Symbol=" " Tile="Floor3" />
+        <Object Symbol="S" Description="Player Start" />
+        <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="P" Description="PatrolPerimiterTest" />
+        <Object Symbol="#" Description="CrumblyWall" />
+      </TileDefinitions>
+    </Area>
+  </Areas>
+  
+  <Objects>
+    <Crystal Id="1" Energy="100" Left="30" Top="18" Score="1000"/>
+    <CrumblyWall Energy="20" Left="9" Top="1" Texture="CrumblyWall3" />
+    <CrumblyWall Energy="20" Left="9" Top="2" Texture="CrumblyWall3" />
+    <CrumblyWall Energy="20" Left="9" Top="3" Texture="CrumblyWall3" />
+    <CrumblyWall Energy="20" Left="10" Top="3" Texture="CrumblyWall3" />
+    <CrumblyWall Energy="20" Left="11" Top="3" Texture="CrumblyWall3" />
+    <CrumblyWall Energy="20" Left="12" Top="3" Texture="CrumblyWall3" />
+    <CrumblyWall Energy="20" Left="13" Top="3" Texture="CrumblyWall3" />
+    <CrumblyWall Energy="20" Left="14" Top="3" Texture="CrumblyWall3" />
+    <Monster Type="PatrolPerimiterTest" Left="10" Top="2" Energy="10" Mobility="Patrolling" InitialDirection="Right" ChangeRooms="MovesRoom" />
+  </Objects>
+</World>

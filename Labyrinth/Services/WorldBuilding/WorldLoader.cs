@@ -129,6 +129,11 @@ namespace Labyrinth.Services.WorldBuilding
             if (areaList == null)
                 throw new InvalidOperationException();
 
+            this._playerStartStates.Clear();
+            this._tileDefinitionCollections.Clear();
+            this._randomMonsterDistributions.Clear();
+            this._randomFruitDistributions.Clear();
+
             foreach (XmlElement area in areaList)
                 {
                 var areaRect = RectangleExtensions.GetRectangleFromDefinition(area);
