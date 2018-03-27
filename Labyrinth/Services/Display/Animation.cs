@@ -122,9 +122,9 @@ namespace Labyrinth.Services.Display
             {
             unchecked
                 {
-                int hashCode = (TextureName != null ? TextureName.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ BaseMovementsPerFrame;
-                hashCode = (hashCode*397) ^ LoopAnimation.GetHashCode();
+                int hashCode = (this.TextureName != null ? this.TextureName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.BaseMovementsPerFrame;
+                hashCode = (hashCode * 397) ^ this.LoopAnimation.GetHashCode();
                 return hashCode;
                 }
             }

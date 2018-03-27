@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<World Name="TestWorld" Height="20" Width="32" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
+<World Name="TestWorld" Height="20" Width="32" RestartInSameRoom="true" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
   <Layout>
     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
     OS       #     OO              O
@@ -23,15 +23,39 @@
     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
   </Layout>
   <Areas>
-    <Area Top="0" Left="0" Width="32" Height="20">
+    <Area Top="0" Left="0" Width="16" Height="10">
       <PlayerStartState Id="1" Left="1" Top="1" Energy="50" WorldStart="true"/>
       <TileDefinitions>
-        <Wall Symbol="O" Tile="Wall3Full" />
-        <Floor Symbol=" " Tile="Floor3" />
+        <Wall Symbol="O" Tile="NewTiles/RedAndBlueLarge" />
+        <Floor Symbol=" " Tile="NewTiles/Borgen" />
         <Object Symbol="S" Description="Player Start" />
-        <Object Symbol="C" Description="Crystal" />
         <Object Symbol="P" Description="PatrolPerimiterTest" />
         <Object Symbol="#" Description="CrumblyWall" />
+      </TileDefinitions>
+    </Area>
+
+    <Area Top="0" Left="16" Width="16" Height="10">
+      <PlayerStartState Id="2" Left="17" Top="1" Energy="50" WorldStart="false"/>
+      <TileDefinitions>
+        <Wall Symbol="O" Tile="NewTiles/RedAndBlueSmall" />
+        <Floor Symbol=" " Tile="NewTiles/Jagged" />
+      </TileDefinitions>
+    </Area>
+    
+    <Area Top="10" Left="0" Width="16" Height="10">
+      <PlayerStartState Id="3" Left="1" Top="11" Energy="50" WorldStart="false"/>
+      <TileDefinitions>
+        <Wall Symbol="O" Tile="NewTiles/RedAndBlueLarge" />
+        <Floor Symbol=" " Tile="NewTiles/SquareInSquare" />
+      </TileDefinitions>
+    </Area>
+
+    <Area Top="10" Left="16" Width="16" Height="10">
+      <PlayerStartState Id="4" Left="17" Top="11" Energy="50" WorldStart="false"/>
+      <TileDefinitions>
+        <Wall Symbol="O" Tile="NewTiles/RedAndBlueSmall" />
+        <Floor Symbol=" " Tile="NewTiles/Web" />
+        <Object Symbol="C" Description="Crystal" />
       </TileDefinitions>
     </Area>
   </Areas>

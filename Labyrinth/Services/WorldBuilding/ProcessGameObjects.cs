@@ -27,7 +27,8 @@ namespace Labyrinth.Services.WorldBuilding
                     var td = tdc[symbol];
                     if (td is TileWallDefinition wall)
                         { 
-                        this._gameState.AddWall(p.ToPosition(), "Tiles/" + wall.TextureName);
+                        var pathToTexture = wall.TextureName.Contains("/") ? wall.TextureName : "Tiles/" + wall.TextureName;
+                        this._gameState.AddWall(p.ToPosition(), pathToTexture);
                         }
                     }
                 }

@@ -235,7 +235,8 @@ namespace Labyrinth.Services.WorldBuilding
                         td is TileFloorDefinition definition
                             ? definition.TextureName
                             : defaultFloorName;
-                    var floor = spriteLibrary.GetSprite("Tiles/" + textureName);
+                    var pathToTexture = textureName.Contains("/") ? textureName : "Tiles/" + textureName;
+                    var floor = spriteLibrary.GetSprite(pathToTexture);
 
                     if (!playerStartStateCollection.TryGetStartState(tp, out PlayerStartState pss))
                         throw new InvalidOperationException();

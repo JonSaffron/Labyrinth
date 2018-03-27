@@ -11,7 +11,7 @@ namespace Labyrinth.Services.Display
 
         public SpriteLibrary([NotNull] Game game)
             {
-            _game = game ?? throw new ArgumentNullException(nameof(game));
+            this._game = game ?? throw new ArgumentNullException(nameof(game));
             }
 
         public Texture2D GetSprite(string textureName)
