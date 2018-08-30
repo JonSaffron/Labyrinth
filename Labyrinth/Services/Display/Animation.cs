@@ -10,8 +10,10 @@ namespace Labyrinth.Services.Display
     /// as wide as each animation is tall. The number of frames in the
     /// animation are inferred from this.
     /// </remarks>
-    public class Animation : IEquatable<Animation>
+    public readonly struct Animation : IEquatable<Animation>
         {
+        public static Animation None { get; } = new Animation();
+
         /// <summary>
         /// The name of the texture to animate
         /// </summary>
@@ -94,9 +96,9 @@ namespace Labyrinth.Services.Display
         /// <returns>true if the other animation is the same object or its values are equivalent</returns>
         public bool Equals(Animation other)
             {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            var result = string.Equals(TextureName, other.TextureName) && BaseMovementsPerFrame == other.BaseMovementsPerFrame && LoopAnimation.Equals(other.LoopAnimation);
+            var result = string.Equals(this.TextureName, other.TextureName) 
+                      && this.BaseMovementsPerFrame == other.BaseMovementsPerFrame 
+                      && this.LoopAnimation == other.LoopAnimation;
             return result;
             }
 
@@ -107,11 +109,20 @@ namespace Labyrinth.Services.Display
         /// <returns>true if the other animation is the same object or its values are equivalent</returns>
         public override bool Equals(object obj)
             {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            var result = this.Equals((Animation) obj);
+            if (obj == null)
+                return false;
+            var result = obj is Animation other && this.Equals(other);
             return result;
+            }
+
+        public static bool operator ==(Animation a, Animation b)
+            {
+            return a.Equals(b);
+            }
+
+        public static bool operator !=(Animation a, Animation b)
+            {
+            return !a.Equals(b);
             }
 
         /// <summary>
@@ -122,7 +133,7 @@ namespace Labyrinth.Services.Display
             {
             unchecked
                 {
-                int hashCode = (this.TextureName != null ? this.TextureName.GetHashCode() : 0);
+                var hashCode = TextureName?.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ this.BaseMovementsPerFrame;
                 hashCode = (hashCode * 397) ^ this.LoopAnimation.GetHashCode();
                 return hashCode;

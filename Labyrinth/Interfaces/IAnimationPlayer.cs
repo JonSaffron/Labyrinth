@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,6 +17,9 @@ namespace Labyrinth
         /// </summary>
         SpriteEffects SpriteEffect { get; set; }
 
+        /// <summary>
+        /// Returns the number of frames contained in the animation
+        /// </summary>
         int FrameCount { get; }
 
         /// <summary>
@@ -33,7 +35,8 @@ namespace Labyrinth
         /// <summary>
         /// Begins or continues playback of an animation.
         /// </summary>
-        void PlayAnimation([NotNull] Animation animation);
+        /// <remarks>If the animation specified is already running then no change is made.</remarks>
+        void PlayAnimation(Animation animation);
 
         /// <summary>
         /// Advance frame index for manually controlled animations

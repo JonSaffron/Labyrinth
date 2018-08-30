@@ -19,14 +19,10 @@ namespace Labyrinth.Services.Display
 
         private Texture2D _texture;
 
-        /// <summary>
-        /// What rotation to apply when drawing the sprite
-        /// </summary>
+        /// <inheritdoc />
         public float Rotation { get; set; }
 
-        /// <summary>
-        /// What effect to apply when drawing the sprite
-        /// </summary>
+        /// <inheritdoc />
         public SpriteEffects SpriteEffect { get; set; }
 
         /// <summary>
@@ -34,6 +30,7 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private int _frameIndex;
 
+        /// <inheritdoc />
         public int FrameCount {get; private set;}
 
         /// <summary>
@@ -46,9 +43,7 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private double _time;
 
-        /// <summary>
-        /// Used to notify a game object that the animation has progressed to the next frame
-        /// </summary>
+        /// <inheritdoc />
         public event EventHandler<EventArgs> NewFrame;
         
         /// <summary>
@@ -72,16 +67,14 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private static Vector2 Origin => Constants.CentreOfTile;
 
-        /// <summary>
-        /// Begins or continues playback of an animation.
-        /// </summary>
+        /// <inheritdoc />
         public void PlayAnimation(Animation animation)
             {
-            if (animation == null)
-                throw new ArgumentNullException(nameof(animation));
+            if (animation == Animation.None)
+                throw new ArgumentOutOfRangeException(nameof(animation), "Cannot be None.");
 
             // If this animation is already running, do not restart it.
-            if (animation.Equals(this._animation))
+            if (animation == this._animation)
                 return;
 
             // Start the new animation.
@@ -99,9 +92,7 @@ namespace Labyrinth.Services.Display
                 this._advanceRoutine = AdvanceLoopedAnimation;
             }
 
-        /// <summary>
-        /// Gets the index of the current frame in the animation.
-        /// </summary>
+        /// <inheritdoc />
         public int FrameIndex
             {
             get => this._frameIndex;
@@ -140,10 +131,7 @@ namespace Labyrinth.Services.Display
                 }
             }
 
-        /// <summary>
-        /// Advance frame index for manually controlled animations
-        /// </summary>
-        /// <param name="gameTime">Time passed since the last call to Draw</param>
+        /// <inheritdoc />
         public bool AdvanceManualAnimation(GameTime gameTime)
             {
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
@@ -162,15 +150,10 @@ namespace Labyrinth.Services.Display
             return true;
             }
 
-        /// <summary>
-        /// Advances the time position and draws the current frame of the animation.
-        /// </summary>
-        /// <param name="gameTime">Time passed since the last call to Draw</param>
-        /// <param name="spriteBatch">The SpriteBatch object to draw the sprite to</param>
-        /// <param name="position">The position of the sprite</param>
+        /// <inheritdoc />
         public void Draw(GameTime gameTime, ISpriteBatch spriteBatch, Vector2 position)
             {
-            if (_animation == null)
+            if (this._animation == null)
                 throw new NotSupportedException("No animation is currently playing.");
 
             // Advance the frame index
