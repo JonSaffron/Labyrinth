@@ -23,7 +23,7 @@ namespace Labyrinth.Services.PathFinder
         public Func<TilePos, bool> CanBeOccupied { get; set; }
 
         /// <summary>
-        /// Sets or returns the maximum length of the path that can be travelled
+        /// Sets or returns the maximum length of the path that can be traveled
         /// </summary>
         public int MaximumLengthOfPath 
             { 
