@@ -8,7 +8,7 @@ namespace Labyrinth.Services.PathFinder
     /// <summary>
     /// An ordered list of items with an associated cost which is implemented as an immutable list for memory efficiency
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type of object to construct the path out of</typeparam>
     [DebuggerDisplay("{" + nameof(ToString) + "()}")] 
     public class Path<T> : IEnumerable<T>, IComparable<Path<T>>
         {
