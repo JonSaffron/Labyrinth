@@ -24,7 +24,7 @@ namespace Labyrinth.Services.WorldBuilding
             var regExp = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             var match = regExp.Match(diceRoll);
             if (!match.Success)
-                throw new FormatException("Parameter must be in form <nuberofdice>D<numberofsides>, e.g. 4D6.");
+                throw new FormatException("Parameter must be in form <numberOfDice>D<numberOfSides>, e.g. 4D6.");
 
             var numberOfDice = int.Parse(match.Groups["numberOfDice"].Value);
             var numberOfSides = int.Parse(match.Groups["numberOfSides"].Value);
