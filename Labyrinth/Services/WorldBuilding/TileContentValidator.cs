@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.WorldBuilding
@@ -12,7 +13,7 @@ namespace Labyrinth.Services.WorldBuilding
         /// <param name="objects">A list of objects to check</param>
         /// <param name="reason">Returns a reason why the objects cannot share the same tile, or an empty string if there are no problems found.</param>
         /// <returns>True if the specified objects can share the same tile, or false otherwise.</returns>
-        public bool IsListOfObjectsValid(IEnumerable<IGameObject> objects, out string reason)
+        public bool IsListOfObjectsValid([CanBeNull] IEnumerable<IGameObject> objects, out string reason)
             {
             var list = new List<IGameObject>(objects ?? Enumerable.Empty<StaticItem>());
 
@@ -24,10 +25,10 @@ namespace Labyrinth.Services.WorldBuilding
 
             if (list.Any(item => item.Solidity == ObjectSolidity.Impassable))
                 {
-                var result = list.Count == 1;
-                if (!result)
+                var isThereOneAndOnlyOneObjectInTheList = list.Count == 1;
+                if (!isThereOneAndOnlyOneObjectInTheList)
                     {
-                    reason = "Multiple impassable objects: " + string.Join(", ", list.Where(item => item.Solidity == ObjectSolidity.Impassable).Select(item => item.GetType().Name));
+                    reason = "Multiple impassable objects: " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Impassable));
                     return false;
                     }
                 }
@@ -35,25 +36,33 @@ namespace Labyrinth.Services.WorldBuilding
             var countOfMoveableObjects = list.Count(item => item.Solidity == ObjectSolidity.Moveable);
             if (countOfMoveableObjects > 1)
                 {
-                reason = "Multiple moveable objects: " + string.Join(", ", list.Where(item => item.Solidity == ObjectSolidity.Moveable).Select(item => item.GetType().Name));
+                reason = "Multiple moveable objects: " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Moveable));
                 return false;
                 }
 
             var countOfStationaryObjects = list.Count(item => item.Solidity == ObjectSolidity.Stationary);
             if (countOfStationaryObjects > 1)
                 {
-                reason = "Multiple stationary objects: " + string.Join(", ", list.Where(item => item.Solidity == ObjectSolidity.Stationary).Select(item => item.GetType().Name));
+                reason = "Multiple stationary objects: " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Stationary));
                 return false;
                 }
 
             if (countOfMoveableObjects != 0 && list.Any(item => item.Solidity == ObjectSolidity.Insubstantial))
                 {
-                reason = "A moveable object and an insubstantial object: " + list.Single(item => item.Solidity == ObjectSolidity.Moveable).GetType().Name + ", " + list.Where(item => item.Solidity == ObjectSolidity.Insubstantial).Select(item => item.GetType().Name);
+                reason = "A moveable object and an insubstantial object: " + list.Single(item => item.Solidity == ObjectSolidity.Moveable).GetType().Name 
+                                                                           + " and " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Insubstantial));
                 return false;
                 }
 
             reason = string.Empty;
             return true;
+            }
+
+        private static string ObjectListToString(IEnumerable<IGameObject> items)
+            {
+            IEnumerable<string> itemsAsStrings = items.Select(item => item.GetType().Name);
+            string result = string.Join("+", itemsAsStrings);
+            return result;
             }
         }
     }
