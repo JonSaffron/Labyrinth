@@ -21,8 +21,8 @@ namespace Labyrinth.ClockEvents
             var totalFruitCount = 0;
             foreach (var fd in fruitDistList.Definitions)
                 {
-                this._population.Add(fd.FruitType, new bool[fd.FruitQuantity]);
-                totalFruitCount += fd.FruitQuantity;
+                this._population.Add(fd.Type, new bool[fd.Quantity]);
+                totalFruitCount += fd.Quantity;
                 }
             this._reverseLookup = new Dictionary<Fruit, int>(totalFruitCount);
             GlobalServices.GameState.GameObjectRemoved += OnRemoveFruit;
@@ -35,9 +35,9 @@ namespace Labyrinth.ClockEvents
 
             foreach (var fd in this._fruitDistList.Definitions)
                 {
-                int slotNumber = (ticks % fd.FruitQuantity);
-                AddFruit(slotNumber, this._fruitDistList.Area, fd.FruitType, fd.Energy);
-                }            
+                int slotNumber = (ticks % fd.Quantity);
+                AddFruit(slotNumber, this._fruitDistList.Area, fd.Type, fd.Energy);
+                }
             }
 
         private void AddFruit(int slotNumber, Rectangle area, FruitType fruitType, int energy)

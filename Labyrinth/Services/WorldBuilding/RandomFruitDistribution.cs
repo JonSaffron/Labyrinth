@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
@@ -12,23 +11,7 @@ namespace Labyrinth.Services.WorldBuilding
         private readonly Dictionary<FruitType, FruitDefinition> _definitions = new Dictionary<FruitType, FruitDefinition>();
         public FruitPopulationMethod PopulationMethod;
         
-        public void Add([NotNull] FruitDefinition fd)
-            {
-            if (fd == null) throw new ArgumentNullException(nameof(fd));
-            this._definitions.Add(fd.FruitType, fd);
-            }
-
         public IEnumerable<FruitDefinition> Definitions => this._definitions.Values;
-
-        public FruitDefinition this[FruitType fruitType]
-            {
-            get
-                {
-                if (!this._definitions.TryGetValue(fruitType, out var fd))
-                    fd = new FruitDefinition {Energy = 0, FruitQuantity = 0, FruitType = fruitType};
-                return fd;
-                }
-            }
 
         public static RandomFruitDistribution FromXml(XmlElement fruitDistribution)
             {
@@ -41,7 +24,7 @@ namespace Labyrinth.Services.WorldBuilding
             foreach (XmlElement fruitDef in fruitDistribution.ChildNodes)
                 {
                 var fd = FruitDefinition.FromXml(fruitDef);
-                result.Add(fd);
+                result._definitions.Add(fd.Type, fd);
                 }
             return result;
             }

@@ -146,10 +146,10 @@ namespace Labyrinth.Services.WorldBuilding
                 {
                 foreach (var def in dist.Definitions)
                     {
-                    for (int i = 0; i < def.FruitQuantity; i++)
+                    for (int i = 0; i < def.Quantity; i++)
                         {
                         var position = GetFreeTile(dist.Area).ToPosition();
-                        this._gameState.AddFruit(position, def.FruitType, def.Energy);
+                        this._gameState.AddFruit(position, def.Type, def.Energy);
                         }
                     }
                 }
