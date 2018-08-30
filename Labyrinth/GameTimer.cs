@@ -20,7 +20,7 @@ namespace Labyrinth
         private GameTimer(Game game, TimeSpan timeToElapse, EventHandler callBack, bool isEnabled = true) : base(game)
             {
             if (timeToElapse.Ticks < 0)
-                throw new ArgumentOutOfRangeException("timeToElapse");
+                throw new ArgumentOutOfRangeException(nameof(timeToElapse));
             if (callBack == null)
                 throw new ArgumentNullException("callBack");
 
