@@ -6,6 +6,12 @@ namespace Labyrinth.Services.WorldBuilding
     {
     class TileContentValidator
         {
+        /// <summary>
+        /// Checks whether the supplied list of game objects are able to share the same tile
+        /// </summary>
+        /// <param name="objects">A list of objects to check</param>
+        /// <param name="reason">Returns a reason why the objects cannot share the same tile, or an empty string if there are no problems found.</param>
+        /// <returns>True if the specified objects can share the same tile, or false otherwise.</returns>
         public bool IsListOfObjectsValid(IEnumerable<IGameObject> objects, out string reason)
             {
             var list = new List<IGameObject>(objects ?? Enumerable.Empty<StaticItem>());
