@@ -5,7 +5,7 @@ namespace Labyrinth.Services.WorldBuilding
     /// <summary>
     /// Stores the floor texture and other meta data for a tile in the world
     /// </summary>
-    public class Tile
+    public readonly struct Tile
         {
         public readonly Texture2D Floor;
         public readonly int WorldAreaId;
