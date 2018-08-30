@@ -17,7 +17,7 @@ namespace Labyrinth
         private LevelReturnType _levelReturnType = LevelReturnType.Normal;
         private bool _doNotUpdate;
         
-        private TilePos _worldSize;
+        private readonly TilePos _worldSize;
         [NotNull] private readonly Tile[,] _tiles;
         private readonly bool _restartInSameRoom;
         [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
