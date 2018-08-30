@@ -133,13 +133,13 @@ namespace Labyrinth.Services.WorldBuilding
             string shootsAtPlayer = mdef.GetAttribute(nameof(result.ShootsAtPlayer));
             if (!string.IsNullOrEmpty(shootsAtPlayer))
                 {
-                result.ShootsAtPlayer = Boolean.Parse(shootsAtPlayer);
+                result.ShootsAtPlayer = bool.Parse(shootsAtPlayer);
                 }
 
             string shootsOnceProvoked = mdef.GetAttribute(nameof(result.ShootsOnceProvoked));
             if (!string.IsNullOrEmpty(shootsOnceProvoked))
                 {
-                result.ShootsOnceProvoked = Boolean.Parse(shootsOnceProvoked);
+                result.ShootsOnceProvoked = bool.Parse(shootsOnceProvoked);
                 }
 
             string shotsBounceOffAttribute = mdef.GetAttribute(nameof(result.ShotsBounceOff));
