@@ -18,7 +18,7 @@ namespace Labyrinth.Services.ScoreKeeper
 
         public void Reset()
             {
-            this._score = 0;
+            this._score = 0m;
             }
 
         private void MonsterShot(MonsterShot monsterShot)
@@ -27,7 +27,7 @@ namespace Labyrinth.Services.ScoreKeeper
             if (monsterShot.Shot.HasRebounded || !(monsterShot.Shot.Originator is IPlayer)) 
                 return;
 
-            var energyRemoved = Math.Min(monsterShot.Monster.Energy, monsterShot.Shot.Energy );
+            var energyRemoved = Math.Min(monsterShot.Monster.Energy, monsterShot.Shot.Energy);
             var increaseToScore = (energyRemoved >> 1) + 1;
             this._score += increaseToScore;
             }
