@@ -57,7 +57,7 @@ namespace Labyrinth
         Insubstantial,
         
         /// <summary>
-        /// An object that does not move such as a crystal or grave. Only a single stationary object can occupy a given space. Insubstatial objects can move into the same space though.
+        /// An object that does not move such as a crystal or grave. Only a single stationary object can occupy a given space. Insubstantial objects can move into the same space though.
         /// </summary>
         Stationary,
 
@@ -88,7 +88,7 @@ namespace Labyrinth
         CanPushOthers,
 
         /// <summary>
-        /// An object that can push another objecct in the same direction or cause it to bounce backwards (i.e. player)
+        /// An object that can push another object in the same direction or cause it to bounce backwards (i.e. player)
         /// </summary>
         CanPushOrCauseBounceBack
         }
