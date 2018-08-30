@@ -3,10 +3,12 @@ using System.Text.RegularExpressions;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    public class DiceRoll
+    public readonly struct DiceRoll : IEquatable<DiceRoll>
         {
         public int NumberOfDice { get; }
         public int NumberOfSides { get; }
+
+        public static DiceRoll None = new DiceRoll();
 
         public DiceRoll(int numberOfDice, int numberOfSides)
             {
@@ -39,5 +41,34 @@ namespace Labyrinth.Services.WorldBuilding
         public int MinValue => this.NumberOfDice;
 
         public int MaxValue => this.NumberOfDice * this.NumberOfSides;
+
+        public override bool Equals(object obj)
+            {
+            return obj is DiceRoll roll && this.Equals(roll);
+            }
+
+        public bool Equals(DiceRoll other)
+            {
+            return this.NumberOfDice == other.NumberOfDice &&
+                   this.NumberOfSides == other.NumberOfSides;
+            }
+
+        public override int GetHashCode()
+            {
+            var hashCode = 214213997;
+            hashCode = hashCode * -1521134295 + this.NumberOfDice.GetHashCode();
+            hashCode = hashCode * -1521134295 + this.NumberOfSides.GetHashCode();
+            return hashCode;
+            }
+
+        public static bool operator ==(DiceRoll roll1, DiceRoll roll2)
+            {
+            return roll1.Equals(roll2);
+            }
+
+        public static bool operator !=(DiceRoll roll1, DiceRoll roll2)
+            {
+            return !(roll1 == roll2);
+            }
         }
     }

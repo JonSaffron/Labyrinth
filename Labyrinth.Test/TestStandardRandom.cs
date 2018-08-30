@@ -83,7 +83,7 @@ namespace Labyrinth.Test
             {
             var r = new StandardRandom();
 
-            Assert.Throws<ArgumentNullException>(() => r.DiceRoll(null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => r.DiceRoll(new DiceRoll()));
             for (int i = 1; i <= 10; i++)
                 {
                 for (int j = 1; j <= 10; j++)

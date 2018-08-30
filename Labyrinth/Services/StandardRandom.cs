@@ -33,10 +33,10 @@ namespace Labyrinth.Services
             }
 
         [MustUseReturnValue]
-        public int DiceRoll([NotNull] DiceRoll diceRoll)
+        public int DiceRoll(DiceRoll diceRoll)
             {
-            if (diceRoll == null) 
-                throw new ArgumentNullException(nameof(diceRoll));
+            if (diceRoll == WorldBuilding.DiceRoll.None) 
+                throw new ArgumentOutOfRangeException(nameof(diceRoll));
 
             var result = 0;
             for (int i = 0; i < diceRoll.NumberOfDice; i++)
