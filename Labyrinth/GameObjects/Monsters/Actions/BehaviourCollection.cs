@@ -28,6 +28,7 @@ namespace Labyrinth.GameObjects.Actions
 
         public void Add<T>() where T : BaseBehaviour, new() 
             {
+            // todo ensure that type T has one or more of the marker interfaces
             if (!this.Has<T>())
                 return;
             var newBehaviour = new T();

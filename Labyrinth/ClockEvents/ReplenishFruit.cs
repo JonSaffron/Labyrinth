@@ -56,6 +56,8 @@ namespace Labyrinth.ClockEvents
             if (gameState.GetItemsOnTile(tp).Any())
                 return;
 
+            // Don't put a new fruit near to the player.
+            // This differs from the original game's methodology which would not place it in the same room as the player or the previous room that the player had visited.
             if (Math.Abs(tp.X - gameState.Player.TilePosition.X) < Constants.RoomSizeInTiles.X
                 && Math.Abs(tp.Y - gameState.Player.TilePosition.Y) < Constants.RoomSizeInTiles.Y)
                 {

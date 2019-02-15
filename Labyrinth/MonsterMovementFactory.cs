@@ -53,7 +53,7 @@ namespace Labyrinth
             return result;
             }
 
-        public IMonsterMotion PatrolPerimiter(Monster monster, Direction initialDirection)
+        public IMonsterMotion PatrolPerimeter(Monster monster, Direction initialDirection)
             {
             var result = new PatrolPerimeter(monster, initialDirection);
             return result;

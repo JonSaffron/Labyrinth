@@ -283,6 +283,10 @@ namespace Labyrinth
                 result.ShotsBounceOff = monsterDef.ShotsBounceOff.Value;
             if (monsterDef.IsActive.HasValue)
                 result.IsActive = monsterDef.IsActive.Value;
+            if (!result.IsActive)
+                {
+                result.Behaviours.Add<ActivateWhenHurt>();
+                }
 
             this._gameObjectCollection.Add(result);
             return result;

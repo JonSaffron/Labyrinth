@@ -25,6 +25,7 @@ namespace Labyrinth.Services.WorldBuilding
         public bool? ShotsBounceOff { get; set; }
         public bool? IsActive { get; set; }
 
+        [Obsolete("use Breed property instead")]
         public Type Type
             {
             get { return this._type; }
@@ -36,6 +37,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
+        [Obsolete("use Breed property instead")]
         public string MonsterType
             {
             get { return this._type?.Name; }

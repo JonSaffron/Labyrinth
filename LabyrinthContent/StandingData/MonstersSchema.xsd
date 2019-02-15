@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema targetNamespace="http://JonSaffron/Labyrinth/Monsters" elementFormDefault="qualified" xmlns="http://JonSaffron/Labyrinth/Monsters" xmlns:mstns="http://tempuri.org/XMLSchema.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Monsters">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="Breed" type="Breed" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+
+  <xs:complexType name="Breed">
+    <xs:all>
+      <xs:element name="DefaultBehaviours" type="DefaultBehaviours" />
+      <xs:element name="Movement" type="Movement" />
+    </xs:all>
+    <xs:attribute name="Name" use="required" type="xs:string" />
+    <xs:attribute name="Texture" use="required" type="xs:string" />
+    <xs:attribute name="BaseMovementsPerFrame" use="required" type="xs:integer" />
+  </xs:complexType>
+
+  <xs:complexType name="DefaultBehaviours">
+    <xs:all>
+      <xs:element name="Flitters" minOccurs="0" maxOccurs="1" />
+      <xs:element name="LaysEggs" minOccurs="0" maxOccurs="1" />
+      <xs:element name="ShootsAtPlayer" minOccurs="0" maxOccurs="1" />
+      <xs:element name="Mobility" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="Default" use="required" type="MonsterMobility" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ChangeRooms" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="Default" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:pattern value="StaysWithinRoom|MovesRoom|FollowsPlayer" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="Movement">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="Move">
+        <xs:complexType>
+          <xs:attribute name="Type" use="required" type="MonsterMobility" />
+          <xs:attribute name="Name" use="required" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:simpleType name="MonsterMobility">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="Stationary|Placid|Aggressive|Patrolling|Cautious" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

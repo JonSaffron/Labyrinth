@@ -12,6 +12,6 @@ namespace Labyrinth
         IMonsterMotion Placid(Monster monster);
         IMonsterMotion KillerCubeRedMovement(Monster monster);
         IMonsterMotion RotaFloaterCyanMovement(Monster monster);
-        IMonsterMotion PatrolPerimiter(Monster monster, Direction initialDirection);
+        IMonsterMotion PatrolPerimeter(Monster monster, Direction initialDirection);
         }
     }

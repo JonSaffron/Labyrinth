@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Monsters xmlns="http://JonSaffron/Labyrinth/Monsters" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth MonstersSchema.xsd">
+  <Breed Name="Butterfly" Texture="Butterfly" BaseMovementsPerFrame="3">
+    <DefaultBehaviours>
+      <Flitters />
+      <Mobility Default="Aggressive" />
+      <ChangeRooms Default="FollowsPlayer" />
+      <LaysEggs />
+      <ShootsAtPlayer />
+    </DefaultBehaviours>
+    <Movement>
+      <Move Type="Aggressive" Name="FullPursuit" />
+    </Movement>
+  </Breed>
+</Monsters>

@@ -132,6 +132,7 @@
     <Compile Include="GameObjects\BoundaryCurrentRoom.cs" />
     <Compile Include="GameObjects\BoundaryFixed.cs" />
     <Compile Include="GameObjects\BoundMovementFactory.cs" />
+    <Compile Include="GameObjects\MonsterFactory.cs" />
     <Compile Include="GameObjects\Monsters\Actions\ActivateWhenHurt.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BaseBehaviour.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BehaviourCollection.cs" />
@@ -149,7 +150,7 @@
     <Compile Include="GameObjects\Monsters\Movement\MonsterMotionBase.cs" />
     <Compile Include="GameObjects\Monsters\Movement\PatrolPerimeter.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Stationary.cs" />
-    <Compile Include="GameObjects\Monsters\PatrolPerimiterTest.cs" />
+    <Compile Include="GameObjects\Monsters\PatrolPerimeterTest.cs" />
     <Compile Include="GameObjects\MovementChecker.cs" />
     <Compile Include="GameObjects\MovementOfAnother.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
