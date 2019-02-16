@@ -10,8 +10,8 @@
 
   <xs:complexType name="Breed">
     <xs:all>
-      <xs:element name="DefaultBehaviours" type="DefaultBehaviours" />
-      <xs:element name="Movement" type="Movement" />
+      <xs:element name="DefaultBehaviours" type="DefaultBehaviours" minOccurs="0" />
+      <xs:element name="Movement" type="Movement" minOccurs="0" />
     </xs:all>
     <xs:attribute name="Name" use="required" type="xs:string" />
     <xs:attribute name="Texture" use="required" type="xs:string" />
@@ -22,23 +22,11 @@
     <xs:all>
       <xs:element name="Flitters" minOccurs="0" maxOccurs="1" />
       <xs:element name="LaysEggs" minOccurs="0" maxOccurs="1" />
+      <xs:element name="LaysMushroom" minOccurs="0" maxOccurs="1" />
       <xs:element name="ShootsAtPlayer" minOccurs="0" maxOccurs="1" />
-      <xs:element name="Mobility" minOccurs="1" maxOccurs="1">
-        <xs:complexType>
-          <xs:attribute name="Default" use="required" type="MonsterMobility" />
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="ChangeRooms" minOccurs="1" maxOccurs="1">
-        <xs:complexType>
-          <xs:attribute name="Default" use="required">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:pattern value="StaysWithinRoom|MovesRoom|FollowsPlayer" />
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="StartsShootingWhenHurt" minOccurs="0" maxOccurs="1" />
+      <xs:element name="ShotsBounceOff" minOccurs="0" maxOccurs="1" />
+      <xs:element name="SpawnsUponDeath" minOccurs="0" maxOccurs="1" />
     </xs:all>
   </xs:complexType>
 
@@ -47,10 +35,19 @@
       <xs:element name="Move">
         <xs:complexType>
           <xs:attribute name="Type" use="required" type="MonsterMobility" />
-          <xs:attribute name="Name" use="required" type="xs:string" />
+          <xs:attribute name="Implementation" use="required" type="xs:string" />
         </xs:complexType>
       </xs:element>
     </xs:choice>
+    <xs:attribute name="Default" use="optional" type="MonsterMobility" />
+    <xs:attribute name="ChangeRooms" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="StaysWithinRoom|MovesRoom|FollowsPlayer" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Speed" use="optional" type="xs:decimal" />
   </xs:complexType>
 
   <xs:simpleType name="MonsterMobility">

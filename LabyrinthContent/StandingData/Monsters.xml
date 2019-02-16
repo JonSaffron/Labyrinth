@@ -3,13 +3,151 @@
   <Breed Name="Butterfly" Texture="Butterfly" BaseMovementsPerFrame="3">
     <DefaultBehaviours>
       <Flitters />
-      <Mobility Default="Aggressive" />
-      <ChangeRooms Default="FollowsPlayer" />
       <LaysEggs />
       <ShootsAtPlayer />
     </DefaultBehaviours>
-    <Movement>
-      <Move Type="Aggressive" Name="FullPursuit" />
+    <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
+      <Move Type="Aggressive" Implementation="FullPursuit" />
+    </Movement>
+  </Breed>
+
+  <Breed Name="CrazyCrawler" Texture="CrazyCrawler" BaseMovementsPerFrame="3">
+    <DefaultBehaviours>
+      <ShotsBounceOff />
+    </DefaultBehaviours>
+    <Movement Default="Aggressive">
+      <Move Type="Placid" Implementation="Placid" />
+      <Move Type="Aggressive" Implementation="SemiAggressive" />
+    </Movement>
+  </Breed>
+
+  <Breed Name="DeathCube" Texture="DeathCube" BaseMovementsPerFrame="3">
+    <DefaultBehaviours>
+      <ShotsBounceOff />
+    </DefaultBehaviours>
+  </Breed>
+
+  <Breed Name="DiamondDemon" Texture="DiamondDemon" BaseMovementsPerFrame="4">
+    <DefaultBehaviours>
+      <Flitters />
+      <LaysEggs />
+      <ShootsAtPlayer />
+    </DefaultBehaviours>
+    <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
+      <Move Type="Placid" Implementation="Placid" />
+      <Move Type="Aggressive" Implementation="SemiAggressive" />
+    </Movement>
+  </Breed>
+ 
+  <Breed Name="FlitterbugBrown" Texture="FlitterbugBrown" BaseMovementsPerFrame="4">
+    <DefaultBehaviours>
+      <Flitters />
+      <SpawnsUponDeath />
+    </DefaultBehaviours>
+    <Movement Default="Aggressive" ChangeRooms="MovesRoom">
+      <Move Type="Aggressive" Implementation="SemiAggressive" />
+      <Move Type="Cautious" Implementation="Cautious" />
+    </Movement>
+  </Breed>
+
+  <Breed Name="FlitterbugCyan" Texture="FlitterbugCyan" BaseMovementsPerFrame="4">
+    <DefaultBehaviours>
+      <Flitters />
+    </DefaultBehaviours>
+    <Movement Default="Cautious" ChangeRooms="FollowsPlayer">
+      <Move Type="Aggressive" Implementation="SemiAggressive" />
+      <Move Type="Cautious" Implementation="Cautious" />
+    </Movement>
+  </Breed>
+
+  <Breed Name="FlitterbugRed" Texture="FlitterbugRed" BaseMovementsPerFrame="4">
+    <DefaultBehaviours>
+      <Flitters />
+    </DefaultBehaviours>
+    <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
+      <Move Type="Aggressive" Implementation="SemiAggressive" />
+      <Move Type="Cautious" Implementation="Cautious" />
+    </Movement>
+  </Breed>
+
+  <Breed Name="Joker" Texture="Joker" BaseMovementsPerFrame="4">
+    <DefaultBehaviours>
+      <Flitters />
+      <LaysEggs />
+      <SpawnsUponDeath />
+      <ShootsAtPlayer />
+    </DefaultBehaviours>
+    <Movement Default="Cautious" ChangeRooms="FollowsPlayer">
+      <Move Type="Cautious" Implementation="Cautious" />
+    </Movement>
+  </Breed>
+
+  <Breed Name="KillerCubeGreen" Texture="KillerCubeGreen" BaseMovementsPerFrame="3">
+    <DefaultBehaviours>
+      <ShootsAtPlayer />
+    </DefaultBehaviours>
+  </Breed>
+
+  <Breed Name="KillerCube" Texture="KillerCubeRed" BaseMovementsPerFrame="3">
+    <DefaultBehaviours>
+      <ShootsAtPlayer />
+    </DefaultBehaviours>
+    <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
+      <Move Type="Patrolling" Implementation="StandardPatrolling" />
+      <Move Type="Placid" Implementation="StandardRolling" />
+      <Move Type="Aggressive" Implementation="KillerCubeRedMovement" />
+    </Movement>
+  </Breed>
+
+  <Breed Name="RotaFloaterBrown" Texture="RotaFloaterBrown" BaseMovementsPerFrame="2">
+    <DefaultBehaviours />
+
+    <Movement Default="Placid" ChangeRooms="FollowsPlayer">
+      <Move Type="Placid" Implementation="StandardRolling"/>
+      <Move Type="Patrolling" Implementation="StandardPatrolling"/>
+      <Move Type="Aggressive" Implementation="RotaFloaterCyanMovement"/>
+    </Movement>
+  </Breed>
+
+  <Breed Name="RotaFloater" Texture="RotaFloaterCyan" BaseMovementsPerFrame="2">
+    <DefaultBehaviours />
+
+    <Movement Default="Placid" Speed="1.5">
+      <Move Type="Placid" Implementation="StandardRolling"/>
+      <Move Type="Patrolling" Implementation="StandardPatrolling"/>
+      <Move Type="Aggressive" Implementation="RotaFloaterCyanMovement"/>
+    </Movement>
+  </Breed>
+
+  <Breed Name="ThresherBrown" Texture="ThresherBrown" BaseMovementsPerFrame="3">
+    <DefaultBehaviours/>
+
+    <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
+      <Move Type="Placid" Implementation="Placid"/>
+      <Move Type="Aggressive" Implementation="SemiAggressive"/>
+      <Move Type="Cautious" Implementation="Cautious"/>
+    </Movement>
+  </Breed>
+
+  <Breed Name="ThresherCyan" Texture="ThresherCyan" BaseMovementsPerFrame="4">
+    <DefaultBehaviours>
+      <LaysMushroom />
+    </DefaultBehaviours>
+
+    <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
+      <Move Type="Placid" Implementation="Placid"/>
+      <Move Type="Aggressive" Implementation="SemiAggressive"/>
+      <Move Type="Cautious" Implementation="Cautious"/>
+    </Movement>
+  </Breed>
+
+  <Breed Name="TigerMoth" Texture="TigerMoth" BaseMovementsPerFrame="4">
+    <DefaultBehaviours>
+      <StartsShootingWhenHurt />
+      <LaysMushroom />
+    </DefaultBehaviours>
+    <Movement Default="Aggressive" ChangeRooms="MovesRoom">
+      <Move Type="Aggressive" Implementation="SemiAggressive"/>
     </Movement>
   </Breed>
 </Monsters>
