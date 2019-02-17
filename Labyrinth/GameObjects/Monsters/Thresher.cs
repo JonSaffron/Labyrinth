@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     abstract class Thresher : Monster
         {
-        protected Thresher(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
+        protected Thresher(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
             }
 

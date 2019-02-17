@@ -28,7 +28,7 @@ namespace Labyrinth.GameObjects.Movement
         private Direction MoveAwayFromPlayer(Monster monster)
             {
             var towardsPlayer = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
-            bool alterDirection = GlobalServices.Randomess.Test(3);
+            bool alterDirection = GlobalServices.Randomness.Test(3);
             Direction result = alterDirection 
                 ?  MonsterMovement.AlterDirection(this._currentDirection) 
                 : towardsPlayer.Reversed();
@@ -37,7 +37,7 @@ namespace Labyrinth.GameObjects.Movement
 
         private static Direction MoveTowardsPlayer(Monster monster)
             {
-            bool alterDirection = GlobalServices.Randomess.Test(7);
+            bool alterDirection = GlobalServices.Randomness.Test(7);
             Direction result = alterDirection 
                 ? MonsterMovement.RandomDirection() 
                 : MonsterMovement.DetermineDirectionTowardsPlayer(monster);

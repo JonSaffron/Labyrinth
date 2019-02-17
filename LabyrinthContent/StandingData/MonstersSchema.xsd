@@ -10,7 +10,7 @@
 
   <xs:complexType name="Breed">
     <xs:all>
-      <xs:element name="DefaultBehaviours" type="DefaultBehaviours" minOccurs="0" />
+      <xs:element name="InherentBehaviours" type="InherentBehaviours" minOccurs="0" />
       <xs:element name="Movement" type="Movement" minOccurs="0" />
     </xs:all>
     <xs:attribute name="Name" use="required" type="xs:string" />
@@ -18,7 +18,7 @@
     <xs:attribute name="BaseMovementsPerFrame" use="required" type="xs:integer" />
   </xs:complexType>
 
-  <xs:complexType name="DefaultBehaviours">
+  <xs:complexType name="InherentBehaviours">
     <xs:all>
       <xs:element name="Flitters" minOccurs="0" maxOccurs="1" />
       <xs:element name="LaysEggs" minOccurs="0" maxOccurs="1" />

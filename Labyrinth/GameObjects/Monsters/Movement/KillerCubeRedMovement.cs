@@ -28,7 +28,7 @@ namespace Labyrinth.GameObjects.Movement
                 {
                 newDirection = xDiff > 0 ? Direction.Left : Direction.Right;
                 }
-            else if (GlobalServices.Randomess.Next(16) == 0)
+            else if (GlobalServices.Randomness.Next(16) == 0)
                 {
                 newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
                 }
@@ -49,16 +49,16 @@ namespace Labyrinth.GameObjects.Movement
 
         private static bool ShouldMakeMoveToAvoidTrouble()
             {
-            return GlobalServices.Randomess.Next(8) == 0; 
+            return GlobalServices.Randomness.Next(8) == 0; 
             }
 
         private static Direction GetRandomPerpendicularDirection(Direction currentDirection)
             {
             var orientation = currentDirection.Orientation();
             if (orientation == Orientation.Horizontal)
-                return GlobalServices.Randomess.Next(2) == 0 ? Direction.Up : Direction.Down;
+                return GlobalServices.Randomness.Next(2) == 0 ? Direction.Up : Direction.Down;
             if (orientation == Orientation.Vertical)
-                return GlobalServices.Randomess.Next(2) == 0 ? Direction.Left : Direction.Right;
+                return GlobalServices.Randomness.Next(2) == 0 ? Direction.Left : Direction.Right;
             return MonsterMovement.RandomDirection();
             }
 

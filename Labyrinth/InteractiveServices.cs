@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.Display;
+﻿using Labyrinth.GameObjects;
+using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.ScoreKeeper;
 using Labyrinth.Services.Sound;
@@ -32,6 +33,9 @@ namespace Labyrinth
 
             var spriteLibrary = new SpriteLibrary(game);
             GlobalServices.SetSpriteLibrary(spriteLibrary);
+
+            var monsterFactory = new MonsterFactory();
+            GlobalServices.SetMonsterFactory(monsterFactory);
             }
         }
     }

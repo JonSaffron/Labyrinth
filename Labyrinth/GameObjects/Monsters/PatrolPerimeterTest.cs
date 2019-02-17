@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
     {
     class PatrolPerimiterTest : Monster
         {
-        public PatrolPerimiterTest(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
+        public PatrolPerimiterTest(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/DeathCube", 3));
             this.Mobility = MonsterMobility.Patrolling;

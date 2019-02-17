@@ -94,7 +94,7 @@ namespace Labyrinth.Test
                             break;
                         case 'm':
                             var mdef = new MonsterDef();
-                            mdef.Type = typeof(DummyMonster);
+                            mdef.Breed = "DummyMonster";
                             mdef.Position = position;
                             mdef.Energy = 100;
                             gameState.AddMonster(mdef);

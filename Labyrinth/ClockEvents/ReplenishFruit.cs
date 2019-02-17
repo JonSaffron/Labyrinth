@@ -30,7 +30,7 @@ namespace Labyrinth.ClockEvents
 
         public void Update(int ticks)
             {
-            if (GlobalServices.Randomess.Next(4) == 0)
+            if (GlobalServices.Randomness.Next(4) == 0)
                 return;
 
             foreach (var fd in this._fruitDistList.Definitions)
@@ -51,7 +51,7 @@ namespace Labyrinth.ClockEvents
             if (populated)
                 return;
 
-            var rnd = GlobalServices.Randomess;
+            var rnd = GlobalServices.Randomness;
             var tp = new TilePos(area.X + rnd.Next(area.Width), area.Y + rnd.Next(area.Height));
             if (gameState.GetItemsOnTile(tp).Any())
                 return;

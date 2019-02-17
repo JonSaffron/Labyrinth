@@ -20,7 +20,7 @@ namespace Labyrinth.GameObjects.Movement
 
         private static bool ShouldMakeAnAggressiveMove(Monster monster)
             {
-            bool result = GlobalServices.Randomess.Test(1) && MonsterMovement.IsPlayerNearby(monster);
+            bool result = GlobalServices.Randomness.Test(1) && MonsterMovement.IsPlayerNearby(monster);
             return result;
             }   
         }

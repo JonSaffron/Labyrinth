@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Labyrinth.GameObjects;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
@@ -76,11 +77,11 @@ namespace Labyrinth
             MonsterMovementFactory = monsterMovementFactory;
             }
 
-        public static IRandomess Randomess { get; private set; }
+        public static IRandomness Randomness { get; private set; }
 
-        public static void SetRandomness(IRandomess randomess)
+        public static void SetRandomness(IRandomness randomness)
             {
-            Randomess = randomess;
+            Randomness = randomness;
             }
 
         public static void SetBoundMovementFactory(IBoundMovementFactory boundMovementFactory)
@@ -89,5 +90,12 @@ namespace Labyrinth
             }
 
         public static IBoundMovementFactory BoundMovementFactory { get; private set; }
+
+        public static void SetMonsterFactory(MonsterFactory monsterFactory)
+            {
+            MonsterFactory = monsterFactory;
+            }
+
+        public static MonsterFactory MonsterFactory { get; private set; }
         }
     }

@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     class CrazyCrawler : Monster
         {
-        public CrazyCrawler(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
+        public CrazyCrawler(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/CrazyCrawler", 3));
             

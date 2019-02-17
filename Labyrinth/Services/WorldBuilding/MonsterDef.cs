@@ -9,6 +9,7 @@ namespace Labyrinth.Services.WorldBuilding
     {
     public struct MonsterDef
         {
+        public string Breed { get; set; }
         private Type _type;
         public Vector2 Position { get; set; }
         public int Energy { get; set; }
@@ -58,7 +59,7 @@ namespace Labyrinth.Services.WorldBuilding
 
             var result = new MonsterDef
                 {
-                Type = monster.GetType(),
+                Breed = monster.Breed,
                 Position = monster.TilePosition.ToPosition(),
                 Energy = monster.OriginalEnergy,
                 Mobility = monster.Mobility,
@@ -80,7 +81,8 @@ namespace Labyrinth.Services.WorldBuilding
             {
             MonsterDef result = new MonsterDef
                 {
-                MonsterType = mdef.GetAttribute(nameof(result.Type)),
+                // todo change worlddef monster Type to Breed?
+                Breed = mdef.GetAttribute("Type"),
                 Energy = int.Parse(mdef.GetAttribute(nameof(result.Energy)))
                 };
 
@@ -91,7 +93,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
 
             string mobility = mdef.GetAttribute(nameof(result.Mobility));
-            if (!String.IsNullOrEmpty(mobility))
+            if (!string.IsNullOrEmpty(mobility))
                 {
                 result.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);
                 }

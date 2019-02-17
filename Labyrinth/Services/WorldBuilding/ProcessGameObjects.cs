@@ -126,7 +126,7 @@ namespace Labyrinth.Services.WorldBuilding
         public void AddMonstersFromRandomDistributions([NotNull] IEnumerable<RandomMonsterDistribution> randomMonsterDistributions)
             {
             if (randomMonsterDistributions == null) throw new ArgumentNullException(nameof(randomMonsterDistributions));
-            var rnd = GlobalServices.Randomess;
+            var rnd = GlobalServices.Randomness;
             foreach (var dist in randomMonsterDistributions)
                 {
                 for (int i = 0; i < dist.CountOfMonsters; i++)
@@ -157,7 +157,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         private TilePos GetFreeTile(Rectangle area)
             {
-            var rnd = GlobalServices.Randomess;
+            var rnd = GlobalServices.Randomness;
             while (true)
                 {
                 var tp = new TilePos(area.X + rnd.Next(area.Width), area.Y + rnd.Next(area.Height));

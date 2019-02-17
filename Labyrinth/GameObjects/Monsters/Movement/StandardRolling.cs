@@ -20,7 +20,7 @@ namespace Labyrinth.GameObjects.Movement
             if (this.CurrentDirection == Direction.None)
                 this.CurrentDirection = MonsterMovement.RandomDirection();
 
-            bool changeDirection = GlobalServices.Randomess.Test(7);
+            bool changeDirection = GlobalServices.Randomness.Test(7);
             if (changeDirection)
                 {
                 var result = MonsterMovement.AlterDirection(this.CurrentDirection);

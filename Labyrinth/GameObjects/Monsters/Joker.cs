@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
     {
     class Joker : Monster
         {
-        public Joker(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
+        public Joker(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/Joker", 4));
 

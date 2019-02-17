@@ -2,7 +2,7 @@
 
 namespace Labyrinth
     {
-    public interface IRandomess
+    public interface IRandomness
         {
         /// <summary>
         /// Tests whether an 8 bit random number is masked as specified, the result is zero

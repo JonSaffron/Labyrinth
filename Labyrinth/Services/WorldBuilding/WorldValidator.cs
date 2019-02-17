@@ -38,7 +38,7 @@ namespace Labyrinth.Services.WorldBuilding
             var strings = new string[this._validationErrors.Count];
             this._validationErrors.CopyTo(strings, 0);
             var message = String.Join("\r\n", strings);
-            throw new FormatException("The world xml is invalid:\r\n" + message);
+            throw new FormatException("Xml data is invalid:\r\n" + message);
             }
 
         private XmlReaderSettings GetSettings(Stream schema)

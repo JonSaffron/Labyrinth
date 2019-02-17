@@ -24,7 +24,7 @@ namespace Labyrinth.GameObjects.Movement
 
         public static Direction RandomDirection()
             {
-            int d = GlobalServices.Randomess.Next(256) & 3;
+            int d = GlobalServices.Randomness.Next(256) & 3;
             switch (d)
                 {
                 case 0:

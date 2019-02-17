@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects.Actions
     public abstract class BaseBehaviour : IBehaviour
         {
         protected readonly Player Player = GlobalServices.GameState.Player;
-        protected readonly IRandomess Random = GlobalServices.Randomess;
+        protected readonly IRandomness Random = GlobalServices.Randomness;
         private Monster _monster;
 
         protected Monster Monster => _monster;

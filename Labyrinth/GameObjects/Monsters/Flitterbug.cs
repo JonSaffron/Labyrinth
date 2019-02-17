@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
     {
     abstract class Flitterbug : Monster
         {
-        protected Flitterbug(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
+        protected Flitterbug(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
             this.Behaviours.Add<Flitter>();
             }

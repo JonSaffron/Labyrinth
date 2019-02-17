@@ -10,10 +10,11 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public abstract class Monster : MovingItem, IMonster
+    public class Monster : MovingItem, IMonster
         {
+        public string Breed { get; }
         private MonsterMobility _mobility;
-        protected abstract IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility);
+        public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
         [CanBeNull] private IMonsterMotion _determineDirection;
         public Direction InitialDirection = Direction.None;
 
@@ -42,8 +43,9 @@ namespace Labyrinth.GameObjects
             HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
             }
 
-        protected Monster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
+        public Monster(string breed, AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
+            this.Breed = breed;
             this.Energy = energy;
             this.OriginalEnergy = energy;
             this.CurrentSpeed = Constants.BaseSpeed;
@@ -316,6 +318,12 @@ namespace Labyrinth.GameObjects
                     this.SightBoundary = roomBoundary;
                     }
                 }
+            }
+
+        protected virtual IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
+            {
+            // todo
+            return null;
             }
         }
     }

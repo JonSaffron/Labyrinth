@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.GameObjects.Movement;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -57,6 +58,14 @@ namespace Labyrinth
             if (isPaused)
                 {
                 DrawPausedMessage(spriteBatch);
+                }
+
+            // todo remove after testing
+            var patrolPerimiter = (PatrolPerimeter) GlobalServices.Game.Services.GetService(typeof(PatrolPerimeter));
+            if (patrolPerimiter != null)
+                {
+                string msg = string.Format("{0}\r\n{1}", patrolPerimiter.CurrentAttachmentMode, patrolPerimiter.CurrentAttachmentToWall);
+                spriteBatch.DrawCentredString(this._statusFont, msg, 100, Color.HotPink);
                 }
             }
 

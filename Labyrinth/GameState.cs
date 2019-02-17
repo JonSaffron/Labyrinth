@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Labyrinth.GameObjects;
-using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -184,7 +183,7 @@ namespace Labyrinth
             {
             MonsterDef md = new MonsterDef
                 {
-                Type = typeof(DiamondDemon),
+                Breed = "DiamondDemon",
                 Position = p,
                 Energy = 30,
                 Mobility = MonsterMobility.Aggressive,
@@ -255,39 +254,7 @@ namespace Labyrinth
 
         public Monster AddMonster(MonsterDef monsterDef)
             {
-            var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var constructorInfo = monsterDef.Type.GetConstructor(new[] {typeof (AnimationPlayer), typeof (Vector2), typeof (int)});
-            if (constructorInfo == null)
-                throw new InvalidOperationException("Failed to get matching constructor information for " + monsterDef.MonsterType + " object.");
-            var constructorArguments = new object[] {animationPlayer, monsterDef.Position, monsterDef.Energy};
-            var result = (Monster) constructorInfo.Invoke(constructorArguments);
-            if (monsterDef.InitialDirection.HasValue)
-                result.InitialDirection = monsterDef.InitialDirection.Value;
-            if (monsterDef.Mobility.HasValue)
-                result.Mobility = monsterDef.Mobility.Value;
-            if (monsterDef.ChangeRooms.HasValue)
-                result.ChangeRooms = monsterDef.ChangeRooms.Value;
-            if (monsterDef.IsEgg.GetValueOrDefault() && monsterDef.TimeBeforeHatching.HasValue)
-                result.SetDelayBeforeHatching(monsterDef.TimeBeforeHatching.Value);
-            if (monsterDef.LaysMushrooms.HasValue)
-                result.Behaviours.Set<LaysMushroom>(monsterDef.LaysMushrooms.Value);
-            if (monsterDef.LaysEggs.HasValue)
-                result.Behaviours.Set<LaysEgg>(monsterDef.LaysEggs.Value);
-            if (monsterDef.SplitsOnHit.HasValue)
-                result.Behaviours.Set<SpawnsUponDeath>(monsterDef.SplitsOnHit.Value);
-            if (monsterDef.ShootsAtPlayer.HasValue)
-                result.SetShootsAtPlayer(monsterDef.ShootsAtPlayer.Value);
-            if (monsterDef.ShootsOnceProvoked.HasValue)
-                result.Behaviours.Set<StartsShootingWhenHurt>(monsterDef.ShootsOnceProvoked.Value);
-            if (monsterDef.ShotsBounceOff.HasValue)
-                result.ShotsBounceOff = monsterDef.ShotsBounceOff.Value;
-            if (monsterDef.IsActive.HasValue)
-                result.IsActive = monsterDef.IsActive.Value;
-            if (!result.IsActive)
-                {
-                result.Behaviours.Add<ActivateWhenHurt>();
-                }
-
+            var result = GlobalServices.MonsterFactory.BuildMonster(monsterDef);
             this._gameObjectCollection.Add(result);
             return result;
             }

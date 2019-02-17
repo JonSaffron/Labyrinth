@@ -4,7 +4,7 @@ using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth.Services
     {
-    class StandardRandom : IRandomess
+    class StandardRandom : IRandomness
         {
         private readonly Random _random;
 

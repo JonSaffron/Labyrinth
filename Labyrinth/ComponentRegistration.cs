@@ -23,7 +23,7 @@ namespace Labyrinth
             container.Register(Component.For<IActiveSoundService>().ImplementedBy<ActiveSoundService>());
             container.Register(Component.For<ISpriteLibrary>().ImplementedBy<SpriteLibrary>());
             container.Register(Component.For<IMonsterMovementFactory>().ImplementedBy<MonsterMovementFactory>());
-            container.Register(Component.For<IRandomess>().ImplementedBy<StandardRandom>());
+            container.Register(Component.For<IRandomness>().ImplementedBy<StandardRandom>());
             }
         }
     }

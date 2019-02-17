@@ -7,7 +7,7 @@ namespace Labyrinth.GameObjects
     {
     class DiamondDemon : Monster
         {
-        public DiamondDemon(AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position, energy)
+        public DiamondDemon(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("Sprites/Monsters/DiamondDemon", 4));
             
