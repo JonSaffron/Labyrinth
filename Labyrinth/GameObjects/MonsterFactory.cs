@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
@@ -55,7 +56,53 @@ namespace Labyrinth.GameObjects
             {
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var result = new Monster(breed, animationPlayer, position, energy);
-            // todo apply inherent defaults and movement implementations
+            
+            var breedInfo = Breeds[breed];
+            var inherentBehaviours = breedInfo.InherentBehaviours;
+            foreach (var behaviourName in inherentBehaviours)
+                {
+                // todo I think we've settled on Behaviours as the nomenclature rather than Actions 
+                string typeName = "Labyrinth.GameObjects.Actions." + behaviourName;
+                Type behaviourType = Type.GetType(typeName);
+                if (behaviourType == null || !behaviourType.GetInterfaces().Contains(typeof(IBehaviour)))
+                    {
+                    throw new InvalidOperationException("Could not find behaviour Type " + behaviourName);
+                    }
+                var constructorInfo = behaviourType.GetConstructor(new[] {typeof (Monster)});
+                if (constructorInfo == null)
+                    throw new InvalidOperationException("Failed to get matching constructor information for " + behaviourName + " class.");
+                var constructorArguments = new object[] {result};
+                var behaviour = (IBehaviour) constructorInfo.Invoke(constructorArguments);
+
+                result.Behaviours.Add(behaviour);
+                }
+
+            var movement = breedInfo.BreedMovement;
+            if (movement.ChangeRooms.HasValue)
+                {
+                result.ChangeRooms = movement.ChangeRooms.Value;
+                }
+            if (movement.Speed.HasValue)
+                {
+                result.CurrentSpeed = (int) (Constants.BaseSpeed * movement.Speed.Value);
+                }
+
+            foreach (var move in breedInfo.BreedMovement.Moves)
+                {
+                string typeName = "Labyrinth.GameObjects.Movement." + move.Value;
+                Type movementType = Type.GetType(typeName);
+                if (movementType == null || !movementType.GetInterfaces().Contains(typeof(IMonsterMotion)))
+                    {
+                    throw new InvalidOperationException("Could not find movement Type" + move.Value);
+                    }
+
+                result.MovementMethods.Add(move.Key, movementType);
+                }
+            if (movement.DefaultMobility.HasValue)
+                {
+                result.Mobility = movement.DefaultMobility.Value;
+                }
+
             return result;
             }
 

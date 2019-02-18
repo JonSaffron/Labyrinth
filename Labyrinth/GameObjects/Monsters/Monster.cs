@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects.Actions;
 using Labyrinth.GameObjects.Movement;
@@ -54,10 +55,7 @@ namespace Labyrinth.GameObjects
             
         public MonsterMobility Mobility
             {
-            get
-                {
-                return this._mobility;
-                }
+            get => this._mobility;
             set
                 {
                 this._mobility = value;
@@ -139,7 +137,7 @@ namespace Labyrinth.GameObjects
 
         private void SetMonsterMotion()
             {
-            this._determineDirection = !this.IsActive || this.IsEgg || this.Mobility == MonsterMobility.Stationary ? new Stationary(this) : GetMethodForDeterminingDirection(this.Mobility);
+            this._determineDirection = !this.IsActive || this.IsEgg || this.Mobility == MonsterMobility.Stationary ? new Stationary(this) : GetImplementationForDeterminingDirection(this.Mobility);
             }
 
         /// <inheritdoc cref="IMonster" />
@@ -322,8 +320,22 @@ namespace Labyrinth.GameObjects
 
         protected virtual IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
             {
-            // todo
-            return null;
+            throw new NotImplementedException("This is no longer used.");
+            }
+
+        private IMonsterMotion GetImplementationForDeterminingDirection(MonsterMobility mobility)
+            {
+            Type type = this.MovementMethods[mobility];
+            if (!type.GetInterfaces().Contains(typeof(IMonsterMotion)))
+                {
+                throw new InvalidOperationException("Type " + type.Name + " does not implement IMonsterMotion.");
+                }
+            var constructorInfo = type.GetConstructor(new [] { typeof(Monster)});
+            if (constructorInfo == null)
+                throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
+            var constructorArguments = new object[] { this };
+            var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments);
+            return movementImplementation;
             }
         }
     }

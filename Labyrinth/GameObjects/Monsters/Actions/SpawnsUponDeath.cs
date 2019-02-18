@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth.GameObjects.Actions
     {
-    class SpawnsUponDeath : BaseBehaviour
+    class SpawnsUponDeath : BaseBehaviour, IDeathBehaviour
         {
         public override void Perform()
             {

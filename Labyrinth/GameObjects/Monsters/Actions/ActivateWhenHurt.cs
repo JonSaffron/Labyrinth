@@ -4,7 +4,7 @@
     /// 
     /// </summary>
     /// <remarks>Not a behavior of the original game, but seems like a sensible thing to have</remarks>
-    class ActivateWhenHurt : BaseBehaviour
+    class ActivateWhenHurt : BaseBehaviour, IInjuryBehaviour
         {
         public override void Perform()
             {

@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth.GameObjects.Actions
     {
-    class ChangeMovementWhenHurt : BaseBehaviour
+    class ChangeMovementWhenHurt : BaseBehaviour, IInjuryBehaviour
         {
         private readonly MonsterMobility _mobilityToChangeTo;
 

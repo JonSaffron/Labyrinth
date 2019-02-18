@@ -83,7 +83,7 @@ namespace Labyrinth
             {
             if (this._world == null)
                 {
-                LoadLevel("TestWorld.xml");
+                LoadLevel("World1.xml");
                 }
 
             // Must process keyboard input before checking pause status

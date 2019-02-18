@@ -2,7 +2,7 @@
 
 namespace Labyrinth.GameObjects.Actions
     {
-    class LaysEgg : BaseBehaviour
+    class LaysEgg : BaseBehaviour, IMovementBehaviour
         {
         public override void Perform()
             {

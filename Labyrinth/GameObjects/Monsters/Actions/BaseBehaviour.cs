@@ -8,13 +8,32 @@ namespace Labyrinth.GameObjects.Actions
         {
         protected readonly Player Player = GlobalServices.GameState.Player;
         protected readonly IRandomness Random = GlobalServices.Randomness;
-        private Monster _monster;
 
-        protected Monster Monster => _monster;
+        protected Monster Monster { get; private set; }
+
+        protected BaseBehaviour()
+            {
+            // nothing to do
+            }
+
+        // ReSharper disable once UnusedMember.Global - used by reflection
+        protected BaseBehaviour([NotNull] Monster monster)
+            {
+            this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            }
 
         public virtual void Init([NotNull] Monster monster)
             {
-            this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            // ReSharper disable once JoinNullCheckWithUsage
+            if (monster == null)
+                {
+                throw new ArgumentNullException(nameof(monster));
+                }
+            if (this.Monster != null)
+                {
+                throw new InvalidOperationException("Init already called.");
+                }
+            this.Monster = monster;
             }
 
         public abstract void Perform();

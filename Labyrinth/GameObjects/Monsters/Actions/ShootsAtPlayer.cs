@@ -4,7 +4,7 @@ using Labyrinth.GameObjects.Movement;
 
 namespace Labyrinth.GameObjects.Actions
     {
-    class ShootsAtPlayer : BaseBehaviour
+    class ShootsAtPlayer : BaseBehaviour, IMovementBehaviour
         {
         private readonly IMonsterWeapon _weapon;
 

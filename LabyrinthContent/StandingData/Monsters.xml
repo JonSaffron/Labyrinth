@@ -2,8 +2,8 @@
 <Monsters xmlns="http://JonSaffron/Labyrinth/Monsters" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth MonstersSchema.xsd">
   <Breed Name="Butterfly" Texture="Butterfly" BaseMovementsPerFrame="3">
     <InherentBehaviours>
-      <Flitters />
-      <LaysEggs />
+      <Flitter />
+      <LaysEgg />
       <ShootsAtPlayer />
     </InherentBehaviours>
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
@@ -29,8 +29,8 @@
 
   <Breed Name="DiamondDemon" Texture="DiamondDemon" BaseMovementsPerFrame="4">
     <InherentBehaviours>
-      <Flitters />
-      <LaysEggs />
+      <Flitter />
+      <LaysEgg />
       <ShootsAtPlayer />
     </InherentBehaviours>
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
@@ -41,7 +41,7 @@
  
   <Breed Name="FlitterbugBrown" Texture="FlitterbugBrown" BaseMovementsPerFrame="4">
     <InherentBehaviours>
-      <Flitters />
+      <Flitter />
       <SpawnsUponDeath />
     </InherentBehaviours>
     <Movement Default="Aggressive" ChangeRooms="MovesRoom">
@@ -52,7 +52,7 @@
 
   <Breed Name="FlitterbugCyan" Texture="FlitterbugCyan" BaseMovementsPerFrame="4">
     <InherentBehaviours>
-      <Flitters />
+      <Flitter />
     </InherentBehaviours>
     <Movement Default="Cautious" ChangeRooms="FollowsPlayer">
       <Move Type="Aggressive" Implementation="SemiAggressive" />
@@ -62,7 +62,7 @@
 
   <Breed Name="FlitterbugRed" Texture="FlitterbugRed" BaseMovementsPerFrame="4">
     <InherentBehaviours>
-      <Flitters />
+      <Flitter />
     </InherentBehaviours>
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
       <Move Type="Aggressive" Implementation="SemiAggressive" />
@@ -72,8 +72,8 @@
 
   <Breed Name="Joker" Texture="Joker" BaseMovementsPerFrame="4">
     <InherentBehaviours>
-      <Flitters />
-      <LaysEggs />
+      <Flitter />
+      <LaysEgg />
       <SpawnsUponDeath />
       <ShootsAtPlayer />
     </InherentBehaviours>
@@ -107,7 +107,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="RotaFloater" Texture="RotaFloaterCyan" BaseMovementsPerFrame="2">
+  <Breed Name="RotaFloaterCyan" Texture="RotaFloaterCyan" BaseMovementsPerFrame="2">
     <Movement Default="Placid" Speed="1.5">
       <Move Type="Placid" Implementation="StandardRolling"/>
       <Move Type="Patrolling" Implementation="StandardPatrolling"/>

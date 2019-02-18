@@ -2,7 +2,7 @@
 
 namespace Labyrinth.GameObjects.Actions
     {
-    class LaysMushroom : BaseBehaviour
+    class LaysMushroom : BaseBehaviour, IMovementBehaviour
         {
         public override void Perform()
             {

@@ -20,13 +20,13 @@
 
   <xs:complexType name="InherentBehaviours">
     <xs:all>
-      <xs:element name="Flitters" minOccurs="0" maxOccurs="1" />
-      <xs:element name="LaysEggs" minOccurs="0" maxOccurs="1" />
+      <xs:element name="Flitter" minOccurs="0" maxOccurs="1" />
+      <xs:element name="LaysEgg" minOccurs="0" maxOccurs="1" />
       <xs:element name="LaysMushroom" minOccurs="0" maxOccurs="1" />
       <xs:element name="ShootsAtPlayer" minOccurs="0" maxOccurs="1" />
-      <xs:element name="StartsShootingWhenHurt" minOccurs="0" maxOccurs="1" />
       <xs:element name="ShotsBounceOff" minOccurs="0" maxOccurs="1" />
       <xs:element name="SpawnsUponDeath" minOccurs="0" maxOccurs="1" />
+      <xs:element name="StartsShootingWhenHurt" minOccurs="0" maxOccurs="1" />
     </xs:all>
   </xs:complexType>
 

@@ -1,8 +1,18 @@
 ﻿namespace Labyrinth.GameObjects.Actions
     {
-    class Flitter : BaseBehaviour
+    class Flitter : BaseBehaviour, IMovementBehaviour
         {
         private bool _doubleSpeed;
+
+        public Flitter()
+            {
+            // nothing to do
+            }
+
+        public Flitter(Monster monster): base(monster)
+            {
+            // nothing to do
+            }
 
         public override void Perform()
             {

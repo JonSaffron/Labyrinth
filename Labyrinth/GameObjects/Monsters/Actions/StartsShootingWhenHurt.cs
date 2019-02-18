@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth.GameObjects.Actions
     {
-    class StartsShootingWhenHurt : BaseBehaviour
+    class StartsShootingWhenHurt : BaseBehaviour, IInjuryBehaviour
         {
         public override void Perform()
             {
