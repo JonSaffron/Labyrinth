@@ -172,7 +172,7 @@
     <Compile Include="Interfaces\IMonsterMovement.cs" />
     <Compile Include="Interfaces\IMovingItem.cs" />
     <Compile Include="Interfaces\IPlayer.cs" />
-    <Compile Include="Interfaces\IRandomess.cs" />
+    <Compile Include="Interfaces\IRandomness.cs" />
     <Compile Include="Interfaces\IScoreKeeper.cs" />
     <Compile Include="Interfaces\IShot.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
