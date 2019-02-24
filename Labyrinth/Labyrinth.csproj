@@ -127,11 +127,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="Enumeration.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoulderForTesting.cs" />
     <Compile Include="GameObjects\BoundaryCurrentRoom.cs" />
     <Compile Include="GameObjects\BoundaryFixed.cs" />
     <Compile Include="GameObjects\BoundMovementFactory.cs" />
+    <Compile Include="GameObjects\GameObjectProperties.cs" />
     <Compile Include="GameObjects\MonsterFactory.cs" />
     <Compile Include="GameObjects\Monsters\Actions\ActivateWhenHurt.cs" />
     <Compile Include="GameObjects\Monsters\Actions\BaseBehaviour.cs" />
@@ -187,6 +189,8 @@
     <Compile Include="Movement.cs" />
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
     <Compile Include="Interfaces\IAnimationPlayer.cs" />
+    <Compile Include="PropertyBag.cs" />
+    <Compile Include="PropertyDef.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Services\Messages\CrystalTaken.cs" />

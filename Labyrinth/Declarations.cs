@@ -151,7 +151,7 @@ namespace Labyrinth
         Patrolling,
 
         /// <summary>
-        /// Moving towards or away from the player
+        /// Evaluates risk of battle with Player and attacks or retreats appropriately
         /// </summary>
         Cautious
         }
@@ -197,9 +197,38 @@ namespace Labyrinth
 
     public enum FiringState
         {
+        /// <summary>
+        /// Cannot or does not fire
+        /// </summary>
         None,
+
+        /// <summary>
+        /// Fires single rounds
+        /// </summary>
         Pulse,
+
+        /// <summary>
+        /// Fires in streams
+        /// </summary>
         Continuous
+        }
+
+    public enum EffectOfShot
+        {
+        /// <summary>
+        /// No effect - the shot passes through the object
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// The shot causes the object to lose energy and the shot to dissipate
+        /// </summary>
+        Injury,
+
+        /// <summary>
+        /// The shot bounces off the object (unless it already has bounced off)
+        /// </summary>
+        Reflection
         }
 
     public enum GameSound

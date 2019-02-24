@@ -9,6 +9,8 @@ namespace Labyrinth.GameObjects
         private Vector2 _position;
         private int _energy;
 
+        public PropertyBag Properties { get; } = new PropertyBag();
+
         /// <summary>
         /// Constructs a new static item object
         /// </summary>
