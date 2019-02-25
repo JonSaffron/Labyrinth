@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
+using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 
@@ -146,6 +148,14 @@ namespace Labyrinth
             {
             var moa = new MovementOfAnother(objectDoingThePushing);
             moa.PushOrBounce(objectBeingPushed, direction);
+            }
+
+        [NotNull]
+        public static XmlNodeList SelectNodesEx([NotNull] this XmlElement xmlElement, [NotNull] string xpath, [NotNull] XmlNamespaceManager namespaceManager)
+            {
+            // ReSharper disable AssignNullToNotNullAttribute
+            return xmlElement.SelectNodes(xpath, namespaceManager);
+            // ReSharper restore AssignNullToNotNullAttribute
             }
         }
     }

@@ -143,7 +143,6 @@
     <Compile Include="GameObjects\Monsters\Actions\LaysEgg.cs" />
     <Compile Include="GameObjects\Monsters\Actions\LaysMushroom.cs" />
     <Compile Include="GameObjects\Monsters\Actions\ShootsAtPlayer.cs" />
-    <Compile Include="GameObjects\Monsters\Actions\ShotsBounceOff.cs" />
     <Compile Include="GameObjects\Monsters\Actions\SpawnsUponDeath.cs" />
     <Compile Include="GameObjects\Monsters\Actions\StartsShootingWhenHurt.cs" />
     <Compile Include="GameObjects\Monsters\MonsterBehaviour.cs" />

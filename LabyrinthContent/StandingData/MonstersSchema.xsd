@@ -11,6 +11,7 @@
   <xs:complexType name="Breed">
     <xs:all>
       <xs:element name="InherentBehaviours" type="InherentBehaviours" minOccurs="0" />
+      <xs:element name="InherentProperties" type="InherentProperties" minOccurs="0" />
       <xs:element name="Movement" type="Movement" minOccurs="0" />
     </xs:all>
     <xs:attribute name="Name" use="required" type="xs:string" />
@@ -24,10 +25,25 @@
       <xs:element name="LaysEgg" minOccurs="0" maxOccurs="1" />
       <xs:element name="LaysMushroom" minOccurs="0" maxOccurs="1" />
       <xs:element name="ShootsAtPlayer" minOccurs="0" maxOccurs="1" />
-      <xs:element name="ShotsBounceOff" minOccurs="0" maxOccurs="1" />
       <xs:element name="SpawnsUponDeath" minOccurs="0" maxOccurs="1" />
       <xs:element name="StartsShootingWhenHurt" minOccurs="0" maxOccurs="1" />
     </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="InherentProperties">
+    <xs:all>
+      <xs:element name="EffectOfShot" type="EffectOfShotProperty" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="EffectOfShotProperty">
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="None|Injury|Reflection" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="Movement">

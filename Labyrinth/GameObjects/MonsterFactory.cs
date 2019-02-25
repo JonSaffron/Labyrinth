@@ -128,12 +128,13 @@ namespace Labyrinth.GameObjects
             xnm.AddNamespace("ns", "http://JonSaffron/Labyrinth/Monsters");
 
             var result = new Dictionary<string, Breed>();
-            foreach (XmlElement breedElement in xmlRoot.SelectNodes("ns:Breed", xnm))
+            foreach (XmlElement breedElement in xmlRoot.SelectNodesEx("ns:Breed", xnm))
                 {
                 var breed = new Breed();
                 breed.Name = breedElement.GetAttribute("Name");
                 breed.Texture = breedElement.GetAttribute("Texture");
                 breed.BaseMovementsPerFrame = int.Parse(breedElement.GetAttribute("BaseMovementsPerFrame"));
+                
                 XmlElement inherentBehaviours = (XmlElement) breedElement.SelectSingleNode("ns:InherentBehaviours", xnm);
                 if (inherentBehaviours != null)
                     {
@@ -142,6 +143,17 @@ namespace Labyrinth.GameObjects
                         breed.InherentBehaviours.Add(behaviour.LocalName);
                         }
                     }
+
+                XmlElement inherentProperties = (XmlElement) breedElement.SelectSingleNode("ns:InherentProperties", xnm);
+                if (inherentProperties != null)
+                    {
+                    foreach (XmlElement property in inherentProperties.ChildNodes)
+                        {
+                        var propertyValue = property.GetAttribute("value");
+                        //breed.InherentProperties.Set();
+                        }
+                    }
+
                 XmlElement movement = (XmlElement) breedElement.SelectSingleNode("ns:Movement", xnm);
                 if (movement != null)
                     {
@@ -161,10 +173,10 @@ namespace Labyrinth.GameObjects
                         breed.BreedMovement.Speed = decimal.Parse(speed);
                         }
 
-                    var movesElement = movement.SelectSingleNode("ns:Movement", xnm);
+                    XmlElement movesElement = (XmlElement) movement.SelectSingleNode("ns:Movement", xnm);
                     if (movesElement != null)
                         {
-                        foreach (XmlElement moveElement in movesElement.SelectNodes("ns:Move", xnm))
+                        foreach (XmlElement moveElement in movesElement.SelectNodesEx("ns:Move", xnm))
                             {
                             var type = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), moveElement.GetAttribute("Type"));
                             var implementation = moveElement.GetAttribute("Implementation");
@@ -185,6 +197,7 @@ namespace Labyrinth.GameObjects
             public string Texture;
             public int BaseMovementsPerFrame;
             public readonly HashSet<string> InherentBehaviours = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            public readonly PropertyBag InherentProperties = new PropertyBag();
             public readonly BreedMovement BreedMovement = new BreedMovement();
             }
 

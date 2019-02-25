@@ -12,9 +12,9 @@
   </Breed>
 
   <Breed Name="CrazyCrawler" Texture="CrazyCrawler" BaseMovementsPerFrame="3">
-    <InherentBehaviours>
-      <ShotsBounceOff />
-    </InherentBehaviours>
+    <InherentProperties>
+      <EffectOfShot value="Reflection" />
+    </InherentProperties>
     <Movement Default="Aggressive">
       <Move Type="Placid" Implementation="Placid" />
       <Move Type="Aggressive" Implementation="SemiAggressive" />
@@ -22,9 +22,9 @@
   </Breed>
 
   <Breed Name="DeathCube" Texture="DeathCube" BaseMovementsPerFrame="3">
-    <InherentBehaviours>
-      <ShotsBounceOff />
-    </InherentBehaviours>
+    <InherentProperties>
+      <EffectOfShot value="Reflection" />
+    </InherentProperties>
   </Breed>
 
   <Breed Name="DiamondDemon" Texture="DiamondDemon" BaseMovementsPerFrame="4">

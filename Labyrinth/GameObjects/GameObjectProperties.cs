@@ -2,6 +2,6 @@
     {
     public static class GameObjectProperties
         {
-        public static PropertyDef<EffectOfShot> SomeImportantDataProperty = new PropertyDef<EffectOfShot>("EffectOfShot", EffectOfShot.None);
+        public static PropertyDef<EffectOfShot> EffectOfShot = new PropertyDef<EffectOfShot>("EffectOfShot", Labyrinth.EffectOfShot.None);
         }
     }
