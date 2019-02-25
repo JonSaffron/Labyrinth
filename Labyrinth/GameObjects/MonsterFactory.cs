@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Display;
@@ -150,7 +151,31 @@ namespace Labyrinth.GameObjects
                     foreach (XmlElement property in inherentProperties.ChildNodes)
                         {
                         var propertyValue = property.GetAttribute("value");
-                        //breed.InherentProperties.Set();
+                        
+                        string typeName = "Labyrinth.GameObjects.GameObjectProperties";
+                        Type behaviourType = Type.GetType(typeName);
+                        if (behaviourType == null || !behaviourType.GetInterfaces().Contains(typeof(IBehaviour)))
+                            {
+                            throw new InvalidOperationException("Could not find Type " + typeName);
+                            }
+                        var fieldInfo = behaviourType.GetField(property.Name, BindingFlags.Public | BindingFlags.Static);
+                        if (fieldInfo == null)
+                            throw new InvalidOperationException("Failed to get property definition " + property.Name + ".");
+
+// https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-examine-and-instantiate-generic-types-with-reflection
+
+                        var propertyDef = (PropertyDef<>) fieldInfo.GetValue(null);
+
+                        var enumTypeName = "Labyrinth." + property.Name;
+                        Type enumType = Type.GetType(enumTypeName);
+                        if (enumType == null)
+                            {
+                            throw new InvalidOperationException("Failed to get type for enum " + enumTypeName);
+                            }
+
+                        object value = Enum.Parse(enumType, propertyValue);
+
+                        breed.InherentProperties.Set(propertyDef, value);
                         }
                     }
 
