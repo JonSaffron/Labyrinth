@@ -1,10 +1,10 @@
 ﻿using System;
-using Labyrinth.GameObjects.Actions;
 using Labyrinth.Services.Messages;
 using Labyrinth.Services.ScoreKeeper;
 using NUnit.Framework;
 using Moq;
 using GalaSoft.MvvmLight.Messaging;
+using Labyrinth.GameObjects.Behaviour;
 
 // ReSharper disable ObjectCreationAsStatement
 // ReSharper disable AssignNullToNotNullAttribute

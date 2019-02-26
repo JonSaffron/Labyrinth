@@ -1,4 +1,4 @@
-﻿using Labyrinth.GameObjects.Actions;
+﻿using Labyrinth.GameObjects.Behaviour;
 
 namespace Labyrinth.GameObjects
     {

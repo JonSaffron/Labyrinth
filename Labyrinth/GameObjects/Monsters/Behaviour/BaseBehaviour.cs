@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using Labyrinth.GameObjects.Movement;
 
-namespace Labyrinth.GameObjects.Actions
+namespace Labyrinth.GameObjects.Behaviour
     {
     public abstract class BaseBehaviour : IBehaviour
         {

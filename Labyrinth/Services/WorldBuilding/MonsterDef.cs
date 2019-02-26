@@ -2,7 +2,7 @@
 using System.Xml;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects;
-using Labyrinth.GameObjects.Actions;
+using Labyrinth.GameObjects.Behaviour;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding

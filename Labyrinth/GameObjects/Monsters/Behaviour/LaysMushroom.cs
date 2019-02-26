@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Labyrinth.GameObjects.Actions
+namespace Labyrinth.GameObjects.Behaviour
     {
     class LaysMushroom : BaseBehaviour, IMovementBehaviour
         {

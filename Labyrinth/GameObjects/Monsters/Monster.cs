@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using Labyrinth.GameObjects.Actions;
+using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;

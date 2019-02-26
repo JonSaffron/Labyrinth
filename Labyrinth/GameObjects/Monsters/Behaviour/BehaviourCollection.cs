@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace Labyrinth.GameObjects.Actions
+namespace Labyrinth.GameObjects.Behaviour
     {
     public class BehaviourCollection : Collection<IBehaviour>
         {
@@ -11,7 +11,7 @@ namespace Labyrinth.GameObjects.Actions
 
         public BehaviourCollection([NotNull] Monster monster)
             {
-            _monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
         public void Perform<T>() where T : IBehaviour

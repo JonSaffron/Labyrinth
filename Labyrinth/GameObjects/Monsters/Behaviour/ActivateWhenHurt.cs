@@ -1,4 +1,4 @@
-﻿namespace Labyrinth.GameObjects.Actions
+﻿namespace Labyrinth.GameObjects.Behaviour
     {
     /// <summary>
     /// 

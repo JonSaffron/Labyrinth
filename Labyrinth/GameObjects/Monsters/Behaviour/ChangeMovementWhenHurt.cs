@@ -1,4 +1,4 @@
-﻿namespace Labyrinth.GameObjects.Actions
+﻿namespace Labyrinth.GameObjects.Behaviour
     {
     class ChangeMovementWhenHurt : BaseBehaviour, IInjuryBehaviour
         {
@@ -16,7 +16,7 @@
 
         public ChangeMovementWhenHurt(MonsterMobility mobilityToChangeTo)
             {
-            _mobilityToChangeTo = mobilityToChangeTo;
+            this._mobilityToChangeTo = mobilityToChangeTo;
             }
 
         public override void Perform()

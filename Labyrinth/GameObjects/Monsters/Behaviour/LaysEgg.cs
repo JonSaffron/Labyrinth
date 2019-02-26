@@ -1,6 +1,6 @@
 ﻿using Labyrinth.Services.WorldBuilding;
 
-namespace Labyrinth.GameObjects.Actions
+namespace Labyrinth.GameObjects.Behaviour
     {
     class LaysEgg : BaseBehaviour, IMovementBehaviour
         {

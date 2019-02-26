@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
-using Labyrinth.GameObjects.Actions;
+using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -17,10 +17,6 @@ namespace Labyrinth.GameObjects
 
         public Monster BuildMonster(MonsterDef monsterDef)
             {
-
-            // as was, we could instantiate the class which would apply the class defaults
-            // these would then be overridden by the monsterDef
-
             var result = BuildMonsterFromDefaults(monsterDef.Breed, monsterDef.Position, monsterDef.Energy);
 
             if (monsterDef.InitialDirection.HasValue)
@@ -53,7 +49,6 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-
         private Monster BuildMonsterFromDefaults(string breed, Vector2 position, int energy)
             {
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
@@ -67,8 +62,7 @@ namespace Labyrinth.GameObjects
             var inherentBehaviours = breedInfo.InherentBehaviours;
             foreach (var behaviourName in inherentBehaviours)
                 {
-                // todo I think we've settled on Behaviours as the nomenclature rather than Actions 
-                string typeName = "Labyrinth.GameObjects.Actions." + behaviourName;
+                string typeName = "Labyrinth.GameObjects.Behaviour." + behaviourName;
                 Type behaviourType = Type.GetType(typeName);
                 if (behaviourType == null || !behaviourType.GetInterfaces().Contains(typeof(IBehaviour)))
                     {
@@ -136,11 +130,13 @@ namespace Labyrinth.GameObjects
             var result = new Dictionary<string, Breed>();
             foreach (XmlElement breedElement in xmlRoot.SelectNodesEx("ns:Breed", xnm))
                 {
-                var breed = new Breed();
-                breed.Name = breedElement.GetAttribute("Name");
-                breed.Texture = breedElement.GetAttribute("Texture");
-                breed.BaseMovementsPerFrame = int.Parse(breedElement.GetAttribute("BaseMovementsPerFrame"));
-                
+                var breed = new Breed
+                    {
+                    Name = breedElement.GetAttribute("Name"),
+                    Texture = breedElement.GetAttribute("Texture"),
+                    BaseMovementsPerFrame = int.Parse(breedElement.GetAttribute("BaseMovementsPerFrame"))
+                    };
+
                 XmlElement inherentBehaviours = (XmlElement) breedElement.SelectSingleNode("ns:InherentBehaviours", xnm);
                 if (inherentBehaviours != null)
                     {
