@@ -49,7 +49,7 @@ namespace Labyrinth
 
         public IMonsterMotion RotaFloaterCyanMovement(Monster monster)
             {
-            var result = new RotaFloatCyanMovement(monster);
+            var result = new RotaFloaterCyanMovement(monster);
             return result;
             }
 

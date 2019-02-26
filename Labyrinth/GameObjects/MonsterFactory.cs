@@ -93,7 +93,7 @@ namespace Labyrinth.GameObjects
                 Type movementType = Type.GetType(typeName);
                 if (movementType == null || !movementType.GetInterfaces().Contains(typeof(IMonsterMotion)))
                     {
-                    throw new InvalidOperationException("Could not find movement Type" + move.Value);
+                    throw new InvalidOperationException("Could not find movement Type " + move.Value);
                     }
 
                 result.MovementMethods.Add(move.Key, movementType);
@@ -175,15 +175,11 @@ namespace Labyrinth.GameObjects
                         breed.BreedMovement.Speed = decimal.Parse(speed);
                         }
 
-                    XmlElement movesElement = (XmlElement) movement.SelectSingleNode("ns:Movement", xnm);
-                    if (movesElement != null)
+                    foreach (XmlElement moveElement in movement.SelectNodesEx("ns:Move", xnm))
                         {
-                        foreach (XmlElement moveElement in movesElement.SelectNodesEx("ns:Move", xnm))
-                            {
-                            var type = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), moveElement.GetAttribute("Type"));
-                            var implementation = moveElement.GetAttribute("Implementation");
-                            breed.BreedMovement.Moves.Add(type, implementation);
-                            }
+                        var type = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), moveElement.GetAttribute("Type"));
+                        var implementation = moveElement.GetAttribute("Implementation");
+                        breed.BreedMovement.Moves.Add(type, implementation);
                         }
                     }
 

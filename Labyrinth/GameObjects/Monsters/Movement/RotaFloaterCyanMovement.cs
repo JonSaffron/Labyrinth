@@ -2,9 +2,9 @@ using JetBrains.Annotations;
 
 namespace Labyrinth.GameObjects.Movement
     {
-    class RotaFloatCyanMovement : StandardRolling
+    class RotaFloaterCyanMovement : StandardRolling
         {
-        public RotaFloatCyanMovement([NotNull] Monster monster) : base(monster)
+        public RotaFloaterCyanMovement([NotNull] Monster monster) : base(monster)
             {
             }
             

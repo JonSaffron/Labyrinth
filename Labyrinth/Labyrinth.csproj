@@ -183,7 +183,7 @@
     <Compile Include="Interfaces\IServiceSetup.cs" />
     <Compile Include="MonsterMovementFactory.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Placid.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\RotaFloatCyanMovement.cs" />
+    <Compile Include="GameObjects\Monsters\Movement\RotaFloaterCyanMovement.cs" />
     <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
     <Compile Include="Movement.cs" />
     <Compile Include="ClockEvents\ReplenishFruit.cs" />

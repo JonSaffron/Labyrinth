@@ -46,7 +46,7 @@
     </InherentBehaviours>
     <Movement Default="Aggressive" ChangeRooms="MovesRoom">
       <Move Type="Aggressive" Implementation="SemiAggressive" />
-      <Move Type="Cautious" Implementation="Cautious" />
+      <Move Type="Cautious" Implementation="CautiousPursuit" />
     </Movement>
   </Breed>
 
@@ -56,7 +56,7 @@
     </InherentBehaviours>
     <Movement Default="Cautious" ChangeRooms="FollowsPlayer">
       <Move Type="Aggressive" Implementation="SemiAggressive" />
-      <Move Type="Cautious" Implementation="Cautious" />
+      <Move Type="Cautious" Implementation="CautiousPursuit" />
     </Movement>
   </Breed>
 
@@ -66,7 +66,7 @@
     </InherentBehaviours>
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
       <Move Type="Aggressive" Implementation="SemiAggressive" />
-      <Move Type="Cautious" Implementation="Cautious" />
+      <Move Type="Cautious" Implementation="CautiousPursuit" />
     </Movement>
   </Breed>
 
@@ -78,7 +78,7 @@
       <ShootsAtPlayer />
     </InherentBehaviours>
     <Movement Default="Cautious" ChangeRooms="FollowsPlayer">
-      <Move Type="Cautious" Implementation="Cautious" />
+      <Move Type="Cautious" Implementation="CautiousPursuit" />
     </Movement>
   </Breed>
 
@@ -121,7 +121,7 @@
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="Placid"/>
       <Move Type="Aggressive" Implementation="SemiAggressive"/>
-      <Move Type="Cautious" Implementation="Cautious"/>
+      <Move Type="Cautious" Implementation="CautiousPursuit"/>
     </Movement>
   </Breed>
 
@@ -133,7 +133,7 @@
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="Placid"/>
       <Move Type="Aggressive" Implementation="SemiAggressive"/>
-      <Move Type="Cautious" Implementation="Cautious"/>
+      <Move Type="Cautious" Implementation="CautiousPursuit"/>
     </Movement>
   </Breed>
 
