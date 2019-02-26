@@ -53,9 +53,6 @@ namespace Labyrinth
         /// Gets or generates the default value for this property
         /// </summary>
         /// <returns>A value that represents the default value for this property</returns>
-        public T GetDefault()
-            {
-            return this._createDefaultValueFunc();
-            }
+        public T DefaultValue => this._createDefaultValueFunc();
         }
     }

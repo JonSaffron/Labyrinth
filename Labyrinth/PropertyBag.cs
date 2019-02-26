@@ -11,7 +11,7 @@ namespace Labyrinth
             {
             var result = this._dict.TryGetValue(property.Name, out var returnValue)
                 ? (T) returnValue
-                : property.GetDefault();
+                : property.DefaultValue;
             return result;
             }
 
@@ -26,12 +26,12 @@ namespace Labyrinth
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanging(string propertyName)
+        private void OnPropertyChanging(string propertyName)
             {
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
             }
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        private void OnPropertyChanged(string propertyName)
             {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
