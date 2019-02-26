@@ -3,13 +3,13 @@
 namespace Labyrinth
     {
     /// <summary>
-    /// Strongly typed property identifier for properties on a blackboard
+    /// Strongly typed property identifier for properties
     /// </summary>
     /// <typeparam name="T">The type of the property value it identifies</typeparam>
     public class PropertyDef<T>
         {
         /// <summary>
-        /// The name of the property.
+        /// The name of the property
         /// </summary>
         /// <remarks>
         /// Properties are uniquely identified by name. Do not use the same name with different types.
@@ -28,7 +28,7 @@ namespace Labyrinth
         /// <remarks>
         /// Use this constructor if the default value is a constant or a value type.
         /// </remarks>
-        public PropertyDef(string name, T defaultValue = default)
+        public PropertyDef(string name, T defaultValue)
             {
             this.Name = name;
             this._createDefaultValueFunc = () => defaultValue;
@@ -49,6 +49,10 @@ namespace Labyrinth
             this._createDefaultValueFunc = createDefaultValueFunc;
             }
 
+        /// <summary>
+        /// Gets or generates the default value for this property
+        /// </summary>
+        /// <returns>A value that represents the default value for this property</returns>
         public T GetDefault()
             {
             return this._createDefaultValueFunc();

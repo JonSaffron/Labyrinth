@@ -98,7 +98,7 @@ namespace Labyrinth.GameObjects
             this.MonsterState = MonsterState.Normal;
             }
 
-        protected void SetNormalAnimation(Animation value)
+        public void SetNormalAnimation(Animation value)
             {
             this._normalAnimation = value;
             if (this.MonsterState == MonsterState.Normal)

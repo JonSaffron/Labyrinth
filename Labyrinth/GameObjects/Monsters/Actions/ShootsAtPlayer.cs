@@ -8,6 +8,16 @@ namespace Labyrinth.GameObjects.Actions
         {
         private readonly IMonsterWeapon _weapon;
 
+        public ShootsAtPlayer(Monster monster) : base(monster)
+            {
+            // nothing to do
+            }
+
+        public ShootsAtPlayer()
+            {
+            // nothing to do
+            }
+
         public ShootsAtPlayer([NotNull] IMonsterWeapon weapon)
             {
             this._weapon = weapon ?? throw new ArgumentNullException(nameof(weapon));

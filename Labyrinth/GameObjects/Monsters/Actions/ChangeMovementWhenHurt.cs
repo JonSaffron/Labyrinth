@@ -4,6 +4,16 @@
         {
         private readonly MonsterMobility _mobilityToChangeTo;
 
+        public ChangeMovementWhenHurt(Monster monster) : base(monster)
+            {
+            // nothing to do
+            }
+
+        public ChangeMovementWhenHurt()
+            {
+            // nothing to do
+            }
+
         public ChangeMovementWhenHurt(MonsterMobility mobilityToChangeTo)
             {
             _mobilityToChangeTo = mobilityToChangeTo;

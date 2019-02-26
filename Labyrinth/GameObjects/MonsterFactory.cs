@@ -22,6 +22,7 @@ namespace Labyrinth.GameObjects
             // these would then be overridden by the monsterDef
 
             var result = BuildMonsterFromDefaults(monsterDef.Breed, monsterDef.Position, monsterDef.Energy);
+
             if (monsterDef.InitialDirection.HasValue)
                 result.InitialDirection = monsterDef.InitialDirection.Value;
             if (monsterDef.Mobility.HasValue)
@@ -59,6 +60,10 @@ namespace Labyrinth.GameObjects
             var result = new Monster(breed, animationPlayer, position, energy);
             
             var breedInfo = Breeds[breed];
+
+            var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
+            result.SetNormalAnimation(Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovementsPerFrame));
+
             var inherentBehaviours = breedInfo.InherentBehaviours;
             foreach (var behaviourName in inherentBehaviours)
                 {
@@ -151,39 +156,15 @@ namespace Labyrinth.GameObjects
                     foreach (XmlElement property in inherentProperties.ChildNodes)
                         {
                         var propertyValue = property.GetAttribute("value");
-                        
-                        string typeName = "Labyrinth.GameObjects.GameObjectProperties";
-                        Type behaviourType = Type.GetType(typeName);
-                        if (behaviourType == null || !behaviourType.GetInterfaces().Contains(typeof(IBehaviour)))
-                            {
-                            throw new InvalidOperationException("Could not find Type " + typeName);
-                            }
-                        var fieldInfo = behaviourType.GetField(property.Name, BindingFlags.Public | BindingFlags.Static);
-                        if (fieldInfo == null)
-                            throw new InvalidOperationException("Failed to get property definition " + property.Name + ".");
-
-// https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-examine-and-instantiate-generic-types-with-reflection
-
-                        var propertyDef = (PropertyDef<>) fieldInfo.GetValue(null);
-
-                        var enumTypeName = "Labyrinth." + property.Name;
-                        Type enumType = Type.GetType(enumTypeName);
-                        if (enumType == null)
-                            {
-                            throw new InvalidOperationException("Failed to get type for enum " + enumTypeName);
-                            }
-
-                        object value = Enum.Parse(enumType, propertyValue);
-
-                        breed.InherentProperties.Set(propertyDef, value);
+                        AddToPropertyBag(breed.InherentProperties, property.Name, propertyValue);
                         }
                     }
 
                 XmlElement movement = (XmlElement) breedElement.SelectSingleNode("ns:Movement", xnm);
                 if (movement != null)
                     {
-                    var defaultMobility = movement.GetAttribute("DefaultMobility");
-                    if (!string.IsNullOrWhiteSpace( defaultMobility)) 
+                    var defaultMobility = movement.GetAttribute("Default");
+                    if (!string.IsNullOrWhiteSpace(defaultMobility)) 
                         {
                         breed.BreedMovement.DefaultMobility = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), defaultMobility);
                         }
@@ -214,6 +195,32 @@ namespace Labyrinth.GameObjects
                 }
 
             return result;
+            }
+
+        private static void AddToPropertyBag(PropertyBag propertyBag, string propertyName, string propertyValue)
+            {
+            Type gameObjectPropertiesType = typeof(GameObjectProperties);
+            var fieldInfo = gameObjectPropertiesType.GetField(propertyName, BindingFlags.Public | BindingFlags.Static);
+            if (fieldInfo == null)
+                {
+                throw new InvalidOperationException("Failed to get property definition for " + propertyName);
+                }
+
+            object propertyDef = fieldInfo.GetValue(null);
+            Type propertyType = propertyDef.GetType().GetGenericArguments()[0];
+            if (!propertyType.IsEnum)
+                {
+                throw new InvalidOperationException($"Property definition {propertyName} has type {propertyType.FullName} which isn't supported.");
+                }
+
+            MethodInfo methodInfo = typeof(PropertyBag).GetMethod("Set")?.MakeGenericMethod(propertyType);
+            if (methodInfo == null)
+                {
+                throw new InvalidOperationException("Failed to get generic PropertyBag method definition");
+                }
+
+            object value = Enum.Parse(propertyType, propertyValue);
+            methodInfo.Invoke(propertyBag, new[] {propertyDef, value});
             }
 
         private class Breed

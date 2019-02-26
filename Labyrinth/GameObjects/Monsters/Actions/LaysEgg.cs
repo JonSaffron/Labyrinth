@@ -4,6 +4,16 @@ namespace Labyrinth.GameObjects.Actions
     {
     class LaysEgg : BaseBehaviour, IMovementBehaviour
         {
+        public LaysEgg(Monster monster) : base(monster)
+            {
+            // nothing to do
+            }
+
+        public LaysEgg()
+            {
+            // nothing to do
+            }
+
         public override void Perform()
             {
             if (!ShouldAttemptToLayEgg())

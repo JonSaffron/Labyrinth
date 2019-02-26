@@ -88,7 +88,7 @@
     </InherentBehaviours>
   </Breed>
 
-  <Breed Name="KillerCube" Texture="KillerCubeRed" BaseMovementsPerFrame="3">
+  <Breed Name="KillerCubeRed" Texture="KillerCubeRed" BaseMovementsPerFrame="3">
     <InherentBehaviours>
       <ShootsAtPlayer />
     </InherentBehaviours>
