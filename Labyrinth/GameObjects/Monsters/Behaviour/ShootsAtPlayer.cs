@@ -18,6 +18,7 @@ namespace Labyrinth.GameObjects.Behaviour
             // nothing to do
             }
 
+        [Obsolete("find a way to refactor this class so that it doesn't need this constructor")]
         public ShootsAtPlayer([NotNull] IMonsterWeapon weapon)
             {
             this._weapon = weapon ?? throw new ArgumentNullException(nameof(weapon));

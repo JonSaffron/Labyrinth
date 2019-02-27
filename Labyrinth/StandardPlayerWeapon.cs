@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth
@@ -19,15 +20,16 @@ namespace Labyrinth
 
             if (firingState != FiringState.Pulse || source.Energy < 4)
                 return;
-            var startPos = source.TilePosition.ToPosition();
-            var shot = GlobalServices.GameState.AddStandardShot(startPos, direction, source.Energy >> 2, source);
-            if (!shot.CanMoveInDirection(direction))
+
+            var adjacentTilePos = source.TilePosition.GetPositionAfterOneMove(direction);
+            var itemsOnTile = GlobalServices.GameState.GetItemsOnTile(adjacentTilePos);
+            if (itemsOnTile.Any(item => item.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Impervious))
                 {
-                shot.InstantlyExpire();
                 return;
                 }
-            startPos += direction.ToVector() * Constants.CentreOfTile;
-            shot.ResetPosition(startPos);
+
+            var startPos = source.TilePosition.ToPosition() + direction.ToVector() * Constants.CentreOfTile;
+            GlobalServices.GameState.AddStandardShot(startPos, direction, source.Energy >> 2, source);
 
             source.PlaySound(GameSound.PlayerShoots);
             _countOfShotsBeforeCostingEnergy--;

@@ -10,7 +10,6 @@ namespace Labyrinth.Services.WorldBuilding
     public struct MonsterDef
         {
         public string Breed { get; set; }
-        private Type _type;
         public Vector2 Position { get; set; }
         public int Energy { get; set; }
         public MonsterMobility? Mobility { get; set;}
@@ -25,30 +24,6 @@ namespace Labyrinth.Services.WorldBuilding
         public bool? ShootsOnceProvoked { get; set; }
         public bool? ShotsBounceOff { get; set; }
         public bool? IsActive { get; set; }
-
-        [Obsolete("use Breed property instead")]
-        public Type Type
-            {
-            get { return this._type; }
-            set
-                {
-                if (!value.IsSubclassOf(typeof(Monster)))
-                    throw new ArgumentOutOfRangeException();
-                this._type = value;
-                }
-            }
-
-        [Obsolete("use Breed property instead")]
-        public string MonsterType
-            {
-            get { return this._type?.Name; }
-            set
-                {
-                string typeName = "Labyrinth.GameObjects." + value;
-                Type monsterType = Type.GetType(typeName);
-                this._type = monsterType;
-                }
-            }
 
         public static MonsterDef FromExistingMonster([NotNull] Monster monster)
             {
@@ -71,7 +46,7 @@ namespace Labyrinth.Services.WorldBuilding
                 SplitsOnHit = monster.Behaviours.Has<SpawnsUponDeath>(),
                 ShootsAtPlayer = monster.Behaviours.Has<ShootsAtPlayer>(),
                 ShootsOnceProvoked = monster.Behaviours.Has<StartsShootingWhenHurt>(),
-                ShotsBounceOff = monster.ShotsBounceOff,
+                ShotsBounceOff = monster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection,
                 IsActive = monster.IsActive
                 };
             return result;

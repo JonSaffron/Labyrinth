@@ -208,7 +208,7 @@ namespace Labyrinth
         private static bool ShotHitsPlayerOrMonster(StandardShot shot, IMovingItem playerOrMonster)
             {
             Monster monster = playerOrMonster as Monster;
-            if (monster != null && monster.ShotsBounceOff)
+            if (playerOrMonster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection)
                 {
                 // A rebounded shot cannot hurt a monster that shots rebound off but it doesn't rebound again
                 if (!shot.HasRebounded)

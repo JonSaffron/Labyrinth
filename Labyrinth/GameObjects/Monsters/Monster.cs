@@ -23,7 +23,6 @@ namespace Labyrinth.GameObjects
         [CanBeNull] private GameTimer _hatchingTimer;
 
         public bool IsActive { get; set; }
-        public bool ShotsBounceOff { get; set; }
         public IBoundMovement SightBoundary { get; set; }
 
         [NotNull] private readonly BehaviourCollection _behaviours;
@@ -330,11 +329,24 @@ namespace Labyrinth.GameObjects
                 {
                 throw new InvalidOperationException("Type " + type.Name + " does not implement IMonsterMotion.");
                 }
-            var constructorInfo = type.GetConstructor(new [] { typeof(Monster)});
+
+            var constructorArgTypes = new List<Type> {typeof(Monster)};
+            if (this.InitialDirection != Direction.None)
+                {
+                constructorArgTypes.Add(typeof(Direction));
+                }
+
+            var constructorInfo = type.GetConstructor(constructorArgTypes.ToArray());
             if (constructorInfo == null)
                 throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
-            var constructorArguments = new object[] { this };
-            var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments);
+
+            var constructorArguments = new List<object> {this};
+            if (this.InitialDirection != Direction.None)
+                {
+                constructorArguments.Add(this.InitialDirection);
+                }
+
+            var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments.ToArray());
             return movementImplementation;
             }
         }
