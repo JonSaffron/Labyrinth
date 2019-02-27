@@ -38,15 +38,9 @@ namespace Labyrinth
                 return;
                 }
 
-            if (this._movingItem is Explosion explosion)
+            if (this._movingItem is IMunition munition)
                 {
-                InteractionInvolvesExplosion(explosion, this._staticItem);
-                return;
-                }
-
-            if (this._movingItem is IShot shot)
-                {
-                InteractionInvolvesShot(shot, this._staticItem);
+                InteractionInvolvesMunition(munition, this._staticItem);
                 // return;
                 }
             }
@@ -115,59 +109,48 @@ namespace Labyrinth
                 }
             }
 
-        private static void InteractionInvolvesShot(IShot shot, IGameObject staticItem)
+        private static void InteractionInvolvesMunition(IMunition munition, IGameObject staticItem)
             {
-            if (staticItem is Wall)
+            EffectOfShot effectOfShot = staticItem.Properties.Get(GameObjectProperties.EffectOfShot);
+
+            if (effectOfShot == EffectOfShot.Impervious)
                 {
-                shot.InstantlyExpire();
+                munition.InstantlyExpire();
                 return;
                 }
 
-            if (staticItem is Fruit || staticItem is Grave || staticItem is Mushroom || staticItem is CrumblyWall)
+            if (effectOfShot == EffectOfShot.Injury)
                 {
-                staticItem.ReduceEnergy(shot.Energy);
-                Bang bang;
+                int energyOfStaticItem = staticItem.Energy;
+                staticItem.ReduceEnergy(munition.Energy);
+
                 if (staticItem.IsExtant)
-                    bang = GlobalServices.GameState.ConvertShotToBang(shot);
+                    {
+                    staticItem.PlaySound(GameSound.StaticObjectShotAndInjured);
+                    GlobalServices.GameState.ConvertShotToBang(munition);
+                    }
                 else
                     {
-                    bang = GlobalServices.GameState.AddBang(staticItem.Position, BangType.Short);
-                    shot.InstantlyExpire();
-                    }
-                bang.PlaySound(GameSound.StaticObjectShotAndInjured);
-                return;
-                }
-
-            if (!(shot is StandardShot standardShot))
-                return;
-            if (staticItem is ForceField)
-                {
-                if (!standardShot.HasRebounded)
-                    standardShot.Reverse();
-                //return;
-                }
-
-            }
-
-        private static void InteractionInvolvesExplosion(Explosion explosion, IGameObject staticItem)
-            {
-            if (staticItem is Wall)
-                {
-                explosion.InstantlyExpire();
-                return;
-                }
-
-            if (staticItem is Fruit || staticItem is Grave || staticItem is Mushroom || staticItem is CrumblyWall)
-                {
-                staticItem.ReduceEnergy(explosion.Energy);
-                if (!staticItem.IsExtant)
-                    {
                     var bang = GlobalServices.GameState.AddBang(staticItem.Position, BangType.Short);
-                    explosion.InstantlyExpire();
                     bang.PlaySound(GameSound.StaticObjectShotAndInjured);
+                    if (munition is StandardShot)
+                        {
+                        munition.InstantlyExpire();
+                        }
+                    else
+                        {
+                        munition.ReduceEnergy(energyOfStaticItem);
+                        }
                     }
-                //return;
+
+                return;
                 }
+
+            if (effectOfShot == EffectOfShot.Reflection && munition is IStandardShot standardShot && !standardShot.HasRebounded)
+                {
+                standardShot.Reverse();
+                }
+
             }
         }
     }

@@ -17,6 +17,7 @@ namespace Labyrinth.GameObjects
 
             var a = Animation.LoopingAnimation("Sprites/Crystal/Crystal", 4);
             this.Ap.PlayAnimation(a);
+            this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
             }
 
         public override bool IsExtant

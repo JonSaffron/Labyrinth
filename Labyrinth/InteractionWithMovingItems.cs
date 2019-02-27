@@ -162,7 +162,7 @@ namespace Labyrinth
 
         private static bool InteractionInvolvesExplosion(Explosion explosion, IMovingItem movingItem)
             {
-            if (movingItem is IShot shot)
+            if (movingItem is IStandardShot shot)
                 {
                 shot.ReduceEnergy(explosion.Energy);
                 return true;

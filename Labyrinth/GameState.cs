@@ -119,7 +119,7 @@ namespace Labyrinth
                 switch (item)
                     {
                     case Bang _:
-                    case IShot _:
+                    case IMunition _:
                     case TileReservation _:
                         item.InstantlyExpire();
                         break;
@@ -172,7 +172,8 @@ namespace Labyrinth
         /// Place short bang at a shot's position and remove the shot
         /// </summary>
         /// <param name="s">An instance of a shot to convert</param>
-        public Bang ConvertShotToBang(IShot s)
+        // todo review this. I still don't like it.
+        public Bang ConvertShotToBang(IMunition s)
             {
             var result = AddBang(s.Position, BangType.Short);
             s.InstantlyExpire();

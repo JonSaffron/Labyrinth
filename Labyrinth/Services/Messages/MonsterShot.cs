@@ -6,12 +6,12 @@ namespace Labyrinth.Services.Messages
     class MonsterShot
         {
         public readonly IMonster Monster;
-        public readonly IShot Shot;
+        public readonly IMunition Munition;
 
-        public MonsterShot([NotNull] IMonster monster, [NotNull] IShot shot)
+        public MonsterShot([NotNull] IMonster monster, [NotNull] IMunition munition)
             {
             this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
-            this.Shot = shot ?? throw new ArgumentNullException(nameof(shot));
+            this.Munition = munition ?? throw new ArgumentNullException(nameof(munition));
             }
         }
     }

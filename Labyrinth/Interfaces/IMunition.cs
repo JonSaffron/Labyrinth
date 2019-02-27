@@ -1,8 +1,7 @@
 ﻿namespace Labyrinth
     {
-    public interface IShot : IMovingItem
+    public interface IMunition : IMovingItem
         {
         IGameObject Originator { get; }
-        bool HasRebounded { get; }
         }
     }

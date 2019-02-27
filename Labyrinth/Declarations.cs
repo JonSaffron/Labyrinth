@@ -216,9 +216,14 @@ namespace Labyrinth
     public enum EffectOfShot
         {
         /// <summary>
-        /// No effect - the shot passes through the object
+        /// No interaction - the shot passes through the object
         /// </summary>
-        None,
+        Intangible,
+
+        /// <summary>
+        /// The shot is dissipated with no effect on the object
+        /// </summary>
+        Impervious,
 
         /// <summary>
         /// The shot causes the object to lose energy and the shot to dissipate

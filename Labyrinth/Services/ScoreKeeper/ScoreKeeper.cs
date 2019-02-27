@@ -24,10 +24,10 @@ namespace Labyrinth.Services.ScoreKeeper
         private void MonsterShot(MonsterShot monsterShot)
             {
             // no score from a rebound or from an enemy shot
-            if (monsterShot.Shot.HasRebounded || !(monsterShot.Shot.Originator is IPlayer)) 
+            if (monsterShot.Munition is IStandardShot standardShot && (standardShot.HasRebounded || !(standardShot.Originator is IPlayer)))
                 return;
 
-            var energyRemoved = Math.Min(monsterShot.Monster.Energy, monsterShot.Shot.Energy);
+            var energyRemoved = Math.Min(monsterShot.Monster.Energy, monsterShot.Munition.Energy);
             var increaseToScore = (energyRemoved >> 1) + 1;
             this._score += increaseToScore;
             }

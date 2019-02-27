@@ -40,7 +40,7 @@ namespace Labyrinth
 
             mi.OriginalPosition = mi.Position;
             this._interactiveGameItems.AddLast(mi);
-            if (mi is IShot)
+            if (mi is IStandardShot)
                 this.CountOfShots++;
             }
 
@@ -57,7 +57,7 @@ namespace Labyrinth
                     throw new ArgumentOutOfRangeException(nameof(gameObject));
                 }
 
-            if (gameObject is IShot)
+            if (gameObject is IStandardShot)
                 this.CountOfShots--;
 
             int mortonPosition = gameObject.TilePosition.MortonCode;

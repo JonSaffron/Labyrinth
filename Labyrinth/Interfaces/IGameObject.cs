@@ -69,5 +69,9 @@ namespace Labyrinth
         /// <param name="spriteBatch">The spritebatch to draw to</param>
         void Draw(GameTime gt, ISpriteBatch spriteBatch);
         
+        /// <summary>
+        /// Gets the inherent properties of the object.
+        /// </summary>
+        PropertyBag Properties { get; }
         }
     }

@@ -13,6 +13,7 @@ namespace Labyrinth.GameObjects
 
             var a = Animation.LoopingAnimation("Sprites/Props/ForceField", 3);
             this.Ap.PlayAnimation(a);
+            this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Reflection);
             }
 
         public override bool IsExtant

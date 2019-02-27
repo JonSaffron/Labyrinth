@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    public class StandardShot : MovingItem, IShot
+    public class StandardShot : MovingItem, IStandardShot
         {
         public IGameObject Originator { get; }
         public bool HasRebounded { get; private set; }

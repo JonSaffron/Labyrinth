@@ -9,6 +9,7 @@ namespace Labyrinth.GameObjects
             {
             var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);
+            this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Impervious);
             }
 
         public override bool IsExtant { get; } = true;

@@ -18,7 +18,7 @@ namespace Labyrinth.Test
         public void TestInvalidMonsterShotMessage()
             {
             var monster = new Mock<IMonster>();
-            var shot = new Mock<IShot>();
+            var shot = new Mock<IMunition>();
 
             Assert.Throws<ArgumentNullException>(() => new MonsterShot(monster.Object, null));
             Assert.Throws<ArgumentNullException>(() => new MonsterShot(null, shot.Object));
@@ -29,7 +29,7 @@ namespace Labyrinth.Test
             {
             var monster = new Mock<IMonster>();
             monster.Setup(m => m.Energy).Returns(5);
-            var shot = new Mock<IShot>();
+            var shot = new Mock<IMunition>();
             var player = new Mock<IPlayer>();
             shot.Setup(s => s.Originator).Returns(player.Object);
 
@@ -52,7 +52,7 @@ namespace Labyrinth.Test
             {
             var monster = new Mock<IMonster>();
             monster.Setup(m => m.Energy).Returns(5);
-            var shot = new Mock<IShot>();
+            var shot = new Mock<IStandardShot>();
             var otherMonster = new Mock<IMonster>();
             shot.Setup(s => s.Originator).Returns(otherMonster.Object);
             shot.Setup(s => s.Energy).Returns(10);
@@ -70,7 +70,7 @@ namespace Labyrinth.Test
             {
             var monster = new Mock<IMonster>();
             monster.Setup(m => m.Energy).Returns(5);
-            var shot = new Mock<IShot>();
+            var shot = new Mock<IStandardShot>();
             var player = new Mock<IPlayer>();
             shot.Setup(s => s.Originator).Returns(player.Object);
             shot.Setup(s => s.Energy).Returns(10);

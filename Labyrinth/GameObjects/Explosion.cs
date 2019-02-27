@@ -3,10 +3,10 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Explosion : MovingItem, IShot
+    class Explosion : MovingItem, IMunition
         {
         private bool _isExtant;
-        private readonly IGameObject _originator;
+        public IGameObject Originator { get; }  // the mine that caused the explosion
 
         public Explosion(AnimationPlayer animationPlayer, Vector2 position, int energy, IGameObject originator) : base(animationPlayer, position)
             {
@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
             var a = Animation.ManualAnimation("Sprites/Props/LongBang", 2);
             Ap.PlayAnimation(a);
             this._isExtant = true;
-            this._originator = originator;
+            this.Originator = originator;
             }
 
         public override bool IsExtant => base.IsExtant && this._isExtant;
@@ -32,9 +32,5 @@ namespace Labyrinth.GameObjects
                 this._isExtant = false;
             return this._isExtant;
             }
-
-        public IGameObject Originator => this._originator;
-
-        public bool HasRebounded => false;
         }
     }
