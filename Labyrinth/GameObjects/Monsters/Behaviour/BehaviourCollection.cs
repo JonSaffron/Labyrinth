@@ -26,7 +26,7 @@ namespace Labyrinth.GameObjects.Behaviour
             return result;
             }
 
-        public void Add<T>() where T : BaseBehaviour, new() 
+        public void Add<T>() where T : BaseBehaviour
             {
             // todo ensure that type T has one or more of the marker interfaces
             if (!this.Has<T>())
@@ -45,7 +45,7 @@ namespace Labyrinth.GameObjects.Behaviour
                 }
             }
 
-        public void Set<T>(bool include) where T : BaseBehaviour, new()
+        public void Set<T>(bool include) where T : BaseBehaviour
             {
             if (include)
                 {

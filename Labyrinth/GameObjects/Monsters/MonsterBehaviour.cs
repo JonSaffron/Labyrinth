@@ -6,8 +6,7 @@ namespace Labyrinth.GameObjects
         {
         public static void AddShootsAtPlayerBehaviour(this Monster monster)
             {
-            var behaviour = new ShootsAtPlayer(new StandardMonsterWeapon(monster));
-            behaviour.Init(monster);
+            var behaviour = new ShootsAtPlayer(monster);
             monster.Behaviours.Add(behaviour);
             }
 

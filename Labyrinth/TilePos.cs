@@ -8,7 +8,7 @@ namespace Labyrinth
         {
         public readonly int X;
         public readonly int Y;
-        
+
         /// <summary>
         /// Constructs a new TilePos from the specified co-ordinates
         /// </summary>
@@ -27,13 +27,18 @@ namespace Labyrinth
         /// <returns>A TilePos that contains the specified co-ordinate</returns>
         public static TilePos TilePosFromPosition(Vector2 position)
             {
-            var intx = (int)position.X / Constants.TileLength;
-            var inty = (int)position.Y / Constants.TileLength;
+            var intX = (int)position.X / Constants.TileLength;
+            var intY = (int)position.Y / Constants.TileLength;
 
-            var result = new TilePos(intx, inty);
+            var result = new TilePos(intX, intY);
             return result;
             }
         
+        /// <summary>
+        /// Returns a TilePos with all of its components set to zero.
+        /// </summary>
+        public static TilePos Zero { get; } = new TilePos(0, 0);
+
         /// <summary>
         /// Determines if two TilePos structures are equivalent
         /// </summary>

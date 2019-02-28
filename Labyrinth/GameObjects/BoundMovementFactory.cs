@@ -2,17 +2,17 @@
     {
     public class BoundMovementFactory : IBoundMovementFactory
         {
-        private readonly TileRect _worldBoundary;
+        private readonly BoundaryFixed _worldBoundary;
 
         public BoundMovementFactory(TilePos worldSize)
             {
-            var worldBoundary = new TileRect(new TilePos(0, 0), worldSize.X, worldSize.Y);
-            this._worldBoundary = worldBoundary;
+            var worldBoundary = new TileRect(TilePos.Zero, worldSize.X, worldSize.Y);
+            this._worldBoundary = new BoundaryFixed(worldBoundary);
             }
 
         public IBoundMovement GetWorldBoundary()
             {
-            return new BoundaryFixed(this._worldBoundary);
+            return this._worldBoundary;
             }
 
         public IBoundMovement GetExplicitBoundary(TileRect boundary)

@@ -19,7 +19,7 @@
         public override void Perform()
             {
             this.Monster.IsActive = true;
-            this.Monster.Behaviours.Remove<ActivateWhenHurt>();
+            this.RemoveMe();
             }
         }
     }

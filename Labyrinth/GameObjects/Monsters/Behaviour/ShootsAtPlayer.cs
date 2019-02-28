@@ -1,27 +1,12 @@
-﻿using System;
-using JetBrains.Annotations;
-using Labyrinth.GameObjects.Movement;
+﻿using Labyrinth.GameObjects.Movement;
 
 namespace Labyrinth.GameObjects.Behaviour
     {
     class ShootsAtPlayer : BaseBehaviour, IMovementBehaviour
         {
-        private readonly IMonsterWeapon _weapon;
-
         public ShootsAtPlayer(Monster monster) : base(monster)
             {
-            // nothing to do
-            }
-
-        public ShootsAtPlayer()
-            {
-            // nothing to do
-            }
-
-        [Obsolete("find a way to refactor this class so that it doesn't need this constructor")]
-        public ShootsAtPlayer([NotNull] IMonsterWeapon weapon)
-            {
-            this._weapon = weapon ?? throw new ArgumentNullException(nameof(weapon));
+            this.Monster.Weapon = new StandardMonsterWeapon(monster);
             }
 
         public override void Perform()
@@ -29,7 +14,7 @@ namespace Labyrinth.GameObjects.Behaviour
             if (!ShouldAttemptToFireAtPlayer())
                 return;
 
-            this._weapon.FireIfYouLike();
+            this.Monster.Weapon?.FireIfYouLike();
             }
 
         private bool ShouldAttemptToFireAtPlayer()

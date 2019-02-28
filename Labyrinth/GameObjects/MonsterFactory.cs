@@ -34,7 +34,7 @@ namespace Labyrinth.GameObjects
             if (monsterDef.SplitsOnHit.HasValue)
                 result.Behaviours.Set<SpawnsUponDeath>(monsterDef.SplitsOnHit.Value);
             if (monsterDef.ShootsAtPlayer.HasValue)
-                result.SetShootsAtPlayer(monsterDef.ShootsAtPlayer.Value);
+                result.Behaviours.Set<ShootsAtPlayer>(monsterDef.ShootsAtPlayer.Value);
             if (monsterDef.ShootsOnceProvoked.HasValue)
                 result.Behaviours.Set<StartsShootingWhenHurt>(monsterDef.ShootsOnceProvoked.Value);
             if (monsterDef.ShotsBounceOff.HasValue)
@@ -46,10 +46,18 @@ namespace Labyrinth.GameObjects
                 result.Behaviours.Add<ActivateWhenHurt>();
                 }
 
+            if (result.Mobility == MonsterMobility.Patrolling)
+                {
+                // todo this is a bit of a hack
+                var changeMovement = new ChangeMovementWhenHurt(result, MonsterMobility.Aggressive, result.ChangeRooms);
+                result.ChangeRooms = ChangeRooms.StaysWithinRoom;
+                result.Behaviours.Add(changeMovement);
+                }
+
             return result;
             }
 
-        private Monster BuildMonsterFromDefaults(string breed, Vector2 position, int energy)
+        private static Monster BuildMonsterFromDefaults(string breed, Vector2 position, int energy)
             {
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var result = new Monster(breed, animationPlayer, position, energy);
@@ -103,6 +111,11 @@ namespace Labyrinth.GameObjects
                 result.Mobility = movement.DefaultMobility.Value;
                 }
 
+            foreach (var property in breedInfo.InherentProperties)
+                {
+                AddToPropertyBag(result.Properties, property.Key, property.Value);
+                }
+
             return result;
             }
 
@@ -152,7 +165,7 @@ namespace Labyrinth.GameObjects
                     foreach (XmlElement property in inherentProperties.ChildNodes)
                         {
                         var propertyValue = property.GetAttribute("value");
-                        AddToPropertyBag(breed.InherentProperties, property.Name, propertyValue);
+                        breed.InherentProperties.Add(property.Name, propertyValue);
                         }
                     }
 
@@ -221,7 +234,7 @@ namespace Labyrinth.GameObjects
             public string Texture;
             public int BaseMovementsPerFrame;
             public readonly HashSet<string> InherentBehaviours = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            public readonly PropertyBag InherentProperties = new PropertyBag();
+            public readonly Dictionary<string, string> InherentProperties = new Dictionary<string, string>();
             public readonly BreedMovement BreedMovement = new BreedMovement();
             }
 

@@ -49,5 +49,9 @@ namespace Labyrinth.GameObjects.Behaviour
             return result;
             }
 
+        protected void RemoveMe()
+            {
+            this.Monster.Behaviours.Remove(this);
+            }
         }
     }

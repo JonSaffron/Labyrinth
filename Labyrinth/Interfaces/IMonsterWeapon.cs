@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth
     {
-    interface IMonsterWeapon
+    public interface IMonsterWeapon
         {
         void FireIfYouLike();
         }

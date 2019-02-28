@@ -36,6 +36,7 @@ namespace Labyrinth.GameObjects
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
         private ChangeRooms _changeRooms;
+        [CanBeNull] public IMonsterWeapon Weapon { get; set; }
 
         static Monster()
             {
@@ -291,7 +292,7 @@ namespace Labyrinth.GameObjects
 
         public ChangeRooms ChangeRooms
             {
-            get => _changeRooms;
+            get => this._changeRooms;
             set
                 {
                 this._changeRooms = value;
@@ -310,6 +311,7 @@ namespace Labyrinth.GameObjects
                     }
                 else
                     {
+                    // todo not sure why I used this instead of GetBoundedInRoom
                     var roomBoundary = GlobalServices.BoundMovementFactory.GetExplicitBoundary(World.GetContainingRoom(this.TilePosition));
                     this.MovementBoundary = roomBoundary;
                     this.SightBoundary = roomBoundary;

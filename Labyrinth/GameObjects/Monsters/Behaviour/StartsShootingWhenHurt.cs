@@ -15,7 +15,7 @@
         public override void Perform()
             {
             this.Monster.AddShootsAtPlayerBehaviour();
-            this.Monster.Behaviours.Remove<StartsShootingWhenHurt>();
+            this.RemoveMe();
             }
         }
     }
