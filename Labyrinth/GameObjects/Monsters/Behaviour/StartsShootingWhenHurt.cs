@@ -14,7 +14,7 @@
 
         public override void Perform()
             {
-            this.Monster.AddShootsAtPlayerBehaviour();
+            this.Monster.Behaviours.Add<ShootsAtPlayer>();
             this.RemoveMe();
             }
         }

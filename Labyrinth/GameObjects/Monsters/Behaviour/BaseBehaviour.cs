@@ -34,6 +34,12 @@ namespace Labyrinth.GameObjects.Behaviour
                 throw new InvalidOperationException("Init already called.");
                 }
             this.Monster = monster;
+            OnInit();
+            }
+
+        protected virtual void OnInit()
+            {
+            // override if necessary
             }
 
         public abstract void Perform();

@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    /// <remarks>Not a behavior of the original game, but seems like a sensible thing to have</remarks>
+    /// <remarks>Not a behaviour of the original game, but seems like a sensible thing to have</remarks>
     class ActivateWhenHurt : BaseBehaviour, IInjuryBehaviour
         {
         public ActivateWhenHurt(Monster monster) : base(monster)

@@ -103,7 +103,6 @@
     <Movement Default="Placid" ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="StandardRolling"/>
       <Move Type="Patrolling" Implementation="StandardPatrolling"/>
-      <Move Type="Aggressive" Implementation="RotaFloaterCyanMovement"/>
     </Movement>
   </Breed>
 

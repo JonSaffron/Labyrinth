@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects;
@@ -62,12 +63,23 @@ namespace Labyrinth
                     }
                 }
 
+            if (this._secondaryItem is Boulder && this._primaryItem is Monster)
+                {
+                Debugger.Break();
+                }
+            if (this._primaryItem is Boulder && this._secondaryItem is Monster)
+                {
+                Debugger.Break();
+                }
+
             var moveableObject = this._secondaryItem.Solidity == ObjectSolidity.Moveable ? this._secondaryItem : null;
             if (moveableObject != null)
-                {
+                { 
+                // moveableObject will be the boulder
                 var otherObject = this._primaryItem;
                 if (otherObject.Capability.CanMoveAnother())
-                    {
+                    {   
+                    // otherObject here will be a shot or the player
                     var actionTaken = PushOrBounceObject(moveableObject, otherObject);
                     if (actionTaken)
                         return;
@@ -76,6 +88,10 @@ namespace Labyrinth
                 if (CrushObject(moveableObject, otherObject))
                     // ReSharper disable once RedundantJumpStatement
                     return;
+                }
+            else
+                {
+                
                 }
 
             // any other interaction here...

@@ -16,7 +16,8 @@ namespace Labyrinth.GameObjects.Behaviour
 
         public void Perform<T>() where T : IBehaviour
             {
-            foreach (var action in this.Items.OfType<T>())
+            var listOfActions = this.Items.OfType<T>().ToArray();
+            foreach (var action in listOfActions)
                 action.Perform();
             }
 
@@ -26,7 +27,7 @@ namespace Labyrinth.GameObjects.Behaviour
             return result;
             }
 
-        public void Add<T>() where T : BaseBehaviour
+        public void Add<T>() where T : BaseBehaviour, new()
             {
             // todo ensure that type T has one or more of the marker interfaces
             if (!this.Has<T>())
@@ -45,7 +46,7 @@ namespace Labyrinth.GameObjects.Behaviour
                 }
             }
 
-        public void Set<T>(bool include) where T : BaseBehaviour
+        public void Set<T>(bool include) where T : BaseBehaviour, new()
             {
             if (include)
                 {

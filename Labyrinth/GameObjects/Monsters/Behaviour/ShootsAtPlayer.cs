@@ -4,9 +4,19 @@ namespace Labyrinth.GameObjects.Behaviour
     {
     class ShootsAtPlayer : BaseBehaviour, IMovementBehaviour
         {
+        public ShootsAtPlayer()
+            {
+
+            }
+
         public ShootsAtPlayer(Monster monster) : base(monster)
             {
-            this.Monster.Weapon = new StandardMonsterWeapon(monster);
+            OnInit();
+            }
+
+        protected sealed override void OnInit()
+            {
+            this.Monster.Weapon = new StandardMonsterWeapon(this.Monster);
             }
 
         public override void Perform()

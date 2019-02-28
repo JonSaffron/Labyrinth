@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.Display;
+﻿using Labyrinth.GameObjects.Behaviour;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -7,7 +8,7 @@ namespace Labyrinth.GameObjects
         {
         protected KillerCube(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
-            this.AddShootsAtPlayerBehaviour();
+            this.Behaviours.Add<ShootsAtPlayer>();
             }
         }
     }

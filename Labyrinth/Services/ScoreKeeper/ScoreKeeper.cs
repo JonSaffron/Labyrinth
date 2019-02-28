@@ -42,6 +42,8 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private static bool IsMonsterDangerous(IMonster monster)
             {
+            // if it moves then it's dangerous
+            // if it fires then it's dangerous
             if (monster.IsArmed())
                 return true;
             if (!monster.IsStationary)

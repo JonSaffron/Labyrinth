@@ -49,7 +49,7 @@ namespace Labyrinth.GameObjects
             if (result.Mobility == MonsterMobility.Patrolling)
                 {
                 // todo this is a bit of a hack
-                var changeMovement = new ChangeMovementWhenHurt(result, MonsterMobility.Aggressive, result.ChangeRooms);
+                var changeMovement = new ChangeMovementWhenHurt(result, MonsterMobility.Placid, result.ChangeRooms);
                 result.ChangeRooms = ChangeRooms.StaysWithinRoom;
                 result.Behaviours.Add(changeMovement);
                 }
