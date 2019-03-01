@@ -5,8 +5,8 @@ namespace Labyrinth.GameObjects
     {
     public class Crystal : StaticItem, IValuable
         {
-        public int CrystalId { get; private set; }
-        public decimal Score { get; private set; }
+        public int CrystalId { get; }
+        public decimal Score { get; }
         private bool _isTaken;
 
         public Crystal(AnimationPlayer animationPlayer, Vector2 position, int id, int score, int energy) : base(animationPlayer, position)

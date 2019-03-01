@@ -5,20 +5,19 @@ namespace Labyrinth.GameObjects
     {
     public class Fruit : StaticItem
         {
-        private readonly FruitType _fruitType;
+        public FruitType FruitType { get; }
         private bool _isTaken;
 
         public Fruit(AnimationPlayer animationPlayer, Vector2 position, FruitType fruitType, int energy) : base(animationPlayer, position)
             {
-            this._fruitType = fruitType;
+            this.FruitType = fruitType;
             this.Energy = energy;
             
-            string textureName = string.Format("Sprites/Fruit/{0:G}", _fruitType);
+            string textureName = $"Sprites/Fruit/{this.FruitType:G}";
             var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);
             }
 
-        public FruitType FruitType => this._fruitType;
 
         public override bool IsExtant
             {

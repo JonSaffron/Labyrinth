@@ -107,7 +107,7 @@
   </Breed>
 
   <Breed Name="RotaFloaterCyan" Texture="RotaFloaterCyan" BaseMovementsPerFrame="2">
-    <Movement Default="Placid" Speed="1.5">
+    <Movement Default="Placid" ChangeRooms="FollowsPlayer" Speed="1.5">
       <Move Type="Placid" Implementation="StandardRolling"/>
       <Move Type="Patrolling" Implementation="StandardPatrolling"/>
       <Move Type="Aggressive" Implementation="RotaFloaterCyanMovement"/>

@@ -54,6 +54,11 @@ namespace Labyrinth.GameObjects
                 result.Behaviours.Add(changeMovement);
                 }
 
+            if (result.Mobility != MonsterMobility.Stationary && result.MovementBoundary == null)
+                {
+                throw new InvalidOperationException("Monster of type " + monsterDef.Breed + " at " + monsterDef.Position + " has no movement boundary. Presumably ChangeRooms has not been set.");
+                }
+
             return result;
             }
 

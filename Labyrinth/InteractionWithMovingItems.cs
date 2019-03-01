@@ -72,26 +72,21 @@ namespace Labyrinth
                 Debugger.Break();
                 }
 
-            var moveableObject = this._secondaryItem.Solidity == ObjectSolidity.Moveable ? this._secondaryItem : null;
-            if (moveableObject != null)
-                { 
-                // moveableObject will be the boulder
-                var otherObject = this._primaryItem;
-                if (otherObject.Capability.CanMoveAnother())
-                    {   
-                    // otherObject here will be a shot or the player
-                    var actionTaken = PushOrBounceObject(moveableObject, otherObject);
-                    if (actionTaken)
-                        return;
-                    }
-
-                if (CrushObject(moveableObject, otherObject))
-                    // ReSharper disable once RedundantJumpStatement
+            // this deals with the situation where the player or a shot will move the boulder
+            if (this._primaryItem.Capability.CanMoveAnother() && this._secondaryItem.Solidity == ObjectSolidity.Moveable)
+                {
+                var actionTaken = PushOrBounceObject(this._secondaryItem, this._primaryItem);
+                if (actionTaken)
                     return;
                 }
-            else
+
+            // this deals with the situation where the boulder might crush a monster, even a deathcube which wouldn't be moving
+            if (this._primaryItem.Solidity == ObjectSolidity.Moveable)
                 {
-                
+                var actionTaken = CrushObject(this._primaryItem, this._secondaryItem);
+                if (actionTaken)
+                    // ReSharper disable once RedundantJumpStatement
+                    return;
                 }
 
             // any other interaction here...
@@ -110,7 +105,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="moveableObject">An item such as the boulder</param>
         /// <param name="movingObject">An item that is capable of moving another item such as the player or a shot</param>
-        /// <returns></returns>
+        /// <returns>True if a push or bounce occurs, false otherwise</returns>
         private static bool PushOrBounceObject([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
             {
             var result = ShouldStartPushOrBounce(moveableObject, movingObject);
@@ -140,39 +135,52 @@ namespace Labyrinth
             return isGettingCloser;
             }
 
+        /// <summary>
+        /// Deals with a moveableObject potentially crushing a movingObject
+        /// </summary>
+        /// <param name="moveableObject">An item such as the boulder</param>
+        /// <param name="movingObject">Any item that moves, such as the player or a monster</param>
+        /// <returns>True if the movingObject is crushed, false otherwise</returns>
         private static bool CrushObject([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
             {
-            if (IsCrushingPossible(moveableObject, movingObject))
+            if (!IsCrushingPossible(moveableObject, movingObject)) 
+                return false;
+
+            var movingObjectPosition = movingObject.CurrentMovement.Direction == Direction.None ? movingObject.Position : movingObject.CurrentMovement.MovingTowards;
+            var movingObjectTile = TilePos.TilePosFromPosition(movingObjectPosition);
+            var moveableObjectTile = TilePos.TilePosFromPosition(moveableObject.CurrentMovement.MovingTowards);
+            if (movingObjectTile == moveableObjectTile)
                 {
-                var movingObjectPosition = movingObject.CurrentMovement.Direction == Direction.None ? movingObject.Position : movingObject.CurrentMovement.MovingTowards;
-                var movingObjectTile = TilePos.TilePosFromPosition(movingObjectPosition);
-                var moveableObjectTile = TilePos.TilePosFromPosition(moveableObject.CurrentMovement.MovingTowards);
-                if (movingObjectTile == moveableObjectTile)
+                var b = GlobalServices.GameState.AddBang(movingObject.Position, BangType.Long);
+                if (movingObject is Monster monster)
                     {
-                    var b = GlobalServices.GameState.AddBang(movingObject.Position, BangType.Long);
-                    if (movingObject is Monster monster)
-                        {
-                        var monsterCrushed = new MonsterCrushed(monster, moveableObject);
-                        Messenger.Default.Send(monsterCrushed);
-                        b.PlaySound(GameSound.MonsterDies);
-                        }
-                    movingObject.InstantlyExpire();
-                    return true;
+                    var monsterCrushed = new MonsterCrushed(monster, moveableObject);
+                    Messenger.Default.Send(monsterCrushed);
+                    b.PlaySound(GameSound.MonsterDies);
                     }
+                movingObject.InstantlyExpire();
+                return true;
                 }
             return false;
             }
 
+        /// <summary>
+        /// Determines whether it is possible for the moveableObject to crush the movingObject
+        /// </summary>
+        /// <param name="moveableObject">An item such as the boulder</param>
+        /// <param name="movingObject">Any item that moves, such as the player or a monster</param>
+        /// <returns></returns>
         private static bool IsCrushingPossible([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
             {
             if (!moveableObject.CurrentMovement.IsMoving)
                 return false;
             if (movingObject.Capability.CanMoveAnother())
                 {
+                // If the player is moving in the same direction as the boulder, then the player cannot be crushed
                 var isMovingInDifferentDirection = moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction;
                 return isMovingInDifferentDirection;
                 }
-            var result = movingObject.Solidity == ObjectSolidity.Insubstantial;
+            var result = movingObject.Solidity == ObjectSolidity.Insubstantial || movingObject.Solidity == ObjectSolidity.Stationary;
             return result;
             }
 

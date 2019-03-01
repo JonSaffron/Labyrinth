@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class PatrolPerimiterTest : Monster
+    class PatrolPerimeterTest : Monster
         {
-        public PatrolPerimiterTest(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
+        public PatrolPerimeterTest(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
             {
             this.SetNormalAnimation(Animation.LoopingAnimation("sprites/Monsters/DeathCube", 3));
             this.Mobility = MonsterMobility.Patrolling;
@@ -32,3 +32,4 @@ namespace Labyrinth.GameObjects
         public override decimal StandardSpeed => base.StandardSpeed / 2;
         }
     }
+

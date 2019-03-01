@@ -260,14 +260,6 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Gets whether the specified tile is within the world area
-        /// </summary>
-        public bool IsTileWithinWorld(TilePos tp)
-            {
-            return !(tp.X < 0 || tp.X >= this._worldSize.X || tp.Y < 0 || tp.Y >= this._worldSize.Y);
-            }
-
-        /// <summary>
         /// Gets the rectangle that encompasses the room that contains the specified position
         /// </summary>
         /// <param name="position">Specifies the position within the world</param>

@@ -9,7 +9,7 @@ namespace Labyrinth
         bool IsMoving { get; }
         ObjectCapability Capability { get; }
         decimal StandardSpeed { get; }
-        IBoundMovement MovementBoundary { get; set; } 
+        IBoundMovement MovementBoundary { get; } 
 
         bool Update(GameTime gameTime);
 

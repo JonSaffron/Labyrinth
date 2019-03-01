@@ -57,7 +57,7 @@ namespace Labyrinth
         Insubstantial,
         
         /// <summary>
-        /// An object that does not move such as a crystal or grave. Only a single stationary object can occupy a given space. Insubstantial objects can move into the same space though.
+        /// An object that does not move such as a crystal, grave or stationary monster. Only a single stationary object can occupy a given space. Insubstantial objects can move into the same space though.
         /// </summary>
         Stationary,
 
