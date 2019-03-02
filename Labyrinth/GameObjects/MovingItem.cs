@@ -132,6 +132,6 @@ namespace Labyrinth.GameObjects
         /// <remarks>Measured in pixels per second</remarks>
         public virtual decimal StandardSpeed => Constants.BaseSpeed;
 
-        public IBoundMovement MovementBoundary { get; set; }
+        public IBoundMovement MovementBoundary { get; protected set; }
         }
     }

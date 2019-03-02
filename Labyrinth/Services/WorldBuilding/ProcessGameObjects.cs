@@ -42,7 +42,7 @@ namespace Labyrinth.Services.WorldBuilding
                 if (pss.IsInitialArea)
                     {
                     if (playerAdded)
-                        throw new InvalidOperationException("Player has already been addded.");
+                        throw new InvalidOperationException("Player has already been added.");
                     this._gameState.AddPlayer(pss.Position.ToPosition(), pss.Energy, pss.Id);
                     playerAdded = true;
                     }

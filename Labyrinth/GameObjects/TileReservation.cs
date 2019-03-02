@@ -11,6 +11,7 @@ namespace Labyrinth.GameObjects
             this.DrawOrder = 0;
             this.IsExtant = true;
             this.Solidity = ObjectSolidity.Stationary;
+            this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
             }
 
         public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
