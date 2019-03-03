@@ -63,15 +63,6 @@ namespace Labyrinth
                     }
                 }
 
-            if (this._secondaryItem is Boulder && this._primaryItem is Monster)
-                {
-                Debugger.Break();
-                }
-            if (this._primaryItem is Boulder && this._secondaryItem is Monster)
-                {
-                Debugger.Break();
-                }
-
             // this deals with the situation where the player or a shot will move the boulder
             if (this._primaryItem.Properties.Get(GameObjectProperties.Capability).CanMoveAnother() && this._secondaryItem.Solidity == ObjectSolidity.Moveable)
                 {

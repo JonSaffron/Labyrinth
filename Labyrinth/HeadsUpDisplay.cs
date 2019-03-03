@@ -1,5 +1,4 @@
 ﻿using System;
-using Labyrinth.GameObjects.Movement;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -32,19 +31,7 @@ namespace Labyrinth
             {
             if (!isPaused)
                 {
-                if (score != this._displayedScore)
-                    {
-                    double difference = (double) (score - this._displayedScore);
-                    this._displayedScore += (int) Math.Ceiling(Math.Sqrt(difference));
-                    }
-                if (playerEnergy > this._displayedEnergy)
-                    {
-                    this._displayedEnergy++;
-                    }
-                else if (playerEnergy < this._displayedEnergy)
-                    {
-                    this._displayedEnergy = playerEnergy;
-                    }
+                UpdateDisplayValues(playerEnergy, score);
                 }
 
             DrawEnergyRect(spriteBatch, isGameRunningSlowly);
@@ -59,13 +46,23 @@ namespace Labyrinth
                 {
                 DrawPausedMessage(spriteBatch);
                 }
+            }
 
-            // todo remove after testing
-            var patrolPerimiter = (PatrolPerimeter) GlobalServices.Game.Services.GetService(typeof(PatrolPerimeter));
-            if (patrolPerimiter != null)
+        private void UpdateDisplayValues(int playerEnergy, decimal score)
+            {
+            if (score != this._displayedScore)
                 {
-                string msg = string.Format("{0}\r\n{1}", patrolPerimiter.CurrentAttachmentMode, patrolPerimiter.CurrentAttachmentToWall);
-                spriteBatch.DrawCentredString(this._statusFont, msg, 100, Color.HotPink);
+                double difference = (double) (score - this._displayedScore);
+                this._displayedScore += (int) Math.Ceiling(Math.Sqrt(difference));
+                }
+
+            if (playerEnergy > this._displayedEnergy)
+                {
+                this._displayedEnergy++;
+                }
+            else if (playerEnergy < this._displayedEnergy)
+                {
+                this._displayedEnergy = playerEnergy;
                 }
             }
 

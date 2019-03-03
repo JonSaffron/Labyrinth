@@ -18,7 +18,6 @@ namespace Labyrinth.GameObjects
             this.Ap.PlayAnimation(a);
             }
 
-
         public override bool IsExtant
             {
             get

@@ -75,7 +75,7 @@ namespace Labyrinth
         /// <summary>
         /// Returns a list of all extant game objects that are located on the specified tile
         /// </summary>
-        /// <param name="tp">Specifes the tile position to inspect</param>
+        /// <param name="tp">Specifies the tile position to inspect</param>
         /// <returns>A lazy enumeration of all the matching game objects</returns>
         public IEnumerable<IGameObject> GetItemsOnTile(TilePos tp)
             {

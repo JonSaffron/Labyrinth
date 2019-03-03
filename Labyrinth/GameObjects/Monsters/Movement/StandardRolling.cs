@@ -4,7 +4,7 @@ namespace Labyrinth.GameObjects.Movement
     {
     class StandardRolling : MonsterMotionBase
         {
-        public Direction CurrentDirection { get; protected set; }
+        protected Direction CurrentDirection { get; private set; }
 
         public StandardRolling([NotNull] Monster monster) : base(monster)
             {

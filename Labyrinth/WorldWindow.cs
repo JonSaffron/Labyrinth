@@ -5,7 +5,7 @@ namespace Labyrinth
     public class WorldWindow : ICentrePointProvider
         {
         private static readonly Vector2 CentreOfRoom = Constants.RoomSizeInPixels / 2.0f;
-        private const float CurrentVelocity = 750;
+        private const float CurrentVelocity = 750f;
 
         public Vector2 WindowPosition { get; private set; }
 
