@@ -124,7 +124,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Gets an indication of what effect this object can have on others
         /// </summary>
-        public virtual ObjectCapability Capability => ObjectCapability.CannotMoveOthers;
+        //public virtual ObjectCapability Capability => ObjectCapability.CannotMoveOthers;
 
         /// <summary>
         /// Gets the normal speed this object moves at

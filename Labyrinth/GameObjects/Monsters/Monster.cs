@@ -7,8 +7,6 @@ using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
-// todo should monsters be a combination of the generic monster class and a breed class?
-
 namespace Labyrinth.GameObjects
     {
     public class Monster : MovingItem, IMonster
@@ -21,28 +19,21 @@ namespace Labyrinth.GameObjects
 
         private MonsterState _monsterState = MonsterState.Normal;
         [CanBeNull] private GameTimer _hatchingTimer;
-
-        public bool IsActive { get; set; }
         public IBoundMovement SightBoundary { get; set; }
 
         [NotNull] private readonly BehaviourCollection _behaviours;
 
         private Animation _normalAnimation;
-        private static readonly Animation EggAnimation;
-        private static readonly Animation HatchingAnimation;
+        private static readonly Animation EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
+        private static readonly Animation HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
 
         public readonly int OriginalEnergy;
 
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
         private ChangeRooms _changeRooms;
+        private bool _isActive;
         [CanBeNull] public IMonsterWeapon Weapon { get; set; }
-
-        static Monster()
-            {
-            EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
-            HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
-            }
 
         public Monster(string breed, AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
             {
@@ -53,6 +44,17 @@ namespace Labyrinth.GameObjects
             this._behaviours = new BehaviourCollection(this);
             }
             
+
+        public bool IsActive
+            {
+            get => this._isActive;
+            set
+                {
+                this._isActive = value;
+                SetMonsterMotion();
+                }
+            }
+
         public MonsterMobility Mobility
             {
             get => this._mobility;
@@ -68,14 +70,8 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                var monsterState = this.MonsterState;
-                switch (monsterState)
-                    {
-                    case MonsterState.Egg:
-                    case MonsterState.Hatching:
-                        return true;
-                    }
-                return false;
+                var result = this.MonsterState.IsEgg();
+                return result;
                 }
             }
 
@@ -107,11 +103,7 @@ namespace Labyrinth.GameObjects
 
         private MonsterState MonsterState
             {
-            get
-                {
-                var result = this._monsterState;
-                return result;
-                }
+            get => this._monsterState;
             set
                 {
                 Animation animation;
@@ -137,11 +129,11 @@ namespace Labyrinth.GameObjects
 
         private void SetMonsterMotion()
             {
-            this._determineDirection = !this.IsActive || this.IsEgg || this.Mobility == MonsterMobility.Stationary ? new Stationary(this) : GetImplementationForDeterminingDirection(this.Mobility);
+            this._determineDirection = this.IsStationary ? new Stationary(this) : GetImplementationForDeterminingDirection(this.Mobility);
             }
 
         /// <inheritdoc cref="IMonster" />
-        public bool IsStationary => this._determineDirection is Stationary;
+        public bool IsStationary => !this.IsActive || this.IsEgg || this.Mobility == MonsterMobility.Stationary;
 
         protected override void UponInjury()
             {
@@ -182,15 +174,6 @@ namespace Labyrinth.GameObjects
 
             if (this.IsEgg && this._hatchingTimer != null)
                 this._hatchingTimer.Enabled = inSameRoom;
-
-            if (inSameRoom && !this.IsActive)
-                {
-                this.IsActive = true;
-                SetMonsterMotion();
-                }
-
-            if (!this.IsActive)
-                return false;
 
             // move the monster
             this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;

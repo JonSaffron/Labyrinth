@@ -6,8 +6,8 @@ namespace Labyrinth
         {
         Movement CurrentMovement { get; }
         Vector2 OriginalPosition { get; set; }
-        bool IsMoving { get; }
-        ObjectCapability Capability { get; }
+        //bool IsMoving { get; }
+        //ObjectCapability Capability { get; }
         decimal StandardSpeed { get; }
         IBoundMovement MovementBoundary { get; } 
 

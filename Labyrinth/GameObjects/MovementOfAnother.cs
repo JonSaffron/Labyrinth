@@ -17,7 +17,7 @@ namespace Labyrinth.GameObjects
         /// <param name="direction">The direction that the specified object is directing this object</param>
         public void PushOrBounce(IMovingItem gameObject, Direction direction)
             {
-            bool canCauseBounceBack = this.Source.Capability == ObjectCapability.CanPushOrCauseBounceBack;
+            bool canCauseBounceBack = this.Source.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
             var ps = CanBePushedOrBounced(gameObject, this.Source, direction, canCauseBounceBack);
             switch (ps)
                 {

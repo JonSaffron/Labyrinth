@@ -82,6 +82,17 @@ namespace Labyrinth
             return false;
             }
 
+        public static bool IsEgg(this MonsterState monsterState)
+            {
+            switch (monsterState)
+                {
+                case MonsterState.Egg:
+                case MonsterState.Hatching:
+                    return true;
+                }
+            return false;
+            }
+
         internal static bool IsAlive(this IMovingItem mi)
             {
             var result = mi.IsExtant;

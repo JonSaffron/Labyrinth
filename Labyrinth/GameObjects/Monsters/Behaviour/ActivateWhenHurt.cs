@@ -1,7 +1,7 @@
 ﻿namespace Labyrinth.GameObjects.Behaviour
     {
     /// <summary>
-    /// 
+    /// Gets the monster moving if it gets hurt
     /// </summary>
     /// <remarks>Not a behaviour of the original game, but seems like a sensible thing to have</remarks>
     class ActivateWhenHurt : BaseBehaviour, IInjuryBehaviour

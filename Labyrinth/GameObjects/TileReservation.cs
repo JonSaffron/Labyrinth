@@ -8,9 +8,6 @@ namespace Labyrinth.GameObjects
         {
         public TileReservation([NotNull] AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
-            this.DrawOrder = 0;
-            this.IsExtant = true;
-            this.Solidity = ObjectSolidity.Stationary;
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
             }
 
@@ -19,10 +16,10 @@ namespace Labyrinth.GameObjects
             // nothing to draw
             }
 
-        public override ObjectSolidity Solidity { get; }
+        public override ObjectSolidity Solidity => ObjectSolidity.Stationary;
 
-        public override bool IsExtant { get; }
+        public override bool IsExtant => true;
 
-        public override int DrawOrder { get; }
+        public override int DrawOrder => 0;
         }
     }

@@ -36,6 +36,8 @@ namespace Labyrinth.GameObjects
 
             this._boundingRectangles = GetBoundingRectangles();
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
+
+            this.Properties.Set(GameObjectProperties.Capability, ObjectCapability.CanPushOthers);
             }
 
         private Dictionary<Direction, Rectangle> GetBoundingRectangles()
@@ -166,7 +168,7 @@ namespace Labyrinth.GameObjects
 
         public override bool IsMoving => true;
 
-        public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
+        //public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 4;
         }

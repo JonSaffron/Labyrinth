@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
 
         public bool CanMove(Direction direction)
             {
-            bool canCauseBounceBack = this.Source.Capability == ObjectCapability.CanPushOrCauseBounceBack;
+            bool canCauseBounceBack = this.Source.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
             var result = this.CanMove(this.Source, direction, canCauseBounceBack);
             return result;
             }
@@ -80,7 +80,7 @@ namespace Labyrinth.GameObjects
 
             // if the moving object cannot move other objects then the answer's no
             // the moving object cannot be a moveable object - moveable objects can't push other moveable objects
-            if (!byWhom.Capability.CanMoveAnother() || byWhom.Solidity == ObjectSolidity.Moveable)
+            if (!byWhom.Properties.Get(GameObjectProperties.Capability).CanMoveAnother() || byWhom.Solidity == ObjectSolidity.Moveable)
                 return PushStatus.No;
 
             // check if this object can move in the specified direction
@@ -88,7 +88,7 @@ namespace Labyrinth.GameObjects
                 return PushStatus.Yes;
 
             // if bounceback is not a possibility then the answer's no
-            if (byWhom.Capability != ObjectCapability.CanPushOrCauseBounceBack || !isBounceBackPossible)
+            if (byWhom.Properties.Get(GameObjectProperties.Capability) != ObjectCapability.CanPushOrCauseBounceBack || !isBounceBackPossible)
                 return PushStatus.No;
 
             // this object will be able to bounceback only if the object that is pushing it can move backwards

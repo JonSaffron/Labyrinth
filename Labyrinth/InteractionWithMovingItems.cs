@@ -73,7 +73,7 @@ namespace Labyrinth
                 }
 
             // this deals with the situation where the player or a shot will move the boulder
-            if (this._primaryItem.Capability.CanMoveAnother() && this._secondaryItem.Solidity == ObjectSolidity.Moveable)
+            if (this._primaryItem.Properties.Get(GameObjectProperties.Capability).CanMoveAnother() && this._secondaryItem.Solidity == ObjectSolidity.Moveable)
                 {
                 var actionTaken = PushOrBounceObject(this._secondaryItem, this._primaryItem);
                 if (actionTaken)
@@ -174,7 +174,7 @@ namespace Labyrinth
             {
             if (!moveableObject.CurrentMovement.IsMoving)
                 return false;
-            if (movingObject.Capability.CanMoveAnother())
+            if (movingObject.Properties.Get(GameObjectProperties.Capability).CanMoveAnother())
                 {
                 // If the player is moving in the same direction as the boulder, then the player cannot be crushed
                 var isMovingInDifferentDirection = moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction;

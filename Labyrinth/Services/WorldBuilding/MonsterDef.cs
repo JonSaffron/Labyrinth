@@ -52,7 +52,7 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        internal static MonsterDef FromXml(XmlElement mdef)
+        internal static MonsterDef FromXml([NotNull] XmlElement mdef)
             {
             MonsterDef result = new MonsterDef
                 {
