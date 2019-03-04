@@ -19,8 +19,6 @@ namespace Labyrinth.GameObjects
             {
             var result = BuildMonsterFromDefaults(monsterDef.Breed, monsterDef.Position, monsterDef.Energy);
 
-            if (monsterDef.InitialDirection.HasValue)
-                result.InitialDirection = monsterDef.InitialDirection.Value;
             if (monsterDef.Mobility.HasValue)
                 result.Mobility = monsterDef.Mobility.Value;
             if (monsterDef.ChangeRooms.HasValue)
@@ -44,6 +42,7 @@ namespace Labyrinth.GameObjects
             if (!result.IsActive)
                 {
                 result.Behaviours.Add<ActivateWhenHurt>();
+                result.Behaviours.Add<ActivateWhenMeetsPlayer>();
                 }
 
             if (result.Mobility == MonsterMobility.Patrolling)
@@ -59,6 +58,9 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Monster of type " + monsterDef.Breed + " at " + monsterDef.Position + " has no movement boundary. Presumably ChangeRooms has not been set.");
                 }
 
+            var initialDirection = monsterDef.InitialDirection.GetValueOrDefault(Direction.None);
+            result.SetMonsterMotion(initialDirection);
+            
             return result;
             }
 

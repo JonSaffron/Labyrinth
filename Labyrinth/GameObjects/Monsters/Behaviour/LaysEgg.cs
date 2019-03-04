@@ -34,7 +34,8 @@ namespace Labyrinth.GameObjects.Behaviour
         private bool ShouldAttemptToLayEgg()
             {
             var result =
-                    !this.Monster.IsEgg
+                    !this.Monster.IsStationary
+                && this.Monster.Mobility != MonsterMobility.Patrolling
                 && this.Player.IsAlive()
                 && this.IsInSameRoom()
                 && this.Random.Test(0x1f);

@@ -15,13 +15,10 @@ namespace Labyrinth.GameObjects
         private MonsterMobility _mobility;
         public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
         [CanBeNull] private IMonsterMotion _determineDirection;
-        public Direction InitialDirection = Direction.None;
 
         private MonsterState _monsterState = MonsterState.Normal;
         [CanBeNull] private GameTimer _hatchingTimer;
-        public IBoundMovement SightBoundary { get; set; }
-
-        [NotNull] private readonly BehaviourCollection _behaviours;
+        public IBoundMovement SightBoundary { get; private set; }
 
         private Animation _normalAnimation;
         private static readonly Animation EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
@@ -41,10 +38,9 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             this.OriginalEnergy = energy;
             this.CurrentSpeed = Constants.BaseSpeed;
-            this._behaviours = new BehaviourCollection(this);
+            this.Behaviours = new BehaviourCollection(this);
             }
             
-
         public bool IsActive
             {
             get => this._isActive;
@@ -61,6 +57,17 @@ namespace Labyrinth.GameObjects
             set
                 {
                 this._mobility = value;
+                SetMonsterMotion();
+                }
+            }
+
+        private MonsterState MonsterState
+            {
+            get => this._monsterState;
+            set
+                {
+                this._monsterState = value;
+                SetAnimation();
                 SetMonsterMotion();
                 }
             }
@@ -84,9 +91,11 @@ namespace Labyrinth.GameObjects
 
         private void EggIsHatching(object sender, EventArgs args)
             {
-            this.MonsterState = MonsterState.Hatching;
             if (this.IsExtant)
+                {
+                this.MonsterState = MonsterState.Hatching;
                 this.PlaySoundWithCallback(GameSound.EggHatches, EggHatches);
+                }
             }
 
         public void EggHatches(object sender, EventArgs args)
@@ -101,35 +110,30 @@ namespace Labyrinth.GameObjects
                 this.Ap.PlayAnimation(value);
             }
 
-        private MonsterState MonsterState
+        private void SetAnimation()
             {
-            get => this._monsterState;
-            set
+            Animation animation;
+            switch (this._monsterState)
                 {
-                Animation animation;
-                switch (value)
-                    {
-                    case MonsterState.Egg:
-                        animation = EggAnimation;
-                        break;
-                    case MonsterState.Hatching:
-                        animation = HatchingAnimation;
-                        break;
-                    case MonsterState.Normal:
-                        animation = this._normalAnimation;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                    }
-                this.Ap.PlayAnimation(animation);
-                this._monsterState = value;
-                SetMonsterMotion();
+                case MonsterState.Egg:
+                    animation = EggAnimation;
+                    break;
+                case MonsterState.Hatching:
+                    animation = HatchingAnimation;
+                    break;
+                case MonsterState.Normal:
+                    animation = this._normalAnimation;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
                 }
+
+            this.Ap.PlayAnimation(animation);
             }
 
-        private void SetMonsterMotion()
+        public void SetMonsterMotion(Direction initialDirection = Direction.None)
             {
-            this._determineDirection = this.IsStationary ? new Stationary(this) : GetImplementationForDeterminingDirection(this.Mobility);
+            this._determineDirection = this.IsStationary ? new Stationary(this) : GetImplementationForDeterminingDirection(this.Mobility, initialDirection);
             }
 
         /// <inheritdoc cref="IMonster" />
@@ -137,14 +141,14 @@ namespace Labyrinth.GameObjects
 
         protected override void UponInjury()
             {
-            this._behaviours.Perform<IInjuryBehaviour>();
+            this.Behaviours.Perform<IInjuryBehaviour>();
             }
 
         protected override void UponDeath()
             {
             var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             bang.PlaySound(GameSound.MonsterDies);
-            this._behaviours.Perform<IDeathBehaviour>();
+            this.Behaviours.Perform<IDeathBehaviour>();
             }
 
         public override int DrawOrder
@@ -209,7 +213,7 @@ namespace Labyrinth.GameObjects
                         yield return true;  // we have moved
                         }
 
-                    this._behaviours.Perform<IMovementBehaviour>();
+                    this.Behaviours.Perform<IMovementBehaviour>();
                     }
                 else
                     {
@@ -231,7 +235,7 @@ namespace Labyrinth.GameObjects
                     break;
 
                 timeStationary -= timeItWouldTakeToMakeAMove;
-                this._behaviours.Perform<IMovementBehaviour>();
+                this.Behaviours.Perform<IMovementBehaviour>();
                 }
             }
 
@@ -265,11 +269,12 @@ namespace Labyrinth.GameObjects
         public int CurrentSpeed { get; set; }
         public override decimal StandardSpeed => this.CurrentSpeed;
 
-        public BehaviourCollection Behaviours => this._behaviours;
+        [NotNull]
+        public BehaviourCollection Behaviours { get; }
 
         public bool HasBehaviour<T>() where T : IBehaviour
             {
-            var result = this._behaviours.Has<T>();
+            var result = this.Behaviours.Has<T>();
             return result;
             }
 
@@ -283,31 +288,18 @@ namespace Labyrinth.GameObjects
                     {
                     var worldBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
                     this.MovementBoundary = worldBoundary;
-                    if (value == ChangeRooms.FollowsPlayer)
-                        {
-                        this.SightBoundary = worldBoundary;
-                        }
-                    else
-                        {
-                        this.SightBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom(this);
-                        }
+                    this.SightBoundary = value == ChangeRooms.FollowsPlayer ? worldBoundary : GlobalServices.BoundMovementFactory.GetBoundedInRoom(this);
                     }
                 else
                     {
-                    // todo not sure why I used this instead of GetBoundedInRoom
-                    var roomBoundary = GlobalServices.BoundMovementFactory.GetExplicitBoundary(World.GetContainingRoom(this.TilePosition));
+                    var roomBoundary = GlobalServices.BoundMovementFactory.GetBoundedInRoom(this);
                     this.MovementBoundary = roomBoundary;
                     this.SightBoundary = roomBoundary;
                     }
                 }
             }
 
-        protected virtual IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
-            {
-            throw new NotImplementedException("This is no longer used.");
-            }
-
-        private IMonsterMotion GetImplementationForDeterminingDirection(MonsterMobility mobility)
+        private IMonsterMotion GetImplementationForDeterminingDirection(MonsterMobility mobility, Direction initialDirection)
             {
             Type type = this.MovementMethods[mobility];
             if (!type.GetInterfaces().Contains(typeof(IMonsterMotion)))
@@ -316,7 +308,7 @@ namespace Labyrinth.GameObjects
                 }
 
             var constructorArgTypes = new List<Type> {typeof(Monster)};
-            if (this.InitialDirection != Direction.None)
+            if (initialDirection != Direction.None)
                 {
                 constructorArgTypes.Add(typeof(Direction));
                 }
@@ -326,9 +318,9 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
 
             var constructorArguments = new List<object> {this};
-            if (this.InitialDirection != Direction.None)
+            if (initialDirection != Direction.None)
                 {
-                constructorArguments.Add(this.InitialDirection);
+                constructorArguments.Add(initialDirection);
                 }
 
             var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments.ToArray());

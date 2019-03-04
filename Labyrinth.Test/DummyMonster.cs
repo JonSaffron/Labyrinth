@@ -28,11 +28,6 @@ namespace Labyrinth.Test
             // ignore this
             }
 
-        protected override IMonsterMotion GetMethodForDeterminingDirection(MonsterMobility mobility)
-            {
-            return new DummyMonsterMovement(this);
-            }
-
         public List<PositionAndTime> Log
             {
             get

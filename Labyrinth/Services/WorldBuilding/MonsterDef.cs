@@ -38,7 +38,7 @@ namespace Labyrinth.Services.WorldBuilding
                 Position = monster.TilePosition.ToPosition(),
                 Energy = monster.OriginalEnergy,
                 Mobility = monster.Mobility,
-                InitialDirection = monster.InitialDirection,
+                InitialDirection = Direction.None,
                 ChangeRooms = monster.ChangeRooms,
                 IsEgg = false,
                 LaysMushrooms = monster.Behaviours.Has<LaysMushroom>(),
@@ -49,6 +49,12 @@ namespace Labyrinth.Services.WorldBuilding
                 ShotsBounceOff = monster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection,
                 IsActive = monster.IsActive
                 };
+
+            if (result.Mobility == MonsterMobility.Patrolling)
+                {
+
+                }
+
             return result;
             }
 

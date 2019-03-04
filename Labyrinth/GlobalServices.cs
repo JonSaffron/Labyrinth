@@ -70,13 +70,6 @@ namespace Labyrinth
             CentrePointProvider = centrePointProvider;
             }
 
-        public static IMonsterMovementFactory MonsterMovementFactory { get; private set; }
-
-        public static void SetMonsterMovementFactory(IMonsterMovementFactory monsterMovementFactory)
-            {
-            MonsterMovementFactory = monsterMovementFactory;
-            }
-
         public static IRandomness Randomness { get; private set; }
 
         public static void SetRandomness(IRandomness randomness)

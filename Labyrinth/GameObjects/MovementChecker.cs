@@ -16,19 +16,19 @@ namespace Labyrinth.GameObjects
         public bool CanMove(Direction direction)
             {
             bool canCauseBounceBack = this.Source.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
-            var result = this.CanMove(this.Source, direction, canCauseBounceBack);
+            var result = CanMove(this.Source, direction, canCauseBounceBack);
             return result;
             }
 
-        private bool CanMove(IMovingItem objectToCheck, Direction direction, bool isBounceBackPossible)
+        private static bool CanMove(IMovingItem objectToCheck, Direction direction, bool isBounceBackPossible)
             {
-            TilePos proposedDestination = objectToCheck.TilePosition.GetPositionAfterOneMove(direction);
-            if (this.Source.MovementBoundary == null)
+            if (objectToCheck.MovementBoundary == null)
                 {
-                throw new InvalidOperationException("MovementBoundary is not set.");
+                throw new InvalidOperationException("MovementBoundary is not set for " + objectToCheck + ".");
                 }
                 
-            if (!this.Source.MovementBoundary.IsPositionWithinBoundary(proposedDestination))
+            TilePos proposedDestination = objectToCheck.TilePosition.GetPositionAfterOneMove(direction);
+            if (!objectToCheck.MovementBoundary.IsPositionWithinBoundary(proposedDestination))
                 {
                 return false;
                 }
@@ -38,7 +38,7 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private bool CanObjectOccupySameTile(IMovingItem gameObject, IEnumerable<IGameObject> objectsOnTile, Direction direction, bool isBounceBackPossible)
+        private static bool CanObjectOccupySameTile(IMovingItem gameObject, IEnumerable<IGameObject> objectsOnTile, Direction direction, bool isBounceBackPossible)
             {
             foreach (var item in objectsOnTile)
                 {
@@ -72,7 +72,7 @@ namespace Labyrinth.GameObjects
             return true;
             }
 
-        protected PushStatus CanBePushedOrBounced(IMovingItem toBeMoved, IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
+        protected static PushStatus CanBePushedOrBounced(IMovingItem toBeMoved, IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
             {
             // if this object is not moveable then the answer's no
             if (toBeMoved.Solidity != ObjectSolidity.Moveable)
@@ -92,7 +92,7 @@ namespace Labyrinth.GameObjects
                 return PushStatus.No;
 
             // this object will be able to bounceback only if the object that is pushing it can move backwards
-            var willBounceBack = CanMove(this.Source, direction.Reversed(), false);
+            var willBounceBack = CanMove(byWhom, direction.Reversed(), false);
             var result = willBounceBack ? PushStatus.Bounce : PushStatus.No;
             return result;
             }

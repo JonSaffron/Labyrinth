@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects;

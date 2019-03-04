@@ -140,11 +140,14 @@
     <Compile Include="GameObjects\Monsters\Behaviour\BehaviourCollection.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\ChangeMovementWhenHurt.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\Flitter.cs" />
+    <Compile Include="GameObjects\Monsters\Behaviour\HatchFromEgg.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\LaysEgg.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\LaysMushroom.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\ShootsAtPlayer.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\SpawnsUponDeath.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\StartsShootingWhenHurt.cs" />
+    <Compile Include="GameObjects\Monsters\EggDecoration.cs" />
+    <Compile Include="GameObjects\Monsters\MonsterDecoration.cs" />
     <Compile Include="GameObjects\Monsters\MonsterBehaviour.cs" />
     <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
     <Compile Include="Constants.cs" />
@@ -152,7 +155,6 @@
     <Compile Include="GameObjects\Monsters\Movement\MonsterMotionBase.cs" />
     <Compile Include="GameObjects\Monsters\Movement\PatrolPerimeter.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Stationary.cs" />
-    <Compile Include="GameObjects\Monsters\PatrolPerimeterTest.cs" />
     <Compile Include="GameObjects\MovementChecker.cs" />
     <Compile Include="GameObjects\MovementOfAnother.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
@@ -182,7 +184,6 @@
     <Compile Include="Interfaces\IValuable.cs" />
     <Compile Include="GameObjects\Monsters\Movement\KillerCubeRedMovement.cs" />
     <Compile Include="Interfaces\IServiceSetup.cs" />
-    <Compile Include="MonsterMovementFactory.cs" />
     <Compile Include="GameObjects\Monsters\Movement\Placid.cs" />
     <Compile Include="GameObjects\Monsters\Movement\RotaFloaterCyanMovement.cs" />
     <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
