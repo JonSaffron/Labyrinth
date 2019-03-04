@@ -181,6 +181,7 @@
     <Compile Include="Interfaces\IMunition.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
     <Compile Include="Interfaces\IStandardShot.cs" />
+    <Compile Include="Interfaces\ITakeable.cs" />
     <Compile Include="Interfaces\IValuable.cs" />
     <Compile Include="GameObjects\Monsters\Movement\KillerCubeRedMovement.cs" />
     <Compile Include="Interfaces\IServiceSetup.cs" />
