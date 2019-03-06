@@ -29,9 +29,9 @@ namespace Labyrinth.GameObjects.Movement
             {
             var towardsPlayer = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
             bool alterDirection = GlobalServices.Randomness.Test(3);
-            Direction result = alterDirection 
-                ?  MonsterMovement.AlterDirection(this._currentDirection) 
-                : towardsPlayer.Reversed();
+            Direction result = !alterDirection || this._currentDirection == Direction.None
+                ? towardsPlayer.Reversed() 
+                : MonsterMovement.AlterDirection(this._currentDirection);
             return result;
             }
 

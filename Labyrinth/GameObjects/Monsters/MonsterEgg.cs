@@ -43,10 +43,11 @@ namespace Labyrinth.GameObjects
                 return null;
                 }
 
-            this.InstantlyExpire();
             this._underlyingMonster.Energy = this.Energy;
             this._underlyingMonster.Position = this.Position;
             var result = (Monster) GlobalServices.GameState.AddMonster(this._underlyingMonster);
+
+            this.InstantlyExpire(); // must be after copying Energy level
             return result;
             }
 
@@ -58,11 +59,6 @@ namespace Labyrinth.GameObjects
             }
 
         public override int DrawOrder => (int) SpriteDrawOrder.StaticMonster;
-
-        public bool HasBehaviour<T>() where T : IBehaviour
-            {
-            return false;
-            }
 
         public override ObjectSolidity Solidity => ObjectSolidity.Stationary;
         }

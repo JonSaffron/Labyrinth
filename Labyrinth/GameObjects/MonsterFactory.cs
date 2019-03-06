@@ -39,9 +39,15 @@ namespace Labyrinth.GameObjects
             if (monsterDef.ShootsOnceProvoked.HasValue)
                 result.Behaviours.Set<StartsShootingWhenHurt>(monsterDef.ShootsOnceProvoked.Value);
             if (monsterDef.ShotsBounceOff.HasValue)
-                result.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Reflection);
+                {
+                if (monsterDef.ShotsBounceOff.Value)
+                    result.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Reflection);
+                else
+                    result.Properties.Remove(GameObjectProperties.EffectOfShot);
+                }
             if (monsterDef.IsActive.HasValue)
                 result.IsActive = monsterDef.IsActive.Value;
+
             if (!result.IsActive)
                 {
                 result.Behaviours.Add<ActivateWhenHurt>();

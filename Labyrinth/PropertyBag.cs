@@ -22,6 +22,13 @@ namespace Labyrinth
             OnPropertyChanged(property.Name);
             }
 
+        public void Remove<T>(PropertyDef<T> property)
+            {
+            OnPropertyChanging(property.Name);
+            this._dict.Remove(property.Name);
+            OnPropertyChanged(property.Name);
+            }
+
         public event PropertyChangingEventHandler PropertyChanging;
 
         public event PropertyChangedEventHandler PropertyChanged;
