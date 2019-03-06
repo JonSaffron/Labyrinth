@@ -30,8 +30,7 @@ namespace Labyrinth.GameObjects.Behaviour
         private bool ShouldAttemptToFireAtPlayer()
             {
             var result =
-                !this.Monster.IsEgg
-                && this.IsInSameRoom()
+                this.IsInSameRoom()
                 && !this.Random.Test(0x03) // 3 in 4 chance is deliberate
                 && this.Player.IsAlive()
                 && MonsterMovement.IsPlayerInWeaponSights(this.Monster);

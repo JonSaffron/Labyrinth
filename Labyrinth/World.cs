@@ -137,13 +137,14 @@ namespace Labyrinth
                 };
 
             var result = new List<Monster>();
-            foreach (var monster in GlobalServices.GameState.AllItemsInRectangle(area).OfType<Monster>())
+            foreach (var monsterOrEgg in GlobalServices.GameState.AllItemsInRectangle(area).OfType<IMonster>())
                 {
-                if (monster.IsEgg)
+                var monster = monsterOrEgg as Monster;
+                if (monsterOrEgg is MonsterEgg egg)
                     {
-                    monster.EggHatches(monster, new EventArgs());
+                    monster = egg.HatchEgg();
                     }
-                if (!monster.IsStationary)
+                if (monster != null && !monster.IsStationary)
                     {
                     searchParameters.StartLocation = monster.TilePosition;
 

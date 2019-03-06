@@ -34,23 +34,11 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private void EnemyCrushed(MonsterCrushed monsterCrushed)
             {
-            if (!IsMonsterDangerous(monsterCrushed.Monster))
+            var doesMonsterScore = monsterCrushed.Monster.Properties.Get(GameObjectProperties.MonsterScoresWhenKilled);
+            if (!doesMonsterScore)
                 return;
             var increaseToScore = ((monsterCrushed.Monster.Energy >> 1) + 1) << 1;
             this._score += increaseToScore;
-            }
-
-        private static bool IsMonsterDangerous(IMonster monster)
-            {
-            // if it moves then it's dangerous
-            // if it fires then it's dangerous
-            if (monster.IsArmed())
-                return true;
-            if (!monster.IsStationary)
-                return true;
-            if (monster.IsEgg)
-                return true;
-            return false;
             }
 
         private void CrystalTaken(CrystalTaken crystalTaken)

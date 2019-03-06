@@ -12,7 +12,6 @@ namespace Labyrinth.GameObjects.Behaviour
         
         public HatchFromEgg(Monster monster, int gameTicks): base(monster)
             {
-            monster.IsEgg = true;
             var timeSpan = TimeSpan.FromSeconds(gameTicks * Constants.GameClockResolution);
             this._hatchingTimer = GameTimer.AddGameTimer(timeSpan, EggIsHatching, false);
             }
@@ -39,7 +38,7 @@ namespace Labyrinth.GameObjects.Behaviour
 
         private void EggHatches(object sender, EventArgs args)
             {
-            this.Monster.IsEgg = false;
+            // ????
             }
         }
     }

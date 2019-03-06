@@ -37,7 +37,7 @@ namespace Labyrinth.GameObjects
             var elapsed = gameTime.ElapsedGameTime.TotalSeconds;
 
             bool result = false;
-            if (this.IsMoving)
+            if (this.CurrentMovement.IsMoving)
                 {
                 this.TryToCompleteMoveToTarget(ref elapsed);
                 result = true;

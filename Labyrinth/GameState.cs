@@ -180,7 +180,7 @@ namespace Labyrinth
             return result;
             }
         
-        public Monster AddDiamondDemon(Vector2 p)
+        public IMonster AddDiamondDemon(Vector2 p)
             {
             MonsterDef md = new MonsterDef
                 {
@@ -253,7 +253,7 @@ namespace Labyrinth
             this._gameObjectCollection.Add(m);
             }
 
-        public Monster AddMonster(MonsterDef monsterDef)
+        public IMonster AddMonster(MonsterDef monsterDef)
             {
             var result = GlobalServices.MonsterFactory.BuildMonster(monsterDef);
             this._gameObjectCollection.Add(result);

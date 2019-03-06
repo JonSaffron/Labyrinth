@@ -30,8 +30,7 @@ namespace Labyrinth.GameObjects.Behaviour
         private bool ShouldAttemptToLayMushroom()
             {
             var result =
-                !this.Monster.IsEgg
-                && GlobalServices.GameState.DoesShotExist()
+                GlobalServices.GameState.DoesShotExist()
                 && this.IsInSameRoom()
                 && this.Random.Test(3)
                 && IsDirectionCompatible(this.Player.CurrentMovement.Direction, this.Monster.CurrentMovement.Direction);

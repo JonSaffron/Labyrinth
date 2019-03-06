@@ -26,9 +26,10 @@ namespace Labyrinth.ClockEvents
 
         private void Unlock(int levelThatPlayerShouldHaveReached)
             {
+            // this loop won't include Eggs
             foreach (Monster m in GlobalServices.GameState.DistinctItemsOfType<Monster>())
                 {
-                if (m.IsEgg || m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
+                if (m.IsActive || !m.IsExtant || m.ChangeRooms == ChangeRooms.StaysWithinRoom)
                     continue;
 
                 int worldAreaId = this._world.GetWorldAreaIdForTilePos(m.TilePosition);

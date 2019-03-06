@@ -59,7 +59,7 @@ namespace Labyrinth.GameObjects.Movement
             return result;
             }
 
-        public static bool IsPlayerInSameRoomAsMonster(Monster m)
+        public static bool IsPlayerInSameRoomAsMonster(IMonster m)
             {
             Player p = GlobalServices.GameState.Player;
             if (!p.IsExtant)

@@ -15,16 +15,19 @@ namespace Labyrinth.GameObjects
         {
         private static readonly Dictionary<string, Breed> Breeds = BuildBreedDefinitions();
 
-        public Monster BuildMonster(MonsterDef monsterDef)
+        public IMonster BuildMonster(MonsterDef monsterDef)
             {
+            if (monsterDef.IsEgg)
+                {
+                return BuildEgg(monsterDef);
+                }
+
             var result = BuildMonsterFromDefaults(monsterDef.Breed, monsterDef.Position, monsterDef.Energy);
 
             if (monsterDef.Mobility.HasValue)
                 result.Mobility = monsterDef.Mobility.Value;
             if (monsterDef.ChangeRooms.HasValue)
                 result.ChangeRooms = monsterDef.ChangeRooms.Value;
-            if (monsterDef.IsEgg.GetValueOrDefault() && monsterDef.TimeBeforeHatching.HasValue)
-                result.SetDelayBeforeHatching(monsterDef.TimeBeforeHatching.Value);
             if (monsterDef.LaysMushrooms.HasValue)
                 result.Behaviours.Set<LaysMushroom>(monsterDef.LaysMushrooms.Value);
             if (monsterDef.LaysEggs.HasValue)
@@ -64,15 +67,26 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
+        private static IMonster BuildEgg(MonsterDef monsterDef)
+            {
+            if (!monsterDef.TimeBeforeHatching.HasValue)
+                throw new InvalidOperationException("MonsterDef has IsEgg set without a TimeBeforeHatching value.");
+            var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
+            var underlyingMonster = monsterDef;
+            underlyingMonster.IsEgg = false;
+            underlyingMonster.TimeBeforeHatching = null;
+            var result = new MonsterEgg(animationPlayer, underlyingMonster, monsterDef.TimeBeforeHatching.Value);
+            return result;
+            }
+
         private static Monster BuildMonsterFromDefaults(string breed, Vector2 position, int energy)
             {
-            var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new Monster(breed, animationPlayer, position, energy);
-            
             var breedInfo = Breeds[breed];
 
+            var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
-            result.SetNormalAnimation(Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovementsPerFrame));
+            animationPlayer.PlayAnimation(Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovementsPerFrame));
+            var result = new Monster(breed, animationPlayer, position, energy);
 
             var inherentBehaviours = breedInfo.InherentBehaviours;
             foreach (var behaviourName in inherentBehaviours)
@@ -220,7 +234,16 @@ namespace Labyrinth.GameObjects
 
             object propertyDef = fieldInfo.GetValue(null);
             Type propertyType = propertyDef.GetType().GetGenericArguments()[0];
-            if (!propertyType.IsEnum)
+            object value;
+            if (propertyType.IsEnum)
+                {
+                value = Enum.Parse(propertyType, propertyValue);
+                }
+            else if (propertyType == typeof(bool))
+                {
+                value = XmlConvert.ToBoolean(propertyValue);
+                }
+            else
                 {
                 throw new InvalidOperationException($"Property definition {propertyName} has type {propertyType.FullName} which isn't supported.");
                 }
@@ -231,7 +254,6 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Failed to get generic PropertyBag method definition");
                 }
 
-            object value = Enum.Parse(propertyType, propertyValue);
             methodInfo.Invoke(propertyBag, new[] {propertyDef, value});
             }
 

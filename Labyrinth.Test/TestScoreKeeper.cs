@@ -4,7 +4,7 @@ using Labyrinth.Services.ScoreKeeper;
 using NUnit.Framework;
 using Moq;
 using GalaSoft.MvvmLight.Messaging;
-using Labyrinth.GameObjects.Behaviour;
+using Labyrinth.GameObjects;
 
 // ReSharper disable ObjectCreationAsStatement
 // ReSharper disable AssignNullToNotNullAttribute
@@ -97,11 +97,11 @@ namespace Labyrinth.Test
             }
 
         [Test]
-        public void TestEnemyCrushedWhenEnemyShoots()
+        public void TestEnemyCrushedWhenEnemyScores()
             {
             var monster = new Mock<IMonster>();
             monster.Setup(m => m.Energy).Returns(5);
-            monster.Setup(m => m.HasBehaviour<ShootsAtPlayer>()).Returns(true);
+            monster.Setup(m => m.Properties.Get(GameObjectProperties.MonsterScoresWhenKilled)).Returns(true);
             var boulder = new Mock<IGameObject>();
 
             using (var scoreKeeper = new ScoreKeeper())
@@ -114,49 +114,11 @@ namespace Labyrinth.Test
             }
 
         [Test]
-        public void TestEnemyCrushedWhenEnemyMoves()
-            {
-            var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.Energy).Returns(8);
-            monster.Setup(monsterMoves => monsterMoves.IsStationary).Returns(false);
-            var boulder = new Mock<IGameObject>();
-
-            using (var scoreKeeper = new ScoreKeeper())
-                {
-                var monsterCrushed = new MonsterCrushed(monster.Object, boulder.Object);
-                Messenger.Default.Send(monsterCrushed);
-
-                Assert.AreEqual(100, scoreKeeper.CurrentScore);
-                }
-            }
-
-        [Test]
-        public void TestEnemyCrushedWhenEnemyIsEgg()
+        public void TestEnemyCrushedWhenEnemyDoesNotScore()
             {
             var monster = new Mock<IMonster>();
             monster.Setup(monsterShoots => monsterShoots.Energy).Returns(10);
-            monster.Setup(monsterIsEgg => monsterIsEgg.HasBehaviour<ShootsAtPlayer>()).Returns(false);
-            monster.Setup(monsterIsEgg => monsterIsEgg.IsStationary).Returns(true);
-            monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(true);
-            var boulder = new Mock<IGameObject>();
-
-            using (var scoreKeeper = new ScoreKeeper())
-                {
-                var monsterCrushed = new MonsterCrushed(monster.Object, boulder.Object);
-                Messenger.Default.Send(monsterCrushed);
-
-                Assert.AreEqual(120, scoreKeeper.CurrentScore);
-                }
-            }
-
-        [Test]
-        public void TestEnemyCrushedWhenEnemyIsNotDangerous()
-            {
-            var monster = new Mock<IMonster>();
-            monster.Setup(monsterShoots => monsterShoots.Energy).Returns(10);
-            monster.Setup(monsterShoots => monsterShoots.HasBehaviour<ShootsAtPlayer>()).Returns(false);
-            monster.Setup(monsterMoves => monsterMoves.IsStationary).Returns(true);
-            monster.Setup(monsterIsEgg => monsterIsEgg.IsEgg).Returns(false);
+            monster.Setup(m => m.Properties.Get(GameObjectProperties.MonsterScoresWhenKilled)).Returns(false);
             var boulder = new Mock<IGameObject>();
 
             using (var scoreKeeper = new ScoreKeeper())

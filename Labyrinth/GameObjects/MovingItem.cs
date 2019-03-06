@@ -113,18 +113,8 @@ namespace Labyrinth.GameObjects
             return hasArrivedAtDestination;
             }
 
-        /// <summary>
-        /// Returns whether this object is currently moving
-        /// </summary>
-        public virtual bool IsMoving => this.CurrentMovement.IsMoving;
-
         /// <inheritdoc />
         public override ObjectSolidity Solidity => ObjectSolidity.Insubstantial;
-
-        /// <summary>
-        /// Gets an indication of what effect this object can have on others
-        /// </summary>
-        //public virtual ObjectCapability Capability => ObjectCapability.CannotMoveOthers;
 
         /// <summary>
         /// Gets the normal speed this object moves at

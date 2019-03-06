@@ -166,10 +166,6 @@ namespace Labyrinth.GameObjects
             ResetTimeToTravel();
             }
 
-        public override bool IsMoving => true;
-
-        //public override ObjectCapability Capability => ObjectCapability.CanPushOthers;
-
         public override decimal StandardSpeed => Constants.BaseSpeed * 4;
         }
     }

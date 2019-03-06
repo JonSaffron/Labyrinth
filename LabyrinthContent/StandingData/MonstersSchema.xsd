@@ -33,6 +33,7 @@
   <xs:complexType name="InherentProperties">
     <xs:all>
       <xs:element name="EffectOfShot" type="EffectOfShotProperty" minOccurs="0" maxOccurs="1" />
+      <xs:element name="MonsterScoresWhenKilled" type="BooleanProperty" minOccurs="0" maxOccurs="1" />
     </xs:all>
   </xs:complexType>
 
@@ -44,6 +45,10 @@
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="BooleanProperty">
+    <xs:attribute name="value" use="required" type="xs:boolean" />
   </xs:complexType>
 
   <xs:complexType name="Movement">

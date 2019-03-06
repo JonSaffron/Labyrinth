@@ -12,11 +12,11 @@ namespace Labyrinth.Services.WorldBuilding
         public string Breed { get; set; }
         public Vector2 Position { get; set; }
         public int Energy { get; set; }
+        public bool IsEgg { get; set; }
+        public int? TimeBeforeHatching { get; set; }
         public MonsterMobility? Mobility { get; set;}
         public Direction? InitialDirection { get; set; }
         public ChangeRooms? ChangeRooms { get; set; }
-        public bool? IsEgg { get; set; }
-        public int? TimeBeforeHatching { get; set; }
         public bool? LaysMushrooms { get; set; }
         public bool? LaysEggs { get; set; }
         public bool? SplitsOnHit { get; set; }
@@ -29,8 +29,6 @@ namespace Labyrinth.Services.WorldBuilding
             {
             if (monster == null)
                 throw new ArgumentNullException();
-            if (monster.IsEgg)
-                throw new ArgumentException("Cannot get properties of an egg.");
 
             var result = new MonsterDef
                 {

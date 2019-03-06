@@ -221,7 +221,7 @@ namespace Labyrinth
 
         private static bool ShotHitsPlayerOrMonster(StandardShot shot, IMovingItem playerOrMonster)
             {
-            Monster monster = playerOrMonster as Monster;
+            IMonster monster = playerOrMonster as IMonster;
             if (playerOrMonster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection)
                 {
                 // A rebounded shot cannot hurt a monster that shots rebound off but it doesn't rebound again
@@ -245,7 +245,7 @@ namespace Labyrinth
                     playerOrMonster.PlaySound(GameSound.PlayerInjured);
                 else if (monster != null)
                     {
-                    var gs = monster.IsEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
+                    var gs = monster is MonsterEgg ? GameSound.PlayerShootsAndInjuresEgg : GameSound.PlayerShootsAndInjuresMonster;
                     monster.PlaySound(gs);
                     }
                 }

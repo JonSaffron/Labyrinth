@@ -33,6 +33,8 @@ namespace Labyrinth
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
+            if (!gameObject.IsExtant)
+                throw new ArgumentException("Cannot Add a non-extant object to the GameObjectCollection.");
 
             InsertIntoAllGameItemsArray(gameObject);
             if (!(gameObject is IMovingItem mi)) 

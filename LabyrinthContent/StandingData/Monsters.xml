@@ -6,6 +6,11 @@
       <LaysEgg />
       <ShootsAtPlayer />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
       <Move Type="Aggressive" Implementation="FullPursuit" />
     </Movement>
@@ -14,7 +19,9 @@
   <Breed Name="CrazyCrawler" Texture="CrazyCrawler" BaseMovementsPerFrame="3">
     <InherentProperties>
       <EffectOfShot value="Reflection" />
+      <MonsterScoresWhenKilled value="true" />
     </InherentProperties>
+
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="Placid" /> <!-- not used, but might be useful -->
       <Move Type="Aggressive" Implementation="SemiAggressive" />
@@ -24,6 +31,7 @@
   <Breed Name="DeathCube" Texture="DeathCube" BaseMovementsPerFrame="3">
     <InherentProperties>
       <EffectOfShot value="Reflection" />
+      <MonsterScoresWhenKilled value="false" />
     </InherentProperties>
   </Breed>
 
@@ -33,6 +41,11 @@
       <LaysEgg />
       <ShootsAtPlayer />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Placid">
       <Move Type="Placid" Implementation="Placid" />
       <Move Type="Aggressive" Implementation="SemiAggressive" />
@@ -44,6 +57,11 @@
       <Flitter />
       <SpawnsUponDeath />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Aggressive">
       <Move Type="Aggressive" Implementation="SemiAggressive" />
       <Move Type="Cautious" Implementation="CautiousPursuit" />
@@ -54,6 +72,11 @@
     <InherentBehaviours>
       <Flitter />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Cautious" ChangeRooms="FollowsPlayer">
       <Move Type="Aggressive" Implementation="SemiAggressive" />
       <Move Type="Cautious" Implementation="CautiousPursuit" />
@@ -64,6 +87,11 @@
     <InherentBehaviours>
       <Flitter />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="Placid"/>
       <Move Type="Aggressive" Implementation="SemiAggressive" />
@@ -77,6 +105,11 @@
       <SpawnsUponDeath />
       <ShootsAtPlayer />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Cautious">
       <Move Type="Cautious" Implementation="CautiousPursuit" />
     </Movement>
@@ -86,12 +119,21 @@
     <InherentBehaviours>
       <ShootsAtPlayer />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
   </Breed>
 
   <Breed Name="KillerCubeRed" Texture="KillerCubeRed" BaseMovementsPerFrame="3">
     <InherentBehaviours>
       <ShootsAtPlayer />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Placid" ChangeRooms="FollowsPlayer">
       <Move Type="Patrolling" Implementation="StandardPatrolling" />
       <Move Type="Placid" Implementation="StandardRolling" />
@@ -100,6 +142,10 @@
   </Breed>
 
   <Breed Name="RotaFloaterBrown" Texture="RotaFloaterBrown" BaseMovementsPerFrame="2">
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Placid" ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="StandardRolling"/>
       <Move Type="Patrolling" Implementation="StandardPatrolling"/>
@@ -107,6 +153,10 @@
   </Breed>
 
   <Breed Name="RotaFloaterCyan" Texture="RotaFloaterCyan" BaseMovementsPerFrame="2">
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Placid" ChangeRooms="FollowsPlayer" Speed="1.5">
       <Move Type="Placid" Implementation="StandardRolling"/>
       <Move Type="Patrolling" Implementation="StandardPatrolling"/>
@@ -115,7 +165,9 @@
   </Breed>
 
   <Breed Name="ThresherBrown" Texture="ThresherBrown" BaseMovementsPerFrame="3">
-    <InherentBehaviours/>
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
 
     <Movement Default="Aggressive" ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="Placid"/>
@@ -127,6 +179,10 @@
     <InherentBehaviours>
       <LaysMushroom />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
 
     <Movement ChangeRooms="FollowsPlayer">
       <Move Type="Placid" Implementation="Placid"/> <!-- not used but could be useful -->
@@ -140,6 +196,11 @@
       <StartsShootingWhenHurt />
       <LaysMushroom />
     </InherentBehaviours>
+
+    <InherentProperties>
+      <MonsterScoresWhenKilled value="true" />
+    </InherentProperties>
+
     <Movement Default="Aggressive">
       <Move Type="Aggressive" Implementation="SemiAggressive"/>
     </Movement>

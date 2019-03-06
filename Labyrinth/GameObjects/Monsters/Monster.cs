@@ -16,13 +16,7 @@ namespace Labyrinth.GameObjects
         public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
         [CanBeNull] private IMonsterMotion _determineDirection;
 
-        private MonsterState _monsterState = MonsterState.Normal;
-        [CanBeNull] private GameTimer _hatchingTimer;
         public IBoundMovement SightBoundary { get; private set; }
-
-        private Animation _normalAnimation;
-        private static readonly Animation EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
-        private static readonly Animation HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
 
         public readonly int OriginalEnergy;
 
@@ -61,83 +55,13 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private MonsterState MonsterState
-            {
-            get => this._monsterState;
-            set
-                {
-                this._monsterState = value;
-                SetAnimation();
-                SetMonsterMotion();
-                }
-            }
-
-        /// <inheritdoc cref="IMonster" />
-        public bool IsEgg
-            {
-            get
-                {
-                var result = this.MonsterState.IsEgg();
-                return result;
-                }
-            }
-
-        public void SetDelayBeforeHatching(int gameTicks)
-            {
-            this.MonsterState = MonsterState.Egg;
-            var timeSpan = TimeSpan.FromSeconds(gameTicks * Constants.GameClockResolution);
-            this._hatchingTimer = GameTimer.AddGameTimer(timeSpan, EggIsHatching, false);
-            }
-
-        private void EggIsHatching(object sender, EventArgs args)
-            {
-            if (this.IsExtant)
-                {
-                this.MonsterState = MonsterState.Hatching;
-                this.PlaySoundWithCallback(GameSound.EggHatches, EggHatches);
-                }
-            }
-
-        public void EggHatches(object sender, EventArgs args)
-            {
-            this.MonsterState = MonsterState.Normal;
-            }
-
-        public void SetNormalAnimation(Animation value)
-            {
-            this._normalAnimation = value;
-            if (this.MonsterState == MonsterState.Normal)
-                this.Ap.PlayAnimation(value);
-            }
-
-        private void SetAnimation()
-            {
-            Animation animation;
-            switch (this._monsterState)
-                {
-                case MonsterState.Egg:
-                    animation = EggAnimation;
-                    break;
-                case MonsterState.Hatching:
-                    animation = HatchingAnimation;
-                    break;
-                case MonsterState.Normal:
-                    animation = this._normalAnimation;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-                }
-
-            this.Ap.PlayAnimation(animation);
-            }
-
         public void SetMonsterMotion(Direction initialDirection = Direction.None)
             {
             this._determineDirection = this.IsStationary ? new Stationary(this) : GetImplementationForDeterminingDirection(this.Mobility, initialDirection);
             }
 
         /// <inheritdoc cref="IMonster" />
-        public bool IsStationary => !this.IsActive || this.IsEgg || this.Mobility == MonsterMobility.Stationary;
+        public bool IsStationary => !this.IsActive || this.Mobility == MonsterMobility.Stationary;
 
         protected override void UponInjury()
             {
@@ -155,7 +79,7 @@ namespace Labyrinth.GameObjects
             {
             get
                 {
-                var result = this.IsMoving ? SpriteDrawOrder.MovingMonster : SpriteDrawOrder.StaticMonster;
+                var result = this.CurrentMovement.IsMoving ? SpriteDrawOrder.MovingMonster : SpriteDrawOrder.StaticMonster;
                 return (int) result;
                 }
             }
@@ -174,11 +98,6 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this);
-
-            if (this.IsEgg && this._hatchingTimer != null)
-                this._hatchingTimer.Enabled = inSameRoom;
-
             // move the monster
             this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
             if (this._movementIterator == null)
@@ -264,19 +183,13 @@ namespace Labyrinth.GameObjects
         /// <remarks>The implementation of this must be consistent with the type of monster and its current state (egg/normal).
         /// It cannot look at the current movement class being used because that inactive monsters will be stationary.
         /// The TileContentValidator needs this value to be reflective of the general state of the monster, not its current ephemeral state.</remarks>
-        public override ObjectSolidity Solidity => (this.IsEgg || this.Mobility == MonsterMobility.Stationary) ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
+        public override ObjectSolidity Solidity => (this.Mobility == MonsterMobility.Stationary) ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
 
         public int CurrentSpeed { get; set; }
         public override decimal StandardSpeed => this.CurrentSpeed;
 
         [NotNull]
         public BehaviourCollection Behaviours { get; }
-
-        public bool HasBehaviour<T>() where T : IBehaviour
-            {
-            var result = this.Behaviours.Has<T>();
-            return result;
-            }
 
         public ChangeRooms ChangeRooms
             {
