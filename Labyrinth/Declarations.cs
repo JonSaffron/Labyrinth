@@ -177,24 +177,6 @@ namespace Labyrinth
         FollowsPlayer
         }
 
-    public enum MonsterState
-        {
-        /// <summary>
-        /// Monster is in its normal state
-        /// </summary>
-        Normal,
-
-        /// <summary>
-        /// Monster is a stationery egg and a countdown is running before it hatches
-        /// </summary>
-        Egg,
-
-        /// <summary>
-        /// The countdown to hatching has expired and the monster is about to transition to its normal state
-        /// </summary>
-        Hatching
-        }
-
     public enum FiringState
         {
         /// <summary>

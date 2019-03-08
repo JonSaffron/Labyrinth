@@ -35,7 +35,7 @@ namespace Labyrinth.GameObjects.Movement
             return result;
             }
 
-        private static Direction MoveTowardsPlayer(Monster monster)
+        public static Direction MoveTowardsPlayer(Monster monster)
             {
             bool alterDirection = GlobalServices.Randomness.Test(7);
             Direction result = alterDirection 

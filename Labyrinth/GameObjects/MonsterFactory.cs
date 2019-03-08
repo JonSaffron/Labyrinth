@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using JetBrains.Annotations;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
@@ -22,7 +23,11 @@ namespace Labyrinth.GameObjects
                 return BuildEgg(monsterDef);
                 }
 
-            var result = BuildMonsterFromDefaults(monsterDef.Breed, monsterDef.Position, monsterDef.Energy);
+            var breedInfo = Breeds[monsterDef.Breed];
+            var result = BuildMonsterFromBreed(breedInfo, monsterDef.Position, monsterDef.Energy);
+            AddInherentBehaviours(result, breedInfo);
+            AddMovements(result, breedInfo, monsterDef.InitialDirection.GetValueOrDefault(Direction.None));
+            AddInherentProperties(result, breedInfo);
 
             if (monsterDef.Mobility.HasValue)
                 result.Mobility = monsterDef.Mobility.Value;
@@ -85,15 +90,17 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private static Monster BuildMonsterFromDefaults(string breed, Vector2 position, int energy)
+        private static Monster BuildMonsterFromBreed([NotNull] Breed breedInfo, Vector2 position, int energy)
             {
-            var breedInfo = Breeds[breed];
-
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
             animationPlayer.PlayAnimation(Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovementsPerFrame));
-            var result = new Monster(breed, animationPlayer, position, energy);
+            var result = new Monster(breedInfo.Name, animationPlayer, position, energy);
+            return result;
+            }
 
+        private static void AddInherentBehaviours(Monster monster, Breed breedInfo)
+            {
             var inherentBehaviours = breedInfo.InherentBehaviours;
             foreach (var behaviourName in inherentBehaviours)
                 {
@@ -106,20 +113,23 @@ namespace Labyrinth.GameObjects
                 var constructorInfo = behaviourType.GetConstructor(new[] {typeof (Monster)});
                 if (constructorInfo == null)
                     throw new InvalidOperationException("Failed to get matching constructor information for " + behaviourName + " class.");
-                var constructorArguments = new object[] {result};
+                var constructorArguments = new object[] {monster};
                 var behaviour = (IBehaviour) constructorInfo.Invoke(constructorArguments);
 
-                result.Behaviours.Add(behaviour);
+                monster.Behaviours.Add(behaviour);
                 }
+            }
 
+        private static void AddMovements(Monster monster, Breed breedInfo, Direction initialDirection)
+            {
             var movement = breedInfo.BreedMovement;
             if (movement.ChangeRooms.HasValue)
                 {
-                result.ChangeRooms = movement.ChangeRooms.Value;
+                monster.ChangeRooms = movement.ChangeRooms.Value;
                 }
             if (movement.Speed.HasValue)
                 {
-                result.CurrentSpeed = (int) (Constants.BaseSpeed * movement.Speed.Value);
+                monster.CurrentSpeed = (int) (Constants.BaseSpeed * movement.Speed.Value);
                 }
 
             foreach (var move in breedInfo.BreedMovement.Moves)
@@ -131,19 +141,21 @@ namespace Labyrinth.GameObjects
                     throw new InvalidOperationException("Could not find movement Type " + move.Value);
                     }
 
-                result.MovementMethods.Add(move.Key, movementType);
+                IMonsterMotion implementation = GetImplementationForMotion(monster, movementType, initialDirection);
+                monster.MovementMethods.Add(move.Key, implementation);
                 }
             if (movement.DefaultMobility.HasValue)
                 {
-                result.Mobility = movement.DefaultMobility.Value;
+                monster.Mobility = movement.DefaultMobility.Value;
                 }
+            }
 
+        private static void AddInherentProperties(Monster monster, Breed breedInfo)
+            {
             foreach (var property in breedInfo.InherentProperties)
                 {
-                AddToPropertyBag(result.Properties, property.Key, property.Value);
+                AddToPropertyBag(monster.Properties, property.Key, property.Value);
                 }
-
-            return result;
             }
 
         private static Dictionary<string, Breed> BuildBreedDefinitions()
@@ -261,6 +273,29 @@ namespace Labyrinth.GameObjects
                 }
 
             methodInfo.Invoke(propertyBag, new[] {propertyDef, value});
+            }
+
+        private static IMonsterMotion GetImplementationForMotion(Monster monster, Type type, Direction initialDirection)
+            {
+            if (!type.GetInterfaces().Contains(typeof(IMonsterMotion)))
+                {
+                throw new InvalidOperationException("Type " + type.Name + " does not implement IMonsterMotion.");
+                }
+
+            var constructorArgTypes = new List<Type> {typeof(Monster)};
+            var constructorArguments = new List<object> {monster};
+            if (initialDirection != Direction.None)
+                {
+                constructorArgTypes.Add(typeof(Direction));
+                constructorArguments.Add(initialDirection);
+                }
+
+            var constructorInfo = type.GetConstructor(constructorArgTypes.ToArray());
+            if (constructorInfo == null)
+                throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
+
+            var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments.ToArray());
+            return movementImplementation;
             }
 
         private class Breed

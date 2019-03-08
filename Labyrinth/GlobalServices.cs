@@ -11,10 +11,7 @@ namespace Labyrinth
         private static ISoundPlayer _soundPlayer;
         private static readonly ISoundPlayer NullSoundPlayer = new NullSoundPlayer();
 
-        public static ISoundPlayer SoundPlayer
-            {
-            get { return _soundPlayer ?? NullSoundPlayer; }
-            }
+        public static ISoundPlayer SoundPlayer => _soundPlayer ?? NullSoundPlayer;
 
         public static void SetSoundPlayer(ISoundPlayer soundPlayer)
             {

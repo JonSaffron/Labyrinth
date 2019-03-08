@@ -10,9 +10,13 @@ namespace Labyrinth.GameObjects.Movement
 
         public override Direction DetermineDirection()
             {
-            // todo follow player if leaves room
-
-
+            if (this.Monster.ChangeRooms == ChangeRooms.FollowsPlayer 
+                && !MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster) 
+                && MonsterMovement.IsPlayerNearby(this.Monster))
+                {
+                var pursuitResult = CautiousPursuit.MoveTowardsPlayer(this.Monster);
+                return pursuitResult;
+                }
 
             var result = MonsterMovement.RandomDirection();
             return result;

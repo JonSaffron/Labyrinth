@@ -82,17 +82,6 @@ namespace Labyrinth
             return false;
             }
 
-        public static bool IsEgg(this MonsterState monsterState)
-            {
-            switch (monsterState)
-                {
-                case MonsterState.Egg:
-                case MonsterState.Hatching:
-                    return true;
-                }
-            return false;
-            }
-
         internal static bool IsAlive(this IMovingItem mi)
             {
             var result = mi.IsExtant;
@@ -102,7 +91,7 @@ namespace Labyrinth
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source) where T: class
             {
             if (source == null)
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             // ReSharper disable once LoopCanBeConvertedToQuery (leads to slow delegate)
             foreach (T item in source)
                 {

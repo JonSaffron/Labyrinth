@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.GameObjects.Movement;
@@ -13,7 +12,7 @@ namespace Labyrinth.GameObjects
         {
         public string Breed { get; }
         private MonsterMobility _mobility;
-        public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
+        public readonly Dictionary<MonsterMobility, IMonsterMotion> MovementMethods = new Dictionary<MonsterMobility, IMonsterMotion>();
         [CanBeNull] private IMonsterMotion _determineDirection;
 
         public IBoundMovement SightBoundary { get; private set; }
@@ -57,7 +56,14 @@ namespace Labyrinth.GameObjects
 
         public void SetMonsterMotion(Direction initialDirection = Direction.None)
             {
-            this._determineDirection = this.IsStationary ? new Stationary(this) : GetImplementationForDeterminingDirection(this.Mobility, initialDirection);
+            if (this.IsStationary)
+                {
+                this._determineDirection = new Stationary(this);
+                return;
+                }
+
+            if (!this.MovementMethods.TryGetValue(this.Mobility, out this._determineDirection))
+                throw new InvalidOperationException("Monster is not set for movement " + this.Mobility);
             }
 
         /// <inheritdoc cref="IMonster" />
@@ -210,34 +216,6 @@ namespace Labyrinth.GameObjects
                     this.SightBoundary = roomBoundary;
                     }
                 }
-            }
-
-        private IMonsterMotion GetImplementationForDeterminingDirection(MonsterMobility mobility, Direction initialDirection)
-            {
-            Type type = this.MovementMethods[mobility];
-            if (!type.GetInterfaces().Contains(typeof(IMonsterMotion)))
-                {
-                throw new InvalidOperationException("Type " + type.Name + " does not implement IMonsterMotion.");
-                }
-
-            var constructorArgTypes = new List<Type> {typeof(Monster)};
-            if (initialDirection != Direction.None)
-                {
-                constructorArgTypes.Add(typeof(Direction));
-                }
-
-            var constructorInfo = type.GetConstructor(constructorArgTypes.ToArray());
-            if (constructorInfo == null)
-                throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
-
-            var constructorArguments = new List<object> {this};
-            if (initialDirection != Direction.None)
-                {
-                constructorArguments.Add(initialDirection);
-                }
-
-            var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments.ToArray());
-            return movementImplementation;
             }
         }
     }

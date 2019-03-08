@@ -316,7 +316,6 @@ O              OO              OO              OO              OO              O
 
     <!-- 3rd from top on left -->
     <Monster Type="ThresherBrown" Left="77" Top="63" Energy="25" Mobility="Placid" ChangeRooms="FollowsPlayer" />
-                                        <!-- Top was originally 65 not 66-->
     <Monster Type="ThresherBrown" Left="77" Top="66" Energy="25" Mobility="Placid" ChangeRooms="FollowsPlayer" />
 
     <!-- Bottom, 2nd in -->

@@ -118,9 +118,9 @@ namespace Labyrinth
                 {
                 switch (item)
                     {
+                    // do not remove TileReservations - otherwise you might find a mushroom placed on one
                     case Bang _:
                     case IMunition _:
-                    case TileReservation _:
                         item.InstantlyExpire();
                         break;
                     }
