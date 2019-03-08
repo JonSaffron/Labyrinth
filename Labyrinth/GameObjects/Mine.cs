@@ -22,9 +22,9 @@ namespace Labyrinth.GameObjects
             this._armedAnimation = Animation.LoopingAnimation("Sprites/Shot/MineArmed", 4);
             this.Ap.PlayAnimation(this._staticUnarmedAnimation);
             this._mineState = new InactiveState(this);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
+            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
         public void SteppedOnBy(IMovingItem movingItem)
             {
@@ -50,11 +50,6 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
-
-        /// <summary>
-        /// Gets an indication of how solid the object is
-        /// </summary>
-        public override ObjectSolidity Solidity => ObjectSolidity.Stationary;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

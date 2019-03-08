@@ -12,7 +12,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         protected MovingItem(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
             {
-            // nothing to do
+            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Insubstantial);
             }
 
         /// <summary>
@@ -112,9 +112,6 @@ namespace Labyrinth.GameObjects
                 }
             return hasArrivedAtDestination;
             }
-
-        /// <inheritdoc />
-        public override ObjectSolidity Solidity => ObjectSolidity.Insubstantial;
 
         /// <summary>
         /// Gets the normal speed this object moves at

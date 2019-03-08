@@ -128,16 +128,6 @@ namespace Labyrinth.GameObjects
         public virtual bool IsExtant => this.Energy > 0;
 
         /// <summary>
-        /// Gets an indication of how solid the object is
-        /// </summary>
-        public virtual ObjectSolidity Solidity => ObjectSolidity.Stationary;
-
-        /// <summary>
-        /// Gets the order that objects are drawn in (lowest before highest)
-        /// </summary>
-        public abstract int DrawOrder { get; }
-
-        /// <summary>
         /// Plays a sound which is centred on this instance
         /// </summary>
         /// <param name="gameSound">Sets which sound to play</param>

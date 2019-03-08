@@ -42,7 +42,8 @@ namespace Labyrinth.GameObjects
             {
             foreach (var item in objectsOnTile)
                 {
-                switch (item.Solidity)
+                var solidity = item.Properties.Get(GameObjectProperties.Solidity);
+                switch (solidity)
                     {
                     case ObjectSolidity.Stationary:
                     case ObjectSolidity.Insubstantial:
@@ -75,12 +76,12 @@ namespace Labyrinth.GameObjects
         protected static PushStatus CanBePushedOrBounced(IMovingItem toBeMoved, IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
             {
             // if this object is not moveable then the answer's no
-            if (toBeMoved.Solidity != ObjectSolidity.Moveable)
+            if (toBeMoved.Properties.Get(GameObjectProperties.Solidity) != ObjectSolidity.Moveable)
                 return PushStatus.No;
 
             // if the moving object cannot move other objects then the answer's no
             // the moving object cannot be a moveable object - moveable objects can't push other moveable objects
-            if (!byWhom.Properties.Get(GameObjectProperties.Capability).CanMoveAnother() || byWhom.Solidity == ObjectSolidity.Moveable)
+            if (!byWhom.Properties.Get(GameObjectProperties.Capability).CanMoveAnother() || byWhom.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
                 return PushStatus.No;
 
             // check if this object can move in the specified direction

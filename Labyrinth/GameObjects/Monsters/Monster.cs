@@ -59,11 +59,13 @@ namespace Labyrinth.GameObjects
             if (this.IsStationary)
                 {
                 this._determineDirection = new Stationary(this);
+                this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
                 return;
                 }
 
             if (!this.MovementMethods.TryGetValue(this.Mobility, out this._determineDirection))
                 throw new InvalidOperationException("Monster is not set for movement " + this.Mobility);
+            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Insubstantial);
             }
 
         /// <inheritdoc cref="IMonster" />
@@ -79,15 +81,6 @@ namespace Labyrinth.GameObjects
             var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             bang.PlaySound(GameSound.MonsterDies);
             this.Behaviours.Perform<IDeathBehaviour>();
-            }
-
-        public override int DrawOrder
-            {
-            get
-                {
-                var result = this.CurrentMovement.IsMoving ? SpriteDrawOrder.MovingMonster : SpriteDrawOrder.StaticMonster;
-                return (int) result;
-                }
             }
 
         private bool SetDirectionAndDestination()
@@ -135,6 +128,7 @@ namespace Labyrinth.GameObjects
                         if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
                             break;
                         
+                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.MovingMonster);
                         yield return true;  // we have moved
                         }
 
@@ -144,6 +138,7 @@ namespace Labyrinth.GameObjects
                     {
                     timeStationary += this._remainingTime;
                     DoActionsWhilstStationary(ref timeStationary);
+                    this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
                     yield return hasMovedSinceLastCall;
                     hasMovedSinceLastCall = false;
                     }
@@ -182,14 +177,6 @@ namespace Labyrinth.GameObjects
                 }
             return result;
             }
-
-        /// <summary>
-        /// Gets an indication of how solid the object is
-        /// </summary>
-        /// <remarks>The implementation of this must be consistent with the type of monster and its current state (egg/normal).
-        /// It cannot look at the current movement class being used because that inactive monsters will be stationary.
-        /// The TileContentValidator needs this value to be reflective of the general state of the monster, not its current ephemeral state.</remarks>
-        public override ObjectSolidity Solidity => (this.Mobility == MonsterMobility.Stationary) ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial;
 
         public int CurrentSpeed { get; set; }
         public override decimal StandardSpeed => this.CurrentSpeed;

@@ -10,12 +10,11 @@ namespace Labyrinth.GameObjects
             var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Impervious);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Wall);
+            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Impassable);
             }
 
         public override bool IsExtant { get; } = true;
 
-        public override ObjectSolidity Solidity { get; } = ObjectSolidity.Impassable;
-
-        public override int DrawOrder { get; } = (int) SpriteDrawOrder.Wall;
         }
     }

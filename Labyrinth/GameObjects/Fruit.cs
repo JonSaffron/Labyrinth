@@ -16,6 +16,7 @@ namespace Labyrinth.GameObjects
             string textureName = $"Sprites/Fruit/{this.FruitType:G}";
             var a = Animation.StaticAnimation(textureName);
             this.Ap.PlayAnimation(a);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
 
         public override bool IsExtant
@@ -26,8 +27,6 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
         public void SetTaken()
             {

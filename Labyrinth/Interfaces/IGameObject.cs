@@ -38,19 +38,6 @@ namespace Labyrinth
         bool IsExtant { get; }
 
         /// <summary>
-        /// Gets an indication of how solid the object is
-        /// </summary>
-        /// <remarks>This is used to determine how </remarks>
-        ObjectSolidity Solidity { get; }
-
-        /// <summary>
-        /// Determines the z-order that this object is drawn with
-        /// </summary>
-        /// <remarks>Objects with a low DrawOrder are drawn before those with a higher DrawOrder.
-        /// Objects with the same DrawOrder may be drawn in any order.</remarks>
-        int DrawOrder { get; }
-
-        /// <summary>
         /// Removes the specified amount of energy from the object
         /// </summary>
         /// <param name="energyToRemove">The amount to reduce the object's energy by</param>

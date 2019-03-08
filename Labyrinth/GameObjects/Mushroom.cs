@@ -12,6 +12,7 @@ namespace Labyrinth.GameObjects
             var a = Animation.StaticAnimation("Sprites/Props/Mushroom");
             this.Ap.PlayAnimation(a);
             this.Energy = 40;
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
         
         public override bool IsExtant
@@ -22,8 +23,6 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
         public void SetTaken()
             {

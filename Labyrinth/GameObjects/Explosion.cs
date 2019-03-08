@@ -15,6 +15,7 @@ namespace Labyrinth.GameObjects
             Ap.PlayAnimation(a);
             this._isExtant = true;
             this.Originator = originator;
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Bang);
             }
 
         public override bool IsExtant => base.IsExtant && this._isExtant;
@@ -23,8 +24,6 @@ namespace Labyrinth.GameObjects
             {
             // nothing to do
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.Bang;
 
         public override bool Update(GameTime gameTime)
             {

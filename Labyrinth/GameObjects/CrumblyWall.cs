@@ -14,25 +14,20 @@ namespace Labyrinth.GameObjects
             this.Ap.PlayAnimation(a);
             this.Energy = energy;
             this._initialEnergy = energy;
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Wall);
+            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Impassable);
             }
 
         public override void ReduceEnergy(int energyToRemove)
             {
             base.ReduceEnergy(energyToRemove);
+            if (!this.IsExtant)
+                {
+                this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
+                }
 
             int stages = this.Ap.FrameCount - 1;
             this.Ap.FrameIndex = stages - (int) Math.Floor(stages * this.Energy / (float) this._initialEnergy);
             }
-
-        public override ObjectSolidity Solidity
-            {
-            get
-                {
-                var result = this.IsExtant ? ObjectSolidity.Impassable : ObjectSolidity.Stationary;
-                return result;
-                }
-            }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.Wall;
         }
     }

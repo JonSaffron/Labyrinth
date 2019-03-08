@@ -14,6 +14,7 @@ namespace Labyrinth.GameObjects
             var a = Animation.LoopingAnimation("Sprites/Props/ForceField", 3);
             this.Ap.PlayAnimation(a);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Reflection);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.ForceField);
             }
 
         public override bool IsExtant
@@ -24,7 +25,5 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.ForceField;
         }
     }

@@ -16,6 +16,8 @@ namespace Labyrinth.GameObjects
             LoadContent();
             Ap.PlayAnimation(_staticImage);
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Boulder);
+            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Moveable);
             }
         
         /// <summary>
@@ -44,10 +46,6 @@ namespace Labyrinth.GameObjects
                 }
             return result;
             }
-
-        public override ObjectSolidity Solidity => ObjectSolidity.Moveable;
-
-        public override int DrawOrder => (int) SpriteDrawOrder.Boulder;
 
         public override decimal StandardSpeed => Constants.BaseSpeed * 2.5m;
         }

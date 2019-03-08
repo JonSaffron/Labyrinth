@@ -146,7 +146,7 @@ namespace Labyrinth
         public bool IsStaticItemOnTile(TilePos tp)
             {
             var objectsAtPosition = this.GetItemsOnTile(tp);
-            var result = objectsAtPosition.Any(gi => gi.Solidity != ObjectSolidity.Insubstantial);
+            var result = objectsAtPosition.Any(gi => gi.Properties.Get(GameObjectProperties.Solidity) != ObjectSolidity.Insubstantial);
             return result;
             }
 
@@ -159,7 +159,7 @@ namespace Labyrinth
         public bool IsImpassableItemOnTile(TilePos tp)
             {
             var objectsAtPosition = this.GetItemsOnTile(tp);
-            var result = objectsAtPosition.Any(gi => gi.Solidity == ObjectSolidity.Impassable);
+            var result = objectsAtPosition.Any(gi => gi.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Impassable);
             return result;
             }
 

@@ -25,11 +25,11 @@ namespace Labyrinth.GameObjects
             
             Ap.PlayAnimation(a);
             this._isExtant = true;
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Bang);
             }
 
         public override bool IsExtant => this._isExtant;
 
-        public override int DrawOrder => (int) SpriteDrawOrder.Bang;
         public override bool Update(GameTime gameTime)
             {
             if (!this.Ap.AdvanceManualAnimation(gameTime))

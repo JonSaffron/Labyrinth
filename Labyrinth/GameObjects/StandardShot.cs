@@ -38,6 +38,7 @@ namespace Labyrinth.GameObjects
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
 
             this.Properties.Set(GameObjectProperties.Capability, ObjectCapability.CanPushOthers);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Shot);
             }
 
         private Dictionary<Direction, Rectangle> GetBoundingRectangles()
@@ -86,8 +87,6 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.Shot;
 
         public override bool IsExtant
             {

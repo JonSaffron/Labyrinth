@@ -11,8 +11,7 @@ namespace Labyrinth.GameObjects
             
             var a = Animation.StaticAnimation("Sprites/Props/Grave");
             this.Ap.PlayAnimation(a);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
         }
     }

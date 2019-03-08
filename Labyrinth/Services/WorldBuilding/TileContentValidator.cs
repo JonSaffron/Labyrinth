@@ -23,34 +23,34 @@ namespace Labyrinth.Services.WorldBuilding
                 return true;
                 }
 
-            if (list.Any(item => item.Solidity == ObjectSolidity.Impassable))
+            if (list.Any(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Impassable))
                 {
                 var isThereOneAndOnlyOneObjectInTheList = list.Count == 1;
                 if (!isThereOneAndOnlyOneObjectInTheList)
                     {
-                    reason = "Multiple impassable objects: " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Impassable));
+                    reason = "Multiple impassable objects: " + ObjectListToString(list.Where(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Impassable));
                     return false;
                     }
                 }
 
-            var countOfMoveableObjects = list.Count(item => item.Solidity == ObjectSolidity.Moveable);
+            var countOfMoveableObjects = list.Count(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable);
             if (countOfMoveableObjects > 1)
                 {
-                reason = "Multiple moveable objects: " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Moveable));
+                reason = "Multiple moveable objects: " + ObjectListToString(list.Where(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable));
                 return false;
                 }
 
-            var countOfStationaryObjects = list.Count(item => item.Solidity == ObjectSolidity.Stationary);
+            var countOfStationaryObjects = list.Count(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Stationary);
             if (countOfStationaryObjects > 1)
                 {
-                reason = "Multiple stationary objects: " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Stationary));
+                reason = "Multiple stationary objects: " + ObjectListToString(list.Where(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Stationary));
                 return false;
                 }
 
-            if (countOfMoveableObjects != 0 && list.Any(item => item.Solidity == ObjectSolidity.Insubstantial))
+            if (countOfMoveableObjects != 0 && list.Any(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Insubstantial))
                 {
-                reason = "A moveable object and an insubstantial object: " + list.Single(item => item.Solidity == ObjectSolidity.Moveable).GetType().Name 
-                                                                           + " and " + ObjectListToString(list.Where(item => item.Solidity == ObjectSolidity.Insubstantial));
+                reason = "A moveable object and an insubstantial object: " + list.Single(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable).GetType().Name 
+                                                                           + " and " + ObjectListToString(list.Where(item => item.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Insubstantial));
                 return false;
                 }
 

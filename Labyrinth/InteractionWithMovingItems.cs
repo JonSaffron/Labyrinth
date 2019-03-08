@@ -63,7 +63,7 @@ namespace Labyrinth
                 }
 
             // this deals with the situation where the player or a shot will move the boulder
-            if (this._primaryItem.Properties.Get(GameObjectProperties.Capability).CanMoveAnother() && this._secondaryItem.Solidity == ObjectSolidity.Moveable)
+            if (this._primaryItem.Properties.Get(GameObjectProperties.Capability).CanMoveAnother() && this._secondaryItem.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
                 {
                 var actionTaken = PushOrBounceObject(this._secondaryItem, this._primaryItem);
                 if (actionTaken)
@@ -71,7 +71,7 @@ namespace Labyrinth
                 }
 
             // this deals with the situation where the boulder might crush a monster, even a deathcube which wouldn't be moving
-            if (this._primaryItem.Solidity == ObjectSolidity.Moveable)
+            if (this._primaryItem.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
                 {
                 var actionTaken = CrushObject(this._primaryItem, this._secondaryItem);
                 if (actionTaken)
@@ -170,7 +170,7 @@ namespace Labyrinth
                 var isMovingInDifferentDirection = moveableObject.CurrentMovement.Direction != movingObject.CurrentMovement.Direction;
                 return isMovingInDifferentDirection;
                 }
-            var result = movingObject.Solidity == ObjectSolidity.Insubstantial || movingObject.Solidity == ObjectSolidity.Stationary;
+            var result = movingObject.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Insubstantial || movingObject.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Stationary;
             return result;
             }
 

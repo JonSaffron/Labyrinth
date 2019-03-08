@@ -301,7 +301,8 @@ namespace Labyrinth
             var drawQueue = new PriorityQueue<int, IGameObject>(100);
             foreach (var item in itemsToDraw)
                 {
-                drawQueue.Enqueue(item.DrawOrder, item);
+                int drawOrder = item.Properties.Get(GameObjectProperties.DrawOrder);
+                drawQueue.Enqueue(drawOrder, item);
                 }
             //Trace.WriteLine("Drawing " + drawQueue.Count + " sprites.");
             while (drawQueue.Count > 0)

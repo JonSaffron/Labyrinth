@@ -20,6 +20,8 @@ namespace Labyrinth.GameObjects
             var timeSpan = TimeSpan.FromSeconds(timeToHatch * Constants.GameClockResolution);
             this._hatchingTimer = GameTimer.AddGameTimer(timeSpan, EggIsHatching, false);
             this.Ap.PlayAnimation(EggAnimation);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
+            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
             }
 
         private void EggIsHatching(object sender, EventArgs args)
@@ -57,9 +59,5 @@ namespace Labyrinth.GameObjects
             this._hatchingTimer.Enabled = inSameRoom;
             return false;
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.StaticMonster;
-
-        public override ObjectSolidity Solidity => ObjectSolidity.Stationary;
         }
     }

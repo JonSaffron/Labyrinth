@@ -18,6 +18,7 @@ namespace Labyrinth.GameObjects
             var a = Animation.LoopingAnimation("Sprites/Crystal/Crystal", 4);
             this.Ap.PlayAnimation(a);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
+            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
 
         public override bool IsExtant
@@ -28,8 +29,6 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
-
-        public override int DrawOrder => (int) SpriteDrawOrder.StaticItem;
 
         public void SetTaken()
             {
