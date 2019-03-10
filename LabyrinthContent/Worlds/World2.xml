@@ -114,21 +114,21 @@
       
       <RandomMonsterDistribution DiceToRoll="2D8" CountOfMonsters="190">
         <MonsterTemplates>
-          <Monster MatchingDiceRoll="2" Type="RotaFloaterCyan" Energy="110" Mobility="Placid" ChangeRooms="FollowsPlayer" />
-          <Monster MatchingDiceRoll="3" Type="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- lays eggs and shoots -->
-          <Monster MatchingDiceRoll="4" Type="FlitterbugRed" Energy="100" Mobility="Aggressive" ChangeRooms="FollowsPlayer" />
-          <Monster MatchingDiceRoll="5" Type="ThresherCyan" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" /> <!-- lays mushrooms -->
-          <Monster MatchingDiceRoll="6" Type="KillerCubeRed" Energy="150" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- shoots immediately -->
-          <Monster MatchingDiceRoll="7" Type="FlitterbugRed" Energy="110" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" />
-          <Monster MatchingDiceRoll="8" Type="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- lays eggs and shoots -->
-          <Monster MatchingDiceRoll="9" Type="CrazyCrawler" Energy="40" Mobility="Aggressive" ChangeRooms="FollowsPlayer" />
-          <Monster MatchingDiceRoll="10" Type="FlitterbugCyan" Energy="150" Mobility="Cautious" ChangeRooms="FollowsPlayer" />
-          <Monster MatchingDiceRoll="11" Type="TigerMoth" Energy="120" Mobility="Aggressive" ChangeRooms="MovesRoom" /> <!-- shoots once shot lays mushrooms -->
-          <Monster MatchingDiceRoll="12" Type="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> <!-- splits -->
-          <Monster MatchingDiceRoll="13" Type="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" /> <!-- splits -->
-          <Monster MatchingDiceRoll="14" Type="Butterfly" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> <!-- shoots lays eggs -->
-          <Monster MatchingDiceRoll="15" Type="Joker" Energy="120" Mobility="Cautious" ChangeRooms="FollowsPlayer" /> <!-- shoots, splits, lays eggs -->
-          <Monster MatchingDiceRoll="16" Type="CrazyCrawler" Energy="40" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> 
+          <Monster MatchingDiceRoll="2" Breed="RotaFloaterCyan" Energy="110" Mobility="Placid" ChangeRooms="FollowsPlayer" />
+          <Monster MatchingDiceRoll="3" Breed="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- lays eggs and shoots -->
+          <Monster MatchingDiceRoll="4" Breed="FlitterbugRed" Energy="100" Mobility="Aggressive" ChangeRooms="FollowsPlayer" />
+          <Monster MatchingDiceRoll="5" Breed="ThresherCyan" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" /> <!-- lays mushrooms -->
+          <Monster MatchingDiceRoll="6" Breed="KillerCubeRed" Energy="150" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- shoots immediately -->
+          <Monster MatchingDiceRoll="7" Breed="FlitterbugRed" Energy="110" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" />
+          <Monster MatchingDiceRoll="8" Breed="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- lays eggs and shoots -->
+          <Monster MatchingDiceRoll="9" Breed="CrazyCrawler" Energy="40" Mobility="Aggressive" ChangeRooms="FollowsPlayer" />
+          <Monster MatchingDiceRoll="10" Breed="FlitterbugCyan" Energy="150" Mobility="Cautious" ChangeRooms="FollowsPlayer" />
+          <Monster MatchingDiceRoll="11" Breed="TigerMoth" Energy="120" Mobility="Aggressive" ChangeRooms="MovesRoom" /> <!-- shoots once shot lays mushrooms -->
+          <Monster MatchingDiceRoll="12" Breed="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> <!-- splits -->
+          <Monster MatchingDiceRoll="13" Breed="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" /> <!-- splits -->
+          <Monster MatchingDiceRoll="14" Breed="Butterfly" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> <!-- shoots lays eggs -->
+          <Monster MatchingDiceRoll="15" Breed="Joker" Energy="120" Mobility="Cautious" ChangeRooms="FollowsPlayer" /> <!-- shoots, splits, lays eggs -->
+          <Monster MatchingDiceRoll="16" Breed="CrazyCrawler" Energy="40" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> 
         </MonsterTemplates>
       </RandomMonsterDistribution>
     </Area>
@@ -138,6 +138,6 @@
     <Boulder Left="10" Top="75" />
     <Crystal Left="202" Top="65" Id="1" Score="80000" Energy="255" />
   
-    <Monster Type="ThresherCyan" Left="201" Top="64" Energy="100" Mobility="Cautious" ChangeRooms="FollowsPlayer" />
+    <Monster Breed="ThresherCyan" Left="201" Top="64" Energy="100" Mobility="Cautious" ChangeRooms="FollowsPlayer" />
   </Objects>
 </World>

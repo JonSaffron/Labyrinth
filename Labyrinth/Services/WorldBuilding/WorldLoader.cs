@@ -67,7 +67,7 @@ namespace Labyrinth.Services.WorldBuilding
                 var text = this._xmlRoot.GetAttribute("RestartInSameRoom");
                 if (string.IsNullOrWhiteSpace(text))
                     return false;
-                bool result = bool.Parse(text);
+                bool result = XmlConvert.ToBoolean(text);
                 return result;
                 }
             }
@@ -79,7 +79,7 @@ namespace Labyrinth.Services.WorldBuilding
                 var text = this._xmlRoot.GetAttribute("UnlockLevels");
                 if (string.IsNullOrWhiteSpace(text))
                     return false;
-                bool result = bool.Parse(text);
+                bool result = XmlConvert.ToBoolean(text);
                 return result;
                 }
             }

@@ -27,6 +27,11 @@
       <xs:element name="ShootsAtPlayer" minOccurs="0" maxOccurs="1" />
       <xs:element name="SpawnsUponDeath" minOccurs="0" maxOccurs="1" />
       <xs:element name="StartsShootingWhenHurt" minOccurs="0" maxOccurs="1" />
+      <xs:element name="ChangeMovementWhenHurt" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="ChangeTo" type="MonsterMobilitySubsequent" />
+        </xs:complexType>
+      </xs:element>
     </xs:all>
   </xs:complexType>
 
@@ -41,7 +46,10 @@
     <xs:attribute name="value" use="required">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:pattern value="None|Injury|Reflection" />
+          <xs:enumeration value="Intangible" />
+          <xs:enumeration value="Impervious" />
+          <xs:enumeration value="Injury" />
+          <xs:enumeration value="Reflection" />
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
@@ -64,16 +72,31 @@
     <xs:attribute name="ChangeRooms" use="optional">
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:pattern value="StaysWithinRoom|MovesRoom|FollowsPlayer" />
+          <xs:enumeration value="StaysWithinRoom" />
+          <xs:enumeration value="MovesRoom" />
+          <xs:enumeration value="FollowsPlayer" />
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
     <xs:attribute name="Speed" use="optional" type="xs:decimal" />
   </xs:complexType>
 
-  <xs:simpleType name="MonsterMobility">
+  <xs:simpleType name="MonsterMobilityInitial">
     <xs:restriction base="xs:string">
-      <xs:pattern value="Stationary|Placid|Aggressive|Patrolling|Cautious" />
+      <xs:enumeration value="Stationary" />
+      <xs:enumeration value="Patrolling" />
     </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MonsterMobilitySubsequent">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Placid" />
+      <xs:enumeration value="Aggressive" />
+      <xs:enumeration value="Cautious" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MonsterMobility">
+    <xs:union memberTypes="MonsterMobilityInitial MonsterMobilitySubsequent" />
   </xs:simpleType>
 </xs:schema>

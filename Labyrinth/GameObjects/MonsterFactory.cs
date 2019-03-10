@@ -33,6 +33,22 @@ namespace Labyrinth.GameObjects
                 result.Mobility = monsterDef.Mobility.Value;
             if (monsterDef.ChangeRooms.HasValue)
                 result.ChangeRooms = monsterDef.ChangeRooms.Value;
+            if (monsterDef.MobilityAfterInjury.HasValue)
+                {
+                result.Behaviours.Remove<MobilityAfterInjury>();
+                if (monsterDef.MobilityAfterInjury.Value == "")
+                    {
+                    result.Behaviours.Add(new MobilityAfterInjury(result, monsterDef.MobilityAfterInjury.Value));
+                    }
+                }
+            if (monsterDef.ChangeRoomsAfterInjury.HasValue)
+                {
+                result.Behaviours.Remove<ChangeRoomsAfterInjury>();
+                if (monsterDef.ChangeRoomsAfterInjury.Value == "")
+                    {
+                    result.Behaviours.Add(new ChangeRoomsAfterInjury(result, monsterDef.ChangeRoomsAfterInjury.Value));
+                    }
+                }
             if (monsterDef.LaysMushrooms.HasValue)
                 result.Behaviours.Set<LaysMushroom>(monsterDef.LaysMushrooms.Value);
             if (monsterDef.LaysEggs.HasValue)
@@ -57,14 +73,6 @@ namespace Labyrinth.GameObjects
                 {
                 result.Behaviours.Add<ActivateWhenHurt>();
                 result.Behaviours.Add<ActivateWhenMeetsPlayer>();
-                }
-
-            if (result.Mobility == MonsterMobility.Patrolling)
-                {
-                // todo this is a bit of a hack
-                var changeMovement = new ChangeMovementWhenHurt(result, MonsterMobility.Placid, result.ChangeRooms);
-                result.ChangeRooms = ChangeRooms.StaysWithinRoom;
-                result.Behaviours.Add(changeMovement);
                 }
 
             if (result.Mobility != MonsterMobility.Stationary && result.MovementBoundary == null)

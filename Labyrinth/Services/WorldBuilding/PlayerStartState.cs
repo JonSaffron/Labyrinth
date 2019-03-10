@@ -16,7 +16,7 @@ namespace Labyrinth.Services.WorldBuilding
             int id = int.Parse(startPos.GetAttribute("Id"));
 
             string worldStart = startPos.GetAttribute("WorldStart");
-            var isInitialArea = !string.IsNullOrWhiteSpace(worldStart) && bool.Parse(worldStart);
+            var isInitialArea = !string.IsNullOrWhiteSpace(worldStart) && XmlConvert.ToBoolean(worldStart);
 
             int x = int.Parse(startPos.GetAttribute("Left"));
             int y = int.Parse(startPos.GetAttribute("Top"));

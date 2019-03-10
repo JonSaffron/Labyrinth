@@ -16,7 +16,9 @@ namespace Labyrinth.Services.WorldBuilding
         public int? TimeBeforeHatching { get; set; }
         public MonsterMobility? Mobility { get; set;}
         public Direction? InitialDirection { get; set; }
+        public MonsterMobility? MobilityAfterInjury { get; set; }
         public ChangeRooms? ChangeRooms { get; set; }
+        public ChangeRooms? ChangeRoomsAfterInjury { get; set; }
         public bool? LaysMushrooms { get; set; }
         public bool? LaysEggs { get; set; }
         public bool? SplitsOnHit { get; set; }
@@ -50,7 +52,7 @@ namespace Labyrinth.Services.WorldBuilding
 
             if (result.Mobility == MonsterMobility.Patrolling)
                 {
-
+                throw new InvalidOperationException("Cannot clone a monster which is patrolling.");
                 }
 
             return result;
@@ -61,7 +63,7 @@ namespace Labyrinth.Services.WorldBuilding
             MonsterDef result = new MonsterDef
                 {
                 // todo change worlddef monster Type to Breed?
-                Breed = mdef.GetAttribute("Type"),
+                Breed = mdef.GetAttribute(nameof(result.Breed)),
                 Energy = int.Parse(mdef.GetAttribute(nameof(result.Energy)))
                 };
 
@@ -77,16 +79,28 @@ namespace Labyrinth.Services.WorldBuilding
                 result.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);
                 }
 
+            string mobilityAfterInjury = mdef.GetAttribute(nameof(result.MobilityAfterInjury));
+            if (!string.IsNullOrEmpty(mobilityAfterInjury))
+                {
+                result.MobilityAfterInjury = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), mobilityAfterInjury);
+                }
+
             string changeRooms = mdef.GetAttribute(nameof(result.ChangeRooms));
             if (!string.IsNullOrEmpty(changeRooms))
                 {
                 result.ChangeRooms = (ChangeRooms)Enum.Parse(typeof(ChangeRooms), changeRooms);
                 }
 
+            string changeRoomsAfterInjury = mdef.GetAttribute(nameof(ChangeRoomsAfterInjury));
+            if (!string.IsNullOrEmpty(changeRoomsAfterInjury))
+                {
+                result.ChangeRoomsAfterInjury = (ChangeRooms) Enum.Parse(typeof(ChangeRooms), changeRoomsAfterInjury);
+                }
+
             string isEggAttribute = mdef.GetAttribute(nameof(result.IsEgg));
             if (!string.IsNullOrEmpty(isEggAttribute))
                 {
-                result.IsEgg = bool.Parse(isEggAttribute);
+                result.IsEgg = XmlConvert.ToBoolean(isEggAttribute);
                 }
 
             string timeBeforeHatchingAttribute = mdef.GetAttribute(nameof(result.TimeBeforeHatching));
@@ -98,45 +112,43 @@ namespace Labyrinth.Services.WorldBuilding
             string laysMushrooms = mdef.GetAttribute(nameof(result.LaysMushrooms));
             if (!string.IsNullOrEmpty(laysMushrooms))
                 {
-                result.LaysMushrooms = bool.Parse(laysMushrooms);
+                result.LaysMushrooms = XmlConvert.ToBoolean(laysMushrooms);
                 }
 
             string laysEggs = mdef.GetAttribute(nameof(result.LaysEggs));
             if (!string.IsNullOrEmpty(laysEggs))
                 {
-                result.LaysEggs = bool.Parse(laysEggs);
+                result.LaysEggs = XmlConvert.ToBoolean(laysEggs);
                 }
 
             string splitsOnHit = mdef.GetAttribute(nameof(result.SplitsOnHit));
             if (!string.IsNullOrEmpty(splitsOnHit))
                 {
-                result.SplitsOnHit = bool.Parse(splitsOnHit);
+                result.SplitsOnHit = XmlConvert.ToBoolean(splitsOnHit);
                 }
 
             string shootsAtPlayer = mdef.GetAttribute(nameof(result.ShootsAtPlayer));
             if (!string.IsNullOrEmpty(shootsAtPlayer))
                 {
-                result.ShootsAtPlayer = bool.Parse(shootsAtPlayer);
+                result.ShootsAtPlayer = XmlConvert.ToBoolean(shootsAtPlayer);
                 }
 
             string shootsOnceProvoked = mdef.GetAttribute(nameof(result.ShootsOnceProvoked));
             if (!string.IsNullOrEmpty(shootsOnceProvoked))
                 {
-                result.ShootsOnceProvoked = bool.Parse(shootsOnceProvoked);
+                result.ShootsOnceProvoked = XmlConvert.ToBoolean(shootsOnceProvoked);
                 }
 
             string shotsBounceOffAttribute = mdef.GetAttribute(nameof(result.ShotsBounceOff));
             if (!string.IsNullOrEmpty(shotsBounceOffAttribute))
                 {
-                bool shotsBounceOff = bool.Parse(shotsBounceOffAttribute);
-                result.ShotsBounceOff = shotsBounceOff;
+                result.ShotsBounceOff = XmlConvert.ToBoolean(shotsBounceOffAttribute);;
                 }
 
             string isActiveAttribute = mdef.GetAttribute(nameof(result.IsActive));
             if (!string.IsNullOrEmpty(isActiveAttribute))
                 {
-                bool isActive = bool.Parse(isActiveAttribute);
-                result.IsActive = isActive;
+                result.IsActive = XmlConvert.ToBoolean(isActiveAttribute);;
                 }
 
             return result;

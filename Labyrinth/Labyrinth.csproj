@@ -138,7 +138,8 @@
     <Compile Include="GameObjects\Monsters\Behaviour\ActivateWhenHurt.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\BaseBehaviour.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\BehaviourCollection.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\ChangeMovementWhenHurt.cs" />
+    <Compile Include="GameObjects\Monsters\Behaviour\ChangeRoomsAfterInjury.cs" />
+    <Compile Include="GameObjects\Monsters\Behaviour\MobilityAfterInjury.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\Flitter.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\LaysEgg.cs" />
     <Compile Include="GameObjects\Monsters\Behaviour\LaysMushroom.cs" />
