@@ -1,11 +1,12 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
     public class GameTimer : GameComponent
         {
-        public TimeSpan TimeRemaining { get; private set; }
+        private TimeSpan _timeRemaining;
 
         private readonly EventHandler _callBack;
 
@@ -17,15 +18,14 @@ namespace Labyrinth
             return gt;
             }
 
-        private GameTimer(Game game, TimeSpan timeToElapse, EventHandler callBack, bool isEnabled = true) : base(game)
+        private GameTimer(Game game, TimeSpan timeToElapse, [NotNull] EventHandler callBack, bool isEnabled = true) : base(game)
             {
             if (timeToElapse.Ticks < 0)
                 throw new ArgumentOutOfRangeException(nameof(timeToElapse));
-            if (callBack == null)
-                throw new ArgumentNullException("callBack");
+            this._timeRemaining = timeToElapse;
 
-            this.TimeRemaining = timeToElapse;
-            this._callBack = callBack;
+            this._callBack = callBack ?? throw new ArgumentNullException(nameof(callBack));
+
             this.Enabled = isEnabled;
             this.UpdateOrder = 0;
             }
@@ -35,12 +35,17 @@ namespace Labyrinth
             if (!this.Enabled)
                 return;
 
-            this.TimeRemaining -= gameTime.ElapsedGameTime;
-            if (TimeRemaining.Ticks <= 0)
+            this._timeRemaining -= gameTime.ElapsedGameTime;
+            if (this._timeRemaining.Ticks <= 0)
                 {
                 this._callBack(this, new EventArgs());
                 this.Dispose();
                 }
+            }
+
+        public override string ToString()
+            {
+            return $"GameTimer {(this.Enabled ? "Enabled" : "Disabled")} {(this._timeRemaining.Ticks <= 0 ? "Elapsed" : this._timeRemaining + " remaining")}";
             }
         }
     }

@@ -280,4 +280,10 @@ namespace Labyrinth
         /// </summary>
         InitialPopulationWithReplenishment
         }
+
+    public enum ShootsAtPlayer
+        {
+        Immediately,
+        OnceInjured
+        }
     }

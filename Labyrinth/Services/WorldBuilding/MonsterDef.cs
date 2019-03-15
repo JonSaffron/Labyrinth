@@ -16,62 +16,23 @@ namespace Labyrinth.Services.WorldBuilding
         public int? TimeBeforeHatching { get; set; }
         public MonsterMobility? Mobility { get; set;}
         public Direction? InitialDirection { get; set; }
-        public MonsterMobility? MobilityAfterInjury { get; set; }
+        public Setting<MonsterMobility> MobilityAfterInjury { get; set; }
         public ChangeRooms? ChangeRooms { get; set; }
-        public ChangeRooms? ChangeRoomsAfterInjury { get; set; }
+        public Setting<ChangeRooms> ChangeRoomsAfterInjury { get; set; }
         public bool? LaysMushrooms { get; set; }
         public bool? LaysEggs { get; set; }
         public bool? SplitsOnHit { get; set; }
-        public bool? ShootsAtPlayer { get; set; }
-        public bool? ShootsOnceProvoked { get; set; }
+        public Setting<ShootsAtPlayer> ShootsAtPlayer { get; set; }
         public bool? ShotsBounceOff { get; set; }
         public bool? IsActive { get; set; }
-
-        public static MonsterDef FromExistingMonster([NotNull] Monster monster)
-            {
-            if (monster == null)
-                throw new ArgumentNullException();
-
-            var result = new MonsterDef
-                {
-                Breed = monster.Breed,
-                Position = monster.TilePosition.ToPosition(),
-                Energy = monster.OriginalEnergy,
-                Mobility = monster.Mobility,
-                InitialDirection = Direction.None,
-                ChangeRooms = monster.ChangeRooms,
-                IsEgg = false,
-                LaysMushrooms = monster.Behaviours.Has<LaysMushroom>(),
-                LaysEggs = monster.Behaviours.Has<LaysEgg>(),
-                SplitsOnHit = monster.Behaviours.Has<SpawnsUponDeath>(),
-                ShootsAtPlayer = monster.Behaviours.Has<ShootsAtPlayer>(),
-                ShootsOnceProvoked = monster.Behaviours.Has<StartsShootingWhenHurt>(),
-                ShotsBounceOff = monster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection,
-                IsActive = monster.IsActive
-                };
-
-            if (result.Mobility == MonsterMobility.Patrolling)
-                {
-                throw new InvalidOperationException("Cannot clone a monster which is patrolling.");
-                }
-
-            return result;
-            }
 
         internal static MonsterDef FromXml([NotNull] XmlElement mdef)
             {
             MonsterDef result = new MonsterDef
                 {
-                // todo change worlddef monster Type to Breed?
                 Breed = mdef.GetAttribute(nameof(result.Breed)),
                 Energy = int.Parse(mdef.GetAttribute(nameof(result.Energy)))
                 };
-
-            string initialDirection = mdef.GetAttribute(nameof(result.InitialDirection));
-            if (!string.IsNullOrEmpty(initialDirection))
-                {
-                result.InitialDirection = (Direction)Enum.Parse(typeof(Direction), initialDirection);
-                }
 
             string mobility = mdef.GetAttribute(nameof(result.Mobility));
             if (!string.IsNullOrEmpty(mobility))
@@ -79,10 +40,10 @@ namespace Labyrinth.Services.WorldBuilding
                 result.Mobility = (MonsterMobility)Enum.Parse(typeof(MonsterMobility), mobility);
                 }
 
-            string mobilityAfterInjury = mdef.GetAttribute(nameof(result.MobilityAfterInjury));
-            if (!string.IsNullOrEmpty(mobilityAfterInjury))
+            string initialDirection = mdef.GetAttribute(nameof(result.InitialDirection));
+            if (!string.IsNullOrEmpty(initialDirection))
                 {
-                result.MobilityAfterInjury = (MonsterMobility) Enum.Parse(typeof(MonsterMobility), mobilityAfterInjury);
+                result.InitialDirection = (Direction)Enum.Parse(typeof(Direction), initialDirection);
                 }
 
             string changeRooms = mdef.GetAttribute(nameof(result.ChangeRooms));
@@ -91,67 +52,138 @@ namespace Labyrinth.Services.WorldBuilding
                 result.ChangeRooms = (ChangeRooms)Enum.Parse(typeof(ChangeRooms), changeRooms);
                 }
 
-            string changeRoomsAfterInjury = mdef.GetAttribute(nameof(ChangeRoomsAfterInjury));
-            if (!string.IsNullOrEmpty(changeRoomsAfterInjury))
-                {
-                result.ChangeRoomsAfterInjury = (ChangeRooms) Enum.Parse(typeof(ChangeRooms), changeRoomsAfterInjury);
-                }
-
-            string isEggAttribute = mdef.GetAttribute(nameof(result.IsEgg));
-            if (!string.IsNullOrEmpty(isEggAttribute))
-                {
-                result.IsEgg = XmlConvert.ToBoolean(isEggAttribute);
-                }
-
-            string timeBeforeHatchingAttribute = mdef.GetAttribute(nameof(result.TimeBeforeHatching));
-            if (!string.IsNullOrEmpty(timeBeforeHatchingAttribute))
-                {
-                result.TimeBeforeHatching = int.Parse(timeBeforeHatchingAttribute) | 1;
-                }
-
-            string laysMushrooms = mdef.GetAttribute(nameof(result.LaysMushrooms));
-            if (!string.IsNullOrEmpty(laysMushrooms))
-                {
-                result.LaysMushrooms = XmlConvert.ToBoolean(laysMushrooms);
-                }
-
-            string laysEggs = mdef.GetAttribute(nameof(result.LaysEggs));
-            if (!string.IsNullOrEmpty(laysEggs))
-                {
-                result.LaysEggs = XmlConvert.ToBoolean(laysEggs);
-                }
-
-            string splitsOnHit = mdef.GetAttribute(nameof(result.SplitsOnHit));
-            if (!string.IsNullOrEmpty(splitsOnHit))
-                {
-                result.SplitsOnHit = XmlConvert.ToBoolean(splitsOnHit);
-                }
-
-            string shootsAtPlayer = mdef.GetAttribute(nameof(result.ShootsAtPlayer));
-            if (!string.IsNullOrEmpty(shootsAtPlayer))
-                {
-                result.ShootsAtPlayer = XmlConvert.ToBoolean(shootsAtPlayer);
-                }
-
-            string shootsOnceProvoked = mdef.GetAttribute(nameof(result.ShootsOnceProvoked));
-            if (!string.IsNullOrEmpty(shootsOnceProvoked))
-                {
-                result.ShootsOnceProvoked = XmlConvert.ToBoolean(shootsOnceProvoked);
-                }
-
-            string shotsBounceOffAttribute = mdef.GetAttribute(nameof(result.ShotsBounceOff));
-            if (!string.IsNullOrEmpty(shotsBounceOffAttribute))
-                {
-                result.ShotsBounceOff = XmlConvert.ToBoolean(shotsBounceOffAttribute);;
-                }
-
             string isActiveAttribute = mdef.GetAttribute(nameof(result.IsActive));
             if (!string.IsNullOrEmpty(isActiveAttribute))
                 {
-                result.IsActive = XmlConvert.ToBoolean(isActiveAttribute);;
+                result.IsActive = XmlConvert.ToBoolean(isActiveAttribute);
+                }
+
+            // additional behaviours
+            var apply = mdef.SelectSingleNode("Apply");
+            if (apply != null)
+                {
+                ApplyNewBehaviours(ref result, apply);
+                }
+
+            // remove behaviours
+            var remove = mdef.SelectSingleNode("Remove");
+            if (remove != null)
+                {
+                RemoveUnwantedBehaviours(ref result, remove);
                 }
 
             return result;
+            }
+
+        private static void ApplyNewBehaviours(ref MonsterDef result, XmlNode apply)
+            {
+            var mobilityAfterInjury = (XmlElement) apply.SelectSingleNode(nameof(result.MobilityAfterInjury));
+            if (mobilityAfterInjury != null)
+                {
+                result.MobilityAfterInjury = Setting<MonsterMobility>.NewSetting((MonsterMobility) Enum.Parse(typeof(MonsterMobility), mobilityAfterInjury.GetAttribute("value")));
+                }
+
+            var changeRoomsAfterInjury = (XmlElement) apply.SelectSingleNode(nameof(ChangeRoomsAfterInjury));
+            if (changeRoomsAfterInjury != null)
+                {
+                result.ChangeRoomsAfterInjury = Setting<ChangeRooms>.NewSetting((ChangeRooms) Enum.Parse(typeof(ChangeRooms), changeRoomsAfterInjury.GetAttribute("value")));
+                }
+
+            var isEgg = (XmlElement) apply.SelectSingleNode(nameof(result.IsEgg));
+            if (isEgg != null)
+                {
+                result.TimeBeforeHatching = int.Parse(isEgg.GetAttribute(nameof(TimeBeforeHatching)));
+                result.TimeBeforeHatching |= 1; // not sure why the original game does this...
+                }
+
+            var laysEggs = (XmlElement) apply.SelectSingleNode(nameof(result.LaysEggs));
+            if (laysEggs != null)
+                {
+                result.LaysEggs = true;
+                }
+
+            var laysMushrooms = (XmlElement) apply.SelectSingleNode(nameof(result.LaysMushrooms));
+            if (laysMushrooms != null)
+                {
+                result.LaysMushrooms = true;
+                }
+
+            var splitsOnHit = (XmlElement) apply.SelectSingleNode(nameof(SplitsOnHit));
+            if (splitsOnHit != null)
+                {
+                result.SplitsOnHit = true;
+                }
+
+            var shootsAtPlayer = (XmlElement) apply.SelectSingleNode(nameof(ShootsAtPlayer));
+            if (shootsAtPlayer != null)
+                {
+                result.ShootsAtPlayer = Setting<ShootsAtPlayer>.NewSetting((ShootsAtPlayer) Enum.Parse(typeof(ShootsAtPlayer), shootsAtPlayer.GetAttribute("value")));
+                }
+
+            var shotsBounceOff = (XmlElement) apply.SelectSingleNode(nameof(ShotsBounceOff));
+            if (shotsBounceOff != null)
+                {
+                result.ShotsBounceOff = true;
+                }
+            }
+
+        private static void RemoveUnwantedBehaviours(ref MonsterDef result, XmlNode remove)
+            {
+            var mobilityAfterInjury = (XmlElement) remove.SelectSingleNode(nameof(result.MobilityAfterInjury));
+            if (mobilityAfterInjury != null)
+                {
+                if (!result.MobilityAfterInjury.UseBreedDefault)
+                    throw new InvalidOperationException("Contradictory setting for MobilityAfterInjury");
+                result.MobilityAfterInjury = Setting<MonsterMobility>.SettingNoBehaviour();
+                }
+
+            var changeRoomsAfterInjury = (XmlElement) remove.SelectSingleNode(nameof(ChangeRoomsAfterInjury));
+            if (changeRoomsAfterInjury != null)
+                {
+                if (!result.ChangeRoomsAfterInjury.UseBreedDefault)
+                    throw new InvalidOperationException("Contradictory setting for ChangeRoomsAfterInjury");
+                result.ChangeRoomsAfterInjury = Setting<ChangeRooms>.SettingNoBehaviour();
+                }
+
+            var laysEggs = (XmlElement) remove.SelectSingleNode(nameof(result.LaysEggs));
+            if (laysEggs != null)
+                {
+                if (result.LaysEggs.HasValue)
+                    throw new InvalidOperationException("Contradictory setting for LaysEggs");
+                result.LaysEggs = false;
+                }
+
+            var laysMushrooms = (XmlElement) remove.SelectSingleNode(nameof(result.LaysMushrooms));
+            if (laysMushrooms != null)
+                {
+                if (result.LaysMushrooms.HasValue)
+                    throw new InvalidOperationException("Contradictory setting for LaysMushrooms");
+                result.LaysMushrooms = false;
+                }
+
+            var splitsOnHit = (XmlElement) remove.SelectSingleNode(nameof(result.SplitsOnHit));
+            if (splitsOnHit != null)
+                {
+                if (result.SplitsOnHit.HasValue)
+                    throw new InvalidOperationException("Contradictory setting for SplitsOnHit");
+                result.SplitsOnHit = false;
+                }
+
+            var shootsAtPlayer = (XmlElement) remove.SelectSingleNode(nameof(result.ShootsAtPlayer));
+            if (shootsAtPlayer != null)
+                {
+                if (!result.ShootsAtPlayer.UseBreedDefault)
+                    throw new InvalidOperationException("Contradictory setting for ShootsAtPlayer");
+                result.ShootsAtPlayer = Setting<ShootsAtPlayer>.SettingNoBehaviour();
+                }
+
+            var shotsBounceOffAttribute = (XmlElement) remove.SelectSingleNode(nameof(result.ShotsBounceOff));
+            if (shotsBounceOffAttribute != null)
+                {
+                if (result.ShotsBounceOff.HasValue)
+                    throw new InvalidOperationException("Contradictory setting for ShotsBounceOff");
+                result.ShotsBounceOff = false;
+                }
             }
         }
     }

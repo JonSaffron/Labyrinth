@@ -336,8 +336,17 @@ O              OO              OO              OO              OO              O
     <!-- top line, 3rd from left -->
     <Monster Breed="RotaFloaterBrown" Left="99" Top="43" Energy="40" ChangeRooms="StaysWithinRoom" />
     <Monster Breed="RotaFloaterBrown" Left="98" Top="45" Energy="40" />
-    <Monster Breed="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" InitialDirection="Up" MobilityAfterInjury="Placid" />
-    <Monster Breed="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" InitialDirection="Right" MobilityAfterInjury="Placid" ChangeRooms="StaysWithinRoom" />
+    <Monster Breed="RotaFloaterBrown" Left="102" Top="44" Energy="40" Mobility="Patrolling" InitialDirection="Up" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+        <ChangeRoomsAfterInjury value="FollowsPlayer" />
+      </Apply>
+    </Monster> 
+    <Monster Breed="RotaFloaterBrown" Left="106" Top="45" Energy="40" Mobility="Patrolling" InitialDirection="Right" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+      </Apply>
+    </Monster>
     <Monster Breed="DeathCube" Left="110" Top="44" Energy="255" />
     <Monster Breed="DeathCube" Left="110" Top="45" Energy="255" />
 
@@ -347,10 +356,19 @@ O              OO              OO              OO              OO              O
     <Monster Breed="RotaFloaterBrown" Left="125" Top="45" Energy="40" ChangeRooms="StaysWithinRoom" />
 
     <!-- 2nd from top, right side -->
-    <Monster Breed="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" InitialDirection="Up" MobilityAfterInjury="Placid" />
+    <Monster Breed="RotaFloaterBrown" Left="123" Top="55" Energy="50" Mobility="Patrolling" InitialDirection="Up" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+        <ChangeRoomsAfterInjury value="FollowsPlayer" />
+      </Apply>
+    </Monster>
 
     <!-- 3rd from top, right side -->
-    <Monster Breed="ThresherBrown" Left="119" Top="68" Energy="55" Mobility="Aggressive" ChangeRooms="FollowsPlayer" IsEgg="true" TimeBeforeHatching="20" />
+    <Monster Breed="ThresherBrown" Left="119" Top="68" Energy="55" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <IsEgg TimeBeforeHatching="20" />
+      </Apply>
+    </Monster> 
 
     <!-- Bottom right-->
     <Monster Breed="ThresherBrown" Left="115" Top="76" Energy="50" Mobility="Aggressive" ChangeRooms="FollowsPlayer" />
@@ -368,8 +386,16 @@ O              OO              OO              OO              OO              O
     <Monster Breed="FlitterbugRed" Left="136" Top="55" Energy="60" Mobility="Aggressive" />
 
     <!-- 2nd from left, top -->
-    <Monster Breed="ThresherBrown" Left="150" Top="43" Energy="60" Mobility="Aggressive" ChangeRooms="FollowsPlayer" IsEgg="true" TimeBeforeHatching="60" />
-    <Monster Breed="ThresherBrown" Left="153" Top="43" Energy="60" Mobility="Aggressive" ChangeRooms="FollowsPlayer" IsEgg="true" TimeBeforeHatching="40" />
+    <Monster Breed="ThresherBrown" Left="150" Top="43" Energy="60" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <IsEgg TimeBeforeHatching="60" />
+      </Apply>
+    </Monster>
+    <Monster Breed="ThresherBrown" Left="153" Top="43" Energy="60" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <IsEgg TimeBeforeHatching="40" />
+      </Apply>
+    </Monster>
 
     <!-- 2nd from left, 2nd from top -->
     <Monster Breed="FlitterbugRed" Left="156" Top="52" Energy="60" Mobility="Aggressive" />
@@ -381,11 +407,23 @@ O              OO              OO              OO              OO              O
     <Monster Breed="RotaFloaterBrown" Left="162" Top="47" Energy="55" />
     <Monster Breed="RotaFloaterBrown" Left="172" Top="42" Energy="45" />
     <Monster Breed="RotaFloaterCyan" Left="172" Top="47" Energy="55" />
-    <Monster Breed="ThresherBrown" Left="169" Top="47" Energy="60" Mobility="Aggressive" ChangeRooms="FollowsPlayer" IsEgg="true" TimeBeforeHatching="80" />
+    <Monster Breed="ThresherBrown" Left="169" Top="47" Energy="60" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <IsEgg TimeBeforeHatching="80" />
+      </Apply>
+    </Monster>
 
     <!-- right, 2nd from top -->
-    <Monster Breed="ThresherBrown" Left="177" Top="51" Energy="70" Mobility="Aggressive" ChangeRooms="FollowsPlayer" IsEgg="true" TimeBeforeHatching="50" />
-    <Monster Breed="ThresherBrown" Left="190" Top="58" Energy="70" Mobility="Aggressive" ChangeRooms="FollowsPlayer" IsEgg="true" TimeBeforeHatching="10" />
+    <Monster Breed="ThresherBrown" Left="177" Top="51" Energy="70" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <IsEgg TimeBeforeHatching="50" />
+      </Apply>
+    </Monster>
+    <Monster Breed="ThresherBrown" Left="190" Top="58" Energy="70" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <IsEgg TimeBeforeHatching="10" />
+      </Apply>
+    </Monster>
 
     <!-- 3rd from left, 2 down -->
     <Monster Breed="KillerCubeGreen" Left="167" Top="57" Energy="60" />
@@ -395,9 +433,21 @@ O              OO              OO              OO              OO              O
     <Monster Breed="FlitterbugRed" Left="174" Top="73" Energy="60" Mobility="Aggressive" />
     <Monster Breed="DeathCube" Left="161" Top="76" Energy="80" />
     <Monster Breed="DeathCube" Left="174" Top="76" Energy="80" />
-    <Monster Breed="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" MobilityAfterInjury="Placid" ChangeRooms="StaysWithinRoom" />
-    <Monster Breed="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" MobilityAfterInjury="Placid" ChangeRooms="StaysWithinRoom" />
-    <Monster Breed="FlitterbugRed" Left="167" Top="78" Energy="90" Mobility="Aggressive" IsEgg="true" TimeBeforeHatching="127" />
+    <Monster Breed="RotaFloaterCyan" Left="163" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+      </Apply>
+    </Monster>
+    <Monster Breed="RotaFloaterCyan" Left="172" Top="76" Energy="60" Mobility="Patrolling" InitialDirection="Down" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+      </Apply>
+    </Monster>
+    <Monster Breed="FlitterbugRed" Left="167" Top="78" Energy="90" Mobility="Aggressive">
+      <Apply>
+        <IsEgg TimeBeforeHatching="127" />
+      </Apply>
+    </Monster>
 
     <!-- right, 3 down -->
     <Monster Breed="FlitterbugRed" Left="189" Top="61" Energy="80" Mobility="Aggressive" />
@@ -443,17 +493,33 @@ O              OO              OO              OO              OO              O
     <Monster Breed="RotaFloaterCyan" Left="198" Top="54" Energy="48" InitialDirection="Right" />
 
     <!-- right, 5th from top -->
-    <Monster Breed="FlitterbugRed" Left="248" Top="42" Energy="48" Mobility="Aggressive" LaysEggs="true"  />
+    <Monster Breed="FlitterbugRed" Left="248" Top="42" Energy="48" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster>
 
     <!-- right, 4th from top -->
-    <Monster Breed="FlitterbugRed" Left="242" Top="32" Energy="48" Mobility="Aggressive" LaysEggs="true" />
-    <Monster Breed="FlitterbugRed" Left="253" Top="33" Energy="48" Mobility="Placid" LaysEggs="true" />
+    <Monster Breed="FlitterbugRed" Left="242" Top="32" Energy="48" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster>
+    <Monster Breed="FlitterbugRed" Left="253" Top="33" Energy="48" Mobility="Placid">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster>
 
     <!-- right, 3rd from top -->
     <Monster Breed="ThresherCyan" Left="248" Top="21" Energy="48" Mobility="Cautious" />
 
     <!-- right, 2nd from top -->
-    <Monster Breed="FlitterbugRed" Left="247" Top="11" Energy="48" Mobility="Placid" LaysEggs="true" />
+    <Monster Breed="FlitterbugRed" Left="247" Top="11" Energy="48" Mobility="Placid">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
     <Monster Breed="ThresherCyan" Left="242" Top="14" Energy="48" Mobility="Cautious" />
 
     <!-- top right corner -->
@@ -464,24 +530,48 @@ O              OO              OO              OO              OO              O
     <Monster Breed="RotaFloaterCyan" Left="226" Top="5" Energy="48" />
     <Monster Breed="RotaFloaterCyan" Left="226" Top="6" Energy="48" />
     <Monster Breed="RotaFloaterCyan" Left="227" Top="6" Energy="48" />
-    <Monster Breed="ThresherCyan" Left="232" Top="4" Energy="64" Mobility="Cautious" LaysEggs="false" />
-    <Monster Breed="ThresherCyan" Left="232" Top="5" Energy="64" Mobility="Aggressive" LaysEggs="true" />
-    <Monster Breed="FlitterbugRed" Left="227" Top="4" Energy="48" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="ThresherCyan" Left="232" Top="4" Energy="64" Mobility="Cautious">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
+    <Monster Breed="ThresherCyan" Left="232" Top="5" Energy="64" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
+    <Monster Breed="FlitterbugRed" Left="227" Top="4" Energy="48" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
     <Monster Breed="KillerCubeGreen" Left="234" Top="2" Energy="48" />
 
     <!-- 2nd from top, 2nd from right -->
-    <Monster Breed="FlitterbugRed" Left="232" Top="14" Energy="64" Mobility="Placid" LaysEggs="true" />
+    <Monster Breed="FlitterbugRed" Left="232" Top="14" Energy="64" Mobility="Placid">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
     <Monster Breed="KillerCubeGreen" Left="231" Top="17" Energy="64" />
 
     <!-- 3rd from top, 2nd from right -->
     <Monster Breed="CrazyCrawler" Left="232" Top="28" Energy="40" />
 
     <!-- 4th from top, 2nd from right -->
-    <Monster Breed="FlitterbugRed" Left="232" Top="37" Energy="64" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="FlitterbugRed" Left="232" Top="37" Energy="64" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
     <Monster Breed="CrazyCrawler" Left="233" Top="37" Energy="40" />
 
     <!-- 5th from top, 2nd from right-->
-    <Monster Breed="ThresherCyan" Left="231" Top="45" Energy="72" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="ThresherCyan" Left="231" Top="45" Energy="72" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 5th from top, left-->
     <Monster Breed="CrazyCrawler" Left="199" Top="44" Energy="40" />
@@ -490,13 +580,25 @@ O              OO              OO              OO              OO              O
     <Monster Breed="CrazyCrawler" Left="200" Top="31" Energy="40" />
 
     <!-- 3rd from top, left -->
-    <Monster Breed="FlitterbugRed" Left="199" Top="25" Energy="72" Mobility="Placid" LaysEggs="true" />
+    <Monster Breed="FlitterbugRed" Left="199" Top="25" Energy="72" Mobility="Placid">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 4th from top, 2nd from left -->
-    <Monster Breed="ThresherCyan" Left="215" Top="35" Energy="72" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="ThresherCyan" Left="215" Top="35" Energy="72" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 3rd from top, 2nd from left -->
-    <Monster Breed="ThresherCyan" Left="216" Top="25" Energy="72" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="ThresherCyan" Left="216" Top="25" Energy="72" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 2nd from top, 2nd from left -->
     <Monster Breed="RotaFloaterCyan" Left="215" Top="12" Energy="48" InitialDirection="Right" />
@@ -507,11 +609,19 @@ O              OO              OO              OO              OO              O
     <Monster Breed="CrazyCrawler" Left="215" Top="5" Energy="40" ChangeRooms="MovesRoom" />
 
     <!-- Top left -->
-    <Monster Breed="FlitterbugRed" Left="199" Top="5" Energy="80" Mobility="Placid" LaysEggs="true" />
+    <Monster Breed="FlitterbugRed" Left="199" Top="5" Energy="80" Mobility="Placid">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 2nd from top, left -->
     <Monster Breed="CrazyCrawler" Left="199" Top="15" Energy="40" />
-    <Monster Breed="FlitterbugRed" Left="201" Top="15" Energy="80" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="FlitterbugRed" Left="201" Top="15" Energy="80" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- =-=-=-= -->
     <!-- Level 5 -->
@@ -519,25 +629,41 @@ O              OO              OO              OO              OO              O
 
     <!-- 2nd from top, right -->
     <Monster Breed="CrazyCrawler" Left="178" Top="11" Energy="50" />
-    <Monster Breed="ThresherCyan" Left="184" Top="15" Energy="90" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="ThresherCyan" Left="184" Top="15" Energy="90" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- top right -->
     <Monster Breed="KillerCubeRed" Left="178" Top="2" Energy="150" />
 
     <!-- top, 2nd from right -->
-    <Monster Breed="FlitterbugCyan" Left="168" Top="5" Energy="150" LaysEggs="false" />
+    <Monster Breed="FlitterbugCyan" Left="168" Top="5" Energy="150">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
 
     <!-- top, 2nd from left -->
     <Monster Breed="KillerCubeRed" Left="152" Top="4" Energy="100" />
 
     <!-- top left -->
-    <Monster Breed="FlitterbugCyan" Left="130" Top="7" Energy="100" LaysEggs="true" />
+    <Monster Breed="FlitterbugCyan" Left="130" Top="7" Energy="100">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 2nd down on left -->
     <Monster Breed="CrazyCrawler" Left="136" Top="14" Energy="80" />
 
     <!-- 2nd down, 2nd from left -->
-    <Monster Breed="ThresherCyan" Left="147" Top="13" Energy="90" Mobility="Aggressive" LaysEggs="true" />
+    <Monster Breed="ThresherCyan" Left="147" Top="13" Energy="90" Mobility="Aggressive">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 2nd down, 3rd from left -->
     <Monster Breed="KillerCubeRed" Left="162" Top="12" Energy="150" />
@@ -546,20 +672,40 @@ O              OO              OO              OO              OO              O
     <Monster Breed="KillerCubeRed" Left="189" Top="27" Energy="150" />
 
     <!-- 3rd from top, 3rd from left -->
-    <Monster Breed="FlitterbugCyan" Left="168" Top="26" Energy="150" LaysEggs="false" />
+    <Monster Breed="FlitterbugCyan" Left="168" Top="26" Energy="150">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
 
     <!-- bottom, 2nd from left -->
     <Monster Breed="CrazyCrawler" Left="148" Top="37" Energy="80" />
 
     <!-- bottom, 3rd from left -->
-    <Monster Breed="FlitterbugCyan" Left="174" Top="34" Energy="100" LaysEggs="true" />
-    <Monster Breed="FlitterbugCyan" Left="174" Top="35" Energy="100" LaysEggs="false" />
+    <Monster Breed="FlitterbugCyan" Left="174" Top="34" Energy="100">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
+    <Monster Breed="FlitterbugCyan" Left="174" Top="35" Energy="100">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
 
     <!-- treasure room, bottom right -->
     <Monster Breed="KillerCubeGreen" Left="177" Top="31" Energy="100" />
-    <Monster Breed="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" InitialDirection="Left" MobilityAfterInjury="Placid" ChangeRooms="StaysWithinRoom" />
+    <Monster Breed="KillerCubeRed" Left="183" Top="31" Energy="100" Mobility="Patrolling" InitialDirection="Left" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+      </Apply>
+    </Monster>
     <Monster Breed="KillerCubeGreen" Left="184" Top="38" Energy="100" />
-    <Monster Breed="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" InitialDirection="Left" MobilityAfterInjury="Placid" ChangeRooms="StaysWithinRoom" />
+    <Monster Breed="KillerCubeRed" Left="179" Top="38" Energy="100" Mobility="Patrolling" InitialDirection="Left" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+      </Apply>
+    </Monster>
     <Monster Breed="CrazyCrawler" Left="182" Top="33" Energy="80" />
     <Monster Breed="CrazyCrawler" Left="182" Top="35" Energy="80" />
     <Monster Breed="CrazyCrawler" Left="185" Top="34" Energy="80" ChangeRooms="StaysWithinRoom" />
@@ -572,18 +718,30 @@ O              OO              OO              OO              OO              O
     <!-- =-=-=-= -->
 
     <!-- Bottom right -->
-    <Monster Breed="DiamondDemon" Left="117" Top="32" Energy="32" ChangeRooms="StaysWithinRoom" LaysEggs="false" />
+    <Monster Breed="DiamondDemon" Left="117" Top="32" Energy="32" ChangeRooms="StaysWithinRoom">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
     <Monster Breed="DiamondDemon" Left="115" Top="33" Energy="24" ChangeRooms="StaysWithinRoom" />
     <Monster Breed="DiamondDemon" Left="114" Top="36" Energy="24" ChangeRooms="FollowsPlayer" />
 
     <!-- Bottom, 2nd from right -->
-    <Monster Breed="FlitterbugCyan" Left="98" Top="37" Energy="144" LaysEggs="true" />
+    <Monster Breed="FlitterbugCyan" Left="98" Top="37" Energy="144">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- Bottom, 2nd from left -->
     <Monster Breed="FlitterbugBrown" Left="88" Top="35" Energy="90" ChangeRooms="MovesRoom" />
 
     <!-- 2nd from bottom, right -->
-    <Monster Breed="FlitterbugCyan" Left="120" Top="25" Energy="144" LaysEggs="true" />
+    <Monster Breed="FlitterbugCyan" Left="120" Top="25" Energy="144">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 2nd from bottom, 2nd from right -->
     <Monster Breed="FlitterbugBrown" Left="98" Top="22" Energy="80" ChangeRooms="MovesRoom" />
@@ -593,7 +751,11 @@ O              OO              OO              OO              OO              O
     <Monster Breed="KillerCubeRed" Left="66" Top="27" Energy="120" />
 
     <!-- 2nd from top, left -->
-    <Monster Breed="FlitterbugCyan" Left="72" Top="15" Energy="144" LaysEggs="true" />
+    <Monster Breed="FlitterbugCyan" Left="72" Top="15" Energy="144">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 2nd from top, 2nd from left -->
     <Monster Breed="CrazyCrawler" Left="87" Top="11" Energy="72" />
@@ -605,11 +767,23 @@ O              OO              OO              OO              OO              O
 
     <!-- Treasure room, top right-->
     <Monster Breed="TigerMoth" Left="120" Top="5" Energy="96" ChangeRooms="StaysWithinRoom" />
-    <Monster Breed="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" InitialDirection="Down" MobilityAfterInjury="Placid" ChangeRooms="StaysWithinRoom" />
-    <Monster Breed="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" InitialDirection="Right" MobilityAfterInjury="Placid" ChangeRooms="StaysWithinRoom" />
+    <Monster Breed="KillerCubeRed" Left="118" Top="1" Energy="96" Mobility="Patrolling" InitialDirection="Down" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+      </Apply>
+    </Monster>
+    <Monster Breed="KillerCubeRed" Left="125" Top="1" Energy="120" Mobility="Patrolling" InitialDirection="Right" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <MobilityAfterInjury value="Placid" />
+      </Apply>
+    </Monster>
     <Monster Breed="CrazyCrawler" Left="118" Top="3" Energy="72" ChangeRooms="StaysWithinRoom" />
     <Monster Breed="CrazyCrawler" Left="121" Top="3" Energy="72" />
-    <Monster Breed="FlitterbugBrown" Left="125" Top="5" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+    <Monster Breed="FlitterbugBrown" Left="125" Top="5" Energy="120" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- Top, 2nd from right -->
     <Monster Breed="TigerMoth" Left="104" Top="5" Energy="120" ChangeRooms="MovesRoom" />
@@ -622,27 +796,59 @@ O              OO              OO              OO              OO              O
     <!-- =-=-=-= -->
 
     <!-- Top, 3rd from left -->
-    <Monster Breed="TigerMoth" Left="40" Top="5" Energy="120" LaysEggs="false" ChangeRooms="FollowsPlayer" />
-    <Monster Breed="TigerMoth" Left="34" Top="1" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+    <Monster Breed="TigerMoth" Left="40" Top="5" Energy="120" ChangeRooms="FollowsPlayer">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
+    <Monster Breed="TigerMoth" Left="34" Top="1" Energy="120" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- Top, 2nd from left -->
-    <Monster Breed="FlitterbugBrown" Left="18" Top="8" Energy="120" Mobility="Cautious" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+    <Monster Breed="FlitterbugBrown" Left="18" Top="8" Energy="120" Mobility="Cautious" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- Top left -->
-    <Monster Breed="Butterfly" Left="8" Top="5" Energy="120" LaysEggs="false" />
+    <Monster Breed="Butterfly" Left="8" Top="5" Energy="120">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
 
     <!-- 2nd from top, left -->
-    <Monster Breed="Butterfly" Left="9" Top="13" Energy="120" LaysEggs="false" />
+    <Monster Breed="Butterfly" Left="9" Top="13" Energy="120">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
 
     <!-- 2nd from top, 2nd from left -->
     <Monster Breed="Butterfly" Left="25" Top="13" Energy="120" />
 
     <!-- 2nd from top, 3rd from left -->
-    <Monster Breed="FlitterbugBrown" Left="34" Top="18" Energy="120" Mobility="Cautious" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+    <Monster Breed="FlitterbugBrown" Left="34" Top="18" Energy="120" Mobility="Cautious" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 2nd from top, right -->
-    <Monster Breed="TigerMoth" Left="55" Top="16" Energy="120" LaysEggs="false" ChangeRooms="FollowsPlayer" />
-    <Monster Breed="TigerMoth" Left="61" Top="18" Energy="120" LaysEggs="true" ChangeRooms="FollowsPlayer" />
+    <Monster Breed="TigerMoth" Left="55" Top="16" Energy="120" ChangeRooms="FollowsPlayer">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
+    <Monster Breed="TigerMoth" Left="61" Top="18" Energy="120" ChangeRooms="FollowsPlayer">
+      <Apply>
+        <LaysEggs />
+      </Apply>
+    </Monster> 
 
     <!-- 3rd from top, 2nd from right -->
     <Monster Breed="Butterfly" Left="39" Top="26" Energy="120" />
@@ -669,10 +875,25 @@ O              OO              OO              OO              OO              O
     <Monster Breed="Butterfly" Left="1" Top="24" Energy="120" />
 
     <!-- Final room, bottom left -->
-    <Monster Breed="Joker" Left="1" Top="34" Energy="120" LaysEggs="false" ChangeRooms="MovesRoom" />
+    <Monster Breed="Joker" Left="1" Top="34" Energy="120" ChangeRooms="MovesRoom">
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
     <Monster Breed="Joker" Left="9" Top="33" Energy="120" ChangeRooms="MovesRoom" />
-    <Monster Breed="Joker" Left="6" Top="37" Energy="150" LaysEggs="false" LaysMushrooms="true" ChangeRooms="StaysWithinRoom" />
-    <Monster Breed="Joker" Left="1" Top="32" Energy="120" SplitsOnHit="false" ChangeRooms="FollowsPlayer" />
+    <Monster Breed="Joker" Left="6" Top="37" Energy="150" ChangeRooms="StaysWithinRoom">
+      <Apply>
+        <LaysMushrooms /> <!-- this may possibly be a mistake in the original game -->
+      </Apply>
+      <Remove>
+        <LaysEggs />
+      </Remove>
+    </Monster>
+    <Monster Breed="Joker" Left="1" Top="32" Energy="120" ChangeRooms="FollowsPlayer">
+      <Remove>
+        <SplitsOnHit />
+      </Remove>
+    </Monster>
     <Monster Breed="Joker" Left="13" Top="38" Energy="120" ChangeRooms="FollowsPlayer" />
   </Objects>
 </World>

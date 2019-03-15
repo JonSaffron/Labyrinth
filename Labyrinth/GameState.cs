@@ -190,7 +190,7 @@ namespace Labyrinth
                 Mobility = MonsterMobility.Aggressive,
                 LaysEggs = true,
                 ChangeRooms = ChangeRooms.FollowsPlayer,
-                ShootsAtPlayer = true
+                ShootsAtPlayer = Setting<ShootsAtPlayer>.NewSetting(ShootsAtPlayer.Immediately)
                 };
             var result = AddMonster(md);
             return result;

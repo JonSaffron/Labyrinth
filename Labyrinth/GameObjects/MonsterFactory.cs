@@ -24,7 +24,7 @@ namespace Labyrinth.GameObjects
                 }
 
             var breedInfo = Breeds[monsterDef.Breed];
-            var result = BuildMonsterFromBreed(breedInfo, monsterDef.Position, monsterDef.Energy);
+            var result = BuildMonsterFromBreed(breedInfo, monsterDef);
             AddInherentBehaviours(result, breedInfo);
             AddMovements(result, breedInfo, monsterDef.InitialDirection.GetValueOrDefault(Direction.None));
             AddInherentProperties(result, breedInfo);
@@ -33,20 +33,20 @@ namespace Labyrinth.GameObjects
                 result.Mobility = monsterDef.Mobility.Value;
             if (monsterDef.ChangeRooms.HasValue)
                 result.ChangeRooms = monsterDef.ChangeRooms.Value;
-            if (monsterDef.MobilityAfterInjury.HasValue)
+            if (!monsterDef.MobilityAfterInjury.UseBreedDefault)
                 {
                 result.Behaviours.Remove<MobilityAfterInjury>();
-                if (monsterDef.MobilityAfterInjury.Value == "")
+                if (monsterDef.MobilityAfterInjury.UseSpecificBehaviour)
                     {
-                    result.Behaviours.Add(new MobilityAfterInjury(result, monsterDef.MobilityAfterInjury.Value));
+                    result.Behaviours.Add(new MobilityAfterInjury(result, monsterDef.MobilityAfterInjury.SpecificBehaviour));
                     }
                 }
-            if (monsterDef.ChangeRoomsAfterInjury.HasValue)
+            if (!monsterDef.ChangeRoomsAfterInjury.UseBreedDefault)
                 {
                 result.Behaviours.Remove<ChangeRoomsAfterInjury>();
-                if (monsterDef.ChangeRoomsAfterInjury.Value == "")
+                if (monsterDef.ChangeRoomsAfterInjury.UseSpecificBehaviour)
                     {
-                    result.Behaviours.Add(new ChangeRoomsAfterInjury(result, monsterDef.ChangeRoomsAfterInjury.Value));
+                    result.Behaviours.Add(new ChangeRoomsAfterInjury(result, monsterDef.ChangeRoomsAfterInjury.SpecificBehaviour));
                     }
                 }
             if (monsterDef.LaysMushrooms.HasValue)
@@ -55,10 +55,22 @@ namespace Labyrinth.GameObjects
                 result.Behaviours.Set<LaysEgg>(monsterDef.LaysEggs.Value);
             if (monsterDef.SplitsOnHit.HasValue)
                 result.Behaviours.Set<SpawnsUponDeath>(monsterDef.SplitsOnHit.Value);
-            if (monsterDef.ShootsAtPlayer.HasValue)
-                result.Behaviours.Set<ShootsAtPlayer>(monsterDef.ShootsAtPlayer.Value);
-            if (monsterDef.ShootsOnceProvoked.HasValue)
-                result.Behaviours.Set<StartsShootingWhenHurt>(monsterDef.ShootsOnceProvoked.Value);
+            if (!monsterDef.ShootsAtPlayer.UseBreedDefault)
+                {
+                result.Behaviours.Remove<Behaviour.ShootsAtPlayer>();
+                result.Behaviours.Remove<StartsShootingWhenHurt>();
+                switch (monsterDef.ShootsAtPlayer.SpecificBehaviour)
+                    {
+                    case ShootsAtPlayer.Immediately:
+                        result.Behaviours.Add<Behaviour.ShootsAtPlayer>();
+                        break;
+                    case ShootsAtPlayer.OnceInjured:
+                        result.Behaviours.Add<StartsShootingWhenHurt>();
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown setting for ShootsAtPlayer");
+                    }
+                }
             if (monsterDef.ShotsBounceOff.HasValue)
                 {
                 if (monsterDef.ShotsBounceOff.Value)
@@ -98,12 +110,12 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private static Monster BuildMonsterFromBreed([NotNull] Breed breedInfo, Vector2 position, int energy)
+        private static Monster BuildMonsterFromBreed([NotNull] Breed breedInfo, MonsterDef monsterDef)
             {
             var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
             animationPlayer.PlayAnimation(Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovementsPerFrame));
-            var result = new Monster(breedInfo.Name, animationPlayer, position, energy);
+            var result = new Monster(monsterDef, animationPlayer);
             return result;
             }
 

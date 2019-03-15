@@ -4,20 +4,20 @@ using JetBrains.Annotations;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
     public class Monster : MovingItem, IMonster
         {
-        public string Breed { get; }
         private MonsterMobility _mobility;
         public readonly Dictionary<MonsterMobility, IMonsterMotion> MovementMethods = new Dictionary<MonsterMobility, IMonsterMotion>();
         [CanBeNull] private IMonsterMotion _determineDirection;
 
         public IBoundMovement SightBoundary { get; private set; }
 
-        public readonly int OriginalEnergy;
+        public readonly MonsterDef Definition;
 
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
@@ -25,11 +25,10 @@ namespace Labyrinth.GameObjects
         private bool _isActive;
         [CanBeNull] public IMonsterWeapon Weapon { get; set; }
 
-        public Monster(string breed, AnimationPlayer animationPlayer, Vector2 position, int energy) : base(animationPlayer, position)
+        public Monster(MonsterDef definition, AnimationPlayer animationPlayer) : base(animationPlayer, definition.Position)
             {
-            this.Breed = breed;
-            this.Energy = energy;
-            this.OriginalEnergy = energy;
+            this.Definition = definition;
+            this.Energy = definition.Energy;
             this.CurrentSpeed = Constants.BaseSpeed;
             this.Behaviours = new BehaviourCollection(this);
             }

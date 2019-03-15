@@ -37,7 +37,7 @@ namespace Labyrinth
             var boundMovementFactory = new BoundMovementFactory(this._worldSize);
             GlobalServices.SetBoundMovementFactory(boundMovementFactory);
 
-            var gameObjectCollection = new GameObjectCollection();
+            var gameObjectCollection = new GameObjectCollection(worldLoader.WorldSize);
             var gameState = new GameState(gameObjectCollection);
             GlobalServices.SetGameState(gameState);
             worldLoader.AddGameObjects(gameState);

@@ -190,21 +190,71 @@
   </xs:complexType>
 
   <xs:complexType name="MonsterBase">
+    <xs:all>
+      <xs:element name="Apply" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="MobilityAfterInjury" minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="value" use="required" type="MonsterMobilitySubsequent" />
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="ChangeRoomsAfterInjury" minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="value" use="required" type="ChangeRooms" />
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="IsEgg" minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="TimeBeforeHatching" use="required" type="xs:int" />
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="LaysEggs" minOccurs="0" />
+
+            <xs:element name="LaysMushrooms" minOccurs="0" />
+
+            <xs:element name="SplitsOnHit" minOccurs="0" />
+
+            <xs:element name="ShootsAtPlayer" minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="value" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:enumeration value="Immediately" />
+                      <xs:enumeration value="OnceInjured" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="ShotsBounceOff" minOccurs="0" />
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Remove" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="MobilityAfterInjury" minOccurs="0" />
+            <xs:element name="ChangeRoomsAfterInjury" minOccurs="0" />
+            <xs:element name="LaysEggs" minOccurs="0" />
+            <xs:element name="LaysMushrooms" minOccurs="0" />
+            <xs:element name="SplitsOnHit" minOccurs="0" />
+            <xs:element name="ShootsAtPlayer" minOccurs="0" />
+            <xs:element name="ShotsBounceOff" minOccurs="0" />
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+
     <xs:attribute name="Breed" type="xs:string" use="required" />
     <xs:attribute name="Energy" type="xs:int" use="required" />
     <xs:attribute name="Mobility" use="optional" type="MonsterMobility" />
     <xs:attribute name="InitialDirection" use="optional" type="Direction" />
-    <xs:attribute name="MobilityAfterInjury" use="optional" type="MonsterMobilitySubsequent" />
     <xs:attribute name="ChangeRooms" use="optional" type="ChangeRooms" />
-    <xs:attribute name="ChangeRoomsAfterInjury" use="optional" type="ChangeRooms" />
-    <xs:attribute name="IsEgg" type="xs:boolean" use="optional" />
-    <xs:attribute name="TimeBeforeHatching" type="xs:int" use="optional" />
-    <xs:attribute name="LaysMushrooms" type="xs:boolean" use="optional" />
-    <xs:attribute name="LaysEggs" type="xs:boolean" use="optional" />
-    <xs:attribute name="SplitsOnHit" type="xs:boolean" use="optional" />
-    <xs:attribute name="ShootsAtPlayer" type="xs:boolean" use="optional" />
-    <xs:attribute name="ShootsOnceProvoked" type="xs:boolean" use="optional" />
-    <xs:attribute name="ShotsBounceOff" type="xs:boolean" use="optional" />
     <xs:attribute name="IsActive" type="xs:boolean" use="optional" />
   </xs:complexType>
 

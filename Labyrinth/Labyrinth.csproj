@@ -127,7 +127,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
-    <Compile Include="Enumeration.cs" />
+    <Compile Include="DataStructures\Grid.cs" />
+    <Compile Include="DataStructures\SimpleList.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoundaryCurrentRoom.cs" />
     <Compile Include="GameObjects\BoundaryFixed.cs" />
@@ -186,11 +187,11 @@
     <Compile Include="GameObjects\Monsters\Movement\Placid.cs" />
     <Compile Include="GameObjects\Monsters\Movement\RotaFloaterCyanMovement.cs" />
     <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
-    <Compile Include="Movement.cs" />
+    <Compile Include="DataStructures\Movement.cs" />
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
     <Compile Include="Interfaces\IAnimationPlayer.cs" />
-    <Compile Include="PropertyBag.cs" />
-    <Compile Include="PropertyDef.cs" />
+    <Compile Include="DataStructures\PropertyBag.cs" />
+    <Compile Include="DataStructures\PropertyDef.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Services\Messages\CrystalTaken.cs" />
@@ -254,6 +255,7 @@
     <Compile Include="Services\WorldBuilding\MonsterDef.cs" />
     <Compile Include="Services\WorldBuilding\ProcessGameObjects.cs" />
     <Compile Include="Services\WorldBuilding\RandomMonsterDistribution.cs" />
+    <Compile Include="Services\WorldBuilding\Setting.cs" />
     <Compile Include="Services\WorldBuilding\TileContentValidator.cs" />
     <Compile Include="Services\WorldBuilding\TileDefinitionCollection.cs" />
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />
@@ -263,7 +265,7 @@
     <Compile Include="StandardPlayerWeapon.cs" />
     <Compile Include="GameObjects\Wall.cs" />
     <Compile Include="GameObjects\Monsters\Movement\StandardRolling.cs" />
-    <Compile Include="TileRect.cs" />
+    <Compile Include="DataStructures\TileRect.cs" />
     <Compile Include="ClockEvents\UnlockLevel.cs" />
     <Compile Include="World.cs" />
     <Compile Include="GameObjects\Monsters\Monster.cs" />
@@ -282,7 +284,7 @@
     <Compile Include="GameObjects\StaticItem.cs" />
     <Compile Include="Services\WorldBuilding\Tile.cs" />
     <Compile Include="Services\WorldBuilding\TileDefinition.cs" />
-    <Compile Include="TilePos.cs" />
+    <Compile Include="DataStructures\TilePos.cs" />
     <Compile Include="Services\WorldBuilding\WorldLoader.cs" />
     <Compile Include="ClockEvents\WorldClock.cs" />
     <Compile Include="WorldWindow.cs" />

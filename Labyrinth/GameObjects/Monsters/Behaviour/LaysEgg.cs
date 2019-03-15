@@ -23,13 +23,48 @@ namespace Labyrinth.GameObjects.Behaviour
             if (!GlobalServices.GameState.IsStaticItemOnTile(tp))
                 {
                 this.PlaySound(GameSound.MonsterLaysEgg);
-                MonsterDef md = MonsterDef.FromExistingMonster(this.Monster);
+                MonsterDef md = this.Monster.Definition;
+                md.Position = this.Monster.TilePosition.ToPosition();
+                md.InitialDirection = Direction.None;
+                md.ChangeRooms = Monster.ChangeRooms; // todo check this
                 md.IsEgg = true;
                 md.TimeBeforeHatching = (this.Random.Next(256) & 0x1f) + 8;
-                md.LaysEggs = false;
+                md.LaysEggs = false; // todo check this
                 GlobalServices.GameState.AddMonster(md);
                 }
             }
+/*
+        public static MonsterDef FromExistingMonster([NotNull] Monster monster)
+            {
+            if (monster == null)
+                throw new ArgumentNullException();
+
+            var result = new MonsterDef
+                {
+                Breed = monster.Breed,
+                Position = monster.TilePosition.ToPosition(),
+                Energy = monster.OriginalEnergy,
+                Mobility = monster.Mobility,
+                InitialDirection = Direction.None,
+                ChangeRooms = monster.ChangeRooms,
+                IsEgg = false,
+                LaysMushrooms = monster.Behaviours.Has<LaysMushroom>(),
+                LaysEggs = monster.Behaviours.Has<LaysEgg>(),
+                SplitsOnHit = monster.Behaviours.Has<SpawnsUponDeath>(),
+                ShootsAtPlayer = monster.Behaviours.Has<ShootsAtPlayer>(),
+                ShootsOnceProvoked = monster.Behaviours.Has<StartsShootingWhenHurt>(),
+                ShotsBounceOff = monster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection,
+                IsActive = monster.IsActive
+                };
+
+            if (result.Mobility == MonsterMobility.Patrolling)
+                {
+                throw new InvalidOperationException("Cannot clone a monster which is patrolling.");
+                }
+
+            return result;
+            }
+*/
 
         private bool ShouldAttemptToLayEgg()
             {

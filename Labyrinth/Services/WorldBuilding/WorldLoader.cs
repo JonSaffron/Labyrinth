@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    // todo is there a way to reduce the number of times the world layout is examined?
     public class WorldLoader : IWorldLoader
         {
         private XmlElement _xmlRoot;
