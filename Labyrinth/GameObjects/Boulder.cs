@@ -46,7 +46,5 @@ namespace Labyrinth.GameObjects
                 }
             return result;
             }
-
-        public override decimal StandardSpeed => Constants.BaseSpeed * 2.5m;
         }
     }

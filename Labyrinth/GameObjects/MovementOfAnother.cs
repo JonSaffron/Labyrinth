@@ -23,8 +23,7 @@ namespace Labyrinth.GameObjects
                 {
                 case PushStatus.Yes:
                     {
-                    // ToDo what speed should objects move at when pushing and bouncing
-                    gameObject.Move(direction, Constants.BaseSpeed * 2);
+                    gameObject.Move(direction, Constants.PushSpeed);
                     return;
                     }
 

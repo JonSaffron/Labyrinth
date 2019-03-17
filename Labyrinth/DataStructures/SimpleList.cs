@@ -5,17 +5,15 @@ namespace Labyrinth
     public class SimpleList<T>
         {
         private T[] _items;
-        private int _size;
-        static readonly T[]  EmptyArray = new T[0];        
+        private static readonly T[]  EmptyArray = new T[0];        
+        
+        public int Length { get; private set; }
 
         public SimpleList(int capacity)
             {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity));
-            if (capacity == 0)
-                this._items = EmptyArray;
-            else
-                this._items = new T[capacity];
+            this._items = capacity == 0 ? EmptyArray : new T[capacity];
             }
 
         public int Capacity
@@ -23,7 +21,7 @@ namespace Labyrinth
             get => this._items.Length;
             set
                 {
-                if (value < this._size) 
+                if (value < this.Length) 
                     {
                     throw new ArgumentOutOfRangeException(nameof(value));
                     }
@@ -33,9 +31,9 @@ namespace Labyrinth
 
                 if (value > 0) {
                     T[] newItems = new T[value];
-                    if (this._size > 0) 
+                    if (this.Length > 0) 
                         {
-                        Array.Copy(this._items, 0, newItems, 0, this._size);
+                        Array.Copy(this._items, 0, newItems, 0, this.Length);
                         }
                     this._items = newItems;
                     }
@@ -46,26 +44,25 @@ namespace Labyrinth
                 }
             }
 
-        public int Length => this._size;
 
         public void Add(T item) 
             {
-            if (this._size == this._items.Length)
+            if (this.Length == this._items.Length)
                 {
-                EnsureCapacity(this._size + 1);
+                EnsureCapacity(this.Length + 1);
                 }
-            this._items[this._size] = item;
-            this._size += 1;
+            this._items[this.Length] = item;
+            this.Length += 1;
             }
 
         public void RemoveAt(int index)
             {
-            if (index < 0 || index >= this._size) 
+            if (index < 0 || index >= this.Length) 
                 {
                 throw new ArgumentOutOfRangeException(nameof(index));
                 }
 
-            var indexOfLastItem = this._items.Length - 1;
+            var indexOfLastItem = this.Length - 1;
             if (indexOfLastItem == 0 || index == indexOfLastItem)
                 {
                 this._items[index] = default;
@@ -77,7 +74,7 @@ namespace Labyrinth
                 this._items[indexOfLastItem] = default;
                 }
                 
-            this._size--;
+            this.Length--;
             }
 
         private void EnsureCapacity(int min) {
@@ -97,13 +94,13 @@ namespace Labyrinth
    
         public int IndexOf(T item) 
             {
-            return Array.IndexOf(this._items, item, 0, this._size);
+            return Array.IndexOf(this._items, item, 0, this.Length);
             }
 
         public void CopyTo(T[] array) 
             {
             // Delegate rest of error checking to Array.Copy.
-            Array.Copy(_items, 0, array, 0, _size);
+            Array.Copy(this._items, 0, array, 0, this.Length);
             }
         }
     }

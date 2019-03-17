@@ -18,7 +18,7 @@
 
         public override void Perform()
             {
-            this.Monster.IsActive = true;
+            this.Monster.Activate();
             this.RemoveMe();
             }
         }

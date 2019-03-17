@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Xml;
 using JetBrains.Annotations;
-using Labyrinth.GameObjects;
-using Labyrinth.GameObjects.Behaviour;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
@@ -26,7 +24,7 @@ namespace Labyrinth.Services.WorldBuilding
         public bool? ShotsBounceOff { get; set; }
         public bool? IsActive { get; set; }
 
-        internal static MonsterDef FromXml([NotNull] XmlElement mdef)
+        internal static MonsterDef FromXml([NotNull] XmlElement mdef, XmlNamespaceManager namespaceManager)
             {
             MonsterDef result = new MonsterDef
                 {
@@ -59,77 +57,77 @@ namespace Labyrinth.Services.WorldBuilding
                 }
 
             // additional behaviours
-            var apply = mdef.SelectSingleNode("Apply");
+            var apply = (XmlElement) mdef.SelectSingleNode("ns:Apply", namespaceManager);
             if (apply != null)
                 {
-                ApplyNewBehaviours(ref result, apply);
+                ApplyNewBehaviours(ref result, apply, namespaceManager);
                 }
 
             // remove behaviours
-            var remove = mdef.SelectSingleNode("Remove");
+            var remove = (XmlElement) mdef.SelectSingleNode("ns:Remove", namespaceManager);
             if (remove != null)
                 {
-                RemoveUnwantedBehaviours(ref result, remove);
+                RemoveUnwantedBehaviours(ref result, remove, namespaceManager);
                 }
 
             return result;
             }
 
-        private static void ApplyNewBehaviours(ref MonsterDef result, XmlNode apply)
+        private static void ApplyNewBehaviours(ref MonsterDef result, XmlElement apply, XmlNamespaceManager namespaceManager)
             {
-            var mobilityAfterInjury = (XmlElement) apply.SelectSingleNode(nameof(result.MobilityAfterInjury));
+            var mobilityAfterInjury = (XmlElement) apply.SelectSingleNode("ns:" + nameof(result.MobilityAfterInjury), namespaceManager);
             if (mobilityAfterInjury != null)
                 {
                 result.MobilityAfterInjury = Setting<MonsterMobility>.NewSetting((MonsterMobility) Enum.Parse(typeof(MonsterMobility), mobilityAfterInjury.GetAttribute("value")));
                 }
 
-            var changeRoomsAfterInjury = (XmlElement) apply.SelectSingleNode(nameof(ChangeRoomsAfterInjury));
+            var changeRoomsAfterInjury = (XmlElement) apply.SelectSingleNode("ns:" + nameof(ChangeRoomsAfterInjury), namespaceManager);
             if (changeRoomsAfterInjury != null)
                 {
                 result.ChangeRoomsAfterInjury = Setting<ChangeRooms>.NewSetting((ChangeRooms) Enum.Parse(typeof(ChangeRooms), changeRoomsAfterInjury.GetAttribute("value")));
                 }
 
-            var isEgg = (XmlElement) apply.SelectSingleNode(nameof(result.IsEgg));
+            var isEgg = (XmlElement) apply.SelectSingleNode("ns:" + nameof(result.IsEgg), namespaceManager);
             if (isEgg != null)
                 {
                 result.TimeBeforeHatching = int.Parse(isEgg.GetAttribute(nameof(TimeBeforeHatching)));
                 result.TimeBeforeHatching |= 1; // not sure why the original game does this...
                 }
 
-            var laysEggs = (XmlElement) apply.SelectSingleNode(nameof(result.LaysEggs));
+            var laysEggs = (XmlElement) apply.SelectSingleNode("ns:" + nameof(result.LaysEggs), namespaceManager);
             if (laysEggs != null)
                 {
                 result.LaysEggs = true;
                 }
 
-            var laysMushrooms = (XmlElement) apply.SelectSingleNode(nameof(result.LaysMushrooms));
+            var laysMushrooms = (XmlElement) apply.SelectSingleNode("ns:" + nameof(result.LaysMushrooms), namespaceManager);
             if (laysMushrooms != null)
                 {
                 result.LaysMushrooms = true;
                 }
 
-            var splitsOnHit = (XmlElement) apply.SelectSingleNode(nameof(SplitsOnHit));
+            var splitsOnHit = (XmlElement) apply.SelectSingleNode("ns:" + nameof(SplitsOnHit), namespaceManager);
             if (splitsOnHit != null)
                 {
                 result.SplitsOnHit = true;
                 }
 
-            var shootsAtPlayer = (XmlElement) apply.SelectSingleNode(nameof(ShootsAtPlayer));
+            var shootsAtPlayer = (XmlElement) apply.SelectSingleNode("ns:" + nameof(ShootsAtPlayer), namespaceManager);
             if (shootsAtPlayer != null)
                 {
                 result.ShootsAtPlayer = Setting<ShootsAtPlayer>.NewSetting((ShootsAtPlayer) Enum.Parse(typeof(ShootsAtPlayer), shootsAtPlayer.GetAttribute("value")));
                 }
 
-            var shotsBounceOff = (XmlElement) apply.SelectSingleNode(nameof(ShotsBounceOff));
+            var shotsBounceOff = (XmlElement) apply.SelectSingleNode("ns:" + nameof(ShotsBounceOff), namespaceManager);
             if (shotsBounceOff != null)
                 {
                 result.ShotsBounceOff = true;
                 }
             }
 
-        private static void RemoveUnwantedBehaviours(ref MonsterDef result, XmlNode remove)
+        private static void RemoveUnwantedBehaviours(ref MonsterDef result, XmlElement remove, XmlNamespaceManager namespaceManager)
             {
-            var mobilityAfterInjury = (XmlElement) remove.SelectSingleNode(nameof(result.MobilityAfterInjury));
+            var mobilityAfterInjury = (XmlElement) remove.SelectSingleNode("ns:" + nameof(result.MobilityAfterInjury), namespaceManager);
             if (mobilityAfterInjury != null)
                 {
                 if (!result.MobilityAfterInjury.UseBreedDefault)
@@ -137,7 +135,7 @@ namespace Labyrinth.Services.WorldBuilding
                 result.MobilityAfterInjury = Setting<MonsterMobility>.SettingNoBehaviour();
                 }
 
-            var changeRoomsAfterInjury = (XmlElement) remove.SelectSingleNode(nameof(ChangeRoomsAfterInjury));
+            var changeRoomsAfterInjury = (XmlElement) remove.SelectSingleNode("ns:" + nameof(ChangeRoomsAfterInjury), namespaceManager);
             if (changeRoomsAfterInjury != null)
                 {
                 if (!result.ChangeRoomsAfterInjury.UseBreedDefault)
@@ -145,7 +143,7 @@ namespace Labyrinth.Services.WorldBuilding
                 result.ChangeRoomsAfterInjury = Setting<ChangeRooms>.SettingNoBehaviour();
                 }
 
-            var laysEggs = (XmlElement) remove.SelectSingleNode(nameof(result.LaysEggs));
+            var laysEggs = (XmlElement) remove.SelectSingleNode("ns:" + nameof(result.LaysEggs), namespaceManager);
             if (laysEggs != null)
                 {
                 if (result.LaysEggs.HasValue)
@@ -153,7 +151,7 @@ namespace Labyrinth.Services.WorldBuilding
                 result.LaysEggs = false;
                 }
 
-            var laysMushrooms = (XmlElement) remove.SelectSingleNode(nameof(result.LaysMushrooms));
+            var laysMushrooms = (XmlElement) remove.SelectSingleNode("ns:" + nameof(result.LaysMushrooms), namespaceManager);
             if (laysMushrooms != null)
                 {
                 if (result.LaysMushrooms.HasValue)
@@ -161,7 +159,7 @@ namespace Labyrinth.Services.WorldBuilding
                 result.LaysMushrooms = false;
                 }
 
-            var splitsOnHit = (XmlElement) remove.SelectSingleNode(nameof(result.SplitsOnHit));
+            var splitsOnHit = (XmlElement) remove.SelectSingleNode("ns:" + nameof(result.SplitsOnHit), namespaceManager);
             if (splitsOnHit != null)
                 {
                 if (result.SplitsOnHit.HasValue)
@@ -169,7 +167,7 @@ namespace Labyrinth.Services.WorldBuilding
                 result.SplitsOnHit = false;
                 }
 
-            var shootsAtPlayer = (XmlElement) remove.SelectSingleNode(nameof(result.ShootsAtPlayer));
+            var shootsAtPlayer = (XmlElement) remove.SelectSingleNode("ns:" + nameof(result.ShootsAtPlayer), namespaceManager);
             if (shootsAtPlayer != null)
                 {
                 if (!result.ShootsAtPlayer.UseBreedDefault)
@@ -177,7 +175,7 @@ namespace Labyrinth.Services.WorldBuilding
                 result.ShootsAtPlayer = Setting<ShootsAtPlayer>.SettingNoBehaviour();
                 }
 
-            var shotsBounceOffAttribute = (XmlElement) remove.SelectSingleNode(nameof(result.ShotsBounceOff));
+            var shotsBounceOffAttribute = (XmlElement) remove.SelectSingleNode("ns:" + nameof(result.ShotsBounceOff), namespaceManager);
             if (shotsBounceOffAttribute != null)
                 {
                 if (result.ShotsBounceOff.HasValue)

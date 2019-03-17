@@ -99,7 +99,7 @@ namespace Labyrinth.Services.WorldBuilding
             if (objects != null)
                 {
                 var objectList = objects.Cast<XmlElement>();
-                pgo.AddGameObjects(objectList);
+                pgo.AddGameObjects(objectList, this._xnm);
                 }
 
             ValidateGameState(layout, gameState);

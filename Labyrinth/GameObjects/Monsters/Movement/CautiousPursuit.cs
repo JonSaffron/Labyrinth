@@ -58,7 +58,7 @@ namespace Labyrinth.GameObjects.Movement
                 return false;
                 }
 
-            this.Monster.Move(direction, this.Monster.StandardSpeed);
+            this.Monster.Move(direction, this.Monster.CurrentSpeed);
             this._currentDirection = direction;
             return true;
             }

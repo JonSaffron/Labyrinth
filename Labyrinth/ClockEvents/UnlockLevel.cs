@@ -34,7 +34,7 @@ namespace Labyrinth.ClockEvents
 
                 int worldAreaId = this._world.GetWorldAreaIdForTilePos(m.TilePosition);
                 if (worldAreaId < levelThatPlayerShouldHaveReached)
-                    m.IsActive = true;
+                    m.Activate();
                 }
             }
         }

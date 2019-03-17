@@ -72,7 +72,7 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new InvalidOperationException();
                 }
-            this._timeToTravel = (double) (distanceToTravel / this.StandardSpeed);
+            this._timeToTravel = (double) (distanceToTravel / StandardSpeed);
             }
         
         /// <summary>
@@ -147,8 +147,8 @@ namespace Labyrinth.GameObjects
             {
             if (this._timeToTravel > 0)
                 {
-                this.Move(this._directionOfTravel, this.StandardSpeed);
-                this._timeToTravel -= Constants.TileLength / (double) this.StandardSpeed;
+                this.Move(this._directionOfTravel, StandardSpeed);
+                this._timeToTravel -= Constants.TileLength / (double) StandardSpeed;
                 return true;
                 }
             return false;
@@ -165,6 +165,6 @@ namespace Labyrinth.GameObjects
             ResetTimeToTravel();
             }
 
-        public override decimal StandardSpeed => Constants.BaseSpeed * 4;
+        private const decimal StandardSpeed = Constants.BaseSpeed * 4;
         }
     }

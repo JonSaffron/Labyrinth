@@ -27,6 +27,11 @@ namespace Labyrinth
         public const int BaseSpeed = BaseDistancesMovedPerSecond * BaseDistance;
 
         /// <summary>
+        /// Speed of a pushed object
+        /// </summary>
+        public const int PushSpeed = (int) (BaseSpeed * 2.5);
+
+        /// <summary>
         /// Speed when bouncing back
         /// </summary>
         public const int BounceBackSpeed = BaseSpeed * 3;

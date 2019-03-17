@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth
     {
@@ -10,9 +11,11 @@ namespace Labyrinth
 
         bool Update(GameTime gameTime);
 
-        // void ResetPosition(Vector2 position);
         void Move(Direction direction, decimal speed);
         void BounceBack(Direction direction, decimal speed);
-        //void StandStill();
+
+        // todo are these required?
+        // void ResetPosition(Vector2 position);
+        // void StandStill();
         }
     }

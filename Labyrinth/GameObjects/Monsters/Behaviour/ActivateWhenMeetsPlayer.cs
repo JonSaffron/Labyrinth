@@ -19,7 +19,7 @@ namespace Labyrinth.GameObjects.Behaviour
             bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster);
             if (inSameRoom)
                 {
-                this.Monster.IsActive = true;
+                this.Monster.Activate();
                 this.RemoveMe();
                 }
             }

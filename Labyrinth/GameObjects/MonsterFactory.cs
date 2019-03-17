@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
-using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
@@ -26,7 +25,7 @@ namespace Labyrinth.GameObjects
             var breedInfo = Breeds[monsterDef.Breed];
             var result = BuildMonsterFromBreed(breedInfo, monsterDef);
             AddInherentBehaviours(result, breedInfo);
-            AddMovements(result, breedInfo, monsterDef.InitialDirection.GetValueOrDefault(Direction.None));
+            AddMovements(result, breedInfo);
             AddInherentProperties(result, breedInfo);
 
             if (monsterDef.Mobility.HasValue)
@@ -78,8 +77,8 @@ namespace Labyrinth.GameObjects
                 else
                     result.Properties.Remove(GameObjectProperties.EffectOfShot);
                 }
-            if (monsterDef.IsActive.HasValue)
-                result.IsActive = monsterDef.IsActive.Value;
+            if (monsterDef.IsActive.GetValueOrDefault())
+                result.Activate();
 
             if (!result.IsActive)
                 {
@@ -92,8 +91,7 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Monster of type " + monsterDef.Breed + " at " + monsterDef.Position + " has no movement boundary. Presumably ChangeRooms has not been set.");
                 }
 
-            var initialDirection = monsterDef.InitialDirection.GetValueOrDefault(Direction.None);
-            result.SetMonsterMotion(initialDirection);
+            result.SetMonsterMotion();
             
             return result;
             }
@@ -140,7 +138,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private static void AddMovements(Monster monster, Breed breedInfo, Direction initialDirection)
+        private static void AddMovements(Monster monster, Breed breedInfo)
             {
             var movement = breedInfo.BreedMovement;
             if (movement.ChangeRooms.HasValue)
@@ -161,8 +159,7 @@ namespace Labyrinth.GameObjects
                     throw new InvalidOperationException("Could not find movement Type " + move.Value);
                     }
 
-                IMonsterMotion implementation = GetImplementationForMotion(monster, movementType, initialDirection);
-                monster.MovementMethods.Add(move.Key, implementation);
+                monster.MovementMethods.Add(move.Key, movementType);
                 }
             if (movement.DefaultMobility.HasValue)
                 {
@@ -293,29 +290,6 @@ namespace Labyrinth.GameObjects
                 }
 
             methodInfo.Invoke(propertyBag, new[] {propertyDef, value});
-            }
-
-        private static IMonsterMotion GetImplementationForMotion(Monster monster, Type type, Direction initialDirection)
-            {
-            if (!type.GetInterfaces().Contains(typeof(IMonsterMotion)))
-                {
-                throw new InvalidOperationException("Type " + type.Name + " does not implement IMonsterMotion.");
-                }
-
-            var constructorArgTypes = new List<Type> {typeof(Monster)};
-            var constructorArguments = new List<object> {monster};
-            if (initialDirection != Direction.None)
-                {
-                constructorArgTypes.Add(typeof(Direction));
-                constructorArguments.Add(initialDirection);
-                }
-
-            var constructorInfo = type.GetConstructor(constructorArgTypes.ToArray());
-            if (constructorInfo == null)
-                throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
-
-            var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments.ToArray());
-            return movementImplementation;
             }
 
         private class Breed

@@ -23,7 +23,7 @@ namespace Labyrinth.Services.WorldBuilding
             // ReSharper disable once PossibleNullReferenceException
             foreach (XmlElement mdef in node.SelectNodes("ns:MonsterTemplates/ns:Monster", xnm))
                 {
-                var md = MonsterDef.FromXml(mdef);
+                var md = MonsterDef.FromXml(mdef, xnm);
                 int matchingDiceRoll = int.Parse(mdef.GetAttribute("MatchingDiceRoll"));
                 result.Templates.Add(matchingDiceRoll, md);
                 }

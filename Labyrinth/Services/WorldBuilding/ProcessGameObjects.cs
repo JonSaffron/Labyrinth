@@ -53,9 +53,9 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public void AddGameObjects(IEnumerable<XmlElement> objectList)
+        public void AddGameObjects(IEnumerable<XmlElement> objectList, XmlNamespaceManager namespaceManager)
             {
-            var objectCreationHandlers = BuildMapForObjectCreation();
+            var objectCreationHandlers = BuildMapForObjectCreation(namespaceManager);
             foreach (XmlElement definition in objectList)
                 {
                 if (!objectCreationHandlers.TryGetValue(definition.LocalName, out var action))
@@ -65,13 +65,17 @@ namespace Labyrinth.Services.WorldBuilding
                 action(definition);
                 }
             }
-                
-        private Dictionary<string, Action<XmlElement>> BuildMapForObjectCreation()
+        
+        private Dictionary<string, Action<XmlElement>> BuildMapForObjectCreation(XmlNamespaceManager namespaceManager)
             {
             var result = new Dictionary<string, Action<XmlElement>>
                 {
                     {nameof(Boulder), AddBoulder},
-                    {nameof(Monster), AddMonster},
+                    {nameof(Monster), item =>
+                        {
+                        AddMonster(item, namespaceManager);
+                        }
+                    },
                     {nameof(Crystal), AddCrystal},
                     {nameof(ForceField), AddForceFields},
                     {nameof(CrumblyWall), AddCrumblyWall}
@@ -79,9 +83,9 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        private void AddMonster(XmlElement mdef)
+        private void AddMonster(XmlElement mdef, XmlNamespaceManager namespaceManager)
             {
-            MonsterDef md = MonsterDef.FromXml(mdef);
+            MonsterDef md = MonsterDef.FromXml(mdef, namespaceManager);
             var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
             md.Position = tilePos.ToPosition();
             this._gameState.AddMonster(md);

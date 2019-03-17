@@ -3,13 +3,14 @@ using Labyrinth.GameObjects;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.GameObjects.Movement;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Test
     {
     class DummyMonster : Monster
         {
-        public DummyMonster(AnimationPlayer animationPlayer, Vector2 position, int energy) : base("", animationPlayer, position, energy)
+        public DummyMonster(MonsterDef monsterDef, AnimationPlayer animationPlayer) : base(monsterDef, animationPlayer)
             {
             this.Mobility = MonsterMobility.Placid;
             this.IsActive = true;
@@ -65,7 +66,7 @@ namespace Labyrinth.Test
                 return false;
                 }
 
-            this.Monster.Move(direction, this.Monster.StandardSpeed);
+            this.Monster.Move(direction, this.Monster.CurrentSpeed);
             return true;
             }
         }

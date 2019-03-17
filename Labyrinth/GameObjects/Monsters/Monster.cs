@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Labyrinth.GameObjects.Behaviour;
@@ -12,7 +13,7 @@ namespace Labyrinth.GameObjects
     public class Monster : MovingItem, IMonster
         {
         private MonsterMobility _mobility;
-        public readonly Dictionary<MonsterMobility, IMonsterMotion> MovementMethods = new Dictionary<MonsterMobility, IMonsterMotion>();
+        public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
         [CanBeNull] private IMonsterMotion _determineDirection;
 
         public IBoundMovement SightBoundary { get; private set; }
@@ -36,10 +37,15 @@ namespace Labyrinth.GameObjects
         public bool IsActive
             {
             get => this._isActive;
-            set
+            protected set => this._isActive = value;
+            }
+
+        public void Activate()
+            {
+            if (!this.IsActive)
                 {
-                this._isActive = value;
-                SetMonsterMotion();
+                this._isActive = true;
+                SetMonsterMotion(true);
                 }
             }
 
@@ -50,21 +56,23 @@ namespace Labyrinth.GameObjects
                 {
                 this._mobility = value;
                 SetMonsterMotion();
+                this.Properties.Set(GameObjectProperties.Solidity,
+                    value == MonsterMobility.Stationary ? ObjectSolidity.Stationary : ObjectSolidity.Insubstantial);
                 }
             }
 
-        public void SetMonsterMotion(Direction initialDirection = Direction.None)
+        public void SetMonsterMotion(bool isInitialActivation = false)
             {
             if (this.IsStationary)
                 {
                 this._determineDirection = new Stationary(this);
-                this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
                 return;
                 }
 
-            if (!this.MovementMethods.TryGetValue(this.Mobility, out this._determineDirection))
+            if (!this.MovementMethods.TryGetValue(this.Mobility, out var movementType))
                 throw new InvalidOperationException("Monster is not set for movement " + this.Mobility);
-            this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Insubstantial);
+            var initialDirection = isInitialActivation ? this.Definition.InitialDirection.GetValueOrDefault(Direction.None) : Direction.None;
+            this._determineDirection = GetImplementationForMotion(this, movementType, initialDirection);
             }
 
         /// <inheritdoc cref="IMonster" />
@@ -149,7 +157,7 @@ namespace Labyrinth.GameObjects
             {
             while (true)
                 {
-                var timeItWouldTakeToMakeAMove = Constants.TileLength / (double) this.StandardSpeed;
+                var timeItWouldTakeToMakeAMove = Constants.TileLength / (double) this.CurrentSpeed;
                 if (timeStationary < timeItWouldTakeToMakeAMove)
                     break;
 
@@ -178,7 +186,6 @@ namespace Labyrinth.GameObjects
             }
 
         public int CurrentSpeed { get; set; }
-        public override decimal StandardSpeed => this.CurrentSpeed;
 
         [NotNull]
         public BehaviourCollection Behaviours { get; }
@@ -202,6 +209,29 @@ namespace Labyrinth.GameObjects
                     this.SightBoundary = roomBoundary;
                     }
                 }
+            }
+
+        private static IMonsterMotion GetImplementationForMotion(Monster monster, Type type, Direction initialDirection)
+            {
+            if (!type.GetInterfaces().Contains(typeof(IMonsterMotion)))
+                {
+                throw new InvalidOperationException("Type " + type.Name + " does not implement IMonsterMotion.");
+                }
+
+            var constructorArgTypes = new List<Type> {typeof(Monster)};
+            var constructorArguments = new List<object> {monster};
+            if (initialDirection != Direction.None)
+                {
+                constructorArgTypes.Add(typeof(Direction));
+                constructorArguments.Add(initialDirection);
+                }
+
+            var constructorInfo = type.GetConstructor(constructorArgTypes.ToArray());
+            if (constructorInfo == null)
+                throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
+
+            var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments.ToArray());
+            return movementImplementation;
             }
         }
     }

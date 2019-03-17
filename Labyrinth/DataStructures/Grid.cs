@@ -55,7 +55,6 @@ namespace Labyrinth.DataStructures
             return result;
             }
 
-        /// <inheritdoc />
         public IEnumerable<IGameObject> DistinctItems()
             {
             var set = new HashSet<IGameObject>();
@@ -76,7 +75,6 @@ namespace Labyrinth.DataStructures
                 }
             }
 
-        /// <inheritdoc />
         public void UpdatePosition(IMovingItem item)
             {
             if (item == null)

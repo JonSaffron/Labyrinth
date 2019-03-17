@@ -90,7 +90,7 @@ namespace Labyrinth.GameObjects
         public void Reset()
             {
             this.CurrentDirectionFaced = Direction.Left;
-            this.CurrentMovement = Labyrinth.Movement.Still;
+            this.CurrentMovement = DataStructures.Movement.Still;
             Ap.PlayAnimation(_leftRightStaticAnimation);
             this._time = 0;
 
@@ -314,8 +314,6 @@ namespace Labyrinth.GameObjects
             return result;
             }
         
-        //public override ObjectCapability Capability => ObjectCapability.CanPushOrCauseBounceBack;
-
-        public override decimal StandardSpeed => Constants.BaseSpeed * 2;
+        private const decimal StandardSpeed = Constants.BaseSpeed * 2;
         }
     }
