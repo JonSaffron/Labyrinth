@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.Services.PathFinder
     {

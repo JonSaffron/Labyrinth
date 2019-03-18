@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Labyrinth.DataStructures;
 using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth

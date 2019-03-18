@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;

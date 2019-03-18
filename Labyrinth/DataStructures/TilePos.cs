@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth
+namespace Labyrinth.DataStructures
     {
     public readonly struct TilePos
         {

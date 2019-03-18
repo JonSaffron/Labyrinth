@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.Services.PathFinder
     {

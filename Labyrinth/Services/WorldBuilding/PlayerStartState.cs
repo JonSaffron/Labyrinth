@@ -1,5 +1,6 @@
 ﻿using System.Xml;
 using Microsoft.Xna.Framework;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.Services.WorldBuilding
     {

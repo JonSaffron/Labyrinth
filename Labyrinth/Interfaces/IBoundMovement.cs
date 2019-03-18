@@ -1,4 +1,6 @@
-﻿namespace Labyrinth
+﻿using Labyrinth.DataStructures;
+
+namespace Labyrinth
     {
     public interface IBoundMovement
         {

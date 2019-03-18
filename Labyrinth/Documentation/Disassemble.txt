@@ -3752,9 +3752,9 @@ static object injured (b)
 2715 A5 73     LDA 73                   
 2717 4C D6 2D  JMP 2DD6                 -- play firing sound
 
-		-- Find an empty monster data slot in c00
-		-- on entry, Y is the initialised loop counter E0
-		-- on exit, Y is the location of the slot
+		-- Find an empty monster data slot in c00 (moving down in memory)
+		-- on entry, Y is the initialised loop counter, e.g. E0 or B0
+		-- on exit, Y is the location of the slot, or 0 if nothing available
 
 271A B9 00 0C  LDA 0C00,Y               -- get slot header
 271D F0 07     BEQ 2726                 -- if zero then it's empty
@@ -3940,11 +3940,12 @@ static object injured (b)
 2842 48        PHA                      
 2843 A8        TAY                      
 2844 48        PHA                      
-2845 B9 06 0C  LDA 0C06,Y               -- get id of egg
+2845 B9 06 0C  LDA 0C06,Y               -- get monster id for the egg
 2848 AA        TAX                      
 2849 BC C0 04  LDY 04C0,X               -- get movement/behaviour template for hatched monster
-284C B9 00 07  LDA 0700,Y               -- get monster type
-284F 10 10     BPL 2861                 -- branch if monster type is not egg
+284C B9 00 07  LDA 0700,Y               -- get monster type from the template
+284F 10 10     BPL 2861                 -- branch if monster type is not egg (which it shouldn't be)
+
 2851 A9 FF     LDA #FF                  
 2853 9D 00 04  STA 0400,X               -- set room number to invalid to clear egg data
 2856 68        PLA                      
@@ -3976,6 +3977,7 @@ static object injured (b)
 2884 60        RTS                      
 
 		-- find a free place to put new monster details in
+		-- returns success with Y in the range 0 to BF, or Y = FF for failure
 
 2885 86 76     STX 76                   
 2887 A0 BF     LDY #BF                  
@@ -4020,7 +4022,7 @@ static object injured (b)
 28C3 48        PHA                      -- push monster slot
 28C4 98        TYA                      
 28C5 48        PHA                      -- push available monster id
-28C6 A0 B0     LDY #B0                  
+28C6 A0 B0     LDY #B0                  -- initialise start point for subroutine
 28C8 20 1A 27  JSR 271A                 -- get a free animation slot
 28CB 98        TYA                      
 28CC F0 3E     BEQ 290C                 -- RTS if nothing available
@@ -4058,7 +4060,8 @@ static object injured (b)
 290E AA        TAX                      
 290F 60        RTS                      
 
-		-- spawn a new diamond demon
+		-- create a new diamond demon
+		-- on successful exit, Y will return the monster ID assigned
 
 2910 8A        TXA                      
 2911 48        PHA                      
@@ -4066,7 +4069,7 @@ static object injured (b)
 2913 20 85 28  JSR 2885                 -- get free monster id
 2916 C0 FF     CPY #FF                  
 2918 F0 F2     BEQ 290C                 -- RTS if didn't find one
-291A 84 75     STY 75                   
+291A 84 75     STY 75                   -- store monster id - this will be the return value
 291C A2 16     LDX #16                  -- monster 22 is the template to use
 291E BD 40 06  LDA 0640,X               -- get 30 
 2921 99 40 06  STA 0640,Y               -- store energy
@@ -4092,14 +4095,14 @@ static object injured (b)
 294F 20 D6 2D  JSR 2DD6                 -- play spawn sound
 2952 4C 0C 29  JMP 290C                 -- RTS
 
-2955 A4 75     LDY 75                   
+2955 A4 75     LDY 75                   -- sets return value
 2957 AD C6 0B  LDA 0BC6                 -- get current room
 295A 99 00 04  STA 0400,Y               -- store room
 295D A9 FF     LDA #FF                  
 295F 99 80 05  STA 0580,Y               -- store unspecific tile
 2962 4C 4D 29  JMP 294D                 -- play sound and RTS
 
-
+		-- ??? adds the specified monster to the current room
 
 2965 8A        TXA                      
 2966 48        PHA                      
@@ -4110,7 +4113,7 @@ static object injured (b)
 296D A0 B0     LDY #B0                  
 296F 20 1A 27  JSR 271A                 -- get empty animation slot
 2972 98        TYA                      
-2973 F0 97     BEQ 290C                 -- nothing available then  RTS
+2973 F0 97     BEQ 290C                 -- nothing available then RTS
 2975 AA        TAX                      
 2976 A5 84     LDA 84                   
 2978 85 76     STA 76                   
@@ -4640,7 +4643,7 @@ static object injured (b)
 2D2B A4 76     LDY 76                   
 2D2D 4C DE 2D  JMP 2DDE                 
 
-		-- off-screen block - did it hit anything?
+		-- off-screen shot/block - did it hit anything?
 
 2D30 C9 00     CMP #00                  
 2D32 F0 16     BEQ 2D4A                 -- if nothing hit, RTS
@@ -5007,16 +5010,16 @@ static object injured (b)
 2F8A A4 84     LDY 84                   -- standard death
 2F8C 4C 5B 2F  JMP 2F5B                 -- set up long bang
 
-		-- spawn two diamond demons
+		-- display the two new diamond demons
 
-2F8F A4 89     LDY 89                   
-2F91 20 65 29  JSR 2965                 -- add newly spawned diamond demon to room
-2F94 A4 88     LDY 88                   
-2F96 20 65 29  JSR 2965                 -- add newly spawned diamond demon to room
+2F8F A4 89     LDY 89                   -- get the previously created id of the 1st monster
+2F91 20 65 29  JSR 2965                 -- add the newly spawned diamond demon to room
+2F94 A4 88     LDY 88                   -- get the previously created id of the 2nd monster
+2F96 20 65 29  JSR 2965                 -- add the newly spawned diamond demon to room
 2F99 A4 84     LDY 84                   
 2F9B 4C 5B 2F  JMP 2F5B                 -- set up long bang
 
-		-- continue dealing survival of monster
+		-- continue dealing with survival of monster
 
 2F9E A4 74     LDY 74                   
 2FA0 B9 40 06  LDA 0640,Y               -- get energy from cache
@@ -5075,12 +5078,12 @@ static object injured (b)
 2FF4 F0 15     BEQ 300B                 -- skip scoring if so 
 2FF6 BD 06 0C  LDA 0C06,X               -- get id of shot/block
 2FF9 C9 01     CMP #01                  
-2FFB F0 09     BEQ 3006                 -- call scoring once for id 1 (shot)
+2FFB F0 09     BEQ 3006                 -- jump to single scoring for id 1 (shot)
 2FFD C9 03     CMP #03                  
 2FFF D0 0A     BNE 300B                 -- skip scoring if not 3 (which indicates crushing by block)
 3001 68        PLA                      
 3002 48        PHA                      
-3003 20 9F 26  JSR 269F                 -- call scoring once for block
+3003 20 9F 26  JSR 269F                 -- call scoring (for the first time) for block
 3006 68        PLA                      
 3007 48        PHA                      
 3008 20 9F 26  JSR 269F                 -- call scoring for the second time for block, for the first time for a shot
@@ -5100,6 +5103,9 @@ static object injured (b)
 
 3017 20 BB 2F  JSR 2FBB                 -- deduct energy and adjust score
 301A B0 24     BCS 3040                 -- branch if monster still alive
+
+		-- monster has been killed
+
 301C 84 74     STY 74                   
 301E A9 00     LDA #00                  
 3020 20 D6 2D  JSR 2DD6                 -- play bang
@@ -5108,20 +5114,24 @@ static object injured (b)
 3028 29 10     AND #10                  -- extract flag for split upon death
 302A F0 1C     BEQ 3048                 -- skip over if it doesn't
 
-302C 20 10 29  JSR 2910                 -- spawn new diamond demon
-302F 84 88     STY 88                   
-3031 20 10 29  JSR 2910                 -- spawn new diamond demon
-3034 84 89     STY 89                   
+302C 20 10 29  JSR 2910                 -- create a new diamond demon
+302F 84 88     STY 88                   -- store its ID for later
+3031 20 10 29  JSR 2910                 -- create a new diamond demon
+3034 84 89     STY 89                   -- store its ID for later
 3036 A4 74     LDY 74                   -- restore monster id
 3038 A9 FF     LDA #FF                  
 303A 99 00 04  STA 0400,Y               -- mark monster as expired
 303D A9 01     LDA #01                  -- return 1 (monster died and split)
 303F 60        RTS                      
 
+		-- indicate that monster survived back to caller
+
 3040 84 74     STY 74                   
 3042 20 50 30  JSR 3050                 -- shot monster without killing it
 3045 A9 FF     LDA #FF                  -- return FF (monster survived)
 3047 60        RTS                      
+
+		-- mark room data free for killed monster
 
 3048 A9 FF     LDA #FF                  
 304A 99 00 04  STA 0400,Y               -- clear monster data slot

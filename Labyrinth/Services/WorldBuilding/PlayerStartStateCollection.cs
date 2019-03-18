@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Labyrinth.DataStructures;
 using JetBrains.Annotations;
 
 namespace Labyrinth.Services.WorldBuilding

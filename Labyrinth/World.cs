@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Labyrinth.ClockEvents;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;

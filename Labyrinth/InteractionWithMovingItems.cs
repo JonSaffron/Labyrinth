@@ -1,6 +1,7 @@
 ﻿using System;
 using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Messages;
 using Microsoft.Xna.Framework;

@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects
     {

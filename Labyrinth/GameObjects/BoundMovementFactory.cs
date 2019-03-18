@@ -1,4 +1,6 @@
-﻿namespace Labyrinth.GameObjects
+﻿using Labyrinth.DataStructures;
+
+namespace Labyrinth.GameObjects
     {
     public class BoundMovementFactory : IBoundMovementFactory
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Labyrinth.DataStructures;
 
 // http://blog.two-cats.com/2014/06/a-star-example/
 // http://theory.stanford.edu/~amitp/GameProgramming/index.html

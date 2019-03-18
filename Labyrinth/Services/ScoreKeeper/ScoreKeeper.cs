@@ -43,7 +43,6 @@ namespace Labyrinth.Services.ScoreKeeper
 
         private void CrystalTaken(CrystalTaken crystalTaken)
             {
-            // todo check isextant
             this._score += crystalTaken.Crystal.Score;
             }
 

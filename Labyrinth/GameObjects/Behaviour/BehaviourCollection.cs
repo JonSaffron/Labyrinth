@@ -29,12 +29,19 @@ namespace Labyrinth.GameObjects.Behaviour
 
         public void Add<T>() where T : BaseBehaviour, new()
             {
-            // todo ensure that type T has one or more of the marker interfaces
             if (this.Has<T>())
                 return;
+            bool hasSpecificInterface = typeof(T).FindInterfaces(TypeFilter, null).Any();
+            if (!hasSpecificInterface)
+                throw new InvalidOperationException("Behaviour " + typeof(T).Name + " does not have a specific behaviour (movement, injury, death)");
             var newBehaviour = new T();
             newBehaviour.Init(this._monster);
             base.Add(newBehaviour);
+            }
+
+        private bool TypeFilter(Type m, object filterCriteria)
+            {
+            return m == typeof(IInjuryBehaviour) || m == typeof(IMovementBehaviour) || m == typeof(IDeathBehaviour);
             }
 
         public void Remove<T>() where T : IBehaviour

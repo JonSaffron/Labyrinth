@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth

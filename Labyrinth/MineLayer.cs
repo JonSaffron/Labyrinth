@@ -1,4 +1,5 @@
-﻿using Labyrinth.GameObjects;
+﻿using Labyrinth.DataStructures;
+using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Labyrinth
+namespace Labyrinth.DataStructures
     {
     public class PropertyBag : INotifyPropertyChanged, INotifyPropertyChanging
         {

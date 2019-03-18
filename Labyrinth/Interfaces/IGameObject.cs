@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth
     {

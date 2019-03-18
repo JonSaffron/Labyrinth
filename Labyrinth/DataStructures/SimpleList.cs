@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Labyrinth
+namespace Labyrinth.DataStructures
     {
     public class SimpleList<T>
         {

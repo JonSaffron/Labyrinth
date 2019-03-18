@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Labyrinth
+namespace Labyrinth.DataStructures
     {
     public readonly struct TileRect
         {

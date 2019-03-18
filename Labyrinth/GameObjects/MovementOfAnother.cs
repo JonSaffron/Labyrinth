@@ -45,7 +45,5 @@ namespace Labyrinth.GameObjects
                     throw new InvalidOperationException();
                 }
             }
-
-
         }
     }

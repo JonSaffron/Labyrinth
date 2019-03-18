@@ -1,4 +1,5 @@
-﻿using Labyrinth.Services.WorldBuilding;
+﻿using Labyrinth.DataStructures;
+using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth.GameObjects.Behaviour
     {
@@ -26,10 +27,10 @@ namespace Labyrinth.GameObjects.Behaviour
                 MonsterDef md = this.Monster.Definition;
                 md.Position = this.Monster.TilePosition.ToPosition();
                 md.InitialDirection = Direction.None;
-                md.ChangeRooms = Monster.ChangeRooms; // todo check this
                 md.IsEgg = true;
                 md.TimeBeforeHatching = (this.Random.Next(256) & 0x1f) + 8;
-                md.LaysEggs = false; // todo check this
+
+                md.LaysEggs = false; // original game says hatched monsters do not lay eggs themselves
                 GlobalServices.GameState.AddMonster(md);
                 }
             }

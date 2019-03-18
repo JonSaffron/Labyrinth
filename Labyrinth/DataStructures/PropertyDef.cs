@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Labyrinth
+namespace Labyrinth.DataStructures
     {
     /// <summary>
     /// Strongly typed property identifier for properties

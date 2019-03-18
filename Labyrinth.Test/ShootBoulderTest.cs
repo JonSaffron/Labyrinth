@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Input;
 using NUnit.Framework;

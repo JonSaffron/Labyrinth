@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.Services.WorldBuilding
     {

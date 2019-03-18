@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
