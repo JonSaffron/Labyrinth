@@ -1,6 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Labyrinth.GameObjects.Movement;
+using Labyrinth.GameObjects.Motility;
 
 namespace Labyrinth.GameObjects.Behaviour
     {

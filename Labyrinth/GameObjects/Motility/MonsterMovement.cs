@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Labyrinth.GameObjects.Movement
+namespace Labyrinth.GameObjects.Motility
     {
     static class MonsterMovement
         {

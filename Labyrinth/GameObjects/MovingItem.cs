@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.DataStructures;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
@@ -18,7 +19,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Returns or sets the current movement by this object
         /// </summary>
-        public DataStructures.Movement CurrentMovement { get; protected set; }
+        public Movement CurrentMovement { get; protected set; }
 
         /// <summary>
         /// Returns or sets the previous position of this object
@@ -34,7 +35,7 @@ namespace Labyrinth.GameObjects
         public virtual void ResetPosition(Vector2 position)
             {
             this.Position = position;
-            this.CurrentMovement = DataStructures.Movement.Still;
+            this.CurrentMovement = Movement.Still;
             GlobalServices.GameState.UpdatePosition(this);
             }
 
@@ -54,7 +55,7 @@ namespace Labyrinth.GameObjects
             {
             var movingTowardsTilePos = this.TilePosition.GetPositionAfterOneMove(direction);
             var movingTowards = movingTowardsTilePos.ToPosition();
-            this.CurrentMovement = new DataStructures.Movement(direction, movingTowards, speed);
+            this.CurrentMovement = new Movement(direction, movingTowards, speed);
             }
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public void StandStill()
             {
-            this.CurrentMovement = DataStructures.Movement.Still;
+            this.CurrentMovement = Movement.Still;
             }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace Labyrinth.GameObjects
             var originallyMovingTowards = TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards);
             var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);
             var movingTowards = movingTowardsTilePos.ToPosition();
-            this.CurrentMovement = new DataStructures.Movement(direction, movingTowards, speed);
+            this.CurrentMovement = new Movement(direction, movingTowards, speed);
             }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace Labyrinth.GameObjects.Movement
+namespace Labyrinth.GameObjects.Motility
     {
     class StandardPatrolling : MonsterMotionBase
         {

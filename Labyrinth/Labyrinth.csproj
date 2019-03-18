@@ -135,25 +135,25 @@
     <Compile Include="GameObjects\BoundMovementFactory.cs" />
     <Compile Include="GameObjects\GameObjectProperties.cs" />
     <Compile Include="GameObjects\MonsterFactory.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\ActivateWhenMeetsPlayer.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\ActivateWhenHurt.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\BaseBehaviour.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\BehaviourCollection.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\ChangeRoomsAfterInjury.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\MobilityAfterInjury.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\Flitter.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\LaysEgg.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\LaysMushroom.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\ShootsAtPlayer.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\SpawnsUponDeath.cs" />
-    <Compile Include="GameObjects\Monsters\Behaviour\StartsShootingWhenHurt.cs" />
-    <Compile Include="GameObjects\Monsters\MonsterEgg.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\CautiousPursuit.cs" />
+    <Compile Include="GameObjects\Behaviour\ActivateWhenMeetsPlayer.cs" />
+    <Compile Include="GameObjects\Behaviour\ActivateWhenHurt.cs" />
+    <Compile Include="GameObjects\Behaviour\BaseBehaviour.cs" />
+    <Compile Include="GameObjects\Behaviour\BehaviourCollection.cs" />
+    <Compile Include="GameObjects\Behaviour\ChangeRoomsAfterInjury.cs" />
+    <Compile Include="GameObjects\Behaviour\MobilityAfterInjury.cs" />
+    <Compile Include="GameObjects\Behaviour\Flitter.cs" />
+    <Compile Include="GameObjects\Behaviour\LaysEgg.cs" />
+    <Compile Include="GameObjects\Behaviour\LaysMushroom.cs" />
+    <Compile Include="GameObjects\Behaviour\ShootsAtPlayer.cs" />
+    <Compile Include="GameObjects\Behaviour\SpawnsUponDeath.cs" />
+    <Compile Include="GameObjects\Behaviour\StartsShootingWhenHurt.cs" />
+    <Compile Include="GameObjects\MonsterEgg.cs" />
+    <Compile Include="GameObjects\Motility\CautiousPursuit.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\FullPursuit.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\MonsterMotionBase.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\PatrolPerimeter.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\Stationary.cs" />
+    <Compile Include="GameObjects\Motility\FullPursuit.cs" />
+    <Compile Include="GameObjects\Motility\MonsterMotionBase.cs" />
+    <Compile Include="GameObjects\Motility\PatrolPerimeter.cs" />
+    <Compile Include="GameObjects\Motility\Stationary.cs" />
     <Compile Include="GameObjects\MovementChecker.cs" />
     <Compile Include="GameObjects\MovementOfAnother.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
@@ -182,11 +182,11 @@
     <Compile Include="Interfaces\IStandardShot.cs" />
     <Compile Include="Interfaces\ITakeable.cs" />
     <Compile Include="Interfaces\IValuable.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\KillerCubeRedMovement.cs" />
+    <Compile Include="GameObjects\Motility\KillerCubeRedMovement.cs" />
     <Compile Include="Interfaces\IServiceSetup.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\Placid.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\RotaFloaterCyanMovement.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\SemiAggressive.cs" />
+    <Compile Include="GameObjects\Motility\Placid.cs" />
+    <Compile Include="GameObjects\Motility\RotaFloaterCyanMovement.cs" />
+    <Compile Include="GameObjects\Motility\SemiAggressive.cs" />
     <Compile Include="DataStructures\Movement.cs" />
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
     <Compile Include="Interfaces\IAnimationPlayer.cs" />
@@ -261,15 +261,15 @@
     <Compile Include="Services\WorldBuilding\TileUsage.cs" />
     <Compile Include="Services\WorldBuilding\WorldValidator.cs" />
     <Compile Include="StandardMonsterWeapon.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\StandardPatrolling.cs" />
+    <Compile Include="GameObjects\Motility\StandardPatrolling.cs" />
     <Compile Include="StandardPlayerWeapon.cs" />
     <Compile Include="GameObjects\Wall.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\StandardRolling.cs" />
+    <Compile Include="GameObjects\Motility\StandardRolling.cs" />
     <Compile Include="DataStructures\TileRect.cs" />
     <Compile Include="ClockEvents\UnlockLevel.cs" />
     <Compile Include="World.cs" />
-    <Compile Include="GameObjects\Monsters\Monster.cs" />
-    <Compile Include="GameObjects\Monsters\Movement\MonsterMovement.cs" />
+    <Compile Include="GameObjects\Monster.cs" />
+    <Compile Include="GameObjects\Motility\MonsterMovement.cs" />
     <Compile Include="GameObjects\MovingItem.cs" />
     <Compile Include="GameObjects\Mushroom.cs" />
     <Compile Include="GameObjects\Player.cs" />
@@ -360,7 +360,9 @@
     <None Include="Documentation\Book1.xls" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="GameObjects\Monsters\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

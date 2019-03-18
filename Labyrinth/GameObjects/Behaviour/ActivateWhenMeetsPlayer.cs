@@ -1,4 +1,4 @@
-﻿using Labyrinth.GameObjects.Movement;
+﻿using Labyrinth.GameObjects.Motility;
 
 namespace Labyrinth.GameObjects.Behaviour
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Labyrinth.GameObjects;
 using Labyrinth.GameObjects.Behaviour;
-using Labyrinth.GameObjects.Movement;
+using Labyrinth.GameObjects.Motility;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;

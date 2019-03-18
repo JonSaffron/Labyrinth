@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Labyrinth.GameObjects.Movement;
+using Labyrinth.GameObjects.Motility;
 using Labyrinth.Services.Input;
 using NUnit.Framework;
 
