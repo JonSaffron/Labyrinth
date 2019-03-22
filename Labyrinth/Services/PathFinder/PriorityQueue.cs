@@ -107,9 +107,14 @@ namespace Labyrinth.Services.PathFinder
             }
 
         /// <summary>
+        /// Returns true if the queue is empty, false otherwise
+        /// </summary>
+        public bool IsEmpty => this._data.Count == 0;
+
+        /// <summary>
         /// Returns a count of all the items currently in the queue.
         /// </summary>
-        public int Count => _data.Count;
+        public int Count => this._data.Count;
 
         /// <summary>
         /// Returns a string representation of the queue contents

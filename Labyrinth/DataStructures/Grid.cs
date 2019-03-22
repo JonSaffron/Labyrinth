@@ -118,6 +118,7 @@ namespace Labyrinth.DataStructures
             item.OriginalPosition = item.Position;
             }
 
+        // ReSharper disable once UnusedMember.Global - useful debugging tool
         public void FindItem(IMovingItem itemToFind)
             {
             System.Diagnostics.Trace.WriteLine($"Previous {TilePos.TilePosFromPosition(itemToFind.OriginalPosition)}    Actual {TilePos.TilePosFromPosition(itemToFind.Position)}");

@@ -26,7 +26,7 @@ namespace Labyrinth.Services.Sound
         public void PlayWithCallback(GameSound gameSound, [NotNull] EventHandler callback)
             {
             if (callback == null)
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
 
             InternalPlay(gameSound);
             AddCallback(gameSound, callback);
@@ -35,9 +35,9 @@ namespace Labyrinth.Services.Sound
         public void PlayForObject(GameSound gameSound, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider)
             {
             if (gameObject == null)
-                throw new ArgumentNullException("gameObject");
+                throw new ArgumentNullException(nameof(gameObject));
             if (centrePointProvider == null)
-                throw new ArgumentNullException("centrePointProvider");
+                throw new ArgumentNullException(nameof(centrePointProvider));
 
             InternalPlayForObject(gameSound, gameObject, centrePointProvider);
             }
@@ -45,11 +45,11 @@ namespace Labyrinth.Services.Sound
         public void PlayForObjectWithCallback(GameSound gameSound, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider, [NotNull] EventHandler callback)
             {
             if (gameObject == null)
-                throw new ArgumentNullException("gameObject");
+                throw new ArgumentNullException(nameof(gameObject));
             if (centrePointProvider == null)
-                throw new ArgumentNullException("centrePointProvider");
+                throw new ArgumentNullException(nameof(centrePointProvider));
             if (callback == null)
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
 
             InternalPlayForObject(gameSound, gameObject, centrePointProvider);
             AddCallback(gameSound, callback);

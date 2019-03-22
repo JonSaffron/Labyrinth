@@ -11,6 +11,7 @@ namespace Labyrinth.Test
     [TestFixture]
     class TestMortonCode
         {
+/*
         [Test]
         public void TestBackAndForth()
             {
@@ -25,7 +26,7 @@ namespace Labyrinth.Test
                     }
                 }
             }
-
+*/
         [Test]
         public void TestTilePosToPosition()
             {

@@ -23,7 +23,13 @@ namespace Labyrinth.Services.Display
         /// Returns the rate at which the animation moves to the next frame. 
         /// The higher the number, the longer the animation will remain on each frame.
         /// </summary>
+        [Obsolete]
         public int BaseMovementsPerFrame { get; }
+
+        /// <summary>
+        /// Returns the length of the animation, measured in the number of BaseMovements
+        /// </summary>
+        public int LengthOfAnimation { get; }
 
         /// <summary>
         /// When the end of the animation is reached, should it
@@ -75,6 +81,8 @@ namespace Labyrinth.Services.Display
             this.TextureName = textureName;
             this.BaseMovementsPerFrame = baseMovementsPerFrame;
             this.LoopAnimation = loopAnimation;
+
+            this.LengthOfAnimation = 0;
             }
 
         /// <summary>

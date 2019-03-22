@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace Labyrinth.GameObjects.Motility
     {
+    // todo prevent monster from entering level that is higher than player's highest level (21AF in disassembly)
     abstract class MonsterMotionBase : IMonsterMotion
         {
         protected readonly Monster Monster;

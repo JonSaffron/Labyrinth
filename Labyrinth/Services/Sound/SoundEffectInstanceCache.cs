@@ -4,7 +4,7 @@ namespace Labyrinth.Services.Sound
     {
     class SoundEffectInstanceCache : InstanceCache<ISoundEffectInstance>
         {
-        public TimeSpan SoundDuration { get; private set; }
+        public TimeSpan SoundDuration { get; }
         private readonly GameSound _gameSound;
 
         public SoundEffectInstanceCache(int countOfEntries, TimeSpan soundDuration, GameSound gameSound, Func<ISoundEffectInstance> createNewInstance): base(countOfEntries, createNewInstance)
@@ -22,7 +22,7 @@ namespace Labyrinth.Services.Sound
 
         public override string ToString()
             {
-            string result = string.Format($"Cache for {this._gameSound}: {this.Count} of {this.Size} used");
+            string result = $"Cache for {this._gameSound}: {this.Count} of {this.Size} used";
             return result;
             }
         }

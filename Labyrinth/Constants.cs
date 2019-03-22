@@ -5,7 +5,7 @@ namespace Labyrinth
     static class Constants
         {
         /// <summary>
-        /// Length of tile
+        /// Length of tile in pixels
         /// </summary>
         public const int TileLength = 32;
 

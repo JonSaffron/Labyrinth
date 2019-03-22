@@ -58,7 +58,7 @@ namespace Labyrinth.Services.Sound
 
         public override string ToString()
             {
-            var result = string.Format("{0} {1}", this.SoundEffectInstance.InstanceName, this.SoundEffectInstance.State);
+            var result = $"{this.SoundEffectInstance.InstanceName} {this.SoundEffectInstance.State}";
             if (this.SoundEffectInstance.RestartPlayWhenStopped)
                 result += " to be restarted";
             return result;

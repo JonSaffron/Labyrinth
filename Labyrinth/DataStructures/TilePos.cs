@@ -151,7 +151,7 @@ namespace Labyrinth.DataStructures
             var result = new TileRect(topLeft, diameter, diameter);
             return result;
             }
-
+/*
         /// <summary>
         /// Returns the Morton Code for this instance
         /// </summary>
@@ -200,7 +200,7 @@ namespace Labyrinth.DataStructures
             x = (x ^ (x >>  8)) & 0x0000ffff; // x = ---- ---- ---- ---- fedc ba98 7654 3210
             return x;
             }
-
+*/
         /// <summary>
         /// Returns a textual representation of this instance
         /// </summary>

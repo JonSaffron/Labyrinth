@@ -48,7 +48,7 @@ namespace Labyrinth.Services.Sound
 
         private static IEnumerable<FileInfo> GetListOfWavFiles(string rootDirectoryForResources)
             {
-            var pathToSoundsFolder = string.Format(@"{0}\{1}", rootDirectoryForResources, SoundsFolder);
+            var pathToSoundsFolder = $@"{rootDirectoryForResources}\{SoundsFolder}";
             var dir = new DirectoryInfo(pathToSoundsFolder);
             if (!dir.Exists)
                 throw new DirectoryNotFoundException(pathToSoundsFolder);
@@ -62,7 +62,7 @@ namespace Labyrinth.Services.Sound
             foreach (var file in listOfWavFiles)
                 {
                 var resourceName = Path.GetFileNameWithoutExtension(file.Name);
-                var pathToResource = string.Format("{0}/{1}", SoundsFolder, resourceName);
+                var pathToResource = $"{SoundsFolder}/{resourceName}";
                 var soundEffect = cm.Load<SoundEffect>(pathToResource);
                 soundEffect.Name = resourceName;
                 result.Add(resourceName, soundEffect);
@@ -76,11 +76,11 @@ namespace Labyrinth.Services.Sound
             foreach (GameSound item in Enum.GetValues(typeof(GameSound)))
                 {
                 var copyOfItem = item;
-                Func<ISoundEffectInstance> createSoundEffectInstance = () => CreateInstance(copyOfItem);
+                ISoundEffectInstance CreateSoundEffectInstance() => CreateInstance(copyOfItem);
 
                 int cacheSize = GetCacheSize(item);
                 TimeSpan soundDuration = GetSoundEffect(copyOfItem).Duration;
-                var cache = new SoundEffectInstanceCache(cacheSize, soundDuration, copyOfItem, createSoundEffectInstance);
+                var cache = new SoundEffectInstanceCache(cacheSize, soundDuration, copyOfItem, CreateSoundEffectInstance);
                 result.Add(item, cache);
                 }
             return result;

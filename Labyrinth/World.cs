@@ -202,7 +202,6 @@ namespace Labyrinth
             return this._levelReturnType;
             }
 
-
         private void UpdateGameItems(GameTime gameTime)
             {
             //const float minimumDistance = (Constants.TileLength * 2;
@@ -268,9 +267,9 @@ namespace Labyrinth
         /// <returns>A rectangular structure which specifies the co-ordinates of the room containing the specified position</returns>
         public static Rectangle GetContainingRoom(Vector2 position)
             {
-            var roomx = (int) (position.X / Constants.RoomSizeInPixels.X);
-            var roomy = (int) (position.Y / Constants.RoomSizeInPixels.Y);
-            var r = new Rectangle(roomx * (int) Constants.RoomSizeInPixels.X, roomy * (int) Constants.RoomSizeInPixels.Y, (int) Constants.RoomSizeInPixels.X, (int) Constants.RoomSizeInPixels.Y);
+            var roomX = (int) (position.X / Constants.RoomSizeInPixels.X);
+            var roomY = (int) (position.Y / Constants.RoomSizeInPixels.Y);
+            var r = new Rectangle(roomX * (int) Constants.RoomSizeInPixels.X, roomY * (int) Constants.RoomSizeInPixels.Y, (int) Constants.RoomSizeInPixels.X, (int) Constants.RoomSizeInPixels.Y);
             return r;
             }
 
@@ -281,9 +280,9 @@ namespace Labyrinth
         /// <returns>A rectangular structure which specifies the co-ordinates of the room containing the specified position</returns>
         public static TileRect GetContainingRoom(TilePos position)
             {
-            var roomx = (int)(position.X / Constants.RoomSizeInTiles.X);
-            var roomy = (int)(position.Y / Constants.RoomSizeInTiles.Y);
-            var topLeft = new TilePos(roomx * (int) Constants.RoomSizeInTiles.X, roomy * (int) Constants.RoomSizeInTiles.Y);
+            var roomX = (int)(position.X / Constants.RoomSizeInTiles.X);
+            var roomY = (int)(position.Y / Constants.RoomSizeInTiles.Y);
+            var topLeft = new TilePos(roomX * (int) Constants.RoomSizeInTiles.X, roomY * (int) Constants.RoomSizeInTiles.Y);
             var result = new TileRect(topLeft, (int) Constants.RoomSizeInTiles.X, (int) Constants.RoomSizeInTiles.Y);
             return result;
             }
@@ -306,7 +305,7 @@ namespace Labyrinth
                 drawQueue.Enqueue(drawOrder, item);
                 }
             //Trace.WriteLine("Drawing " + drawQueue.Count + " sprites.");
-            while (drawQueue.Count > 0)
+            while (!drawQueue.IsEmpty)
                 {
                 var item = drawQueue.Dequeue();
                 item.Draw(gameTime, spriteBatch);

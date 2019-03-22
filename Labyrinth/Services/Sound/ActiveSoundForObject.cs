@@ -63,7 +63,7 @@ namespace Labyrinth.Services.Sound
 
         public override string ToString()
             {
-            var result = string.Format("{0} {1} for {2} vol={3} pan={4}", this.SoundEffectInstance.InstanceName, this.SoundEffectInstance.State, this._gameObject.GetType().Name, this.SoundEffectInstance.Volume, this.SoundEffectInstance.Pan);
+            var result = $"{this.SoundEffectInstance.InstanceName} {this.SoundEffectInstance.State} for {this._gameObject.GetType().Name} vol={this.SoundEffectInstance.Volume} pan={this.SoundEffectInstance.Pan}";
             if (this.SoundEffectInstance.RestartPlayWhenStopped)
                 result += " to be restarted";
             return result;

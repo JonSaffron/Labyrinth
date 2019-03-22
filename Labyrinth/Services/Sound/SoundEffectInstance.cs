@@ -25,36 +25,18 @@ namespace Labyrinth.Services.Sound
 
         public bool RestartPlayWhenStopped { get; set; }
 
-        public SoundState State
-            {
-            get
-                {
-                return this._soundEffectInstance.State;
-                }
-            }
+        public SoundState State => this._soundEffectInstance.State;
 
         public float Pan
             {
-            get
-                {
-                return this._soundEffectInstance.Pan;
-                }
-            set
-                {
-                this._soundEffectInstance.Pan = value;
-                }
+            get => this._soundEffectInstance.Pan;
+            set => this._soundEffectInstance.Pan = value;
             }
 
         public float Volume
             {
-            get
-                {
-                return this._soundEffectInstance.Volume;
-                }
-            set
-                {
-                this._soundEffectInstance.Volume = value;
-                }
+            get => this._soundEffectInstance.Volume;
+            set => this._soundEffectInstance.Volume = value;
             }
 
         public void Dispose()
@@ -67,7 +49,7 @@ namespace Labyrinth.Services.Sound
 
         public override string ToString()
             {
-            var result = string.Format("{0} {1} vol={2} pan={3}", this.InstanceName, this.State, this.Volume, this.Pan);
+            var result = $"{this.InstanceName} {this.State} vol={this.Volume} pan={this.Pan}";
             return result;
             }
         }

@@ -172,6 +172,7 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 				Rb		00	Cursor end register
 				Rb		00
 
+Effectively running in a mode 5 screen setup modified to have 256 pixels horizontally, and 160 pixels vertically, and rendered in the usual 4 colours
 
 18e0 - 18e1		-- joystick input information
 
@@ -1612,6 +1613,10 @@ static object injured (b)
 17F0 B9 01 18  LDA 1801,Y               
 17F3 85 71     STA 71                   
 17F5 6C 70 00  JMP (0070)               -- jump to routine
+
+
+1890 to 18e1 assorted data documented at the top of this document
+
 
 		-- update animation frame for monster
 		-- on entry, X is the index into C00 identifying the monster to update
@@ -3057,7 +3062,7 @@ static object injured (b)
 2264 AD C6 0B  LDA 0BC6                 -- get new room number
 2267 20 06 26  JSR 2606                 -- get level number from room number
 226A C5 73     CMP 73                   
-226C F0 47     BEQ 22B5                 -- RTS
+226C F0 47     BEQ 22B5                 -- if level numbers are the same then RTS
 226E CD CD 0B  CMP 0BCD                 -- compare to highest level achieved
 2271 90 17     BCC 228A                 -- lower level, so branch over to next section
 2273 F0 15     BEQ 228A                 -- same level, so branch over to next section

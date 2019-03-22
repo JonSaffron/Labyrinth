@@ -1,0 +1,5 @@
+Static animation such as fruit
+Looped animation such as crystal
+Manual animation such as crumbly wall where frame index is explictly controlled
+Manual animation such as mine where the finish of the priming animation advances the state machine
+Change from static to looping animation such as player

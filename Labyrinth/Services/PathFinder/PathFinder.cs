@@ -113,7 +113,7 @@ namespace Labyrinth.Services.PathFinder
             }
 
         /// <summary>
-        /// Gets the estimated distance between a specifed point and the goal
+        /// Gets the estimated distance between a specified point and the goal
         /// </summary>
         private float GetEstimatedTraversalCost(TilePos current)
             {
@@ -124,7 +124,7 @@ namespace Labyrinth.Services.PathFinder
             int deltaY = Math.Abs(goal.Y - current.Y);
             float result = (deltaX + deltaY);
 
-            // add tie-breaker. This makes the heurisitic non-applicable but should improve the routes taken
+            // add tie-breaker. This makes the heuristic non-applicable but should improve the routes taken
             int dx1 = current.X - goal.X;
             int dy1 = current.Y - goal.Y;
             int dx2 = start.X - goal.X;

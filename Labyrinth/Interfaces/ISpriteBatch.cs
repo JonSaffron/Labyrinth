@@ -22,6 +22,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="texture">Specifies the texture to draw</param>
         /// <param name="relativePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
+        /// <remarks>Used to draw the floor</remarks>
         void DrawEntireTextureInWindow(Texture2D texture, Vector2 relativePosition);
 
         /// <summary>
@@ -29,6 +30,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="texture">Specifies the texture to draw</param>
         /// <param name="absolutePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
+        /// <remarks>Used to draw the lives left</remarks>
         void DrawEntireTexture(Texture2D texture, Vector2 absolutePosition);
 
         /// <summary>
@@ -40,14 +42,16 @@ namespace Labyrinth
         /// <param name="rotation">Specifies the angle (in radians) to rotate around the origin</param>
         /// <param name="origin">Specifies the origin point of the texture</param>
         /// <param name="effects">Specifies what effect(s) to apply to the texture</param>
+        /// <remarks>Used to draw gameobjects</remarks>
         void DrawTextureInWindow(Texture2D texture, Vector2 relativePosition, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects);
 
         /// <summary>
-        /// Draws the specified texture at the sbsolute co-ordinates specified, specifying a source rectangle
+        /// Draws the specified texture at the absolute co-ordinates specified, specifying a source rectangle
         /// </summary>
         /// <param name="texture">Specifies the texture to draw</param>
         /// <param name="absolutePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
         /// <param name="sourceRectangle">Specifies the section of the texture to draw</param>
+        /// <remarks>Used to draw the score</remarks>
         void DrawTexture(Texture2D texture, Vector2 absolutePosition, Rectangle? sourceRectangle);
 
         /// <summary>

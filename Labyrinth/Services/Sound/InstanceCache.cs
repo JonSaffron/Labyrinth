@@ -15,7 +15,7 @@ namespace Labyrinth.Services.Sound
         public InstanceCache(int countOfEntries, Func<T> createNewInstance)
             {
             if (countOfEntries <= 0)
-                throw new ArgumentOutOfRangeException("countOfEntries");
+                throw new ArgumentOutOfRangeException(nameof(countOfEntries));
 
             this._createNewInstance = createNewInstance;
             this._cache = new T[countOfEntries];
@@ -66,7 +66,7 @@ namespace Labyrinth.Services.Sound
 
         public override string ToString()
             {
-            string result = string.Format("Caching {0} of {1} objects of type {2}", this.Count, this.Size, typeof(T).Name);
+            string result = $"Caching {this.Count} of {this.Size} objects of type {typeof(T).Name}";
             return result;
             }
         }

@@ -7,7 +7,7 @@ namespace Labyrinth.ClockEvents
     {
     class WorldClock
         {
-        private int _gameClock;
+        private int _worldClock;
         private double _time;
         private readonly List<IClockEvent> _clockEvents = new List<IClockEvent>();
 
@@ -17,7 +17,7 @@ namespace Labyrinth.ClockEvents
             while (this._time >= Constants.GameClockResolution)
                 {
                 this._time -= Constants.GameClockResolution;
-                if (this._gameClock < int.MaxValue)
+                if (this._worldClock < int.MaxValue)
                     {
                     Tick();
                     }
@@ -26,10 +26,10 @@ namespace Labyrinth.ClockEvents
 
         private void Tick()
             {
-            this._gameClock++;
+            this._worldClock++;
             foreach (var item in this._clockEvents)
                 {
-                item.Update(this._gameClock);
+                item.Update(this._worldClock);
                 }
             }
 

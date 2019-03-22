@@ -160,6 +160,7 @@
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
     <Compile Include="InteractiveServices.cs" />
+    <Compile Include="Interfaces\IAnimationState.cs" />
     <Compile Include="Interfaces\IBehaviour.cs" />
     <Compile Include="Interfaces\IBoundMovement.cs" />
     <Compile Include="Interfaces\IBoundMovementFactory.cs" />
@@ -192,8 +193,10 @@
     <Compile Include="Interfaces\IAnimationPlayer.cs" />
     <Compile Include="DataStructures\PropertyBag.cs" />
     <Compile Include="DataStructures\PropertyDef.cs" />
+    <Compile Include="Services\Display\DrawParameters.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
+    <Compile Include="Services\Display\WorldRenderer.cs" />
     <Compile Include="Services\Messages\CrystalTaken.cs" />
     <Compile Include="Services\Messages\MonsterCrushed.cs" />
     <Compile Include="Services\Messages\MonsterShot.cs" />

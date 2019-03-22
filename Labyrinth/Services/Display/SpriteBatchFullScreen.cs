@@ -42,11 +42,11 @@ namespace Labyrinth.Services.Display
 
         private static Vector2 GetFullScreenOffset(Viewport viewport, float zoom)
             {
-            var viewx = Constants.RoomSizeInPixels.X * zoom;
-            var viewy = Constants.RoomSizeInPixels.Y * zoom;
-            var offsetx = (viewport.Width - viewx) / 2;
-            var offsety = (viewport.Height - viewy) / 2;
-            var result = new Vector2((int) offsetx, (int) offsety);
+            var viewX = Constants.RoomSizeInPixels.X * zoom;
+            var viewY = Constants.RoomSizeInPixels.Y * zoom;
+            var offsetX = (viewport.Width - viewX) / 2;
+            var offsetY = (viewport.Height - viewY) / 2;
+            var result = new Vector2((int) offsetX, (int) offsetY);
             return result;
             }
         }

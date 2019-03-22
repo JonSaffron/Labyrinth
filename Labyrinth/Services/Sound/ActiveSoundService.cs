@@ -11,7 +11,7 @@ namespace Labyrinth.Services.Sound
         public void Add(IActiveSound activeSound)
             {
             if (activeSound == null)
-                throw new ArgumentNullException("activeSound");
+                throw new ArgumentNullException(nameof(activeSound));
 
             // slightly odd looking, but this means that if a SoundEffectInstance is added both as an ActiveSound and as an ActiveSoundForObject then the code copes
             this._activeSounds.Remove(activeSound);
