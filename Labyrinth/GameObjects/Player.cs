@@ -146,6 +146,9 @@ namespace Labyrinth.GameObjects
 
             // todo should the player shooting be dealt with here?
 
+            if (this.CurrentMovement.IsMoving)
+                this._animationPlayer.Update(gameTime);
+
             // move the player
             this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
             this._gameTime = gameTime;

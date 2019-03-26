@@ -151,7 +151,7 @@ namespace Labyrinth.GameObjects
 
             foreach (var move in breedInfo.BreedMovement.Moves)
                 {
-                string typeName = "Labyrinth.GameObjects.Movement." + move.Value;
+                string typeName = "Labyrinth.GameObjects.Motility." + move.Value;
                 Type movementType = Type.GetType(typeName);
                 if (movementType == null || !movementType.GetInterfaces().Contains(typeof(IMonsterMotion)))
                     {

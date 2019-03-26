@@ -16,7 +16,7 @@ namespace Labyrinth
             this.WindowPosition = newPosition;
             }
         
-        public Vector2 RecalculateWindow(GameTime gameTime)
+        public void RecalculateWindow(GameTime gameTime)
             {
             var player = GlobalServices.GameState.Player;
             var roomRectangle = World.GetContainingRoom(player.Position);
@@ -40,7 +40,6 @@ namespace Labyrinth
                 }
             
             this.WindowPosition = position;
-            return position;
             }
         }
     }

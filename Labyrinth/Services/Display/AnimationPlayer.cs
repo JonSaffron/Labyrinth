@@ -97,7 +97,7 @@ namespace Labyrinth.Services.Display
         /// <param name="gameTime">Time passed since the last call to Draw</param>
         private void AdvanceLoopedAnimation(GameTime gameTime)
             {
-            this._time += gameTime.ElapsedGameTime.TotalSeconds % this._animation.LengthOfAnimation;
+            this._time = (this._time + gameTime.ElapsedGameTime.TotalSeconds) % this._animation.LengthOfAnimation;
             this.Position = this._time / this._animation.LengthOfAnimation;
             // todo trigger OnNewFrame
             }

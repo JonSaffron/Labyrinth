@@ -21,7 +21,7 @@ namespace Labyrinth.Services.Display
             this._tiles = tiles;
             }
 
-        public void RenderWorld(TileRect viewOfWorld, [NotNull] ISpriteBatch spriteBatch)
+        public void RenderWorld(TileRect viewOfWorld, GameTime gameTime, [NotNull] ISpriteBatch spriteBatch)
             {
             if (spriteBatch == null) 
                 throw new ArgumentNullException(nameof(spriteBatch));
@@ -39,6 +39,8 @@ namespace Labyrinth.Services.Display
             while (!drawQueue.IsEmpty)
                 {
                 var item = drawQueue.Dequeue();
+                if (!(item is MovingItem))
+                    item.Update(gameTime);
                 var renderAnimation = item.RenderAnimation;
 
                 renderAnimation?.Draw(spriteBatch, this._spriteLibrary);

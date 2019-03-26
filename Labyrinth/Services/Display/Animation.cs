@@ -86,8 +86,6 @@ namespace Labyrinth.Services.Display
             this.BaseMovesDuringAnimation = baseMovesDuringAnimation;
             this.LengthOfAnimation = baseMovesDuringAnimation * Constants.GameClockResolution;
             this.LoopAnimation = loopAnimation;
-
-            this.LengthOfAnimation = 0;
             }
 
         /// <summary>

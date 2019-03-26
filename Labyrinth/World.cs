@@ -197,6 +197,7 @@ namespace Labyrinth
             if (this._doNotUpdate)
                 return this._levelReturnType;
             
+            this.WorldWindow.RecalculateWindow(gameTime);
             this._worldClock.Update(gameTime);
             
             UpdateGameItems(gameTime);
@@ -294,10 +295,9 @@ namespace Labyrinth
         /// </summary>
         public void Draw(GameTime gameTime, [NotNull] ISpriteBatch spriteBatch)
             {
-            var windowPosition = this.WorldWindow.RecalculateWindow(gameTime);
-            
-            var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(windowPosition);
-            this._worldRenderer.RenderWorld(tileRect, spriteBatch);
+            var windowPosition = this.WorldWindow.WindowPosition;
+            var tileRectangle = GetRectangleEnclosingTilesThatAreCurrentlyInView(windowPosition);
+            this._worldRenderer.RenderWorld(tileRectangle, gameTime, spriteBatch);
             }
 
         private static TileRect GetRectangleEnclosingTilesThatAreCurrentlyInView(Vector2 windowOffset)

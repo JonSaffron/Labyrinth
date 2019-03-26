@@ -107,6 +107,8 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
+            this._animationPlayer.Update(gameTime);
+
             // move the monster
             this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
             if (this._movementIterator == null)
