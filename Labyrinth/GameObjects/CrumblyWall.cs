@@ -1,5 +1,4 @@
-﻿using System;
-using Labyrinth.Services.Display;
+﻿using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -7,16 +6,20 @@ namespace Labyrinth.GameObjects
     public class CrumblyWall : StaticItem
         {
         private readonly int _initialEnergy;
+        private readonly AnimationPlayer _animationPlayer;
 
-        public CrumblyWall(AnimationPlayer animationPlayer, Vector2 position, string textureName, int energy) : base(animationPlayer, position)
+        public CrumblyWall(Vector2 position, string textureName, int energy) : base(position)
             {
+            this._animationPlayer = new AnimationPlayer(this);
             var a = Animation.StaticAnimation(textureName);
-            this.Ap.PlayAnimation(a);
+            this._animationPlayer.PlayAnimation(a);
             this.Energy = energy;
             this._initialEnergy = energy;
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Wall);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Impassable);
             }
+
+        public override IRenderAnimation RenderAnimation => this._animationPlayer;
 
         public override void ReduceEnergy(int energyToRemove)
             {
@@ -26,8 +29,8 @@ namespace Labyrinth.GameObjects
                 this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
                 }
 
-            int stages = this.Ap.FrameCount - 1;
-            this.Ap.FrameIndex = stages - (int) Math.Floor(stages * this.Energy / (float) this._initialEnergy);
+            float percentageEnergyLeft = this.Energy / (float) this._initialEnergy;
+            this._animationPlayer.Position = 1.0 - percentageEnergyLeft;
             }
         }
     }

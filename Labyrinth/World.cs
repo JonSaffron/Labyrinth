@@ -7,8 +7,8 @@ using Labyrinth.DataStructures;
 using Labyrinth.ClockEvents;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Labyrinth.GameObjects;
+using Labyrinth.Services.Display;
 using Labyrinth.Services.PathFinder;
 
 namespace Labyrinth
@@ -24,6 +24,7 @@ namespace Labyrinth
         [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
         [NotNull] private readonly Player _player;
         [NotNull] private readonly WorldClock _worldClock;
+        [NotNull] private readonly WorldRenderer _worldRenderer;
 
         public readonly WorldWindow WorldWindow;
 
@@ -34,6 +35,7 @@ namespace Labyrinth
             this._tiles = worldLoader.FloorTiles;
             this._restartInSameRoom = worldLoader.RestartInSameRoom;
             this._playerStartStates = worldLoader.PlayerStartStates;
+            this._worldRenderer = new WorldRenderer(GlobalServices.SpriteLibrary, ref this._tiles);
 
             var boundMovementFactory = new BoundMovementFactory(this._worldSize);
             GlobalServices.SetBoundMovementFactory(boundMovementFactory);
@@ -295,21 +297,7 @@ namespace Labyrinth
             var windowPosition = this.WorldWindow.RecalculateWindow(gameTime);
             
             var tileRect = GetRectangleEnclosingTilesThatAreCurrentlyInView(windowPosition);
-            DrawFloorTiles(spriteBatch, tileRect);
-
-            var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(tileRect);
-            var drawQueue = new PriorityQueue<int, IGameObject>(100);
-            foreach (var item in itemsToDraw)
-                {
-                int drawOrder = item.Properties.Get(GameObjectProperties.DrawOrder);
-                drawQueue.Enqueue(drawOrder, item);
-                }
-            //Trace.WriteLine("Drawing " + drawQueue.Count + " sprites.");
-            while (!drawQueue.IsEmpty)
-                {
-                var item = drawQueue.Dequeue();
-                item.Draw(gameTime, spriteBatch);
-                }
+            this._worldRenderer.RenderWorld(tileRect, spriteBatch);
             }
 
         private static TileRect GetRectangleEnclosingTilesThatAreCurrentlyInView(Vector2 windowOffset)
@@ -324,29 +312,6 @@ namespace Labyrinth
             Debug.Assert(result.Width == (int) Constants.RoomSizeInTiles.X || result.Width == ((int) Constants.RoomSizeInTiles.X + 1));
             Debug.Assert(result.Height == (int) Constants.RoomSizeInTiles.Y || result.Height == ((int) Constants.RoomSizeInTiles.Y + 1));
             return result;
-            }
-
-        /// <summary>
-        /// Draws the floor of the current view
-        /// </summary>
-        private void DrawFloorTiles(ISpriteBatch spriteBatch, TileRect tr)
-            {
-            for (int j = 0; j < tr.Height; j++)
-                {
-                int y = tr.TopLeft.Y + j;
-
-                for (int i = 0; i < tr.Width; i++)
-                    {
-                    int x = tr.TopLeft.X + i;
-
-                    Texture2D texture = this._tiles[x, y].Floor;
-                    if (texture != null)
-                        {
-                        Vector2 position = new Vector2(x, y) * Constants.TileSize;
-                        spriteBatch.DrawEntireTextureInWindow(texture, position);
-                        }
-                    }
-                }
             }
 
         public void MoveUpALevel()

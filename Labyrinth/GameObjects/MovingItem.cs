@@ -1,6 +1,5 @@
 ﻿using System;
 using Labyrinth.DataStructures;
-using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
@@ -11,7 +10,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new MovingItem object
         /// </summary>
-        protected MovingItem(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
+        protected MovingItem(Vector2 position) : base(position)
             {
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Insubstantial);
             }
@@ -38,13 +37,6 @@ namespace Labyrinth.GameObjects
             this.CurrentMovement = Movement.Still;
             GlobalServices.GameState.UpdatePosition(this);
             }
-
-        /// <summary>
-        /// Updates the position and/or activity of this object each tick of the game
-        /// </summary>
-        /// <param name="gameTime">The amount of gametime that has passed since the last time Update was called</param>
-        /// <returns>True if the position of the object changes, otherwise false if the object is stationary</returns>
-        public abstract bool Update(GameTime gameTime);
 
         /// <summary>
         /// Starts this object moving towards a single adjacent tile

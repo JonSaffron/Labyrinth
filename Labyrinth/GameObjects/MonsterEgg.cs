@@ -10,16 +10,18 @@ namespace Labyrinth.GameObjects
         {
         private MonsterDef _underlyingMonster;
         private readonly GameTimer _hatchingTimer;
-        private static readonly Animation EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 3);
-        private static readonly Animation HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 1);
+        private static readonly Animation EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 6);
+        private static readonly Animation HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 2);
+        private readonly AnimationPlayer _animationPlayer;
 
-        public MonsterEgg(AnimationPlayer animationPlayer, MonsterDef underlyingMonster, int timeToHatch) : base(animationPlayer, underlyingMonster.Position)
+        public MonsterEgg(MonsterDef underlyingMonster, int timeToHatch) : base(underlyingMonster.Position)
             {
             this._underlyingMonster = underlyingMonster;
             this.Energy = underlyingMonster.Energy;
+            this._animationPlayer = new AnimationPlayer(this);
             var timeSpan = TimeSpan.FromSeconds(timeToHatch * Constants.GameClockResolution);
             this._hatchingTimer = GameTimer.AddGameTimer(timeSpan, EggIsHatching, false);
-            this.Ap.PlayAnimation(EggAnimation);
+            this._animationPlayer.PlayAnimation(EggAnimation);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
             }
@@ -28,7 +30,7 @@ namespace Labyrinth.GameObjects
             {
             if (this.IsExtant)
                 {
-                this.Ap.PlayAnimation(HatchingAnimation);
+                this._animationPlayer.PlayAnimation(HatchingAnimation);
                 this.PlaySoundWithCallback(GameSound.EggHatches, HatchingSoundFinished);
                 }
             }
@@ -59,5 +61,7 @@ namespace Labyrinth.GameObjects
             this._hatchingTimer.Enabled = inSameRoom;
             return false;
             }
+
+        public override IRenderAnimation RenderAnimation => this._animationPlayer;
         }
     }

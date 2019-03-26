@@ -10,7 +10,7 @@ namespace Labyrinth.Test
     {
     class DummyMonster : Monster
         {
-        public DummyMonster(MonsterDef monsterDef, AnimationPlayer animationPlayer) : base(monsterDef, animationPlayer)
+        public DummyMonster(MonsterDef monsterDef, Animation animation) : base(monsterDef, animation)
             {
             this.Mobility = MonsterMobility.Placid;
             this.IsActive = true;

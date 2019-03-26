@@ -177,6 +177,7 @@
     <Compile Include="Interfaces\IMovingItem.cs" />
     <Compile Include="Interfaces\IPlayer.cs" />
     <Compile Include="Interfaces\IRandomness.cs" />
+    <Compile Include="Interfaces\IRenderAnimation.cs" />
     <Compile Include="Interfaces\IScoreKeeper.cs" />
     <Compile Include="Interfaces\IMunition.cs" />
     <Compile Include="Interfaces\ISpriteLibrary.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Interfaces\IAnimationPlayer.cs" />
     <Compile Include="DataStructures\PropertyBag.cs" />
     <Compile Include="DataStructures\PropertyDef.cs" />
+    <Compile Include="Services\Display\StaticAnimation.cs" />
     <Compile Include="Services\Display\DrawParameters.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />

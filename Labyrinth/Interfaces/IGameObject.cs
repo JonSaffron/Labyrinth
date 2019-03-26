@@ -49,17 +49,14 @@ namespace Labyrinth
         /// </summary>
         /// <returns>The amount of energy the object had before it expired</returns>
         void InstantlyExpire();
-
-        /// <summary>
-        /// Draws the object if it has any energy remaining
-        /// </summary>
-        /// <param name="gt">The current gametime</param>
-        /// <param name="spriteBatch">The spritebatch to draw to</param>
-        void Draw(GameTime gt, ISpriteBatch spriteBatch);
-        
+       
         /// <summary>
         /// Gets the inherent properties of the object.
         /// </summary>
         PropertyBag Properties { get; }
+
+        bool Update(GameTime gameTime);
+
+        IRenderAnimation RenderAnimation { get; }
         }
     }

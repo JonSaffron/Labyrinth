@@ -12,30 +12,31 @@ namespace Labyrinth.Services.Display
     /// </remarks>
     public readonly struct Animation : IEquatable<Animation>
         {
+        /// <summary>
+        /// Returns a animation that does nothing
+        /// </summary>
         public static Animation None { get; } = new Animation();
 
         /// <summary>
         /// The name of the texture to animate
         /// </summary>
-        public string TextureName { get; }
+        public readonly string TextureName;
 
         /// <summary>
-        /// Returns the rate at which the animation moves to the next frame. 
-        /// The higher the number, the longer the animation will remain on each frame.
+        /// Returns the length of the animation, measured in BaseMovements
         /// </summary>
-        [Obsolete]
-        public int BaseMovementsPerFrame { get; }
+        public readonly int BaseMovesDuringAnimation;
 
         /// <summary>
-        /// Returns the length of the animation, measured in the number of BaseMovements
+        /// Returns the length of the animation, measured in seconds
         /// </summary>
-        public int LengthOfAnimation { get; }
+        public readonly float LengthOfAnimation;
 
         /// <summary>
         /// When the end of the animation is reached, should it
         /// continue playing from the beginning?
         /// </summary>
-        public bool LoopAnimation { get; }
+        public readonly bool LoopAnimation;
 
         /// <summary>
         /// Constructs a new animation using a static image
@@ -51,35 +52,39 @@ namespace Labyrinth.Services.Display
         /// Constructs a new animation which loops
         /// </summary>
         /// <param name="textureName">The name of a multi-framed graphic image to show</param>
-        /// <param name="baseMovementsPerFrame">The rate to switch between frames</param>
-        public static Animation LoopingAnimation(string textureName, int baseMovementsPerFrame)
+        /// <param name="baseMovesDuringAnimation">Specifies the length of the animation in BaseMovements</param>
+        public static Animation LoopingAnimation(string textureName, int baseMovesDuringAnimation)
             {
-            if (baseMovementsPerFrame <= 0)
-                throw new ArgumentOutOfRangeException(nameof(baseMovementsPerFrame));
-            var result = new Animation(textureName, baseMovementsPerFrame, true);
+            if (baseMovesDuringAnimation <= 0)
+                throw new ArgumentOutOfRangeException(nameof(baseMovesDuringAnimation));
+            var result = new Animation(textureName, baseMovesDuringAnimation, true);
             return result;
             }
         
         /// <summary>
-        /// Constructs a new animation which can be manually controlled
+        /// Constructs a new animation which runs only once
         /// </summary>
         /// <param name="textureName">The name of a multi-framed graphic image to show</param>
-        /// <param name="baseMovementsPerFrame">The rate to switch between frames</param>
-        public static Animation ManualAnimation(string textureName, int baseMovementsPerFrame)
+        /// <param name="baseMovesDuringAnimation">Specifies the length of the animation in BaseMovements</param>
+        public static Animation LinearAnimation(string textureName, int baseMovesDuringAnimation)
             {
-            if (baseMovementsPerFrame <= 0)
-                throw new ArgumentOutOfRangeException(nameof(baseMovementsPerFrame));
-            var result = new Animation(textureName, baseMovementsPerFrame, false);
+            if (baseMovesDuringAnimation <= 0)
+                throw new ArgumentOutOfRangeException(nameof(baseMovesDuringAnimation));
+            var result = new Animation(textureName, baseMovesDuringAnimation, false);
             return result;
             }
 
         /// <summary>
         /// Constructs a new animation specifying whether it loops
         /// </summary>        
-        private Animation(string textureName, int baseMovementsPerFrame, bool loopAnimation)
+        /// <param name="textureName">The name of a multi-framed graphic image to show</param>
+        /// <param name="baseMovesDuringAnimation">Specifies the length of the animation in BaseMovements</param>
+        /// <param name="loopAnimation">Specifies whether the animation continually runs or whether it stops on the final frame</param>
+        private Animation(string textureName, int baseMovesDuringAnimation, bool loopAnimation)
             {
             this.TextureName = textureName;
-            this.BaseMovementsPerFrame = baseMovementsPerFrame;
+            this.BaseMovesDuringAnimation = baseMovesDuringAnimation;
+            this.LengthOfAnimation = baseMovesDuringAnimation * Constants.GameClockResolution;
             this.LoopAnimation = loopAnimation;
 
             this.LengthOfAnimation = 0;
@@ -92,7 +97,7 @@ namespace Labyrinth.Services.Display
             {
             get
                 {
-                var result = this.BaseMovementsPerFrame == 0;
+                var result = this.BaseMovesDuringAnimation == 0;
                 return result;
                 }
             }
@@ -105,7 +110,7 @@ namespace Labyrinth.Services.Display
         public bool Equals(Animation other)
             {
             var result = string.Equals(this.TextureName, other.TextureName) 
-                      && this.BaseMovementsPerFrame == other.BaseMovementsPerFrame 
+                      && this.BaseMovesDuringAnimation == other.BaseMovesDuringAnimation 
                       && this.LoopAnimation == other.LoopAnimation;
             return result;
             }
@@ -142,7 +147,7 @@ namespace Labyrinth.Services.Display
             unchecked
                 {
                 var hashCode = TextureName?.GetHashCode() ?? 0;
-                hashCode = (hashCode * 397) ^ this.BaseMovementsPerFrame;
+                hashCode = (hashCode * 397) ^ this.BaseMovesDuringAnimation;
                 hashCode = (hashCode * 397) ^ this.LoopAnimation.GetHashCode();
                 return hashCode;
                 }

@@ -9,7 +9,7 @@ namespace Labyrinth.Services.Display
     /// Controls playback of an Animation.
     /// </summary>
     /// <remarks>Only suitable for a animation which is the same size as a tile</remarks>
-    public class AnimationPlayer : IAnimationPlayer, IRenderAnimation
+    public class StaticAnimation : IRenderAnimation
         {
         private readonly IGameObject _gameObject;
 
@@ -18,15 +18,22 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private Animation _animation;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// What rotation to apply when drawing the sprite
+        /// </summary>
         public float Rotation { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// What effect to apply when drawing the sprite
+        /// </summary>
         public SpriteEffects SpriteEffect { get; set; }
 
         private double _position;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the position within the animation
+        /// </summary>
+        /// Should be a number equal or above 0 and less than 1
         public double Position
             {
             get => this._position;
@@ -38,36 +45,21 @@ namespace Labyrinth.Services.Display
                 }
             }
 
-        /// <summary>
-        /// The amount of time in seconds that the current frame has been shown for.
-        /// </summary>
-        private double _time;
-
-        /// <inheritdoc />
-        public event EventHandler<EventArgs> NewFrame;
-        
-        /// <summary>
-        /// Which routine to use to advance the frame index
-        /// </summary>
-        private Action<GameTime> _advanceRoutine;
-
-        public AnimationPlayer([NotNull] IGameObject gameObject)
+        public StaticAnimation([NotNull] IGameObject gameObject)
             {
             this._gameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             this._animation = Animation.None;
             }
 
-        private void OnNewFrame(EventArgs e)
-            {
-            this.NewFrame?.Invoke(this, e);
-            }
-        
         /// <summary>
         /// Returns the mid-point of animation
         /// </summary>
         private static Vector2 Origin => Constants.CentreOfTile;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Begins or continues playback of an animation.
+        /// </summary>
+        /// <remarks>If the animation specified is already running then no change is made.</remarks>
         public void PlayAnimation(Animation animation)
             {
             if (animation == Animation.None)
@@ -79,54 +71,7 @@ namespace Labyrinth.Services.Display
 
             // Start the new animation.
             this._animation = animation;
-            this._time = 0d;
             this.Position = 0d;
-
-            // setup the advance routine
-            if (!animation.IsStaticAnimation)
-                {
-                this._advanceRoutine = this._animation.LoopAnimation
-                    ? (Action<GameTime>) AdvanceLoopedAnimation
-                    : AdvanceLinearAnimation;
-                }
-            }
-
-        /// <summary>
-        /// Advance frame index for looped animations
-        /// </summary>
-        /// <param name="gameTime">Time passed since the last call to Draw</param>
-        private void AdvanceLoopedAnimation(GameTime gameTime)
-            {
-            this._time += gameTime.ElapsedGameTime.TotalSeconds % this._animation.LengthOfAnimation;
-            this.Position = this._time / this._animation.LengthOfAnimation;
-            // todo trigger OnNewFrame
-            }
-
-        private void AdvanceLinearAnimation(GameTime gameTime)
-            {
-            if (this._time < this._animation.LengthOfAnimation)
-                {
-                this._time += gameTime.ElapsedGameTime.TotalSeconds;
-                if (this._time < this._animation.LengthOfAnimation)
-                    {
-                    this.Position = this._time / this._animation.LengthOfAnimation;
-                    }
-                else
-                    {
-                    this._time = this._animation.LengthOfAnimation;
-                    this._position = 1;
-                    }
-                }
-            // todo trigger OnNewFrame
-            }
-
-        public void Update(GameTime gameTime)
-            {
-            if (this._animation == Animation.None)
-                throw new InvalidOperationException("No animation is currently playing.");
-
-            // Advance the frame index
-            this._advanceRoutine?.Invoke(gameTime);
             }
 
         public void Draw(ISpriteBatch spriteBatch, ISpriteLibrary spriteLibrary)

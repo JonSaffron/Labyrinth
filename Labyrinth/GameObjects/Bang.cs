@@ -7,34 +7,40 @@ namespace Labyrinth.GameObjects
     public class Bang : MovingItem
         {
         private bool _isExtant;
-        
-        public Bang(AnimationPlayer animationPlayer, Vector2 position, BangType bangType) : base(animationPlayer, position)
+        private readonly AnimationPlayer _animationPlayer;
+
+        public Bang(Vector2 position, BangType bangType) : base(position)
             {
+            this._animationPlayer = new AnimationPlayer(this);
             Animation a;
             switch (bangType)
                 {
                 case BangType.Short:
-                    a = Animation.ManualAnimation("Sprites/Props/ShortBang", 3);
+                    a = Animation.LinearAnimation("Sprites/Props/ShortBang", 3);
                     break;
                 case BangType.Long:
-                    a = Animation.ManualAnimation("Sprites/Props/LongBang", 3);
+                    a = Animation.LinearAnimation("Sprites/Props/LongBang", 12);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(bangType));
                 }
             
-            Ap.PlayAnimation(a);
+            this._animationPlayer.PlayAnimation(a);
             this._isExtant = true;
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Bang);
             }
 
         public override bool IsExtant => this._isExtant;
 
+        public override IRenderAnimation RenderAnimation => this._animationPlayer;
+        
         public override bool Update(GameTime gameTime)
             {
-            if (!this.Ap.AdvanceManualAnimation(gameTime))
+            this._animationPlayer.Update(gameTime);
+            if (this._animationPlayer.Position == 1)
                 this._isExtant = false;
-            return this._isExtant;
+            return false;
             }
+
         }
     }

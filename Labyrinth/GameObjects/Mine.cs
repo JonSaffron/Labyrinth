@@ -15,13 +15,12 @@ namespace Labyrinth.GameObjects
         private readonly Animation _movingUnarmedAnimation;
         private readonly Animation _armedAnimation;
 
-        public Mine(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
+        public Mine(Vector2 position) : base(position)
             {
             this.Energy = 240;
             this._staticUnarmedAnimation = Animation.StaticAnimation("Sprites/Shot/MineUnarmed");
-            this._movingUnarmedAnimation = Animation.ManualAnimation("Sprites/Shot/MineUnarmed", 4);
-            this._armedAnimation = Animation.LoopingAnimation("Sprites/Shot/MineArmed", 4);
-            this.Ap.PlayAnimation(this._staticUnarmedAnimation);
+            this._movingUnarmedAnimation = Animation.LinearAnimation("Sprites/Shot/MineUnarmed", 48);
+            this._armedAnimation = Animation.LoopingAnimation("Sprites/Shot/MineArmed", 48);
             this._mineState = new InactiveState(this);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
@@ -38,11 +37,6 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
-            {
-            this._mineState.Draw(gt, spriteBatch);
-            }
-
         public override bool IsExtant
             {
             get
@@ -51,6 +45,8 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
+
+        public override IRenderAnimation RenderAnimation => this._mineState.RenderAnimation;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -68,8 +64,8 @@ namespace Labyrinth.GameObjects
 
             public abstract void SteppedOnBy(IMovingItem movingItem);
             public abstract bool Update(GameTime gameTime);
-            public abstract void Draw(GameTime gt, ISpriteBatch spriteBatch);
             public abstract bool IsExtant();
+            public abstract IRenderAnimation RenderAnimation { get; }
             }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,10 +76,13 @@ namespace Labyrinth.GameObjects
         private class InactiveState : MineState
             {
             private static readonly TimeSpan TimeInState = TimeSpan.FromMilliseconds(1000);
+            private readonly AnimationPlayer _animationPlayer;
 
             public InactiveState(Mine mine) : base(mine)
                 {
                 this.Mine._countdown = TimeSpan.Zero;
+                this._animationPlayer = new AnimationPlayer(mine);
+                this._animationPlayer.PlayAnimation(this.Mine._staticUnarmedAnimation);
                 }
 
             public override void SteppedOnBy(IMovingItem movingItem)
@@ -102,16 +101,12 @@ namespace Labyrinth.GameObjects
                 return true;
                 }
 
-            public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
-                {
-                this.Mine.Ap.PlayAnimation(this.Mine._staticUnarmedAnimation);
-                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
-                }
-
             public override bool IsExtant()
                 {
                 return true;
                 }
+
+            public override IRenderAnimation RenderAnimation => this._animationPlayer;
             }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,8 +116,12 @@ namespace Labyrinth.GameObjects
         /// </summary>
         private class CookingState : MineState
             {
+            private readonly AnimationPlayer _animationPlayer;
+
             public CookingState(Mine mine) : base(mine)
                 {
+                this._animationPlayer = new AnimationPlayer(mine);
+                this._animationPlayer.PlayAnimation(this.Mine._movingUnarmedAnimation);
                 }
 
             public override void SteppedOnBy(IMovingItem movingItem)
@@ -133,22 +132,18 @@ namespace Labyrinth.GameObjects
 
             public override bool Update(GameTime gameTime)
                 {
-                if (this.Mine.Ap.AdvanceManualAnimation(gameTime))
-                    return true;
-                this.Mine._mineState = new PrimedState(this.Mine);
+                this._animationPlayer.Update(gameTime);
+                if (this._animationPlayer.Position == 1)
+                    this.Mine._mineState = new PrimedState(this.Mine);
                 return true;
-                }
-
-            public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
-                {
-                this.Mine.Ap.PlayAnimation(this.Mine._movingUnarmedAnimation);
-                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
                 }
 
             public override bool IsExtant()
                 {
                 return true;
                 }
+
+            public override IRenderAnimation RenderAnimation => this._animationPlayer;
             }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,8 +153,12 @@ namespace Labyrinth.GameObjects
         /// </summary>
         private class PrimedState : MineState
             {
+            private readonly AnimationPlayer _animationPlayer;
+
             public PrimedState(Mine mine) : base(mine)
                 {
+                this._animationPlayer = new AnimationPlayer(mine);
+                this._animationPlayer.PlayAnimation(this.Mine._armedAnimation);
                 }
 
             public override void SteppedOnBy(IMovingItem movingItem)
@@ -172,16 +171,12 @@ namespace Labyrinth.GameObjects
                 return true;
                 }
 
-            public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
-                {
-                this.Mine.Ap.PlayAnimation(this.Mine._armedAnimation);
-                this.Mine.Ap.Draw(gt, spriteBatch, this.Mine.Position);
-                }
-
             public override bool IsExtant()
                 {
                 return true;
                 }
+
+            public override IRenderAnimation RenderAnimation => this._animationPlayer;
             }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,10 +237,7 @@ namespace Labyrinth.GameObjects
                 return false;
                 }
 
-            public override void Draw(GameTime gt, ISpriteBatch spriteBatch)
-                {
-                // don't draw anything
-                }
+            public override IRenderAnimation RenderAnimation => null;
 
             public override bool IsExtant()
                 {

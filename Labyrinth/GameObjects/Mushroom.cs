@@ -6,15 +6,19 @@ namespace Labyrinth.GameObjects
     class Mushroom : StaticItem
         {
         private bool _isTaken;
+        private readonly AnimationPlayer _animationPlayer;
 
-        public Mushroom(AnimationPlayer animationPlayer, Vector2 position) : base(animationPlayer, position)
+        public Mushroom(Vector2 position) : base(position)
             {
+            this._animationPlayer = new AnimationPlayer(this);
             var a = Animation.StaticAnimation("Sprites/Props/Mushroom");
-            this.Ap.PlayAnimation(a);
+            this._animationPlayer.PlayAnimation(a);
             this.Energy = 40;
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
         
+        public override IRenderAnimation RenderAnimation => this._animationPlayer;
+
         public override bool IsExtant
             {
             get

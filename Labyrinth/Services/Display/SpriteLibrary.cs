@@ -24,10 +24,5 @@ namespace Labyrinth.Services.Display
             var result = this._game.Content.Load<Texture2D>(textureName);
             return result;
             }
-
-        public IAnimationPlayer BuildAnimationPlayer()
-            {
-            return new AnimationPlayer(this);
-            }
         }
     }

@@ -15,6 +15,7 @@ namespace Labyrinth.GameObjects
         private MonsterMobility _mobility;
         public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
         [CanBeNull] private IMonsterMotion _determineDirection;
+        private readonly AnimationPlayer _animationPlayer;
 
         public IBoundMovement SightBoundary { get; private set; }
 
@@ -26,9 +27,11 @@ namespace Labyrinth.GameObjects
         private bool _isActive;
         [CanBeNull] public IMonsterWeapon Weapon { get; set; }
 
-        public Monster(MonsterDef definition, AnimationPlayer animationPlayer) : base(animationPlayer, definition.Position)
+        public Monster(MonsterDef definition, Animation animation) : base(definition.Position)
             {
             this.Definition = definition;
+            this._animationPlayer = new AnimationPlayer(this);
+            this._animationPlayer.PlayAnimation(animation);
             this.Energy = definition.Energy;
             this.CurrentSpeed = Constants.BaseSpeed;
             this.Behaviours = new BehaviourCollection(this);
@@ -189,6 +192,8 @@ namespace Labyrinth.GameObjects
 
         [NotNull]
         public BehaviourCollection Behaviours { get; }
+
+        public override IRenderAnimation RenderAnimation => this._animationPlayer;
 
         public ChangeRooms ChangeRooms
             {

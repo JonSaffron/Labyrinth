@@ -16,7 +16,7 @@
     </xs:all>
     <xs:attribute name="Name" use="required" type="xs:string" />
     <xs:attribute name="Texture" use="required" type="xs:string" />
-    <xs:attribute name="BaseMovementsPerFrame" use="required" type="xs:integer" />
+    <xs:attribute name="BaseMovesDuringAnimation" use="required" type="xs:integer" />
   </xs:complexType>
 
   <xs:complexType name="InherentBehaviours">

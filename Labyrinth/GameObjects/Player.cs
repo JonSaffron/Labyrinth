@@ -32,6 +32,7 @@ namespace Labyrinth.GameObjects
         [NotNull] private readonly IPlayerWeapon _weapon2;
 
         // Animations
+        private readonly AnimationPlayer _animationPlayer;
         private readonly Animation _leftRightMovingAnimation;
         private readonly Animation _upMovingAnimation;
         private readonly Animation _downMovingAnimation;
@@ -54,17 +55,18 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new player.
         /// </summary>
-        public Player(AnimationPlayer animationPlayer, Vector2 position, int energy, int initialWorldAreaId) : base(animationPlayer, position)
+        public Player(Vector2 position, int energy, int initialWorldAreaId) : base(position)
             {
             // Load animated textures.
-            this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 1);
-            this._upMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerUpFacing", 1);
-            this._downMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerDownFacing", 1);
+            this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 2);
+            this._animationPlayer = new AnimationPlayer(this);
+            this._upMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerUpFacing", 2);
+            this._downMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerDownFacing", 2);
             this._leftRightStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerLeftFacing");
             this._upStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerUpFacing");
             this._downStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerDownFacing");
 
-            Ap.NewFrame += PlayerSpriteNewFrame;
+            this._animationPlayer.NewFrame += PlayerSpriteNewFrame;
             
             this._weapon1 = new StandardPlayerWeapon();
             this._weapon2 = new MineLayer();
@@ -91,7 +93,7 @@ namespace Labyrinth.GameObjects
             {
             this.CurrentDirectionFaced = Direction.Left;
             this.CurrentMovement = DataStructures.Movement.Still;
-            Ap.PlayAnimation(_leftRightStaticAnimation);
+            SetAnimation(false);
             this._time = 0;
 
             this._weapon1.Reset();
@@ -115,6 +117,14 @@ namespace Labyrinth.GameObjects
             base.ResetPosition(position);
             // it's essential to reset the iterator 
             this._movementIterator = null;
+            }
+
+        public override IRenderAnimation RenderAnimation
+            {
+            get
+                {
+                return this._animationPlayer;
+                }
             }
 
         public override bool IsExtant
@@ -203,8 +213,8 @@ namespace Labyrinth.GameObjects
                 default:
                     throw new InvalidOperationException();
                 }
-            Ap.PlayAnimation(a);
-            Ap.SpriteEffect = se;
+            this._animationPlayer.PlayAnimation(a);
+            this._animationPlayer.SpriteEffect = se;
             }
 
         private void UpdateEnergy(GameTime gameTime)

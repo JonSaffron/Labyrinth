@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Labyrinth.DataStructures;
 
@@ -15,11 +14,9 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Constructs a new static item object
         /// </summary>
-        /// <param name="animationPlayer">An instance of the animation player to use for animating this object</param>
         /// <param name="position">The initial position of the object</param>
-        protected StaticItem([NotNull] IAnimationPlayer animationPlayer, Vector2 position)
+        protected StaticItem(Vector2 position)
             {
-            this.Ap = animationPlayer ?? throw new ArgumentNullException(nameof(animationPlayer));
             this.Position = position;
             }
         
@@ -44,9 +41,16 @@ namespace Labyrinth.GameObjects
         public TilePos TilePosition { get; private set; }
 
         /// <summary>
-        /// Gets the animation player associated with the object
+        /// Updates the position and/or animation of this object each tick of the game
         /// </summary>
-        protected IAnimationPlayer Ap { get; }
+        /// <param name="gameTime">The amount of gametime that has passed since the last time Update was called</param>
+        /// <returns>True if the position of the object changes, otherwise false if the object is stationary</returns>
+        public virtual bool Update(GameTime gameTime)
+            {
+            return false;
+            }
+
+        public abstract IRenderAnimation RenderAnimation { get; }
 
         /// <summary>
         /// Gets or sets how much energy the object has
@@ -72,17 +76,6 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public virtual Rectangle BoundingRectangle { get; protected set; }
 
-        /// <summary>
-        /// Draws the object if it has any energy remaining
-        /// </summary>
-        /// <param name="gt">The current gametime</param>
-        /// <param name="spriteBatch">The spritebatch to draw to</param>
-        public virtual void Draw(GameTime gt, ISpriteBatch spriteBatch)
-            {
-            if (this.IsExtant)
-                this.Ap.Draw(gt, spriteBatch, this.Position);
-            }
-        
         /// <summary>
         /// Removes the specified amount of energy from the object
         /// </summary>

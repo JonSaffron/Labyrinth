@@ -101,20 +101,18 @@ namespace Labyrinth.GameObjects
             {
             if (!monsterDef.TimeBeforeHatching.HasValue)
                 throw new InvalidOperationException("MonsterDef has IsEgg set without a TimeBeforeHatching value.");
-            var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var underlyingMonster = monsterDef;
             underlyingMonster.IsEgg = false;
             underlyingMonster.TimeBeforeHatching = null;
-            var result = new MonsterEgg(animationPlayer, underlyingMonster, monsterDef.TimeBeforeHatching.Value);
+            var result = new MonsterEgg(underlyingMonster, monsterDef.TimeBeforeHatching.Value);
             return result;
             }
 
         private static Monster BuildMonsterFromBreed([NotNull] Breed breedInfo, MonsterDef monsterDef)
             {
-            var animationPlayer = new AnimationPlayer(GlobalServices.SpriteLibrary);
             var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
-            animationPlayer.PlayAnimation(Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovementsPerFrame));
-            var result = new Monster(monsterDef, animationPlayer);
+            var animation = Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovesDuringAnimation);
+            var result = new Monster(monsterDef, animation);
             return result;
             }
 
@@ -202,9 +200,9 @@ namespace Labyrinth.GameObjects
                 {
                 var breed = new Breed
                     {
-                    Name = breedElement.GetAttribute("Name"),
-                    Texture = breedElement.GetAttribute("Texture"),
-                    BaseMovementsPerFrame = int.Parse(breedElement.GetAttribute("BaseMovementsPerFrame"))
+                    Name = breedElement.GetAttribute(nameof(Breed.Name)),
+                    Texture = breedElement.GetAttribute(nameof(Breed.Texture)),
+                    BaseMovesDuringAnimation = int.Parse(breedElement.GetAttribute(nameof(Breed.BaseMovesDuringAnimation)))
                     };
 
                 XmlElement inherentBehaviours = (XmlElement) breedElement.SelectSingleNode("ns:InherentBehaviours", xnm);
@@ -297,7 +295,7 @@ namespace Labyrinth.GameObjects
             {
             public string Name;
             public string Texture;
-            public int BaseMovementsPerFrame;
+            public int BaseMovesDuringAnimation;
             public readonly HashSet<string> InherentBehaviours = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             public readonly Dictionary<string, string> InherentProperties = new Dictionary<string, string>();
             public readonly BreedMovement BreedMovement = new BreedMovement();

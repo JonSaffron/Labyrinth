@@ -18,14 +18,10 @@ namespace Labyrinth
         SpriteEffects SpriteEffect { get; set; }
 
         /// <summary>
-        /// Returns the number of frames contained in the animation
+        /// Gets or sets the position within the animation
         /// </summary>
-        int FrameCount { get; }
-
-        /// <summary>
-        /// Gets the index of the current frame in the animation.
-        /// </summary>
-        int FrameIndex { get; set; }
+        /// Should be a number equal or above 0 and less than 1
+        double Position { get; set; }
 
         /// <summary>
         /// Used to notify a game object that the animation has progressed to the next frame
@@ -39,17 +35,9 @@ namespace Labyrinth
         void PlayAnimation(Animation animation);
 
         /// <summary>
-        /// Advance frame index for manually controlled animations
+        /// Updates the state of the animation
         /// </summary>
-        /// <param name="gameTime">Time passed since the last call to Draw</param>
-        bool AdvanceManualAnimation(GameTime gameTime);
-
-        /// <summary>
-        /// Advances the time position and draws the current frame of the animation.
-        /// </summary>
-        /// <param name="gameTime">Time passed since the last call to Draw</param>
-        /// <param name="spriteBatch">The SpriteBatch object to draw the sprite to</param>
-        /// <param name="position">The position of the sprite</param>
-        void Draw(GameTime gameTime, ISpriteBatch spriteBatch, Vector2 position);
+        /// <param name="gameTime">The amount of time passed</param>
+        void Update(GameTime gameTime);
         }
     }

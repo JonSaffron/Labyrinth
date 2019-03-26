@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
-using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
@@ -204,8 +203,7 @@ namespace Labyrinth
         /// <param name="bangType">The type of bang to create</param>
         public Bang AddBang(Vector2 p, BangType bangType)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var b = new Bang(ap, p, bangType);
+            var b = new Bang(p, bangType);
             this._gameObjectCollection.Add(b);
             return b;
             }
@@ -219,38 +217,33 @@ namespace Labyrinth
 
         public Grave AddGrave(TilePos tp)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var g = new Grave(ap, tp.ToPosition());
+            var g = new Grave(tp.ToPosition());
             this._gameObjectCollection.Add(g);
             return g;
             }
         
         public void AddMushroom(TilePos tp)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var m = new Mushroom(ap, tp.ToPosition());
+            var m = new Mushroom(tp.ToPosition());
             this._gameObjectCollection.Add(m);
             }
         
         public Crystal AddCrystal(Vector2 position, int id, int score, int energy)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var crystal = new Crystal(ap, position, id, score, energy);
+            var crystal = new Crystal(position, id, score, energy);
             this._gameObjectCollection.Add(crystal);
             return crystal;
             }
 
         public void AddExplosion(Vector2 position, int energy, IGameObject originator)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var e = new Explosion(ap, position, energy, originator);
+            var e = new Explosion(position, energy, originator);
             this._gameObjectCollection.Add(e);
             }
         
         public void AddMine(Vector2 position)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var m = new Mine(ap, position);
+            var m = new Mine(position);
             this._gameObjectCollection.Add(m);
             }
 
@@ -263,8 +256,7 @@ namespace Labyrinth
 
         public StandardShot AddStandardShot(Vector2 startPos, Direction direction, int energy, IGameObject originator)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var shot = new StandardShot(ap, startPos, direction, energy, originator);
+            var shot = new StandardShot(startPos, direction, energy, originator);
             this._gameObjectCollection.Add(shot);
             return shot;
             }
@@ -273,8 +265,7 @@ namespace Labyrinth
             {
             if (this.Player != null)
                 throw new InvalidOperationException("Cannot add more than one Player.");
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new Player(ap, position, energy, initialWorldAreaId);
+            var result = new Player(position, energy, initialWorldAreaId);
             this._gameObjectCollection.Add(result);
             this.Player = result;
             return result;
@@ -282,48 +273,42 @@ namespace Labyrinth
 
         public Wall AddWall(Vector2 position, string textureName)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new Wall(ap, position, textureName);
+            var result = new Wall(position, textureName);
             this._gameObjectCollection.Add(result);
             return result;
             }
 
         public Boulder AddBoulder(Vector2 position)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new Boulder(ap, position);
+            var result = new Boulder(position);
             this._gameObjectCollection.Add(result);
             return result;
             }
 
         public ForceField AddForceField(Vector2 position, int crystalRequired)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new ForceField(ap, position, crystalRequired);
+            var result = new ForceField(position, crystalRequired);
             this._gameObjectCollection.Add(result);
             return result;
             }
 
         public CrumblyWall AddCrumblyWall(Vector2 position, string textureName, int energy)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new CrumblyWall(ap, position, textureName, energy);
+            var result = new CrumblyWall(position, textureName, energy);
             this._gameObjectCollection.Add(result);
             return result;
             }
 
         public Fruit AddFruit(Vector2 position, FruitType fruitType, int energy)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new Fruit(ap, position, fruitType, energy);
+            var result = new Fruit(position, fruitType, energy);
             this._gameObjectCollection.Add(result);
             return result;
             }
 
         public TileReservation AddTileReservation(Vector2 position)
             {
-            var ap = new AnimationPlayer(GlobalServices.SpriteLibrary);
-            var result = new TileReservation(ap, position);
+            var result = new TileReservation(position);
             this._gameObjectCollection.Add(result);
             return result;
             }

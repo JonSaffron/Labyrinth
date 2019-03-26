@@ -8,15 +8,17 @@ namespace Labyrinth.GameObjects
         public int CrystalId { get; }
         public decimal Score { get; }
         private bool _isTaken;
+        private readonly AnimationPlayer _animationPlayer;
 
-        public Crystal(AnimationPlayer animationPlayer, Vector2 position, int id, int score, int energy) : base(animationPlayer, position)
+        public Crystal(Vector2 position, int id, int score, int energy) : base(position)
             {
             this.CrystalId = id;
             this.Score = score;
             this.Energy = energy;
+            this._animationPlayer = new AnimationPlayer(this);
 
-            var a = Animation.LoopingAnimation("Sprites/Crystal/Crystal", 4);
-            this.Ap.PlayAnimation(a);
+            var a = Animation.LoopingAnimation("Sprites/Crystal/Crystal", 8);
+            this._animationPlayer.PlayAnimation(a);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
@@ -33,6 +35,14 @@ namespace Labyrinth.GameObjects
         public void SetTaken()
             {
             this._isTaken = true;
+            }
+
+        public override IRenderAnimation RenderAnimation => this._animationPlayer;
+
+        public override bool Update(GameTime gameTime)
+            {
+            this._animationPlayer.Update(gameTime);
+            return false;
             }
         }
     }

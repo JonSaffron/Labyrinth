@@ -15,23 +15,25 @@ namespace Labyrinth.GameObjects
 
         private double _timeToTravel;
         private readonly Dictionary<Direction, Rectangle> _boundingRectangles;
+        private readonly AnimationPlayer _animationPlayer;
 
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
 
-        public StandardShot(AnimationPlayer animationPlayer, Vector2 position, Direction direction, int energy, IGameObject originator) : base(animationPlayer, position)
+        public StandardShot(Vector2 position, Direction direction, int energy, IGameObject originator) : base(position)
             {
             if (direction == Direction.None)
                 throw new ArgumentOutOfRangeException(nameof(direction));
 
             this.Energy = energy;
+            this._animationPlayer = new AnimationPlayer(this);
             this.Originator = originator;
             this._directionOfTravel = direction;
             this.Orientation = direction.Orientation();
 
             string textureName = originator is Player ? "Sprites/Shot/RedShot" : "Sprites/Shot/GreenShot";
             var staticImage = Animation.StaticAnimation(textureName);
-            Ap.PlayAnimation(staticImage);
+            this._animationPlayer.PlayAnimation(staticImage);
             ResetTimeToTravel();
 
             this._boundingRectangles = GetBoundingRectangles();
@@ -63,11 +65,11 @@ namespace Labyrinth.GameObjects
                 {
                 case Orientation.Horizontal:
                     distanceToTravel = (decimal) (Constants.RoomSizeInPixels.X * 1.25);
-                    Ap.Rotation = 0.0f;
+                    this._animationPlayer.Rotation = 0.0f;
                     break;
                 case Orientation.Vertical:
                     distanceToTravel = (decimal) (Constants.RoomSizeInPixels.Y * 1.25);
-                    Ap.Rotation = (float)(Math.PI * 90.0f / 180f);
+                    this._animationPlayer.Rotation = (float)(Math.PI * 90.0f / 180f);
                     break;
                 default:
                     throw new InvalidOperationException();
@@ -96,6 +98,8 @@ namespace Labyrinth.GameObjects
                 return result;
                 }
             }
+
+        public override IRenderAnimation RenderAnimation => this._animationPlayer;
 
         /// <summary>
         /// Handles moving the shot along

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Monsters xmlns="http://JonSaffron/Labyrinth/Monsters" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth MonstersSchema.xsd">
-  <Breed Name="Butterfly" Texture="Butterfly" BaseMovementsPerFrame="3">
+  <Breed Name="Butterfly" Texture="Butterfly" BaseMovesDuringAnimation="6">
     <InherentBehaviours>
       <Flitter />
       <LaysEgg />
@@ -16,7 +16,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="CrazyCrawler" Texture="CrazyCrawler" BaseMovementsPerFrame="3">
+  <Breed Name="CrazyCrawler" Texture="CrazyCrawler" BaseMovesDuringAnimation="6">
     <InherentProperties>
       <EffectOfShot value="Reflection" />
       <MonsterScoresWhenKilled value="true" />
@@ -28,14 +28,14 @@
     </Movement>
   </Breed>
 
-  <Breed Name="DeathCube" Texture="DeathCube" BaseMovementsPerFrame="3">
+  <Breed Name="DeathCube" Texture="DeathCube" BaseMovesDuringAnimation="6">
     <InherentProperties>
       <EffectOfShot value="Reflection" />
       <MonsterScoresWhenKilled value="false" />
     </InherentProperties>
   </Breed>
 
-  <Breed Name="DiamondDemon" Texture="DiamondDemon" BaseMovementsPerFrame="4">
+  <Breed Name="DiamondDemon" Texture="DiamondDemon" BaseMovesDuringAnimation="8">
     <InherentBehaviours>
       <Flitter />
       <LaysEgg />
@@ -52,7 +52,7 @@
     </Movement>
   </Breed>
  
-  <Breed Name="FlitterbugBrown" Texture="FlitterbugBrown" BaseMovementsPerFrame="4">
+  <Breed Name="FlitterbugBrown" Texture="FlitterbugBrown" BaseMovesDuringAnimation="8">
     <InherentBehaviours>
       <Flitter />
       <SpawnsUponDeath />
@@ -68,7 +68,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="FlitterbugCyan" Texture="FlitterbugCyan" BaseMovementsPerFrame="4">
+  <Breed Name="FlitterbugCyan" Texture="FlitterbugCyan" BaseMovesDuringAnimation="8">
     <InherentBehaviours>
       <Flitter />
     </InherentBehaviours>
@@ -83,7 +83,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="FlitterbugRed" Texture="FlitterbugRed" BaseMovementsPerFrame="4">
+  <Breed Name="FlitterbugRed" Texture="FlitterbugRed" BaseMovesDuringAnimation="8">
     <InherentBehaviours>
       <Flitter />
     </InherentBehaviours>
@@ -98,7 +98,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="Joker" Texture="Joker" BaseMovementsPerFrame="4">
+  <Breed Name="Joker" Texture="Joker" BaseMovesDuringAnimation="8">
     <InherentBehaviours>
       <Flitter />
       <LaysEgg />
@@ -115,7 +115,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="KillerCubeGreen" Texture="KillerCubeGreen" BaseMovementsPerFrame="3">
+  <Breed Name="KillerCubeGreen" Texture="KillerCubeGreen" BaseMovesDuringAnimation="6">
     <InherentBehaviours>
       <ShootsAtPlayer />
     </InherentBehaviours>
@@ -125,7 +125,7 @@
     </InherentProperties>
   </Breed>
 
-  <Breed Name="KillerCubeRed" Texture="KillerCubeRed" BaseMovementsPerFrame="3">
+  <Breed Name="KillerCubeRed" Texture="KillerCubeRed" BaseMovesDuringAnimation="6">
     <InherentBehaviours>
       <ShootsAtPlayer />
     </InherentBehaviours>
@@ -141,7 +141,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="RotaFloaterBrown" Texture="RotaFloaterBrown" BaseMovementsPerFrame="2">
+  <Breed Name="RotaFloaterBrown" Texture="RotaFloaterBrown" BaseMovesDuringAnimation="6">
     <InherentProperties>
       <MonsterScoresWhenKilled value="true" />
     </InherentProperties>
@@ -152,7 +152,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="RotaFloaterCyan" Texture="RotaFloaterCyan" BaseMovementsPerFrame="2">
+  <Breed Name="RotaFloaterCyan" Texture="RotaFloaterCyan" BaseMovesDuringAnimation="6">
     <InherentProperties>
       <MonsterScoresWhenKilled value="true" />
     </InherentProperties>
@@ -164,7 +164,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="ThresherBrown" Texture="ThresherBrown" BaseMovementsPerFrame="3">
+  <Breed Name="ThresherBrown" Texture="ThresherBrown" BaseMovesDuringAnimation="6">
     <InherentProperties>
       <MonsterScoresWhenKilled value="true" />
     </InherentProperties>
@@ -175,7 +175,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="ThresherCyan" Texture="ThresherCyan" BaseMovementsPerFrame="4">
+  <Breed Name="ThresherCyan" Texture="ThresherCyan" BaseMovesDuringAnimation="8">
     <InherentBehaviours>
       <LaysMushroom />
     </InherentBehaviours>
@@ -191,7 +191,7 @@
     </Movement>
   </Breed>
 
-  <Breed Name="TigerMoth" Texture="TigerMoth" BaseMovementsPerFrame="4">
+  <Breed Name="TigerMoth" Texture="TigerMoth" BaseMovesDuringAnimation="8">
     <InherentBehaviours>
       <StartsShootingWhenHurt />
       <LaysMushroom />

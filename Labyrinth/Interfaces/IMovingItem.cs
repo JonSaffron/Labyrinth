@@ -9,8 +9,6 @@ namespace Labyrinth
         Vector2 OriginalPosition { get; set; }
         IBoundMovement MovementBoundary { get; } 
 
-        bool Update(GameTime gameTime);
-
         void Move(Direction direction, decimal speed);
         void BounceBack(Direction direction, decimal speed);
 
