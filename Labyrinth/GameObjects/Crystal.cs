@@ -8,17 +8,14 @@ namespace Labyrinth.GameObjects
         public int CrystalId { get; }
         public decimal Score { get; }
         private bool _isTaken;
-        private readonly AnimationPlayer _animationPlayer;
+        private readonly LoopedAnimation _animationPlayer;
 
         public Crystal(Vector2 position, int id, int score, int energy) : base(position)
             {
             this.CrystalId = id;
             this.Score = score;
             this.Energy = energy;
-            this._animationPlayer = new AnimationPlayer(this);
-
-            var a = Animation.LoopingAnimation("Sprites/Crystal/Crystal", 8);
-            this._animationPlayer.PlayAnimation(a);
+            this._animationPlayer = new LoopedAnimation(this, "Sprites/Crystal/Crystal", 8);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }

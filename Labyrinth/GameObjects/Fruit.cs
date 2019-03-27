@@ -7,17 +7,14 @@ namespace Labyrinth.GameObjects
         {
         public FruitType FruitType { get; }
         private bool _isTaken;
-        private readonly AnimationPlayer _animationPlayer;
+        private readonly StaticAnimation _animationPlayer;
 
         public Fruit(Vector2 position, FruitType fruitType, int energy) : base(position)
             {
             this.FruitType = fruitType;
             this.Energy = energy;
-            this._animationPlayer = new AnimationPlayer(this);
-
             string textureName = $"Sprites/Fruit/{this.FruitType:G}";
-            var a = Animation.StaticAnimation(textureName);
-            this._animationPlayer.PlayAnimation(a);
+            this._animationPlayer = new StaticAnimation(this, textureName);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
 

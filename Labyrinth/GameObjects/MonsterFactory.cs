@@ -7,7 +7,6 @@ using System.Xml;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects.Behaviour;
-using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth.GameObjects
@@ -111,8 +110,7 @@ namespace Labyrinth.GameObjects
         private static Monster BuildMonsterFromBreed([NotNull] Breed breedInfo, MonsterDef monsterDef)
             {
             var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
-            var animation = Animation.LoopingAnimation(pathToTexture, breedInfo.BaseMovesDuringAnimation);
-            var result = new Monster(monsterDef, animation);
+            var result = new Monster(monsterDef, pathToTexture, breedInfo.BaseMovesDuringAnimation);
             return result;
             }
 

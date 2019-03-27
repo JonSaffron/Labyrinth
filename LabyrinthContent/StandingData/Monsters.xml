@@ -153,11 +153,15 @@
   </Breed>
 
   <Breed Name="RotaFloaterCyan" Texture="RotaFloaterCyan" BaseMovesDuringAnimation="6">
+    <InherentBehaviours>
+      <Flitter />
+    </InherentBehaviours>
+
     <InherentProperties>
       <MonsterScoresWhenKilled value="true" />
     </InherentProperties>
 
-    <Movement Default="Placid" ChangeRooms="FollowsPlayer" Speed="1.5">
+    <Movement Default="Placid" ChangeRooms="FollowsPlayer" Speed="1">
       <Move Type="Placid" Implementation="StandardRolling"/>
       <Move Type="Patrolling" Implementation="StandardPatrolling"/>
       <Move Type="Aggressive" Implementation="RotaFloaterCyanMovement"/>

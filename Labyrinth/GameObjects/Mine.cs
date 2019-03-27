@@ -11,16 +11,12 @@ namespace Labyrinth.GameObjects
         [NotNull] private MineState _mineState;
         private TimeSpan _countdown;
 
-        private readonly Animation _staticUnarmedAnimation;
         private readonly Animation _movingUnarmedAnimation;
-        private readonly Animation _armedAnimation;
 
         public Mine(Vector2 position) : base(position)
             {
             this.Energy = 240;
-            this._staticUnarmedAnimation = Animation.StaticAnimation("Sprites/Shot/MineUnarmed");
             this._movingUnarmedAnimation = Animation.LinearAnimation("Sprites/Shot/MineUnarmed", 48);
-            this._armedAnimation = Animation.LoopingAnimation("Sprites/Shot/MineArmed", 48);
             this._mineState = new InactiveState(this);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
@@ -76,13 +72,12 @@ namespace Labyrinth.GameObjects
         private class InactiveState : MineState
             {
             private static readonly TimeSpan TimeInState = TimeSpan.FromMilliseconds(1000);
-            private readonly AnimationPlayer _animationPlayer;
+            private readonly StaticAnimation _animationPlayer;
 
             public InactiveState(Mine mine) : base(mine)
                 {
                 this.Mine._countdown = TimeSpan.Zero;
-                this._animationPlayer = new AnimationPlayer(mine);
-                this._animationPlayer.PlayAnimation(this.Mine._staticUnarmedAnimation);
+                this._animationPlayer = new StaticAnimation(mine, "Sprites/Shot/MineUnarmed");
                 }
 
             public override void SteppedOnBy(IMovingItem movingItem)
@@ -153,12 +148,11 @@ namespace Labyrinth.GameObjects
         /// </summary>
         private class PrimedState : MineState
             {
-            private readonly AnimationPlayer _animationPlayer;
+            private readonly LoopedAnimation _animationPlayer;
 
             public PrimedState(Mine mine) : base(mine)
                 {
-                this._animationPlayer = new AnimationPlayer(mine);
-                this._animationPlayer.PlayAnimation(this.Mine._armedAnimation);
+                this._animationPlayer = new LoopedAnimation(mine, "Sprites/Shot/MineArmed", 48);
                 }
 
             public override void SteppedOnBy(IMovingItem movingItem)

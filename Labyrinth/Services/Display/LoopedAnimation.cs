@@ -6,18 +6,22 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Labyrinth.Services.Display
     {
     /// <summary>
-    /// Renders a gameobject with a manually selected image
+    /// Controls playback of an Animation.
     /// </summary>
     /// <remarks>Only suitable for a animation which is the same size as a tile</remarks>
-    public class StaticAnimation : IRenderAnimation
+    public class LoopedAnimation : IRenderAnimation
         {
         private readonly IGameObject _gameObject;
-        private decimal _position;
 
         /// <summary>
         /// The name of the texture to render
         /// </summary>
         private readonly string _textureName;
+
+        /// <summary>
+        /// How long it takes to play the whole animation in seconds
+        /// </summary>
+        private readonly float _lengthOfAnimation;
 
         /// <summary>
         /// What rotation to apply when drawing the sprite
@@ -30,24 +34,17 @@ namespace Labyrinth.Services.Display
         public SpriteEffects SpriteEffect { get; set; }
 
         /// <summary>
-        /// Gets or sets the position within the animation
+        /// The current position within the animation
         /// </summary>
-        /// Should be a number equal or above 0 and less than or equal to 1
-        public decimal Position
-            {
-            get => this._position;
-            set
-                {
-                if (value < 0 || value > 1)
-                    throw new ArgumentOutOfRangeException(nameof(value));
-                this._position = value;
-                }
-            }
+        private double _time;
 
-        public StaticAnimation([NotNull] IGameObject gameObject, [NotNull] string textureName)
+        public LoopedAnimation([NotNull] IGameObject gameObject, [NotNull] string textureName, int baseMovesDuringAnimation)
             {
             this._gameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             this._textureName = textureName ?? throw new ArgumentNullException(nameof(textureName));
+            if (baseMovesDuringAnimation <= 0)
+                throw new ArgumentOutOfRangeException(nameof(baseMovesDuringAnimation));
+            this._lengthOfAnimation = baseMovesDuringAnimation * Constants.GameClockResolution;
             }
 
         /// <summary>
@@ -55,14 +52,22 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private static Vector2 Origin => Constants.CentreOfTile;
 
+        public void Update(GameTime gameTime)
+            {
+            this._time += gameTime.ElapsedGameTime.TotalSeconds;
+            }
+
         public void Draw(ISpriteBatch spriteBatch, ISpriteLibrary spriteLibrary)
             {
             if (!this._gameObject.IsExtant)
                 return;
 
+            this._time %= this._lengthOfAnimation;
+            var positionInAnimation = this._time / this._lengthOfAnimation;
+
             var texture = spriteLibrary.GetSprite(this._textureName);
             var frameCount = (texture.Width / Constants.TileLength);
-            int frameIndex = (this.Position == 1) ? frameCount - 1 : (int) Math.Floor(frameCount * this.Position);
+            int frameIndex = (int) Math.Floor(frameCount * positionInAnimation);
 
             // Calculate the source rectangle of the current frame.
             var source = new Rectangle(frameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);

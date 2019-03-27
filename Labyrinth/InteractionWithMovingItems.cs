@@ -49,14 +49,14 @@ namespace Labyrinth
                 return;
                 }
 
-            if (this._primaryItem is Player player && this._secondaryItem is Monster monster)
+            if (this._primaryItem is Player player && this._secondaryItem is IMonster monster)
                 {
                 PlayerAndMonsterCollide(player, monster);
                 }
             else
                 {
                 player = this._secondaryItem as Player;
-                monster = this._primaryItem as Monster;
+                monster = this._primaryItem as IMonster;
                 if (player != null && monster != null)
                     {
                     PlayerAndMonsterCollide(player, monster);
@@ -83,7 +83,7 @@ namespace Labyrinth
             // any other interaction here...
             }
 
-        private static void PlayerAndMonsterCollide(Player player, Monster monster)
+        private static void PlayerAndMonsterCollide(Player player, IMonster monster)
             {
             int monsterEnergy = monster.Energy;
             monster.InstantlyExpire();
@@ -143,7 +143,7 @@ namespace Labyrinth
             if (movingObjectTile == moveableObjectTile)
                 {
                 var b = GlobalServices.GameState.AddBang(movingObject.Position, BangType.Long);
-                if (movingObject is Monster monster)
+                if (movingObject is IMonster monster)
                     {
                     var monsterCrushed = new MonsterCrushed(monster, moveableObject);
                     Messenger.Default.Send(monsterCrushed);
@@ -183,7 +183,7 @@ namespace Labyrinth
                 return true;
                 }
 
-            if (movingItem is Monster monster)
+            if (movingItem is IMonster monster)
                 {
                 var monsterShot = new MonsterShot(monster, explosion);
                 Messenger.Default.Send(monsterShot);
@@ -205,7 +205,7 @@ namespace Labyrinth
 
         private static bool InteractionInvolvingShot(StandardShot shot, IMovingItem movingItem)
             {
-            if ((movingItem is Player || movingItem is Monster) && (shot.Originator != movingItem || shot.HasRebounded))
+            if ((movingItem is Player || movingItem is IMonster) && (shot.Originator != movingItem || shot.HasRebounded))
                 {
                 var result = ShotHitsPlayerOrMonster(shot, movingItem);
                 return result;
@@ -257,7 +257,7 @@ namespace Labyrinth
         private static bool ShotHitsShot(StandardShot standardShot1, StandardShot standardShot2)
             {
             // this is the same logic the original game uses
-            var isAtLeastOneShotFromMonsterWhichHasNotRebounded = (standardShot1.Originator is Monster && !standardShot1.HasRebounded) || (standardShot2.Originator is Monster && !standardShot2.HasRebounded);
+            var isAtLeastOneShotFromMonsterWhichHasNotRebounded = (standardShot1.Originator is IMonster && !standardShot1.HasRebounded) || (standardShot2.Originator is IMonster && !standardShot2.HasRebounded);
             if (!isAtLeastOneShotFromMonsterWhichHasNotRebounded)
                 {
                 return false;

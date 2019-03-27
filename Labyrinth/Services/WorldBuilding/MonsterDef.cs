@@ -90,6 +90,7 @@ namespace Labyrinth.Services.WorldBuilding
             var isEgg = (XmlElement) apply.SelectSingleNode("ns:" + nameof(result.IsEgg), namespaceManager);
             if (isEgg != null)
                 {
+                result.IsEgg = true;
                 result.TimeBeforeHatching = int.Parse(isEgg.GetAttribute(nameof(TimeBeforeHatching)));
                 result.TimeBeforeHatching |= 1; // not sure why the original game does this...
                 }

@@ -2,7 +2,6 @@
 using Labyrinth.GameObjects;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.GameObjects.Motility;
-using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
@@ -10,7 +9,7 @@ namespace Labyrinth.Test
     {
     class DummyMonster : Monster
         {
-        public DummyMonster(MonsterDef monsterDef, Animation animation) : base(monsterDef, animation)
+        public DummyMonster(MonsterDef monsterDef, string textureName, int baseMovesDuringAnimation) : base(monsterDef, textureName, baseMovesDuringAnimation)
             {
             this.Mobility = MonsterMobility.Placid;
             this.IsActive = true;

@@ -5,15 +5,12 @@ namespace Labyrinth.GameObjects
     {
     public class Grave : StaticItem
         {
-        private readonly AnimationPlayer _animationPlayer;
+        private readonly StaticAnimation _animationPlayer;
 
         public Grave(Vector2 position) : base(position)
             {
             this.Energy = 255;
-            this._animationPlayer = new AnimationPlayer(this);
-
-            var a = Animation.StaticAnimation("Sprites/Props/Grave");
-            this._animationPlayer.PlayAnimation(a);
+            this._animationPlayer = new StaticAnimation(this, "Sprites/Props/Grave");
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             }
 

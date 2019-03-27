@@ -6,15 +6,12 @@ namespace Labyrinth.GameObjects
     public class ForceField : StaticItem
         {
         private readonly int _crystalRequired;
-        private readonly AnimationPlayer _animationPlayer;
+        private readonly LoopedAnimation _animationPlayer;
 
         public ForceField(Vector2 position, int crystalRequired) : base(position)
             {
             this._crystalRequired = crystalRequired;
-            this._animationPlayer = new AnimationPlayer(this);
-
-            var a = Animation.LoopingAnimation("Sprites/Props/ForceField", 6);
-            this._animationPlayer.PlayAnimation(a);
+            this._animationPlayer = new LoopedAnimation(this, "Sprites/Props/ForceField", 6);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Reflection);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.ForceField);
             }
