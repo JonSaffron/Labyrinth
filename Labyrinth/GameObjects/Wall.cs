@@ -9,6 +9,7 @@ namespace Labyrinth.GameObjects
 
         public Wall(Vector2 position, string textureName) : base(position)
             {
+            // todo reuse animationplayer for identical textures
             this._animationPlayer = new AnimationPlayer(this);
             var a = Animation.StaticAnimation(textureName);
             this._animationPlayer.PlayAnimation(a);

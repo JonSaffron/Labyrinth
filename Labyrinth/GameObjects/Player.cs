@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 /* If at grid point: On new keypress
  *  If not facing the same way then turn to face the indicated direction return
@@ -32,25 +31,22 @@ namespace Labyrinth.GameObjects
         [NotNull] private readonly IPlayerWeapon _weapon2;
 
         // Animations
-        private readonly AnimationPlayer _animationPlayer;
-        private readonly Animation _leftRightMovingAnimation;
-        private readonly Animation _upMovingAnimation;
-        private readonly Animation _downMovingAnimation;
-        private readonly Animation _leftRightStaticAnimation;
-        private readonly Animation _upStaticAnimation;
-        private readonly Animation _downStaticAnimation;
+        private readonly PlayerAnimation _playerAnimation;
 
         private readonly HashSet<int> _crystalsCollected = new HashSet<int>();
         private readonly HashSet<int> _worldAreaIdsVisited = new HashSet<int>();
 
+        // used to keep track of game ticks when reducing player's energy over time
         private double _time;
+        // number of game ticks before player's energy is decremented
         private int _countBeforeDecrementingEnergy;
 
-        private bool _whichFootFlag;
-
+        // for movement
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
-        private GameTime _gameTime;
+
+        // this is set on every update and can be compared against WhenCanMoveInDirectionFaced
+        private TimeSpan _totalGameTimeElapsed;
 
         /// <summary>
         /// Constructs a new player.
@@ -58,15 +54,7 @@ namespace Labyrinth.GameObjects
         public Player(Vector2 position, int energy, int initialWorldAreaId) : base(position)
             {
             // Load animated textures.
-            this._leftRightMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerLeftFacing", 2);
-            this._animationPlayer = new AnimationPlayer(this);
-            this._upMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerUpFacing", 2);
-            this._downMovingAnimation = Animation.LoopingAnimation("Sprites/Player/PlayerDownFacing", 2);
-            this._leftRightStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerLeftFacing");
-            this._upStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerUpFacing");
-            this._downStaticAnimation = Animation.StaticAnimation("Sprites/Player/PlayerDownFacing");
-
-            this._animationPlayer.NewFrame += PlayerSpriteNewFrame;
+            this._playerAnimation = new PlayerAnimation(this);
             
             this._weapon1 = new StandardPlayerWeapon();
             this._weapon2 = new MineLayer();
@@ -79,13 +67,6 @@ namespace Labyrinth.GameObjects
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Player);
             }
 
-        private void PlayerSpriteNewFrame(object sender, EventArgs e)
-            {
-            var playerMoves = _whichFootFlag ? GameSound.PlayerMovesFirstFoot : GameSound.PlayerMovesSecondFoot;
-            this.PlaySound(playerMoves);
-            this._whichFootFlag = !(this._whichFootFlag);
-            }
-
         /// <summary>
         /// Resets the player to life.
         /// </summary>
@@ -93,7 +74,6 @@ namespace Labyrinth.GameObjects
             {
             this.CurrentDirectionFaced = Direction.Left;
             this.CurrentMovement = DataStructures.Movement.Still;
-            SetAnimation(false);
             this._time = 0;
 
             this._weapon1.Reset();
@@ -119,13 +99,7 @@ namespace Labyrinth.GameObjects
             this._movementIterator = null;
             }
 
-        public override IRenderAnimation RenderAnimation
-            {
-            get
-                {
-                return this._animationPlayer;
-                }
-            }
+        public override IRenderAnimation RenderAnimation => this._playerAnimation;
 
         public override bool IsExtant
             {
@@ -144,20 +118,18 @@ namespace Labyrinth.GameObjects
             if (!IsExtant)
                 return false;
 
-            // todo should the player shooting be dealt with here?
+            this._playerAnimation.Update(gameTime);
 
-            if (this.CurrentMovement.IsMoving)
-                this._animationPlayer.Update(gameTime);
+            // todo should the player shooting be dealt with here?
 
             // move the player
             this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
-            this._gameTime = gameTime;
+            this._totalGameTimeElapsed = gameTime.TotalGameTime;
             if (this._movementIterator == null)
                 this._movementIterator = this._movementIterator = Move().GetEnumerator();
             this._movementIterator.MoveNext();
             var result = this._movementIterator.Current;
 
-            SetAnimation(result);
             UpdateEnergy(gameTime);
 
             return result;
@@ -174,7 +146,9 @@ namespace Labyrinth.GameObjects
                     while (true)
                         {
                         if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
+                            {
                             break;
+                            }
 
                         yield return true;
                         }
@@ -191,33 +165,10 @@ namespace Labyrinth.GameObjects
             // ReSharper disable once IteratorNeverReturns - this is deliberate
             }
 
-        private void SetAnimation(bool isMoving)
+        public override void BounceBack(Direction direction, decimal speed)
             {
-            Animation a;
-            SpriteEffects se;
-            switch (this.CurrentDirectionFaced)
-                {
-                case Direction.Left:
-                    a = isMoving ? this._leftRightMovingAnimation : this._leftRightStaticAnimation;
-                    se = SpriteEffects.None;
-                    break;
-                case Direction.Right:
-                    a = isMoving ? this._leftRightMovingAnimation : this._leftRightStaticAnimation;
-                    se = SpriteEffects.FlipHorizontally;
-                    break;
-                case Direction.Up:
-                    a = isMoving ? this._upMovingAnimation : this._upStaticAnimation;
-                    se = SpriteEffects.None;
-                    break;
-                case Direction.Down:
-                    a = isMoving ? this._downMovingAnimation : this._downStaticAnimation;
-                    se = SpriteEffects.None;
-                    break;
-                default:
-                    throw new InvalidOperationException();
-                }
-            this._animationPlayer.PlayAnimation(a);
-            this._animationPlayer.SpriteEffect = se;
+            this._playerAnimation.ResetAnimation();
+            base.BounceBack(direction, speed);
             }
 
         private void UpdateEnergy(GameTime gameTime)
@@ -267,10 +218,10 @@ namespace Labyrinth.GameObjects
             if (requestedDirection != this.CurrentDirectionFaced)
                 {
                 this.CurrentDirectionFaced = requestedDirection;
-                this.WhenCanMoveInDirectionFaced = this._gameTime.TotalGameTime.Add(this._delayBeforeMovingInDirectionFaced);
+                this.WhenCanMoveInDirectionFaced = this._totalGameTimeElapsed.Add(this._delayBeforeMovingInDirectionFaced);
                 return false;
                 }
-            if (this._gameTime.TotalGameTime < this.WhenCanMoveInDirectionFaced)
+            if (this._totalGameTimeElapsed < this.WhenCanMoveInDirectionFaced)
                 return false;
             
             // start new movement
@@ -306,14 +257,10 @@ namespace Labyrinth.GameObjects
 
         protected override void UponDeath()
             {
-            GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, SoundEffectFinished);
+            GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, 
+                (sender, args) => GlobalServices.World.SetLevelReturnType(LevelReturnType.LostLife));
             GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             GlobalServices.GameState.AddGrave(this.TilePosition);
-            }
-
-        private void SoundEffectFinished(object sender, EventArgs args)
-            {
-            GlobalServices.World.SetLevelReturnType(LevelReturnType.LostLife);
             }
 
         public void CrystalCollected(Crystal c)

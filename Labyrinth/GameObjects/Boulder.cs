@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     public class Boulder : MovingItem
         {
         // Animations
-        private readonly Animation _staticImage = Animation.StaticAnimation("Sprites/Boulder/Boulder");
+        private const string TextureName = "Sprites/Boulder/Boulder";
         private readonly StaticAnimation _animationPlayer;
         
         /// <summary>
@@ -14,8 +14,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public Boulder(Vector2 position) : base(position)
             {
-            this._animationPlayer = new StaticAnimation(this);
-            this._animationPlayer.PlayAnimation(_staticImage);
+            this._animationPlayer = new StaticAnimation(this, TextureName);
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Boulder);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Moveable);

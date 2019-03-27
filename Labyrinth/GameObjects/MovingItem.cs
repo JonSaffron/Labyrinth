@@ -64,7 +64,7 @@ namespace Labyrinth.GameObjects
         /// <param name="direction">The direction to move in</param>
         /// <param name="speed">The speed to move at</param>
         /// <remarks>This is used by an object that can move another, currently this will only be the player</remarks>
-        public void BounceBack(Direction direction, decimal speed)
+        public virtual void BounceBack(Direction direction, decimal speed)
             {
             var originallyMovingTowards = TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards);
             var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);

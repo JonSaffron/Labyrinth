@@ -194,6 +194,7 @@
     <Compile Include="Interfaces\IAnimationPlayer.cs" />
     <Compile Include="DataStructures\PropertyBag.cs" />
     <Compile Include="DataStructures\PropertyDef.cs" />
+    <Compile Include="Services\Display\PlayerAnimation.cs" />
     <Compile Include="Services\Display\StaticAnimation.cs" />
     <Compile Include="Services\Display\DrawParameters.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />

@@ -103,6 +103,7 @@ namespace Labyrinth
                 }
             else
                 {
+                // todo some graphical effect - original game changed colours
                 GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
                     (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedWorld));
                 world.SetDoNotUpdate();

@@ -518,7 +518,7 @@ static object injured (b)
 0A51 A9 04     LDA #04                  
 0A53 8D C4 0B  STA 0BC4                 -- set direction to still
 0A56 A9 00     LDA #00                  
-0A58 8D 0A 0C  STA 0C0A                 -- set animation frame
+0A58 8D 0A 0C  STA 0C0A                 -- set count of animation frames to 0 (prevents animation)
 0A5B 60        RTS                      
 
 0A5C A0 03     LDY #03                  -- initialise loop counter
@@ -533,11 +533,11 @@ static object injured (b)
 0A6B A9 0F     LDA #0F                  
 0A6D 85 7D     STA 7D                   -- set keyboard delay 
 0A6F A9 00     LDA #00                  
-0A71 8D 0A 0C  STA 0C0A                 
+0A71 8D 0A 0C  STA 0C0A                 -- set count of animation frames to 0 (prevents animation)
 0A74 F0 08     BEQ 0A7E                 -- always jump
 
 0A76 A9 01     LDA #01                  
-0A78 8D 0A 0C  STA 0C0A                 
+0A78 8D 0A 0C  STA 0C0A                 -- set count of animation frames to 1 (enables animation)
 0A7B 8C C4 0B  STY 0BC4                 
 
 0A7E 84 7E     STY 7E                   
@@ -2581,15 +2581,15 @@ static object injured (b)
 1F45 A9 05     LDA #05                  -- initialise first slot for player info
 1F47 8D 00 0C  STA 0C00                 
 1F4A A9 04     LDA #04                  
-1F4C 8D 04 0C  STA 0C04                 
+1F4C 8D 04 0C  STA 0C04                 -- set current direction to still
 1F4F A9 85     LDA #85                  
-1F51 8D 0F 0C  STA 0C0F                 
+1F51 8D 0F 0C  STA 0C0F                 -- set movement to invalid
 1F54 A9 01     LDA #01                  
-1F56 8D 0B 0C  STA 0C0B                 
+1F56 8D 0B 0C  STA 0C0B                 -- time to show each frame = 1
 1F59 A9 22     LDA #22                  
-1F5B 8D 09 0C  STA 0C09                 
+1F5B 8D 09 0C  STA 0C09                 -- start facing left
 1F5E A9 00     LDA #00                  
-1F60 8D 07 0C  STA 0C07                 
+1F60 8D 07 0C  STA 0C07                 -- no flitter
 1F63 8D C9 0B  STA 0BC9                 -- store 0 in the recent monster list flag
 1F66 85 7D     STA 7D                   -- reset keyboard delay
 1F68 85 7E     STA 7E                   -- clear last direction required
@@ -5211,33 +5211,39 @@ static object injured (b)
 30CE A9 0D     LDA #0D                  
 30D0 20 D6 2D  JSR 2DD6                 -- play got crystal
 
-30D3 AD C6 0B  LDA 0BC6                 -- get current room
+		-- remove forcefield for the level containing the crystal
+
+30D3 AD C6 0B  LDA 0BC6                 -- get current room (which contained the crystal)
 30D6 20 06 26  JSR 2606                 -- calculate corresponding level
-30D9 85 71     STA 71                   
+30D9 85 71     STA 71                   -- store the level corresponding to the crystal
 30DB A0 BF     LDY #BF                  -- initialise loop counter
-30DD B9 00 04  LDA 0400,Y               -- get room number
+30DD B9 00 04  LDA 0400,Y               -- get monster room number
 30E0 30 15     BMI 30F7                 -- if &ff then not occupied, branch
 30E2 20 06 26  JSR 2606                 -- calculate corresponding level
-30E5 C5 71     CMP 71                   -- compare to level above
+30E5 C5 71     CMP 71                   -- compare to level of the crystal
 30E7 D0 0E     BNE 30F7                 -- not equal so branch
 30E9 B9 00 07  LDA 0700,Y               -- get monster type
 30EC 30 09     BMI 30F7                 -- skip over if egg
 30EE 29 0F     AND #0F                  -- extract basic type
 30F0 D0 05     BNE 30F7                 -- skip if not zero (forcefield)
 30F2 A9 FF     LDA #FF                  
-30F4 99 00 04  STA 0400,Y               -- set forcefield off
+30F4 99 00 04  STA 0400,Y               -- remove forcefield
 30F7 88        DEY                      -- decrement loop counter
 30F8 C0 FF     CPY #FF                  -- end of loop?
 30FA D0 E1     BNE 30DD                 -- continue loop
 
+		-- check if all crystals have been got
+
 30FC A0 0E     LDY #0E                  -- initialise loop counter
 30FE A9 FF     LDA #FF                  -- set result to true
-3100 39 F0 0B  AND 0BF0,Y               -- result = result & crystal got
+3100 39 F0 0B  AND 0BF0,Y               -- result = result & crystal got (&FF)
 3103 88        DEY                      
 3104 88        DEY                      
 3105 10 F9     BPL 3100                 -- continue loop
 3107 C9 FF     CMP #FF                  -- have all crystals been got?
 3109 D0 3D     BNE 3148                 -- rts if not
+
+		-- end world stuff
 
 310B A9 80     LDA #80                  
 310D 8D DC 0B  STA 0BDC                 -- start delay counter for game loop end
@@ -5248,11 +5254,11 @@ static object injured (b)
 3119 20 D6 2D  JSR 2DD6                 -- play end of world sound
 
 		-- Set counter to hatching/type of movement property of each animation slot to 1
-		-- Not sure what this achieves.
+		-- Not sure what this achieves. Possibly stops them moving?
 
 311C A0 10     LDY #10                  -- initialise loop counter
 311E A9 01     LDA #01                  
-3120 99 0F 0C  STA 0C0F,Y               -- set delay to removal
+3120 99 0F 0C  STA 0C0F,Y               -- set delay to hatching
 3123 98        TYA                      
 3124 18        CLC                      
 3125 69 10     ADC #10                  -- increment counter
@@ -5264,7 +5270,7 @@ static object injured (b)
 312D 8A        TXA                      
 312E 48        PHA                      
 
-312F A2 03     LDX #03                  
+312F A2 03     LDX #03                  -- initialise loop counter
 3131 A9 13     LDA #13                  
 3133 20 EE FF  JSR FFEE                 -- vdu 19
 3136 8A        TXA                      
@@ -5278,10 +5284,10 @@ static object injured (b)
 3147 AA        TAX                      
 3148 60        RTS                      
 
-3149 0B                                 -- flashing yellow/blue
-314A 01                                 -- red
-314B 02                                 -- green
-314C 00                                 -- black
+3149 0B                                 -- 3 = flashing yellow/blue (was blue)
+314A 01                                 -- 2 = red (was green)
+314B 02                                 -- 1 = green (was red)
+314C 00                                 -- 0 = black
 
 		-- player dies
 
@@ -6235,10 +6241,10 @@ static object injured (b)
 
 3810 A9 13     LDA #13                  
 3812 20 F4 FF  JSR FFF4                 -- wait for screen refresh
-3815 A2 03     LDX #03                  
 
 		-- set all logical colours in palette to black
 
+3815 A2 03     LDX #03                  -- initialise loop counter
 3817 A9 13     LDA #13                  
 3819 20 EE FF  JSR FFEE                 -- vdu 19
 381C 8A        TXA                      
@@ -6248,7 +6254,7 @@ static object injured (b)
 3824 10 F1     BPL 3817                 
 3826 60        RTS                      
 
-		-- set colour palette to red, green and blue
+		-- set colour palette to 1 = red, 2 = green and 3 = blue
 
 3827 A9 13     LDA #13                  
 3829 20 F4 FF  JSR FFF4                 -- wait for vertical sync

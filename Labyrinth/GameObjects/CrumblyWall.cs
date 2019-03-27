@@ -5,14 +5,12 @@ namespace Labyrinth.GameObjects
     {
     public class CrumblyWall : StaticItem
         {
-        private readonly int _initialEnergy;
-        private readonly AnimationPlayer _animationPlayer;
+        private readonly decimal _initialEnergy;
+        private readonly StaticAnimation _animationPlayer;
 
         public CrumblyWall(Vector2 position, string textureName, int energy) : base(position)
             {
-            this._animationPlayer = new AnimationPlayer(this);
-            var a = Animation.StaticAnimation(textureName);
-            this._animationPlayer.PlayAnimation(a);
+            this._animationPlayer = new StaticAnimation(this, textureName);
             this.Energy = energy;
             this._initialEnergy = energy;
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Wall);
@@ -29,8 +27,8 @@ namespace Labyrinth.GameObjects
                 this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
                 }
 
-            float percentageEnergyLeft = this.Energy / (float) this._initialEnergy;
-            this._animationPlayer.Position = 1.0 - percentageEnergyLeft;
+            decimal percentageEnergyLeft = this.Energy / this._initialEnergy;
+            this._animationPlayer.Position = 1m - percentageEnergyLeft;
             }
         }
     }

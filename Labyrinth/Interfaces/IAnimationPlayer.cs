@@ -1,5 +1,4 @@
-﻿using System;
-using Labyrinth.Services.Display;
+﻿using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -22,11 +21,6 @@ namespace Labyrinth
         /// </summary>
         /// Should be a number equal or above 0 and less than 1
         double Position { get; set; }
-
-        /// <summary>
-        /// Used to notify a game object that the animation has progressed to the next frame
-        /// </summary>
-        event EventHandler<EventArgs> NewFrame;
 
         /// <summary>
         /// Begins or continues playback of an animation.

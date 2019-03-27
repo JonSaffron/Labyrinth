@@ -43,9 +43,6 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private double _time;
 
-        /// <inheritdoc />
-        public event EventHandler<EventArgs> NewFrame;
-        
         /// <summary>
         /// Which routine to use to advance the frame index
         /// </summary>
@@ -57,11 +54,6 @@ namespace Labyrinth.Services.Display
             this._animation = Animation.None;
             }
 
-        private void OnNewFrame(EventArgs e)
-            {
-            this.NewFrame?.Invoke(this, e);
-            }
-        
         /// <summary>
         /// Returns the mid-point of animation
         /// </summary>
@@ -99,7 +91,6 @@ namespace Labyrinth.Services.Display
             {
             this._time = (this._time + gameTime.ElapsedGameTime.TotalSeconds) % this._animation.LengthOfAnimation;
             this.Position = this._time / this._animation.LengthOfAnimation;
-            // todo trigger OnNewFrame
             }
 
         private void AdvanceLinearAnimation(GameTime gameTime)
@@ -117,7 +108,6 @@ namespace Labyrinth.Services.Display
                     this._position = 1;
                     }
                 }
-            // todo trigger OnNewFrame
             }
 
         public void Update(GameTime gameTime)
