@@ -28,7 +28,7 @@ namespace Labyrinth
             this._worldLoader = services.WorldLoader ?? throw new ArgumentException("WorldLoader");
             this._scoreKeeper = services.ScoreKeeper ?? throw new ArgumentException("ScoreKeeper");
             GlobalServices.SetGame(this);
-            
+
             this._gdm = new GraphicsDeviceManager(this)
                             {
                                 PreferredBackBufferWidth = (int) Constants.RoomSizeInPixels.X * Constants.ZoomWhilstWindowed,
@@ -36,6 +36,7 @@ namespace Labyrinth
                             };
 
             this.Content.RootDirectory = "Content";
+            Components.Add(new FrameRateCounter(this));
             this._lives = 2;
             this._headsUpDisplay.Reset();
             this._scoreKeeper.Reset();
@@ -172,12 +173,11 @@ namespace Labyrinth
             if (this._world != null)
                 {
                 this._spriteBatch.Begin(this._world.WorldWindow.WindowPosition);
-
                 this._world.Draw(gameTime, _spriteBatch);
                 this._headsUpDisplay.DrawStatus(_spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, this._scoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
-                
-                base.Draw(gameTime);
                 this._spriteBatch.End();
+
+                base.Draw(gameTime);
                 }
             }
             

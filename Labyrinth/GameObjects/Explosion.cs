@@ -7,14 +7,12 @@ namespace Labyrinth.GameObjects
         {
         private bool _isExtant;
         public IGameObject Originator { get; }  // the mine that caused the explosion
-        private readonly AnimationPlayer _animationPlayer;
+        private readonly LinearAnimation _animationPlayer;
 
         public Explosion(Vector2 position, int energy, IGameObject originator) : base(position)
             {
             this.Energy = energy;
-            this._animationPlayer = new AnimationPlayer(this);
-            var a = Animation.LinearAnimation("Sprites/Props/LongBang", 8);
-            this._animationPlayer.PlayAnimation(a);
+            this._animationPlayer = new LinearAnimation(this, "Sprites/Props/LongBang", 8);
             this._isExtant = true;
             this.Originator = originator;
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Bang);
@@ -31,9 +29,14 @@ namespace Labyrinth.GameObjects
 
         public override bool Update(GameTime gameTime)
             {
-            this._animationPlayer.Update(gameTime);
-            if (this._animationPlayer.Position == 1)
+            if (!this._animationPlayer.HasReachedEndOfAnimation)
+                {
                 this._isExtant = false;
+                }
+            else
+                {
+                this._animationPlayer.Update(gameTime);
+                }
             return this._isExtant;
             }
         }

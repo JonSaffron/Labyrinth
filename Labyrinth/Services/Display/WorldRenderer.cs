@@ -7,6 +7,13 @@ using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+// todo drawing is quicker if the same texture is used multiple times rather than swapping between different textures - or use a portion of a bigger texture
+// with spritebatch in immediate mode we could turn on GraphicsDevice.RenderState.DepthBufferEnable and specify a layerDepth during Draw and then output in texture order
+// http://www.shawnhargreaves.com/blog/spritebatch-and-spritesortmode.html
+// http://www.shawnhargreaves.com/blog/spritebatch-sorting-part-2.html
+// http://www.shawnhargreaves.com/blog/return-of-the-spritebatch-sorting-part-3.html
+
+
 namespace Labyrinth.Services.Display
     {
     class WorldRenderer

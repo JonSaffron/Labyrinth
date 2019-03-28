@@ -6,10 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Labyrinth.Services.Display
     {
     /// <summary>
-    /// Controls playback of an Animation that loops repeatedly
+    /// Controls playback of an Animation that plays from start to finish only once
     /// </summary>
     /// <remarks>Only suitable for a animation which is the same size as a tile</remarks>
-    public class LoopedAnimation : IRenderAnimation
+    public class LinearAnimation : IRenderAnimation
         {
         private readonly IGameObject _gameObject;
 
@@ -38,7 +38,9 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private double _time;
 
-        public LoopedAnimation([NotNull] IGameObject gameObject, [NotNull] string textureName, int baseMovesDuringAnimation)
+        public bool HasReachedEndOfAnimation { get; private set; }
+
+        public LinearAnimation([NotNull] IGameObject gameObject, [NotNull] string textureName, int baseMovesDuringAnimation)
             {
             this._gameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             this._textureName = textureName ?? throw new ArgumentNullException(nameof(textureName));
@@ -54,7 +56,15 @@ namespace Labyrinth.Services.Display
 
         public void Update(GameTime gameTime)
             {
+            if (this.HasReachedEndOfAnimation) 
+                return;
+
             this._time += gameTime.ElapsedGameTime.TotalSeconds;
+            if (this._time >= this._lengthOfAnimation)
+                {
+                this._time = this._lengthOfAnimation;
+                this.HasReachedEndOfAnimation = true;
+                }
             }
 
         public void Draw(ISpriteBatch spriteBatch, ISpriteLibrary spriteLibrary)
@@ -62,12 +72,16 @@ namespace Labyrinth.Services.Display
             if (!this._gameObject.IsExtant)
                 return;
 
-            this._time %= this._lengthOfAnimation;
-            var positionInAnimation = this._time / this._lengthOfAnimation;
-
             var texture = spriteLibrary.GetSprite(this._textureName);
             var frameCount = (texture.Width / Constants.TileLength);
-            int frameIndex = (int) Math.Floor(frameCount * positionInAnimation);
+            int frameIndex;
+            if (this.HasReachedEndOfAnimation)
+                frameIndex = frameCount - 1;
+            else
+                {
+                var position = this._time / this._lengthOfAnimation;
+                frameIndex = (int) Math.Floor(frameCount * position);
+                }
 
             // Calculate the source rectangle of the current frame.
             var source = new Rectangle(frameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);

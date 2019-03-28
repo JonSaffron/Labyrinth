@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
 
         private double _timeToTravel;
         private readonly Dictionary<Direction, Rectangle> _boundingRectangles;
-        private readonly AnimationPlayer _animationPlayer;
+        private readonly StaticAnimation _animationPlayer;
 
         private IEnumerator<bool> _movementIterator;
         private double _remainingTime;
@@ -26,14 +26,12 @@ namespace Labyrinth.GameObjects
                 throw new ArgumentOutOfRangeException(nameof(direction));
 
             this.Energy = energy;
-            this._animationPlayer = new AnimationPlayer(this);
             this.Originator = originator;
             this._directionOfTravel = direction;
             this.Orientation = direction.Orientation();
 
             string textureName = originator is Player ? "Sprites/Shot/RedShot" : "Sprites/Shot/GreenShot";
-            var staticImage = Animation.StaticAnimation(textureName);
-            this._animationPlayer.PlayAnimation(staticImage);
+            this._animationPlayer = new StaticAnimation(this, textureName);
             ResetTimeToTravel();
 
             this._boundingRectangles = GetBoundingRectangles();

@@ -191,9 +191,10 @@
     <Compile Include="GameObjects\Motility\SemiAggressive.cs" />
     <Compile Include="DataStructures\Movement.cs" />
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
-    <Compile Include="Interfaces\IAnimationPlayer.cs" />
     <Compile Include="DataStructures\PropertyBag.cs" />
     <Compile Include="DataStructures\PropertyDef.cs" />
+    <Compile Include="Services\Display\FrameRateCounter.cs" />
+    <Compile Include="Services\Display\LinearAnimation.cs" />
     <Compile Include="Services\Display\LoopedAnimation.cs" />
     <Compile Include="Services\Display\PlayerAnimation.cs" />
     <Compile Include="Services\Display\StaticAnimation.cs" />
@@ -218,8 +219,6 @@
     <Compile Include="Interfaces\IActiveSoundService.cs" />
     <Compile Include="Interfaces\ICentrePointProvider.cs" />
     <Compile Include="Interfaces\ISoundEffectInstance.cs" />
-    <Compile Include="Services\Display\Animation.cs" />
-    <Compile Include="Services\Display\AnimationPlayer.cs" />
     <Compile Include="GameObjects\Bang.cs" />
     <Compile Include="GameObjects\Boulder.cs" />
     <Compile Include="GameObjects\CrumblyWall.cs" />

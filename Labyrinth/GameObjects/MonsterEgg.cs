@@ -10,18 +10,15 @@ namespace Labyrinth.GameObjects
         {
         private MonsterDef _underlyingMonster;
         private readonly GameTimer _hatchingTimer;
-        private static readonly Animation EggAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 6);
-        private static readonly Animation HatchingAnimation = Animation.LoopingAnimation("Sprites/Monsters/Egg", 2);
-        private readonly AnimationPlayer _animationPlayer;
+        private LoopedAnimation _animationPlayer;
 
         public MonsterEgg(MonsterDef underlyingMonster, int timeToHatch) : base(underlyingMonster.Position)
             {
             this._underlyingMonster = underlyingMonster;
             this.Energy = underlyingMonster.Energy;
-            this._animationPlayer = new AnimationPlayer(this);
+            this._animationPlayer = new LoopedAnimation(this, "Sprites/Monsters/Egg", 6);
             var timeSpan = TimeSpan.FromSeconds(timeToHatch * Constants.GameClockResolution);
             this._hatchingTimer = GameTimer.AddGameTimer(timeSpan, EggIsHatching, false);
-            this._animationPlayer.PlayAnimation(EggAnimation);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
             }
@@ -30,7 +27,7 @@ namespace Labyrinth.GameObjects
             {
             if (this.IsExtant)
                 {
-                this._animationPlayer.PlayAnimation(HatchingAnimation);
+                this._animationPlayer = new LoopedAnimation(this, "Sprites/Monsters/Egg", 2);
                 this.PlaySoundWithCallback(GameSound.EggHatches, HatchingSoundFinished);
                 }
             }

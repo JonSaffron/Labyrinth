@@ -11,12 +11,9 @@ namespace Labyrinth.GameObjects
         [NotNull] private MineState _mineState;
         private TimeSpan _countdown;
 
-        private readonly Animation _movingUnarmedAnimation;
-
         public Mine(Vector2 position) : base(position)
             {
             this.Energy = 240;
-            this._movingUnarmedAnimation = Animation.LinearAnimation("Sprites/Shot/MineUnarmed", 48);
             this._mineState = new InactiveState(this);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
@@ -111,12 +108,11 @@ namespace Labyrinth.GameObjects
         /// </summary>
         private class CookingState : MineState
             {
-            private readonly AnimationPlayer _animationPlayer;
+            private readonly LinearAnimation _animationPlayer;
 
             public CookingState(Mine mine) : base(mine)
                 {
-                this._animationPlayer = new AnimationPlayer(mine);
-                this._animationPlayer.PlayAnimation(this.Mine._movingUnarmedAnimation);
+                this._animationPlayer = new LinearAnimation(mine, "Sprites/Shot/MineUnarmed", 48);
                 }
 
             public override void SteppedOnBy(IMovingItem movingItem)
@@ -127,9 +123,14 @@ namespace Labyrinth.GameObjects
 
             public override bool Update(GameTime gameTime)
                 {
-                this._animationPlayer.Update(gameTime);
-                if (this._animationPlayer.Position == 1)
+                if (!this._animationPlayer.HasReachedEndOfAnimation)
+                    {
+                    this._animationPlayer.Update(gameTime);
+                    }
+                else
+                    {
                     this.Mine._mineState = new PrimedState(this.Mine);
+                    }
                 return true;
                 }
 

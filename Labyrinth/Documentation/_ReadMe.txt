@@ -9,3 +9,11 @@ https://gamedev.stackexchange.com/questions/33888/what-is-the-most-efficient-con
 
 Implementing a quadtree
 https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
+
+Bitmap fonts
+https://web.archive.org/web/20190217034432/https://blogs.msdn.microsoft.com/shawnhar/2007/04/26/bitmap-fonts-in-xna/
+or http://www.shawnhargreaves.com/blog/bitmap-fonts-in-xna.html
+
+https://web.archive.org/web/20140328173607/http://www.nubik.com:80/SpriteFont/
+
+

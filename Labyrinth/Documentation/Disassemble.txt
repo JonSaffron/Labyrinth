@@ -3613,9 +3613,9 @@ static object injured (b)
 
 		-- on tile with static object
 
-2620 AD 00 0C  LDA 0C00
-2623 C9 05     CMP #05                  
-2625 D0 28     BNE 264F                 
+2620 AD 00 0C  LDA 0C00					-- get player status
+2623 C9 05     CMP #05                  -- is player alive?
+2625 D0 28     BNE 264F                 -- if no then rts
 2627 AC 01 0C  LDY 0C01                 -- get player tile number
 262A 20 49 25  JSR 2549                 -- get position into y
 262D 30 20     BMI 264F                 -- not found then jump to exit
@@ -5254,7 +5254,7 @@ static object injured (b)
 3119 20 D6 2D  JSR 2DD6                 -- play end of world sound
 
 		-- Set counter to hatching/type of movement property of each animation slot to 1
-		-- Not sure what this achieves. Possibly stops them moving?
+		-- This will cause them to be removed by the hatching code as they are not eggs
 
 311C A0 10     LDY #10                  -- initialise loop counter
 311E A9 01     LDA #01                  
@@ -5284,10 +5284,10 @@ static object injured (b)
 3147 AA        TAX                      
 3148 60        RTS                      
 
-3149 0B                                 -- 3 = flashing yellow/blue (was blue)
-314A 01                                 -- 2 = red (was green)
-314B 02                                 -- 1 = green (was red)
-314C 00                                 -- 0 = black
+3149 0B                                 -- 0 = flashing yellow/blue (was black)
+314A 01                                 -- 1 = red (was red)
+314B 02                                 -- 2 = green (was green)
+314C 00                                 -- 3 = black (was blue)
 
 		-- player dies
 
