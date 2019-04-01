@@ -103,6 +103,11 @@ namespace Labyrinth
                 }
             else
                 {
+                foreach (IMonster monster in GlobalServices.GameState.DistinctItemsOfType<IMonster>())
+                    {
+                    monster.InstantlyExpire();
+                    }
+
                 // todo some graphical effect - original game changed colours
                 GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
                     (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedWorld));

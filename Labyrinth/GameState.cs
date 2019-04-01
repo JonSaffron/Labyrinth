@@ -66,7 +66,7 @@ namespace Labyrinth
         /// </summary>
         /// <typeparam name="T">The type of object to return</typeparam>
         /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<T> DistinctItemsOfType<T>() where T: StaticItem
+        public IEnumerable<T> DistinctItemsOfType<T>() where T: IGameObject
             {
             var result = this._gameObjectCollection.DistinctItems().OfType<T>();
             return result;

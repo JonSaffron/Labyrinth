@@ -160,7 +160,6 @@
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
     <Compile Include="InteractiveServices.cs" />
-    <Compile Include="Interfaces\IAnimationState.cs" />
     <Compile Include="Interfaces\IBehaviour.cs" />
     <Compile Include="Interfaces\IBoundMovement.cs" />
     <Compile Include="Interfaces\IBoundMovementFactory.cs" />

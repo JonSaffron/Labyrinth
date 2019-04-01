@@ -59,7 +59,7 @@ namespace Labyrinth.Services.Display
             drawParameters.AreaWithinTexture = new Rectangle(frameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
 
             // Draw the current frame.
-            spriteBatch.DrawTextureInWindow(drawParameters.Texture, drawParameters.Position, drawParameters.AreaWithinTexture, drawParameters.Rotation, drawParameters.Centre, drawParameters.Effects);
+            spriteBatch.DrawTexture(drawParameters);
             }
 
         private DrawParameters SetDrawParametersForFacedDirection(ISpriteLibrary spriteLibrary)
@@ -87,8 +87,6 @@ namespace Labyrinth.Services.Display
                     throw new InvalidOperationException();
                 }
             drawParameters.Position = this._player.Position;
-            drawParameters.Rotation = 0;
-            drawParameters.Centre = Constants.CentreOfTile;
             return drawParameters;
             }
         }

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Acornsoft Labyrinth")]
 [assembly: AssemblyCompany("")]
 
-[assembly: AssemblyCopyright("Copyright © Jon Saffron 2011-2017")]
+[assembly: AssemblyCopyright("Copyright © Jon Saffron 2011-2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -91,7 +91,7 @@ namespace Labyrinth.GameObjects
             if (this.IsExtant)
                 UponInjury();
             else
-                UponDeath();
+                UponDeath(false);
             }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Labyrinth.GameObjects
                 return;
             
             this.Energy = 0;
-            UponDeath();
+            UponDeath(true);
             }
 
         protected virtual void UponInjury()
@@ -111,7 +111,7 @@ namespace Labyrinth.GameObjects
             // override as necessary
             }
 
-        protected virtual void UponDeath()
+        protected virtual void UponDeath(bool wasDeathInstant)
             {
             // override as necessary
             }

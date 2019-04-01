@@ -49,11 +49,6 @@ namespace Labyrinth.Services.Display
             this._lengthOfAnimation = baseMovesDuringAnimation * Constants.GameClockResolution;
             }
 
-        /// <summary>
-        /// Returns the mid-point of animation
-        /// </summary>
-        private static Vector2 Origin => Constants.CentreOfTile;
-
         public void Update(GameTime gameTime)
             {
             if (this.HasReachedEndOfAnimation) 
@@ -72,8 +67,9 @@ namespace Labyrinth.Services.Display
             if (!this._gameObject.IsExtant)
                 return;
 
-            var texture = spriteLibrary.GetSprite(this._textureName);
-            var frameCount = (texture.Width / Constants.TileLength);
+            DrawParameters drawParameters = default;
+            drawParameters.Texture = spriteLibrary.GetSprite(this._textureName);
+            var frameCount = (drawParameters.Texture.Width / Constants.TileLength);
             int frameIndex;
             if (this.HasReachedEndOfAnimation)
                 frameIndex = frameCount - 1;
@@ -84,10 +80,13 @@ namespace Labyrinth.Services.Display
                 }
 
             // Calculate the source rectangle of the current frame.
-            var source = new Rectangle(frameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
+            drawParameters.AreaWithinTexture = new Rectangle(frameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
+            drawParameters.Position = this._gameObject.Position;
+            drawParameters.Rotation = this.Rotation;
+            drawParameters.Effects = this.SpriteEffect;
 
             // Draw the current frame.
-            spriteBatch.DrawTextureInWindow(texture, this._gameObject.Position, source, this.Rotation, Origin, this.SpriteEffect);
+            spriteBatch.DrawTexture(drawParameters);
             }
         }
     }

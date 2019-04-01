@@ -1,4 +1,5 @@
 ﻿using System;
+using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -36,14 +37,8 @@ namespace Labyrinth
         /// <summary>
         /// Draws the specified texture at the specified co-ordinates relative to the window position, specifying a source rectangle, rotation, origin and effects
         /// </summary>
-        /// <param name="texture">Specifies the texture to draw</param>
-        /// <param name="relativePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
-        /// <param name="sourceRectangle">Specifies the section of the texture to draw</param>
-        /// <param name="rotation">Specifies the angle (in radians) to rotate around the origin</param>
-        /// <param name="origin">Specifies the origin point of the texture</param>
-        /// <param name="effects">Specifies what effect(s) to apply to the texture</param>
-        /// <remarks>Used to draw gameobjects</remarks>
-        void DrawTextureInWindow(Texture2D texture, Vector2 relativePosition, Rectangle? sourceRectangle, float rotation, Vector2 origin, SpriteEffects effects);
+        /// <param name="drawParameters">Specifies the values to use for the draw</param>
+        void DrawTexture(DrawParameters drawParameters);
 
         /// <summary>
         /// Draws the specified texture at the absolute co-ordinates specified, specifying a source rectangle

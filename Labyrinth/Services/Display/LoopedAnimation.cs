@@ -34,6 +34,11 @@ namespace Labyrinth.Services.Display
         public SpriteEffects SpriteEffect { get; set; }
 
         /// <summary>
+        /// The opacity of the drawn image
+        /// </summary>
+        public float Opacity { get; set; }
+
+        /// <summary>
         /// The current position within the animation
         /// </summary>
         private double _time;
@@ -45,12 +50,8 @@ namespace Labyrinth.Services.Display
             if (baseMovesDuringAnimation <= 0)
                 throw new ArgumentOutOfRangeException(nameof(baseMovesDuringAnimation));
             this._lengthOfAnimation = baseMovesDuringAnimation * Constants.GameClockResolution;
+            this.Opacity = 1f;
             }
-
-        /// <summary>
-        /// Returns the mid-point of animation
-        /// </summary>
-        private static Vector2 Origin => Constants.CentreOfTile;
 
         public void Update(GameTime gameTime)
             {
@@ -65,15 +66,20 @@ namespace Labyrinth.Services.Display
             this._time %= this._lengthOfAnimation;
             var positionInAnimation = this._time / this._lengthOfAnimation;
 
-            var texture = spriteLibrary.GetSprite(this._textureName);
-            var frameCount = (texture.Width / Constants.TileLength);
+            DrawParameters drawParameters = default;
+            drawParameters.Texture = spriteLibrary.GetSprite(this._textureName);
+            var frameCount = (drawParameters.Texture.Width / Constants.TileLength);
             int frameIndex = (int) Math.Floor(frameCount * positionInAnimation);
 
             // Calculate the source rectangle of the current frame.
-            var source = new Rectangle(frameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
+            drawParameters.AreaWithinTexture = new Rectangle(frameIndex * Constants.TileLength, 0, Constants.TileLength, Constants.TileLength);
+            drawParameters.Position = this._gameObject.Position;
+            drawParameters.Rotation = this.Rotation;
+            drawParameters.Effects = this.SpriteEffect;
+            drawParameters.Opacity = this.Opacity;
 
             // Draw the current frame.
-            spriteBatch.DrawTextureInWindow(texture, this._gameObject.Position, source, this.Rotation, Origin, this.SpriteEffect);
+            spriteBatch.DrawTexture(drawParameters);
             }
         }
     }

@@ -85,11 +85,16 @@ namespace Labyrinth.GameObjects
             this.Behaviours.Perform<IInjuryBehaviour>();
             }
 
-        protected override void UponDeath()
+        protected override void UponDeath(bool wasDeathInstant)
             {
             var bang = GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             bang.PlaySound(GameSound.MonsterDies);
-            this.Behaviours.Perform<IDeathBehaviour>();
+            if (!wasDeathInstant)
+                {
+                // In the original game, monsters that are crushed do not spawn
+                // Similarly, we don't want to spawn if we are removing all monsters when the last crystal is collected
+                this.Behaviours.Perform<IDeathBehaviour>();
+                }
             }
 
         private bool SetDirectionAndDestination()

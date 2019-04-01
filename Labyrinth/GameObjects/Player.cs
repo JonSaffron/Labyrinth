@@ -183,7 +183,7 @@ namespace Labyrinth.GameObjects
 
                 if (!this.IsAlive())
                     {
-                    UponDeath();
+                    UponDeath(false);
                     return;
                     }
 
@@ -252,10 +252,10 @@ namespace Labyrinth.GameObjects
 
             this.Energy = 0;
             this._countBeforeDecrementingEnergy = 0;
-            UponDeath();
+            UponDeath(true);
             }
 
-        protected override void UponDeath()
+        protected override void UponDeath(bool wasDeathInstant)
             {
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, 
                 (sender, args) => GlobalServices.World.SetLevelReturnType(LevelReturnType.LostLife));
