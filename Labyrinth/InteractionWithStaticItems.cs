@@ -53,7 +53,7 @@ namespace Labyrinth
                 return;
                 }
 
-            if (staticItem is ForceField)
+            if (staticItem is ForceField ff && ff.IsActive)
                 {
                 player.InstantlyExpire();
                 return;

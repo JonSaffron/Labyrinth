@@ -20,6 +20,8 @@ namespace Labyrinth.GameObjects
 
         public override bool IsExtant => this._forceFieldState.IsExtent;
 
+        public bool IsActive => this._forceFieldState is ActiveState;
+
         public override IRenderAnimation RenderAnimation => this._animationPlayer;
 
         public override bool Update(GameTime gameTime)
@@ -52,7 +54,7 @@ namespace Labyrinth.GameObjects
 
             public override void Update(GameTime gameTime)
                 {
-                bool isNeutralised = !GlobalServices.GameState.Player.HasPlayerGotCrystal(this.ForceField._crystalRequired);
+                bool isNeutralised = GlobalServices.GameState.Player.HasPlayerGotCrystal(this.ForceField._crystalRequired);
                 if (isNeutralised)
                     {
                     this.ForceField._forceFieldState = new NeutralisedState(this.ForceField);

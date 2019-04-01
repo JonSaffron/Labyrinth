@@ -18,7 +18,7 @@ namespace Labyrinth.Services.Display
         protected override void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float opacity, float rotation, Vector2 origin, SpriteEffects effects)
             {
             var destination = position * this.Zoom + this._offset;
-            var colour = new Color(1f, 1f, 1f, opacity);
+            var colour = Color.White * opacity;
             this.SpriteBatch.Draw(texture, destination, sourceRectangle, colour, rotation, origin, this.Zoom, effects, 0);
             }
 
