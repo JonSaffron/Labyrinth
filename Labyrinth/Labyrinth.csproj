@@ -194,8 +194,11 @@
     <Compile Include="DataStructures\PropertyDef.cs" />
     <Compile Include="Services\Display\FrameRateCounter.cs" />
     <Compile Include="Services\Display\LinearAnimation.cs" />
+    <Compile Include="Services\Display\GameScreen.cs" />
     <Compile Include="Services\Display\LoopedAnimation.cs" />
     <Compile Include="Services\Display\PlayerAnimation.cs" />
+    <Compile Include="Services\Display\ScreenManager.cs" />
+    <Compile Include="Services\Display\ScreenState.cs" />
     <Compile Include="Services\Display\StaticAnimation.cs" />
     <Compile Include="Services\Display\DrawParameters.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />

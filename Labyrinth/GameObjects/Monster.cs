@@ -36,11 +36,7 @@ namespace Labyrinth.GameObjects
             this.Behaviours = new BehaviourCollection(this);
             }
             
-        public bool IsActive
-            {
-            get => this._isActive;
-            protected set => this._isActive = value;
-            }
+        public bool IsActive => this._isActive;
 
         public void Activate()
             {

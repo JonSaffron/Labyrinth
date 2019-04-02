@@ -12,7 +12,7 @@ namespace Labyrinth.Test
         public DummyMonster(MonsterDef monsterDef, string textureName, int baseMovesDuringAnimation) : base(monsterDef, textureName, baseMovesDuringAnimation)
             {
             this.Mobility = MonsterMobility.Placid;
-            this.IsActive = true;
+            this.Activate();
 
             var action = new DummyAction();
             action.Init(this);
