@@ -88,6 +88,7 @@ namespace Labyrinth.GameObjects
             public FadingState(ForceField forceField) : base(forceField)
                 {
                 this._fadeRemaining = FadeTime;
+                forceField.PlaySound(GameSound.ForceFieldShutsDown);
                 }
                 
             public override void Update(GameTime gameTime)
