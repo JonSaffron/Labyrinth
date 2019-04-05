@@ -198,7 +198,7 @@ namespace Labyrinth.GameObjects
         private bool SetDirectionAndDestination()
             {
             IPlayerInput playerInput = GlobalServices.PlayerInput;
-            playerInput.ProcessInput();
+            playerInput.Update();
 
             var result = SetDirection(playerInput);            
 

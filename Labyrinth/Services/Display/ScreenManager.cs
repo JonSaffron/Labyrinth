@@ -1,12 +1,12 @@
-using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-using System.IO;
-using System.IO.IsolatedStorage;
+using System.Linq;
+using JetBrains.Annotations;
+using Labyrinth.Services.Input;
 
 namespace Labyrinth.Services.Display
     {
@@ -19,18 +19,18 @@ namespace Labyrinth.Services.Display
     public class ScreenManager : DrawableGameComponent
         {
         private readonly List<GameScreen> _screens = new List<GameScreen>();
-
-        //private readonly InputState _input = new InputState();
+        private readonly InputState _input = new InputState();
+        private readonly GraphicsDeviceManager _gdm;
 
         private Texture2D _blankTexture;
-
+        
         private bool _isInitialised;
 
         /// <summary>
         /// A default SpriteBatch shared by all the screens. This saves
         /// each screen having to bother creating their own local instance.
         /// </summary>
-        public SpriteBatch SpriteBatch { get; private set; }
+        public ISpriteBatch SpriteBatch { get; private set; }
 
         /// <summary>
         /// A default font shared by all the screens. This saves
@@ -45,14 +45,22 @@ namespace Labyrinth.Services.Display
         /// </summary>
         public bool TraceEnabled { get; set; }
 
+        public InputState InputState => this._input;
+
         /// <summary>
         /// Constructs a new screen manager component.
         /// </summary>
-        public ScreenManager(Game game) : base(game)
+        public ScreenManager([NotNull] Game game) : base(game)
             {
             // we must set EnabledGestures before we can query for them, but
             // we don't assume the game wants to read them.
             TouchPanel.EnabledGestures = GestureType.None;
+            this._gdm = new GraphicsDeviceManager(game)
+                            {
+                                PreferredBackBufferWidth = (int) Constants.RoomSizeInPixels.X * Constants.ZoomWhilstWindowed,
+                                PreferredBackBufferHeight = (int) Constants.RoomSizeInPixels.Y * Constants.ZoomWhilstWindowed
+                            };
+
             }
 
         /// <summary>
@@ -73,15 +81,18 @@ namespace Labyrinth.Services.Display
             // Load content belonging to the screen manager.
             ContentManager content = Game.Content;
 
-            SpriteBatch = new SpriteBatch(GraphicsDevice);
-            Font = content.Load<SpriteFont>("menufont");
-            _blankTexture = content.Load<Texture2D>("blank");
+            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
+            this.Font = content.Load<SpriteFont>("Display/MenuFont");
+            this._blankTexture = new Texture2D(this.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            this._blankTexture.SetData(new[] { Color.White });
 
             // Tell each of the screens to load their content.
             foreach (GameScreen screen in _screens)
                 {
                 screen.LoadContent();
                 }
+
+            GlobalServices.SoundPlayer.SoundLibrary.LoadContent(content);
             }
 
         /// <summary>
@@ -94,6 +105,7 @@ namespace Labyrinth.Services.Display
                 {
                 screen.UnloadContent();
                 }
+            this.SpriteBatch.Dispose();
             }
         
         /// <summary>
@@ -102,13 +114,13 @@ namespace Labyrinth.Services.Display
         public override void Update(GameTime gameTime)
             {
             // Read the keyboard and gamepad.
-            //_input.Update();
+            this._input.Update();
 
             // Make a copy of the master screen list, to avoid confusion if
             // the process of updating one screen adds or removes others.
             var screensToUpdate = new Stack<GameScreen>(this._screens);
 
-            bool otherScreenHasFocus = !this.Game.IsActive;
+            bool doesScreenHaveFocus = this.Game.IsActive;
             bool coveredByOtherScreen = false;
 
             // Loop as long as there are screens waiting to be updated.
@@ -118,17 +130,17 @@ namespace Labyrinth.Services.Display
                 GameScreen screen = screensToUpdate.Pop();
 
                 // Update the screen.
-                screen.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+                screen.Update(gameTime, doesScreenHaveFocus, coveredByOtherScreen);
 
                 if (screen.ScreenState == ScreenState.TransitionOn || screen.ScreenState == ScreenState.Active)
                     {
                     // If this is the first active screen we came across,
                     // give it a chance to handle input.
-                    if (!otherScreenHasFocus)
+                    if (doesScreenHaveFocus)
                         {
                         screen.HandleInput(/*_input*/);
 
-                        otherScreenHasFocus = true;
+                        doesScreenHaveFocus = false;
                         }
 
                     // If this is an active non-popup, inform any subsequent
@@ -143,17 +155,18 @@ namespace Labyrinth.Services.Display
                 TraceScreens();
             }
 
+        private string _lastListOfScreens;
+
         /// <summary>
         /// Prints a list of all the screens, for debugging.
         /// </summary>
         void TraceScreens()
             {
-            List<string> screenNames = new List<string>();
-
-            foreach (GameScreen screen in _screens)
-                screenNames.Add(screen.GetType().Name);
-
-            Debug.WriteLine(string.Join(", ", screenNames.ToArray()));
+            var listOfScreens = string.Join(", ", this._screens.Select(item => item.GetType().Name));
+            if (listOfScreens == _lastListOfScreens)
+                return;
+            Debug.WriteLine(listOfScreens);
+            this._lastListOfScreens = listOfScreens;
             }
 
         /// <summary>
@@ -209,7 +222,7 @@ namespace Labyrinth.Services.Display
 
             // if there is a screen still in the manager, update TouchPanel
             // to respond to gestures that screen is interested in.
-            if (_screens.Count > 0)
+            if (this._screens.Count > 0)
                 {
                 TouchPanel.EnabledGestures = _screens[_screens.Count - 1].EnabledGestures;
                 }
@@ -220,10 +233,7 @@ namespace Labyrinth.Services.Display
         /// than the real master list, because screens should only ever be added
         /// or removed using the AddScreen and RemoveScreen methods.
         /// </summary>
-        public GameScreen[] GetScreens()
-            {
-            return _screens.ToArray();
-            }
+        public IEnumerable<GameScreen> Screens => this._screens;
 
         /// <summary>
         /// Helper draws a translucent black fullscreen sprite, used for fading
@@ -232,149 +242,24 @@ namespace Labyrinth.Services.Display
         public void FadeBackBufferToBlack(float alpha)
             {
             Viewport viewport = GraphicsDevice.Viewport;
+            var r = new Rectangle(0, 0, viewport.Width, viewport.Height);
 
-            SpriteBatch.Begin();
-
-            SpriteBatch.Draw(_blankTexture,
-                             new Rectangle(0, 0, viewport.Width, viewport.Height),
-                             Color.Black * alpha);
-
+            this.SpriteBatch.Begin(Vector2.Zero);
+            SpriteBatch.DrawRectangle(r, Color.Black * alpha);
             SpriteBatch.End();
             }
 
-        /// <summary>
-        /// Informs the screen manager to serialise its state to disk.
-        /// </summary>
-        public void SerialiseState()
+        public void ToggleFullScreen()
             {
-            return;
-
-            // open up isolated storage
-            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-                {
-                // if our screen manager directory already exists, delete the contents
-                if (storage.DirectoryExists("ScreenManager"))
-                    {
-                    DeleteState(storage);
-                    }
-                // otherwise just create the directory
-                else
-                    {
-                    storage.CreateDirectory("ScreenManager");
-                    }
-
-                // create a file we'll use to store the list of screens in the stack
-                using (IsolatedStorageFileStream stream = storage.CreateFile("ScreenManager\\ScreenList.dat"))
-                    {
-                    using (BinaryWriter writer = new BinaryWriter(stream))
-                        {
-                        // write out the full name of all the types in our stack so we can
-                        // recreate them if needed.
-                        foreach (GameScreen screen in _screens)
-                            {
-                            if (screen.IsSerializable)
-                                {
-                                writer.Write(screen.GetType().AssemblyQualifiedName);
-                                }
-                            }
-                        }
-                    }
-
-                // now we create a new file stream for each screen so it can save its state
-                // if it needs to. we name each file "ScreenX.dat" where X is the index of
-                // the screen in the stack, to ensure the files are uniquely named
-                int screenIndex = 0;
-                foreach (GameScreen screen in _screens)
-                    {
-                    if (screen.IsSerializable)
-                        {
-                        string fileName = string.Format("ScreenManager\\Screen{0}.dat", screenIndex);
-
-                        // open up the stream and let the screen serialize whatever state it wants
-                        using (IsolatedStorageFileStream stream = storage.CreateFile(fileName))
-                            {
-                            screen.Serialise(stream);
-                            }
-
-                        screenIndex++;
-                        }
-                    }
-                }
+            this._gdm.ToggleFullScreen();
+            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
             }
 
-        public bool DeserializeState()
+        private static ISpriteBatch GetSpriteBatch(GraphicsDevice graphicsDevice, bool isFullScreen)
             {
-            return false;
-
-            // open up isolated storage
-            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-                {
-                // see if our saved state directory exists
-                if (storage.DirectoryExists("ScreenManager"))
-                    {
-                    try
-                        {
-                        // see if we have a screen list
-                        if (storage.FileExists("ScreenManager\\ScreenList.dat"))
-                            {
-                            // load the list of screen types
-                            using (IsolatedStorageFileStream stream = storage.OpenFile("ScreenManager\\ScreenList.dat", FileMode.Open, FileAccess.Read))
-                                {
-                                using (BinaryReader reader = new BinaryReader(stream))
-                                    {
-                                    while (reader.BaseStream.Position < reader.BaseStream.Length)
-                                        {
-                                        // read a line from our file
-                                        string line = reader.ReadString();
-
-                                        // if it isn't blank, we can create a screen from it
-                                        if (!string.IsNullOrEmpty(line))
-                                            {
-                                            Type screenType = Type.GetType(line);
-                                            GameScreen screen = Activator.CreateInstance(screenType) as GameScreen;
-                                            AddScreen(screen, PlayerIndex.One);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                        // next we give each screen a chance to deserialize from the disk
-                        for (int i = 0; i < _screens.Count; i++)
-                            {
-                            string filename = string.Format("ScreenManager\\Screen{0}.dat", i);
-                            using (IsolatedStorageFileStream stream = storage.OpenFile(filename, FileMode.Open, FileAccess.Read))
-                                {
-                                _screens[i].Deserialise(stream);
-                                }
-                            }
-
-                        return true;
-                        }
-                    catch (Exception)
-                        {
-                        // if an exception was thrown while reading, odds are we cannot recover
-                        // from the saved state, so we will delete it so the game can correctly
-                        // launch.
-                        DeleteState(storage);
-                        }
-                    }
-                }
-
-            return false;
+            var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, Constants.ZoomWhilstWindowed);
+            return result;
             }
 
-        /// <summary>
-        /// Deletes the saved state files from isolated storage.
-        /// </summary>
-        private void DeleteState(IsolatedStorageFile storage)
-            {
-            // get all of the files in the directory and delete them
-            string[] files = storage.GetFileNames("ScreenManager\\*");
-            foreach (string file in files)
-                {
-                storage.DeleteFile(Path.Combine("ScreenManager", file));
-                }
-            }
         }
     }

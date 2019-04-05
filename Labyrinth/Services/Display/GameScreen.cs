@@ -67,7 +67,7 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// Checks whether this screen is active and can respond to user input.
         /// </summary>
-        public bool IsActive => !this._otherScreenHasFocus && (this.ScreenState == ScreenState.TransitionOn || this.ScreenState == ScreenState.Active);
+        public bool IsActive => this._doesScreenHaveFocus && (this.ScreenState == ScreenState.TransitionOn || this.ScreenState == ScreenState.Active);
 
         /// <summary>
         /// Gets the manager that this screen belongs to.
@@ -133,16 +133,16 @@ namespace Labyrinth.Services.Display
             {
             }
 
-        private bool _otherScreenHasFocus;
+        private bool _doesScreenHaveFocus;
 
         /// <summary>
         /// Allows the screen to run logic, such as updating the transition position.
         /// Unlike HandleInput, this method is called regardless of whether the screen
         /// is active, hidden, or in the middle of a transition.
         /// </summary>
-        public virtual void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
+        public virtual void Update(GameTime gameTime, bool doesScreenHaveFocus, bool coveredByOtherScreen)
             {
-            this._otherScreenHasFocus = otherScreenHasFocus;
+            this._doesScreenHaveFocus = doesScreenHaveFocus;
 
             if (this.IsExiting)
                 {

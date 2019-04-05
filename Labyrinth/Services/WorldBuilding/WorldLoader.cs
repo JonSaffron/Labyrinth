@@ -26,7 +26,7 @@ namespace Labyrinth.Services.WorldBuilding
             {
             string worldDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Worlds");
 
-            string pathToWorld = worldDirectory + "/" + levelName;
+            string pathToWorld = $"{worldDirectory}/{levelName}.xml";
             if (!File.Exists(pathToWorld))
                 throw new ArgumentOutOfRangeException(pathToWorld);
 

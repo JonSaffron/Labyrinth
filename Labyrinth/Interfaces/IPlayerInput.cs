@@ -9,6 +9,6 @@ namespace Labyrinth
         /// <summary>
         /// Gets player movement and fire action
         /// </summary>
-        void ProcessInput();
+        void Update();
         }
     }

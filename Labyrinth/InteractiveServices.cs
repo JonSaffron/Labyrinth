@@ -20,11 +20,11 @@ namespace Labyrinth
 
         public void Setup(Game1 game)
             {
-            var gameInput = new GameInput(game);
-            GlobalServices.SetGameInput(gameInput);
+            //var gameInput = new GameInput(game);
+            //GlobalServices.SetGameInput(gameInput);
 
-            var playerInput = new PlayerInput(gameInput);
-            GlobalServices.SetPlayerInput(playerInput);
+            //var playerInput = new PlayerInput(gameInput);
+            //GlobalServices.SetPlayerInput(playerInput);
             
             var soundLibrary = new SoundLibrary();
             var activeSoundService = new ActiveSoundService();

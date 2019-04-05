@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Input;
 
 namespace Labyrinth.Services.Input
     {
-    public class GameInput : GameComponent
+    public class GameInput
         {
         public bool HasToggleFullScreenBeenTriggered { get; private set; }
         public bool HasSoundOffBeenTriggered { get; private set; }
@@ -14,46 +15,23 @@ namespace Labyrinth.Services.Input
         public bool HasPauseBeenTriggered { get; private set; }
         public bool HasGameExitBeenTriggered { get; private set; }
 
-        private KeyboardState _currentKeyboardState;
-        private KeyboardState _previousKeyboardState;
+        private readonly InputState _inputState;
 
-        public GameInput(Game1 game) : base(game)
+        public GameInput([NotNull] InputState inputState)
             {
-            game.Components.Add(this);
+            this._inputState = inputState ?? throw new ArgumentNullException(nameof(inputState));
             }
 
-        public override void Initialize()
+        public void Update()
             {
-            this._currentKeyboardState = Keyboard.GetState();
-            }
-
-        public override void Update(GameTime gameTime)
-            {
-            this._previousKeyboardState = this._currentKeyboardState;
-            this._currentKeyboardState = Keyboard.GetState();
-
-            this.HasToggleFullScreenBeenTriggered = IsKeyCurrentlyPressed(Keys.LeftAlt) && IsKeyNewlyPressed(Keys.Enter);
-            this.HasSoundOffBeenTriggered = IsKeyNewlyPressed(Keys.Q);
-            this.HasSoundOnBeenTriggered = IsKeyNewlyPressed(Keys.S);
-            this.HasSoundIncreaseBeenTriggered = IsKeyNewlyPressed(Keys.PageUp);
-            this.HasSoundDecreaseBeenTriggered = IsKeyNewlyPressed(Keys.PageDown);
-            this.HasMoveToNextLevelBeenTriggered = IsKeyCurrentlyPressed(Keys.LeftShift) && IsKeyNewlyPressed(Keys.L);
-            this.HasPauseBeenTriggered = IsKeyNewlyPressed(Keys.P);
-            this.HasGameExitBeenTriggered = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
-            }
-
-        public KeyboardState LastKeyboardState => this._currentKeyboardState;
-
-        private bool IsKeyNewlyPressed(Keys key)
-            {
-            bool result = this._previousKeyboardState.IsKeyUp(key) && this._currentKeyboardState.IsKeyDown(key);
-            return result;
-            }
-
-        private bool IsKeyCurrentlyPressed(Keys key)
-            {
-            bool result = this._currentKeyboardState.IsKeyDown(key);
-            return result;
+            this.HasToggleFullScreenBeenTriggered = this._inputState.IsKeyCurrentlyPressed(Keys.LeftAlt) && this._inputState.IsKeyNewlyPressed(Keys.Enter);
+            this.HasSoundOffBeenTriggered = this._inputState.IsKeyNewlyPressed(Keys.Q);
+            this.HasSoundOnBeenTriggered = this._inputState.IsKeyNewlyPressed(Keys.S);
+            this.HasSoundIncreaseBeenTriggered = this._inputState.IsKeyNewlyPressed(Keys.PageUp);
+            this.HasSoundDecreaseBeenTriggered = this._inputState.IsKeyNewlyPressed(Keys.PageDown);
+            this.HasMoveToNextLevelBeenTriggered = this._inputState.IsKeyCurrentlyPressed(Keys.LeftShift) && this._inputState.IsKeyNewlyPressed(Keys.L);
+            this.HasPauseBeenTriggered = this._inputState.IsKeyNewlyPressed(Keys.P);
+            this.HasGameExitBeenTriggered = this._inputState.IsNewButtonPress(Buttons.Back, null, out _);
             }
         }
     }

@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="DataStructures\GameStartParameters.cs" />
     <Compile Include="DataStructures\Grid.cs" />
     <Compile Include="DataStructures\SimpleList.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
@@ -193,8 +194,10 @@
     <Compile Include="DataStructures\PropertyBag.cs" />
     <Compile Include="DataStructures\PropertyDef.cs" />
     <Compile Include="Services\Display\FrameRateCounter.cs" />
+    <Compile Include="Services\Display\GameplayScreen.cs" />
     <Compile Include="Services\Display\LinearAnimation.cs" />
     <Compile Include="Services\Display\GameScreen.cs" />
+    <Compile Include="Services\Display\LoadingScreen.cs" />
     <Compile Include="Services\Display\LoopedAnimation.cs" />
     <Compile Include="Services\Display\PlayerAnimation.cs" />
     <Compile Include="Services\Display\ScreenManager.cs" />
@@ -204,6 +207,7 @@
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Services\Display\WorldRenderer.cs" />
+    <Compile Include="Services\Input\InputState.cs" />
     <Compile Include="Services\Messages\CrystalTaken.cs" />
     <Compile Include="Services\Messages\MonsterCrushed.cs" />
     <Compile Include="Services\Messages\MonsterShot.cs" />
@@ -228,7 +232,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Services\Input\GameInput.cs" />
     <Compile Include="GameObjectCollection.cs" />
-    <Compile Include="Services\Input\PlayerController.cs" />
     <Compile Include="GameTimer.cs" />
     <Compile Include="Interfaces\IInteraction.cs" />
     <Compile Include="Interfaces\IMonsterWeapon.cs" />
