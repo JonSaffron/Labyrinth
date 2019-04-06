@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Microsoft.Xna.Framework.Input;
 
 namespace Labyrinth.Services.Input
     {
     class PlayerInput : IPlayerInput
         {
-        public Direction Direction { get; private set; }
-        public FiringState FireStatus1 { get; private set; }
-        public FiringState FireStatus2 { get; private set; }
-
         private readonly InputState _inputState;
         private Direction _previousRequestedDirectionOfMovement;
         private static readonly List<DirectionForKey> KeysList = BuildKeys();
@@ -24,11 +21,12 @@ namespace Labyrinth.Services.Input
         /// <summary>
         /// Gets player movement and fire action
         /// </summary>
-        public void Update()
+        public PlayerControl Update()
             {
-            this.Direction = GetDirection(this._inputState);
-            this.FireStatus1 = this._inputState.IsKeyCurrentlyPressed(Keys.LeftControl) ? (this._inputState.WasKeyPressed(Keys.LeftControl) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None;
-            this.FireStatus2 = this._inputState.IsKeyCurrentlyPressed(Keys.Space) ? (this._inputState.WasKeyPressed(Keys.Space) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None;
+            return new PlayerControl(
+                GetDirection(this._inputState),
+                this._inputState.IsKeyCurrentlyPressed(Keys.LeftControl) ? (this._inputState.WasKeyPressed(Keys.LeftControl) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None,
+                this._inputState.IsKeyCurrentlyPressed(Keys.Space) ? (this._inputState.WasKeyPressed(Keys.Space) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None);
             }
 
         private Direction GetDirection(InputState inputState)

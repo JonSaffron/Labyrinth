@@ -129,6 +129,7 @@
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="DataStructures\GameStartParameters.cs" />
     <Compile Include="DataStructures\Grid.cs" />
+    <Compile Include="DataStructures\PlayerControl.cs" />
     <Compile Include="DataStructures\SimpleList.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoundaryCurrentRoom.cs" />
@@ -208,6 +209,7 @@
     <Compile Include="Services\Display\SpriteLibrary.cs" />
     <Compile Include="Services\Display\WorldRenderer.cs" />
     <Compile Include="Services\Input\InputState.cs" />
+    <Compile Include="Services\Input\PlayerController.cs" />
     <Compile Include="Services\Messages\CrystalTaken.cs" />
     <Compile Include="Services\Messages\MonsterCrushed.cs" />
     <Compile Include="Services\Messages\MonsterShot.cs" />

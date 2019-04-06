@@ -14,7 +14,7 @@ namespace Labyrinth.Test
         public void TestPlayerShootsBoulder()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 
@@ -39,7 +39,7 @@ namespace Labyrinth.Test
         public void TestPlayerShootsAdjacentBoulder()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 
@@ -64,7 +64,7 @@ namespace Labyrinth.Test
         public void TestPlayerCannotShootBoulder1()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 
@@ -90,7 +90,7 @@ namespace Labyrinth.Test
         public void TestPlayerCannotShootBoulder2()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 
@@ -115,7 +115,7 @@ namespace Labyrinth.Test
         public void TestPlayerCannotShootBoulder3()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 

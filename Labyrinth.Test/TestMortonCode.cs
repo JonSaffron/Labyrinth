@@ -46,7 +46,7 @@ namespace Labyrinth.Test
         public void VerifyThatTheListOfItemsMovesWhenGameObjectMovesToAnAdjacentEmptySpace()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 {
@@ -72,7 +72,7 @@ namespace Labyrinth.Test
         public void VerifyThatTheListOfItemsIsSuitablyAdjustedWhenGameObjectMovesToAnAdjacentOccupiedSpace()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 {
@@ -99,7 +99,7 @@ namespace Labyrinth.Test
         public void VerifyThatListOfItemsIsSuitablyAdjustedWhenGameObjectMovesFromAnAdditionalOccupiedSpaceToFreeSpace()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 {
@@ -130,7 +130,7 @@ namespace Labyrinth.Test
         public void VerifyThatListOfItemsIsSuitablyAdjustedWhenGameObjectMovesFromAnAdditionalOccupiedSpaceToAnotherOccupiedSpace()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 

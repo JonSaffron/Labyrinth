@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.Input
     {
     class PlayerController : GameComponent, IPlayerInput
         {
-        public Direction Direction { get; private set; }
-        public FiringState FireStatus1 { get; private set; }
-        public FiringState FireStatus2 { get; private set; }
-        
         private readonly Queue<TimedInstruction> _instructions = new Queue<TimedInstruction>(); 
         private Instruction _currentInstruction;
 
@@ -48,17 +45,15 @@ namespace Labyrinth.Services.Input
                 }
             }
 
-        public void ProcessInput()
+        public PlayerControl Update()
             {
-            this.Direction = Direction.None;
-            this.FireStatus1 = FiringState.None;
-            this.FireStatus2 = FiringState.None;
             var ci = this._currentInstruction;
             if (ci == null)
                 {
-                return;
+                return PlayerControl.NoAction;
                 }
 
+            var direction = Direction.None;
             var p = GlobalServices.GameState.Player;
             if (ci.Direction != Direction.None)
                 {
@@ -66,7 +61,7 @@ namespace Labyrinth.Services.Input
                     {
                     if (p.CurrentDirectionFaced != ci.Direction)
                         {   // turn to face the required direction
-                        this.Direction = ci.Direction;
+                        direction = ci.Direction;
                         }
                     ci.Direction = Direction.None;
                     }
@@ -74,18 +69,18 @@ namespace Labyrinth.Services.Input
                     {
                     if (p.CurrentDirectionFaced != ci.Direction)
                         {   // turn to face the required direction
-                        this.Direction = ci.Direction;
+                        direction = ci.Direction;
                         ci.MoveType = MoveType.WaitingToMove;
                         }
                     else 
                         {
-                        this.Direction = ci.Direction;
+                        direction = ci.Direction;
                         ci.Direction = Direction.None;
                         }
                     }
                 else if (ci.MoveType == MoveType.WaitingToMove)
                     {
-                    this.Direction = ci.Direction;
+                    direction = ci.Direction;
                     if (p.WhenCanMoveInDirectionFaced <= this._totalGameTime)
                         {
                         ci.Direction = Direction.None;
@@ -93,13 +88,15 @@ namespace Labyrinth.Services.Input
                     }
                 }
                 
-            this.FireStatus1 = this._currentInstruction.FireStatus1;
-            if (this.FireStatus1 == FiringState.Pulse)
+            var fireStatus1 = this._currentInstruction.FireStatus1;
+            if (fireStatus1 == FiringState.Pulse)
                 ci.FireStatus1 = FiringState.None;
 
-            this.FireStatus2 = this._currentInstruction.FireStatus2;
-            if (this.FireStatus2 == FiringState.Pulse)
+            var fireStatus2 = this._currentInstruction.FireStatus2;
+            if (fireStatus2 == FiringState.Pulse)
                 ci.FireStatus2 = FiringState.None;
+
+            return new PlayerControl(direction, fireStatus1, fireStatus2);
             }
 
         public bool HasFinishedQueue

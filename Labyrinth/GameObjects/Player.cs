@@ -198,19 +198,18 @@ namespace Labyrinth.GameObjects
         private bool SetDirectionAndDestination()
             {
             IPlayerInput playerInput = GlobalServices.PlayerInput;
-            playerInput.Update();
+            var playerControl = playerInput.Update();
 
-            var result = SetDirection(playerInput);            
+            var result = SetDirection(playerControl.Direction);            
 
-            this._weapon1.Fire(this, playerInput.FireStatus1, this.CurrentDirectionFaced);
-            this._weapon2.Fire(this, playerInput.FireStatus2, this.CurrentDirectionFaced);
+            this._weapon1.Fire(this, playerControl.FireState1, this.CurrentDirectionFaced);
+            this._weapon2.Fire(this, playerControl.FireState2, this.CurrentDirectionFaced);
             
             return result;
             }
 
-        private bool SetDirection(IPlayerInput playerInput)
+        private bool SetDirection(Direction requestedDirection)
             {
-            var requestedDirection = playerInput.Direction;
             if (requestedDirection == Direction.None)
                 return false;
 

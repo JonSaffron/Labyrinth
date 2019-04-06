@@ -4,7 +4,7 @@ namespace Labyrinth.Test
     {
     class SuppressDrawComponent : GameComponent
         {
-        public SuppressDrawComponent(Game1 game) : base(game)
+        public SuppressDrawComponent(Game game) : base(game)
             {
             }
 

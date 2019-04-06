@@ -14,7 +14,7 @@ namespace Labyrinth.Test
         public void TestPlayerPushesBoulder()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 
@@ -44,7 +44,7 @@ namespace Labyrinth.Test
         public void TestPlayerBouncesBoulder()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 
@@ -78,7 +78,7 @@ namespace Labyrinth.Test
         public void TestPlayerHasNoSpaceToBounceBoulder()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             g.LoadLevel("#bp#");
             var p = GlobalServices.GameState.Player;
@@ -96,7 +96,7 @@ namespace Labyrinth.Test
         public void TestPlayerBouncesOneBoulderAndEndsUpPushingAnother()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 
@@ -136,7 +136,7 @@ namespace Labyrinth.Test
         public void TestPlayerCannotBouncesOneBoulderBecauseAnotherBoulderBehindCannotMove()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             g.LoadLevel("#bpb#");
             var p = GlobalServices.GameState.Player;
@@ -154,7 +154,7 @@ namespace Labyrinth.Test
         public void TestPlayerCannotMoveMultipleBoulders()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[] 
                 { 

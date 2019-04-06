@@ -1,4 +1,3 @@
-using System;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Display;
@@ -52,15 +51,6 @@ namespace Labyrinth
             {
             GraphicsDevice.Clear(Color.Black);
             base.Draw(gameTime);
-            }
-            
-        /// <inheritdoc />
-        protected override void OnDeactivated(object sender, EventArgs args)
-            {
-            base.OnDeactivated(sender, args);
-
-            // todo find another way to do this
-            //this._isGamePaused = true;
             }
         }
     }

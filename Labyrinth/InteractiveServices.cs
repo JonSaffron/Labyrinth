@@ -1,9 +1,9 @@
 ﻿using Labyrinth.GameObjects;
 using Labyrinth.Services.Display;
-using Labyrinth.Services.Input;
 using Labyrinth.Services.ScoreKeeper;
 using Labyrinth.Services.Sound;
 using Labyrinth.Services.WorldBuilding;
+using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
@@ -18,7 +18,7 @@ namespace Labyrinth
             this.ScoreKeeper = new ScoreKeeper();
             }
 
-        public void Setup(Game1 game)
+        public void Setup(Game game)
             {
             //var gameInput = new GameInput(game);
             //GlobalServices.SetGameInput(gameInput);

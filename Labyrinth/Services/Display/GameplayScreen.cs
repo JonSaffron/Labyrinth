@@ -1,12 +1,10 @@
 using System;
-using System.Threading;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Input;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
@@ -49,12 +47,20 @@ namespace Labyrinth.Services.Display
                 }
 
             this._headsUpDisplay.LoadContent(this._content);
-            LoadLevel(this._gameStartParameters.World);
+            this._world = LoadWorld(this._gameStartParameters.World);
+            GlobalServices.SetWorld(this._world);
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
             // it should not try to catch up.
             ScreenManager.Game.ResetElapsedTime();
+
+            this.ScreenManager.Game.Deactivated += GameOnDeactivated;
+            }
+
+        private void GameOnDeactivated(object sender, EventArgs e)
+            {
+            this._isGamePaused = true;
             }
 
         /// <summary>
@@ -63,6 +69,7 @@ namespace Labyrinth.Services.Display
         public override void UnloadContent()
             {
             this._content.Unload();
+            this.ScreenManager.Game.Deactivated -= GameOnDeactivated;
             }
 
         /// <summary>
@@ -118,6 +125,8 @@ namespace Labyrinth.Services.Display
         public override void HandleInput(/*InputState input*/)
             {
             var gameInput = this._gameInput;
+            gameInput.Update();
+
             if (gameInput.HasGameExitBeenTriggered)
                 {
                 //LoadingScreen.Load(ScreenManager, false, ControllingPlayer, new BackgroundScreen(), new MainMenuScreen());
@@ -174,11 +183,12 @@ namespace Labyrinth.Services.Display
                 ScreenManager.FadeBackBufferToBlack(1f - TransitionAlpha);
             }
 
-        private void LoadLevel(string level)
+        public World LoadWorld(string worldData)
             {
             // Load the World.
-            this._world = new World(this._worldLoader, level);
-            this._world.ResetLevelForStartingNewLife();
+            var world = new World(this._worldLoader, worldData);
+            world.ResetLevelForStartingNewLife();
+            return world;
             }
 
         }

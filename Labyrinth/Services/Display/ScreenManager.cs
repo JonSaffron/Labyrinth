@@ -19,7 +19,6 @@ namespace Labyrinth.Services.Display
     public class ScreenManager : DrawableGameComponent
         {
         private readonly List<GameScreen> _screens = new List<GameScreen>();
-        private readonly InputState _input = new InputState();
         private readonly GraphicsDeviceManager _gdm;
 
         private Texture2D _blankTexture;
@@ -45,7 +44,7 @@ namespace Labyrinth.Services.Display
         /// </summary>
         public bool TraceEnabled { get; set; }
 
-        public InputState InputState => this._input;
+        public InputState InputState { get; } = new InputState();
 
         /// <summary>
         /// Constructs a new screen manager component.
@@ -60,7 +59,8 @@ namespace Labyrinth.Services.Display
                                 PreferredBackBufferWidth = (int) Constants.RoomSizeInPixels.X * Constants.ZoomWhilstWindowed,
                                 PreferredBackBufferHeight = (int) Constants.RoomSizeInPixels.Y * Constants.ZoomWhilstWindowed
                             };
-
+            var playerInput = new PlayerInput(this.InputState);
+            GlobalServices.SetPlayerInput(playerInput);
             }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Labyrinth.Services.Display
         public override void Update(GameTime gameTime)
             {
             // Read the keyboard and gamepad.
-            this._input.Update();
+            this.InputState.Update();
 
             // Make a copy of the master screen list, to avoid confusion if
             // the process of updating one screen adds or removes others.

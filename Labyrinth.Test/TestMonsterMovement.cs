@@ -28,7 +28,7 @@ namespace Labyrinth.Test
         public void Test()
             {
             var services = new UnitTestServices();
-            var g = new Game1(services);
+            var g = new GameForUnitTests(services);
 
             var instructions = new[]
                 {
