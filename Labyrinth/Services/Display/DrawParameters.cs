@@ -31,9 +31,10 @@ namespace Labyrinth.Services.Display
             get => _centre ?? Constants.CentreOfTile;
             set => _centre = value;
             }
+
         public int DrawOrder
             {
-            get { return _drawOrder; }
+            get => _drawOrder;
             set
                 {
                 if (value < 0 || value > 1)

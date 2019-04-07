@@ -2,7 +2,6 @@ using System;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Input;
-using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
@@ -16,7 +15,6 @@ namespace Labyrinth.Services.Display
         private readonly GameStartParameters _gameStartParameters;
         private ContentManager _content;
         private bool _isGamePaused;
-        [NotNull] private readonly IWorldLoader _worldLoader;
         [NotNull] private readonly IScoreKeeper _scoreKeeper;
         private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
         private readonly GameInput _gameInput;
@@ -31,9 +29,9 @@ namespace Labyrinth.Services.Display
             this._gameStartParameters = gameStartParameters ?? throw new ArgumentNullException(nameof(gameStartParameters));
             this.TransitionOnTime = TimeSpan.FromSeconds(1.5);
             this.TransitionOffTime = TimeSpan.FromSeconds(0.5);
-            this._worldLoader = new WorldLoader();
             this._scoreKeeper = new ScoreKeeper.ScoreKeeper();
             this._gameInput = new GameInput(inputState);
+            this._lives = this._gameStartParameters.CountOfLives - 1;
             }
 
         /// <summary>
@@ -186,10 +184,9 @@ namespace Labyrinth.Services.Display
         public World LoadWorld(string worldData)
             {
             // Load the World.
-            var world = new World(this._worldLoader, worldData);
+            var world = new World(this._gameStartParameters.WorldLoader, worldData);
             world.ResetLevelForStartingNewLife();
             return world;
             }
-
         }
     }

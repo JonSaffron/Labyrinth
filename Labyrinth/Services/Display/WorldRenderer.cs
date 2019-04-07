@@ -59,6 +59,10 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private void DrawFloorTiles(ISpriteBatch spriteBatch, TileRect tr)
             {
+            DrawParameters drawParameters = default;
+            drawParameters.AreaWithinTexture = Constants.TileRectangle;
+            drawParameters.Centre = Vector2.Zero;
+
             for (int j = 0; j < tr.Height; j++)
                 {
                 int y = tr.TopLeft.Y + j;
@@ -70,12 +74,12 @@ namespace Labyrinth.Services.Display
                     Texture2D texture = this._tiles[x, y].Floor;
                     if (texture != null)
                         {
-                        Vector2 position = new Vector2(x, y) * Constants.TileSize;
-                        spriteBatch.DrawEntireTextureInWindow(texture, position);
+                        drawParameters.Texture = texture;
+                        drawParameters.Position = new Vector2(x, y) * Constants.TileSize;
+                        spriteBatch.DrawTexture(drawParameters);
                         }
                     }
                 }
             }
-
         }
     }

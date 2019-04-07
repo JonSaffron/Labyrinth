@@ -4,5 +4,6 @@
         {
         public int CountOfLives;
         public string World;
+        public IWorldLoader WorldLoader;
         }
     }

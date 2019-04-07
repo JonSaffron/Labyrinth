@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -10,8 +11,6 @@ namespace Labyrinth
     /// </summary>
     public class Game1 : Game
         {
-        private readonly ScreenManager _screenManager;
-
         public static int Ticks { get; private set; }
 
         public Game1([NotNull] IServiceSetup services)
@@ -20,16 +19,17 @@ namespace Labyrinth
             GlobalServices.SetGame(this);
 
             this.Content.RootDirectory = "Content";
-            Components.Add(new FrameRateCounter(this));
 
             // Create the screen manager component.
-            _screenManager = new ScreenManager(this);
-            _screenManager.TraceEnabled = true;
-            this.Components.Add(this._screenManager);
+            var screenManager = new ScreenManager(this);
+            screenManager.TraceEnabled = true;
+            this.Components.Add(screenManager);
 
-            var gameStartParameters = new GameStartParameters { CountOfLives = 3, World = "World1" };
-            var gamePlayScreen = new GameplayScreen(gameStartParameters, this._screenManager.InputState);
-            LoadingScreen.Load(this._screenManager, true, null, gamePlayScreen);
+            var gameStartParameters = new GameStartParameters { CountOfLives = 3, World = "World1", WorldLoader = new WorldLoader()};
+            var gamePlayScreen = new GameplayScreen(gameStartParameters, screenManager.InputState);
+            LoadingScreen.Load(screenManager, true, null, gamePlayScreen);
+
+            Components.Add(new FrameRateCounter(this));
             }
 
         /// <summary>

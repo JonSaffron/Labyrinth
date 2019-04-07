@@ -19,22 +19,6 @@ namespace Labyrinth
         void End();
 
         /// <summary>
-        /// Draws the specified texture at the specified co-ordinates relative to the window position
-        /// </summary>
-        /// <param name="texture">Specifies the texture to draw</param>
-        /// <param name="relativePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
-        /// <remarks>Used to draw the floor</remarks>
-        void DrawEntireTextureInWindow(Texture2D texture, Vector2 relativePosition);
-
-        /// <summary>
-        /// Draws the specified texture at the absolute co-ordinates specified
-        /// </summary>
-        /// <param name="texture">Specifies the texture to draw</param>
-        /// <param name="absolutePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
-        /// <remarks>Used to draw the lives left</remarks>
-        void DrawEntireTexture(Texture2D texture, Vector2 absolutePosition);
-
-        /// <summary>
         /// Draws the specified texture at the specified co-ordinates relative to the window position, specifying a source rectangle, rotation, origin and effects
         /// </summary>
         /// <param name="drawParameters">Specifies the values to use for the draw</param>

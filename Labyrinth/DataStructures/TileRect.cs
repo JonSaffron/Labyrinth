@@ -25,5 +25,10 @@ namespace Labyrinth.DataStructures
                 &&  tp.Y < this.TopLeft.Y + this.Height;
             return result;
             }
+
+        public override string ToString()
+            {
+            return $"({this.TopLeft.X}, {this.TopLeft.Y}, {this.Width}, {this.Height})";
+            }
         }
     }

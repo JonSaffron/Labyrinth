@@ -14,21 +14,22 @@ namespace Labyrinth.Test
             {
             services.Setup(this);
             GlobalServices.SetGame(this);
-
-
             }
 
         public void LoadLevel(string worldData)
             {
             var gameStartParameters = new GameStartParameters();
             gameStartParameters.World = worldData;
+            gameStartParameters.WorldLoader = new WorldLoaderForTest();
 
             var gamePlayScreen = new GameplayScreen(gameStartParameters, new InputState());
             this._world = gamePlayScreen.LoadWorld(worldData);
+            GlobalServices.SetWorld(this._world);
             }
 
         protected override void Update(GameTime gameTime)
             {
+            base.Update(gameTime);
             this._world.Update(gameTime);
             }
         }

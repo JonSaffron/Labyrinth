@@ -109,10 +109,19 @@ namespace Labyrinth
 
         private void DrawLives(ISpriteBatch spriteBatch, int livesLeft)
             {
-            for (int i = 0; i < livesLeft; i++)
+            if (livesLeft > 3)
                 {
-                var destination = new Vector2(480 - ((i + 1) * 16), 8);
-                spriteBatch.DrawEntireTexture(this._life, destination);
+                spriteBatch.DrawTexture(this._life, new Vector2(480 - 16, 8), new Rectangle(0, 0, 10, 16));
+                spriteBatch.DrawTexture(this._life, new Vector2(480 - 30, 8), new Rectangle(10, 0, 10, 16));
+                DrawValue(spriteBatch, livesLeft + 100, 480 - 32, 8);
+                }
+            else
+                {
+                for (int i = 0; i < livesLeft; i++)
+                    {
+                    var destination = new Vector2(480 - ((i + 1) * 16), 8);
+                    spriteBatch.DrawTexture(this._life, destination, new Rectangle(0, 0, 10, 16));
+                    }
                 }
             }
 

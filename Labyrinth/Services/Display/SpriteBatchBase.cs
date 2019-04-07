@@ -41,19 +41,6 @@ namespace Labyrinth.Services.Display
                 }
             }
 
-        /// <inheritdoc />
-        public void DrawEntireTextureInWindow(Texture2D texture, Vector2 relativePosition)
-            {
-            var absolutePosition = relativePosition - this._windowPosition;
-            this.DrawEntireTexture(texture, absolutePosition);
-            }
-
-        /// <inheritdoc />
-        public void DrawEntireTexture(Texture2D texture, Vector2 absolutePosition)
-            {
-            this.DrawTexture(texture, absolutePosition, null, 1f, 0.0f, Vector2.Zero, SpriteEffects.None);
-            }
-
         public void DrawTexture(DrawParameters drawParameters)
             {
             var absolutePosition = drawParameters.Position - this._windowPosition;
