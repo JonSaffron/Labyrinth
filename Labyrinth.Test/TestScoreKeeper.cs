@@ -4,6 +4,7 @@ using Labyrinth.Services.ScoreKeeper;
 using NUnit.Framework;
 using Moq;
 using GalaSoft.MvvmLight.Messaging;
+using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 
 // ReSharper disable ObjectCreationAsStatement
@@ -99,9 +100,12 @@ namespace Labyrinth.Test
         [Test]
         public void TestEnemyCrushedWhenEnemyScores()
             {
+            var propertyBag = new PropertyBag();
+            propertyBag.Set(GameObjectProperties.MonsterScoresWhenKilled, true);
+
             var monster = new Mock<IMonster>();
             monster.Setup(m => m.Energy).Returns(5);
-            monster.Setup(m => m.Properties.Get(GameObjectProperties.MonsterScoresWhenKilled)).Returns(true);
+            monster.Setup(m => m.Properties).Returns(propertyBag);
             var boulder = new Mock<IGameObject>();
 
             using (var scoreKeeper = new ScoreKeeper())
@@ -116,9 +120,12 @@ namespace Labyrinth.Test
         [Test]
         public void TestEnemyCrushedWhenEnemyDoesNotScore()
             {
+            var propertyBag = new PropertyBag();
+            propertyBag.Set(GameObjectProperties.MonsterScoresWhenKilled, false);
+
             var monster = new Mock<IMonster>();
             monster.Setup(monsterShoots => monsterShoots.Energy).Returns(10);
-            monster.Setup(m => m.Properties.Get(GameObjectProperties.MonsterScoresWhenKilled)).Returns(false);
+            monster.Setup(m => m.Properties).Returns(propertyBag);
             var boulder = new Mock<IGameObject>();
 
             using (var scoreKeeper = new ScoreKeeper())

@@ -57,10 +57,7 @@ namespace Labyrinth.Test
             g.LoadLevel("p ");
             var p = GlobalServices.GameState.Player;
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             Assert.IsEmpty(GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)));
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
@@ -82,10 +79,7 @@ namespace Labyrinth.Test
 
             g.LoadLevel("pg");
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
             
             Assert.IsEmpty(GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)));
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
@@ -110,10 +104,7 @@ namespace Labyrinth.Test
             g.LoadLevel("p ");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)).ToList();
             Assert.IsNotNull(list);
@@ -141,10 +132,7 @@ namespace Labyrinth.Test
             g.LoadLevel("pg");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(0, 0)).ToList();
             Assert.IsNotNull(list);

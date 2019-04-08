@@ -58,21 +58,21 @@ namespace Labyrinth.GameObjects
 
         private void ResetTimeToTravel()
             {
-            decimal distanceToTravel;
+            double distanceToTravel;
             switch (this._directionOfTravel.Orientation())
                 {
                 case Orientation.Horizontal:
-                    distanceToTravel = (decimal) (Constants.RoomSizeInPixels.X * 1.25);
+                    distanceToTravel = Constants.RoomSizeInPixels.X * 1.25d;
                     this._animationPlayer.Rotation = 0.0f;
                     break;
                 case Orientation.Vertical:
-                    distanceToTravel = (decimal) (Constants.RoomSizeInPixels.Y * 1.25);
+                    distanceToTravel = Constants.RoomSizeInPixels.Y * 1.25d;
                     this._animationPlayer.Rotation = (float)(Math.PI * 90.0f / 180f);
                     break;
                 default:
                     throw new InvalidOperationException();
                 }
-            this._timeToTravel = (double) (distanceToTravel / StandardSpeed);
+            this._timeToTravel = distanceToTravel / (double) StandardSpeed;
             }
         
         /// <summary>
@@ -129,8 +129,13 @@ namespace Labyrinth.GameObjects
                     hasMovedSinceLastCall = true;
                     while (true)
                         {
-                        if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
+                        var startTime = this._remainingTime;
+                        bool didMoveComplete = this.TryToCompleteMoveToTarget(ref this._remainingTime);
+                        this._timeToTravel -= (this._remainingTime - startTime);
+                        if (didMoveComplete)
+                            {
                             break;
+                            }
 
                         yield return true;  // we have moved
                         }
@@ -150,7 +155,6 @@ namespace Labyrinth.GameObjects
             if (this._timeToTravel > 0)
                 {
                 this.Move(this._directionOfTravel, StandardSpeed);
-                this._timeToTravel -= Constants.TileLength / (double) StandardSpeed;
                 return true;
                 }
             return false;

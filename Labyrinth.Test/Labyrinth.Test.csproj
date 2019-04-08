@@ -68,12 +68,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DummyMonster.cs" />
     <Compile Include="GameForUnitTests.cs" />
     <Compile Include="RepelObjectTests.cs" />
     <Compile Include="DummySoundEffectInstance.cs" />
     <Compile Include="DummySpriteLibrary.cs" />
-    <Compile Include="Helpers.cs" />
     <Compile Include="PathFinderTests.cs" />
     <Compile Include="PriorityQueueTest.cs" />
     <Compile Include="ShootBoulderTest.cs" />

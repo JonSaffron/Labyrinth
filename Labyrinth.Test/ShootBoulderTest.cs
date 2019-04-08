@@ -24,10 +24,7 @@ namespace Labyrinth.Test
 
             g.LoadLevel("# b p");
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.IsNotEmpty(list);
@@ -49,10 +46,7 @@ namespace Labyrinth.Test
 
             g.LoadLevel("# bp ");
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
             Assert.IsNotEmpty(list);
@@ -74,10 +68,7 @@ namespace Labyrinth.Test
 
             g.LoadLevel("#bp ");
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
@@ -100,10 +91,7 @@ namespace Labyrinth.Test
 
             g.LoadLevel("#b p ");
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(1, 0)).ToList();
@@ -125,10 +113,7 @@ namespace Labyrinth.Test
 
             g.LoadLevel("# bbp ");
 
-            while (!services.PlayerController.HasFinishedQueue || Helpers.IsAnythingMoving())
-                {
-                g.Tick();
-                }
+            g.RunTest();
 
             Assert.IsFalse(GlobalServices.GameState.DoesShotExist());
             var list = GlobalServices.GameState.GetItemsOnTile(new TilePos(2, 0)).ToList();
