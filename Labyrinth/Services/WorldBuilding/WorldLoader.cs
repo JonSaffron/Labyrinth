@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
+using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
+using Labyrinth.Services.Messages;
 
 namespace Labyrinth.Services.WorldBuilding
     {
@@ -24,6 +26,8 @@ namespace Labyrinth.Services.WorldBuilding
 
         public void LoadWorld(string levelName)
             {
+            OnProgress("Loading and validating world design");
+
             string worldDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Worlds");
 
             string pathToWorld = $"{worldDirectory}/{levelName}.xml";
@@ -90,6 +94,8 @@ namespace Labyrinth.Services.WorldBuilding
 
         public void AddGameObjects(GameState gameState)
             {
+            OnProgress("Adding game objects");
+
             var layout = GetLayout();
 
             var pgo = new ProcessGameObjects(gameState);
@@ -103,8 +109,10 @@ namespace Labyrinth.Services.WorldBuilding
                 pgo.AddGameObjects(objectList, this._xnm);
                 }
 
-            ValidateGameState(layout, gameState);
+            OnProgress("Validating layout against gamestate");
+            ValidateGameState(ref layout, gameState);
 
+            OnProgress("Adding random elements");
             pgo.AddMonstersFromRandomDistributions(this._randomMonsterDistributions);
             pgo.AddFruitFromRandomDistributions(this._randomFruitDistributions);
             }
@@ -121,6 +129,8 @@ namespace Labyrinth.Services.WorldBuilding
 
         private void LoadAreas()
             {
+            OnProgress("Building world areas");
+
             var areas = this._xmlRoot.SelectSingleNode("ns:Areas", this._xnm);
             if (areas == null)
                 throw new InvalidOperationException();
@@ -261,9 +271,9 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        private void ValidateGameState(string[] layout, GameState gameState)
+        private void ValidateGameState(ref string[] layout, GameState gameState)
             {
-            var tileUsage = BuildTileUsageByMap(layout);
+            var tileUsage = BuildTileUsageByMap(ref layout);
 
             var issues = new List<string>();
             var cy = this.WorldSize.Y;
@@ -274,7 +284,7 @@ namespace Labyrinth.Services.WorldBuilding
                     {
                     var tp = new TilePos(x, y);
                     var hasItems = gameState.GetItemsOnTile(tp).Any();
-                    TileUsage t = tileUsage[tp];
+                    TileUsage t = tileUsage[x, y];
                     if (t.TileTypeByMap == TileTypeByMap.Object && !hasItems)
                         {
                         issues.Add(tp + ": Map had tile marked as occupied by an object '" + t.Description + "', but nothing is there.");
@@ -298,18 +308,18 @@ namespace Labyrinth.Services.WorldBuilding
                 throw new InvalidOperationException(message);
             }
 
-        private Dictionary<TilePos, TileUsage> BuildTileUsageByMap(string[] layout)
+        private TileUsage[,] BuildTileUsageByMap(ref string[] layout)
             {
-            var result = new Dictionary<TilePos, TileUsage>();
+            var result = new TileUsage[this.WorldSize.X, this.WorldSize.Y];
             foreach (var tdc in this._tileDefinitionCollections)
                 {
                 foreach (TilePos tp in tdc.Area.PointsInside())
                     {
                     char symbol = layout[tp.Y][tp.X];
-                    var td = tdc[symbol];
+                    var tileDefinition = tdc[symbol];
 
                     TileUsage tu;
-                    switch (td)
+                    switch (tileDefinition)
                         {
                         case TileWallDefinition _:
                             tu = TileUsage.Wall(symbol);
@@ -324,10 +334,16 @@ namespace Labyrinth.Services.WorldBuilding
                             throw new InvalidOperationException();
                         }
 
-                    result.Add(tp, tu);
+                    result[tp.X, tp.Y] = tu;
                     }
                 }
             return result;
+            }
+
+        private void OnProgress(string message)
+            {
+            var msg = new WorldLoaderProgress(message);
+            Messenger.Default.Send(msg);
             }
         }
     }

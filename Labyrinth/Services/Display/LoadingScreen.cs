@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using GalaSoft.MvvmLight.Messaging;
+using Labyrinth.Services.Messages;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -26,6 +28,8 @@ namespace Labyrinth.Services.Display
 
         private readonly GameScreen[] _screensToLoad;
 
+        private string _loadingMessage;
+
         /// <summary>
         /// The constructor is private: loading screens should
         /// be activated via the static Load method instead.
@@ -41,6 +45,16 @@ namespace Labyrinth.Services.Display
             IsSerializable = false;
 
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
+
+            Messenger.Default.Register<WorldLoaderProgress>(this, UpdateLoadingScreenMessage);
+            }
+
+        private void UpdateLoadingScreenMessage(WorldLoaderProgress msg)
+            {
+            this._loadingMessage = msg.Message;
+            this.ScreenManager.GraphicsDevice.Clear(Color.Black);
+            this.Draw(new GameTime());
+            this.ScreenManager.GraphicsDevice.Present();
             }
 
         /// <summary>
@@ -83,6 +97,8 @@ namespace Labyrinth.Services.Display
                 // the  game timing mechanism that we have just finished a very
                 // long frame, and that it should not try to catch up.
                 ScreenManager.Game.ResetElapsedTime();
+
+                Messenger.Default.Unregister<WorldLoaderProgress>(this);
             }
         }
         
@@ -109,24 +125,22 @@ namespace Labyrinth.Services.Display
             // to bother drawing the message.
             if (this._loadingIsSlow)
                 {
-                // todo tidy this up
-
                 ISpriteBatch spriteBatch = this.ScreenManager.SpriteBatch;
                 SpriteFont font = ScreenManager.Font;
 
                 const string message = "Loading...";
 
-                // Center the text in the viewport.
                 Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
-                Vector2 viewportSize = new Vector2(viewport.Width, viewport.Height);
-                Vector2 textSize = font.MeasureString(message);
-                Vector2 textPosition = (viewportSize - textSize) / 2;
-
+                int y = viewport.Height / 3;
                 Color color = Color.White * TransitionAlpha;
 
                 // Draw the text.
                 spriteBatch.Begin(Vector2.Zero);
-                spriteBatch.DrawCentredString(font, message, (int) textPosition.Y, color);
+                spriteBatch.DrawCentredString(font, message, y, color);
+
+                if (this._loadingMessage != null)
+                    spriteBatch.DrawCentredString(font, this._loadingMessage, y + 75, color);
+
                 spriteBatch.End();
                 }
             }

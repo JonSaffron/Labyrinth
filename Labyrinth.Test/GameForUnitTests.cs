@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Display;

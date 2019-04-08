@@ -213,6 +213,7 @@
     <Compile Include="Services\Messages\CrystalTaken.cs" />
     <Compile Include="Services\Messages\MonsterCrushed.cs" />
     <Compile Include="Services\Messages\MonsterShot.cs" />
+    <Compile Include="Services\Messages\WorldLoaderProgress.cs" />
     <Compile Include="Services\PathFinder\RepelObject.cs" />
     <Compile Include="Services\PathFinder\Path.cs" />
     <Compile Include="Services\PathFinder\PathFinder.cs" />

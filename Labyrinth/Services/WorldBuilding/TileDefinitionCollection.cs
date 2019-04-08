@@ -35,7 +35,7 @@ namespace Labyrinth.Services.WorldBuilding
                     throw new InvalidOperationException(text);
                     }
                 return result;
-                }   
+                }
             }
 
         public static TileDefinitionCollection FromXml(XmlNodeList tiledefs)

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using Labyrinth.DataStructures;
+﻿using System.Linq;
 using Labyrinth.GameObjects.Motility;
-using Labyrinth.Services.Input;
 using NUnit.Framework;
 
 namespace Labyrinth.Test

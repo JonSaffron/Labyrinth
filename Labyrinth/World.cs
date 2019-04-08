@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.ClockEvents;
@@ -9,6 +10,7 @@ using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.Messages;
 using Labyrinth.Services.PathFinder;
 
 namespace Labyrinth
@@ -63,6 +65,9 @@ namespace Labyrinth
 
         private void ValidateGameState(GameState gameState)
             {
+            var msg = new WorldLoaderProgress("Validating gamestate");
+            Messenger.Default.Send(msg);
+
             var tcv = new TileContentValidator();
             var issues = new List<string>();
             var cy = this._worldSize.Y;
