@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using Labyrinth.DataStructures;
+﻿using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
@@ -10,20 +9,23 @@ namespace Labyrinth.Test
     class GameForUnitTests : Game
         {
         private World _world;
-        private readonly UnitTestServices _unitTestServices;
+        public readonly UnitTestServices UnitTestServices;
 
-        public GameForUnitTests([NotNull] UnitTestServices services)
+        public GameForUnitTests()
             {
-            services.Setup(this);
-            GlobalServices.SetGame(this);
-            this._unitTestServices = services;
+            this.UnitTestServices = new UnitTestServices();
+            this.UnitTestServices.Setup(this);
+
+            this.Components.Add(new SuppressDrawComponent(this));
             }
 
         public void LoadLevel(string worldData)
             {
-            var gameStartParameters = new GameStartParameters();
-            gameStartParameters.World = worldData;
-            gameStartParameters.WorldLoader = new WorldLoaderForTest();
+            var gameStartParameters = new GameStartParameters
+                {
+                World = worldData, 
+                WorldLoader = new WorldLoaderForTest()
+                };
 
             var gamePlayScreen = new GameplayScreen(gameStartParameters, new InputState());
             this._world = gamePlayScreen.LoadWorld(worldData);
@@ -38,7 +40,7 @@ namespace Labyrinth.Test
 
         public void RunTest()
             {
-            while (!this._unitTestServices.PlayerController.HasFinishedQueue)
+            while (!this.UnitTestServices.PlayerController.HasFinishedQueue)
                 {
                 this.Tick();
                 }

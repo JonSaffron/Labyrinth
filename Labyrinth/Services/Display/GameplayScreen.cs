@@ -4,6 +4,7 @@ using Labyrinth.DataStructures;
 using Labyrinth.Services.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
@@ -20,6 +21,7 @@ namespace Labyrinth.Services.Display
         private readonly GameInput _gameInput;
         private World _world;
         private int _lives;
+        private Effect _endOfLevelEffect;
 
         /// <summary>
         /// Constructor.
@@ -43,6 +45,8 @@ namespace Labyrinth.Services.Display
                 {
                 this._content = new ContentManager(ScreenManager.Game.Services, "Content");
                 }
+
+            this._endOfLevelEffect = GlobalServices.Game.Content.Load<Effect>("EndOfLevelFlash");
 
             this._headsUpDisplay.LoadContent(this._content);
             this._world = LoadWorld(this._gameStartParameters.World);
@@ -168,7 +172,11 @@ namespace Labyrinth.Services.Display
             // Draw the sprite.
             if (this._world != null)
                 {
-                spriteBatch.Begin(this._world.WorldWindow.WindowPosition);
+                // flash should change every 80ms
+                var flashOn = (DateTime.Now.Second % 2) == 0;
+                this._endOfLevelEffect.Parameters["flashOn"].SetValue(flashOn);
+
+                spriteBatch.Begin(this._world.WorldWindow.WindowPosition, this._endOfLevelEffect);
                 this._world.Draw(gameTime, spriteBatch);
                 this._headsUpDisplay.DrawStatus(spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, this._scoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
                 spriteBatch.End();

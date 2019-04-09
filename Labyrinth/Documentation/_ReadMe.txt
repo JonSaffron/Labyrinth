@@ -14,6 +14,11 @@ Bitmap fonts
 https://web.archive.org/web/20190217034432/https://blogs.msdn.microsoft.com/shawnhar/2007/04/26/bitmap-fonts-in-xna/
 or http://www.shawnhargreaves.com/blog/bitmap-fonts-in-xna.html
 
+Application for creating font textures 
 https://web.archive.org/web/20140328173607/http://www.nubik.com:80/SpriteFont/
 
+Pixel shaders
+https://gmjosack.github.io/posts/my-first-2d-pixel-shaders-part-1/
 
+XNA blog by Shawn Hargreaves
+http://www.shawnhargreaves.com/blogindex.html

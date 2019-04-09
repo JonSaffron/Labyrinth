@@ -172,8 +172,11 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// Tells each screen to draw itself.
         /// </summary>
+        /// <param name="gameTime">Time passed since the last call to Draw</param>
         public override void Draw(GameTime gameTime)
             {
+            this.Game.GraphicsDevice.Clear(Color.Black);
+
             foreach (GameScreen screen in _screens)
                 {
                 if (screen.ScreenState == ScreenState.Hidden)

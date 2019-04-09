@@ -249,7 +249,8 @@ namespace Labyrinth
 
         public IMonster AddMonster(MonsterDef monsterDef)
             {
-            var result = GlobalServices.MonsterFactory.BuildMonster(monsterDef);
+            var monsterFactory = new MonsterFactory();
+            var result = monsterFactory.BuildMonster(monsterDef);
             this._gameObjectCollection.Add(result);
             return result;
             }

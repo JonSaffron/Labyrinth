@@ -232,7 +232,6 @@ namespace Labyrinth.Services.WorldBuilding
             ValidateLayout(layout);
 
             var result = new Tile[this.WorldSize.X, this.WorldSize.Y];
-            var spriteLibrary = GlobalServices.SpriteLibrary;
             foreach (var tdc in this._tileDefinitionCollections)
                 {
                 string defaultFloorName = tdc.GetDefaultFloor();
@@ -245,12 +244,10 @@ namespace Labyrinth.Services.WorldBuilding
                         td is TileFloorDefinition definition
                             ? definition.TextureName
                             : defaultFloorName;
-                    var pathToTexture = textureName.Contains("/") ? textureName : "Tiles/" + textureName;
-                    var floor = spriteLibrary.GetSprite(pathToTexture);
 
                     if (!playerStartStateCollection.TryGetStartState(tp, out PlayerStartState pss))
                         throw new InvalidOperationException();
-                    result[tp.X, tp.Y] = new Tile(floor, pss.Id);
+                    result[tp.X, tp.Y] = new Tile(textureName, pss.Id);
                     }
                 }
             return result;

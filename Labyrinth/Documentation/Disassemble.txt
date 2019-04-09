@@ -6520,10 +6520,10 @@ static object injured (b)
 5D0B 20 F4 FF  JSR FFF4                 -- escape key disabled, clear memory on break
 5D0E A9 09     LDA #09                  
 5D10 A2 04     LDX #04                  
-5D12 20 F4 FF  JSR FFF4                 -- set duration of 1st flashing colour
+5D12 20 F4 FF  JSR FFF4                 -- set duration of 1st flashing colour to 4 * 20ms
 5D15 A9 0A     LDA #0A                  
 5D17 A2 04     LDX #04                  
-5D19 20 F4 FF  JSR FFF4                 -- set duration of 2nd flashing colour
+5D19 20 F4 FF  JSR FFF4                 -- set duration of 2nd flashing colour to 4 * 20ms
 
 5D1C A9 09     LDA #09                  -- reallocate code from &5800 to &0900
 5D1E 85 71     STA 71                   

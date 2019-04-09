@@ -10,6 +10,8 @@ namespace Labyrinth.Test
 
         public void Setup(Game game)
             {
+            GlobalServices.SetGame(game);
+
             this.PlayerController = new PlayerController(game);
             game.Components.Add(this.PlayerController);
             GlobalServices.SetPlayerInput(this.PlayerController);
@@ -19,8 +21,6 @@ namespace Labyrinth.Test
 
             var spriteLibrary = new DummySpriteLibrary();
             GlobalServices.SetSpriteLibrary(spriteLibrary);
-
-            game.Components.Add(new SuppressDrawComponent(game));
             }
         }
     }

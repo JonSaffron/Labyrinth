@@ -13,14 +13,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerPushesBoulder()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("# bp#");
 
@@ -40,14 +39,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerBouncesBoulder()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("#bp #");
 
@@ -71,8 +69,7 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerHasNoSpaceToBounceBoulder()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             g.LoadLevel("#bp#");
             var p = GlobalServices.GameState.Player;
@@ -89,15 +86,14 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerBouncesOneBoulderAndEndsUpPushingAnother()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
 
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("#bpb #");
 
@@ -126,8 +122,7 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotBouncesOneBoulderBecauseAnotherBoulderBehindCannotMove()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             g.LoadLevel("#bpb#");
             var p = GlobalServices.GameState.Player;
@@ -144,14 +139,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotMoveMultipleBoulders()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("# bbp #");
 

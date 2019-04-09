@@ -13,14 +13,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerShootsBoulder()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("# b p");
 
@@ -35,14 +34,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerShootsAdjacentBoulder()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("# bp ");
 
@@ -57,14 +55,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotShootBoulder1()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("#bp ");
 
@@ -80,14 +77,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotShootBoulder2()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("#b p ");
 
@@ -102,14 +98,13 @@ namespace Labyrinth.Test
         [Test]
         public void TestPlayerCannotShootBoulder3()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Fire(Direction.Left))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("# bbp ");
 

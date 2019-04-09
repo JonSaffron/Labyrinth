@@ -1,18 +1,16 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-
-namespace Labyrinth.Services.WorldBuilding
+﻿namespace Labyrinth.Services.WorldBuilding
     {
     /// <summary>
     /// Stores the floor texture and other meta data for a tile in the world
     /// </summary>
     public readonly struct Tile
         {
-        public readonly Texture2D Floor;
+        public readonly string TextureName;
         public readonly int WorldAreaId;
 
-        public Tile(Texture2D floor, int worldAreaId)
+        public Tile(string textureName, int worldAreaId)
             {
-            this.Floor = floor;
+            this.TextureName = textureName;
             this.WorldAreaId = worldAreaId;
             }
         }

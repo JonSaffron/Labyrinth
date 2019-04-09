@@ -31,5 +31,10 @@ namespace Labyrinth.GameObjects
         /// Indicates whether the player scores for killing the monster
         /// </summary>
         public static readonly PropertyDef<bool> MonsterScoresWhenKilled = new PropertyDef<bool>(nameof(MonsterScoresWhenKilled), false);
+
+        // todo effect of forcefield on player
+        // todo filter for gameobject solidity
+        // public static readonly PropertyDef<Func<bool>> hello = new PropertyDef<Func<bool>>("hello", () => true);
+
         }
     }

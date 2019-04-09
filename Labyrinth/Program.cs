@@ -1,7 +1,5 @@
 using System;
 using System.Windows.Forms;
-using Castle.Windsor;
-using Castle.Windsor.Installer;
 
 namespace Labyrinth
     {
@@ -16,13 +14,8 @@ namespace Labyrinth
             int result;
             try
                 {
-                using (var container = new WindsorContainer().Install(FromAssembly.This()))
-                    {
-                    GlobalServices.SetRandomness(container.Resolve<IRandomness>());
-
-                    var game = new Game1(new InteractiveServices());
-                    game.Run();
-                    }
+                var game = new Game1();
+                game.Run();
                 result = 0;
                 }
             catch (Exception ex)

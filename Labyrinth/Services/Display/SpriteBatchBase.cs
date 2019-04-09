@@ -26,6 +26,12 @@ namespace Labyrinth.Services.Display
             this.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             }
 
+        public void Begin(Vector2 windowPosition, Effect effect)
+            {
+            this._windowPosition = windowPosition;
+            this.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, effect);
+            }
+
         /// <inheritdoc />
         public virtual void End()
             {

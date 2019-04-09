@@ -302,7 +302,7 @@ namespace Labyrinth
             {
             var windowPosition = this.WorldWindow.WindowPosition;
             var tileRectangle = GetRectangleEnclosingTilesThatAreCurrentlyInView(windowPosition);
-            this._worldRenderer.RenderWorld(tileRectangle, gameTime, spriteBatch);
+            this._worldRenderer.RenderWorld(gameTime, tileRectangle, spriteBatch);
             }
 
         private static TileRect GetRectangleEnclosingTilesThatAreCurrentlyInView(Vector2 windowOffset)

@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Labyrinth.GameObjects;
 using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 
@@ -73,11 +72,5 @@ namespace Labyrinth
 
         public static IBoundMovementFactory BoundMovementFactory { get; private set; }
 
-        public static void SetMonsterFactory(MonsterFactory monsterFactory)
-            {
-            MonsterFactory = monsterFactory;
-            }
-
-        public static MonsterFactory MonsterFactory { get; private set; }
         }
     }

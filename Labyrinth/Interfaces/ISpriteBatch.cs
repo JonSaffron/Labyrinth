@@ -13,6 +13,8 @@ namespace Labyrinth
         /// <param name="windowPosition">Sets the top-left co-ordinates of the game window's view upon the world</param>
         void Begin(Vector2 windowPosition);
 
+        void Begin(Vector2 windowPosition, Effect effect);
+
         /// <summary>
         /// Signals the end of a drawing batch
         /// </summary>

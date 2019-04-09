@@ -45,14 +45,13 @@ namespace Labyrinth.Test
         [Test]
         public void VerifyThatTheListOfItemsMovesWhenGameObjectMovesToAnAdjacentEmptySpace()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 {
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Right))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("p ");
             var p = GlobalServices.GameState.Player;
@@ -68,14 +67,13 @@ namespace Labyrinth.Test
         [Test]
         public void VerifyThatTheListOfItemsIsSuitablyAdjustedWhenGameObjectMovesToAnAdjacentOccupiedSpace()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 {
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Right))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("pg");
 
@@ -92,14 +90,13 @@ namespace Labyrinth.Test
         [Test]
         public void VerifyThatListOfItemsIsSuitablyAdjustedWhenGameObjectMovesFromAnAdditionalOccupiedSpaceToFreeSpace()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 {
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Right))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("p ");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
@@ -120,14 +117,13 @@ namespace Labyrinth.Test
         [Test]
         public void VerifyThatListOfItemsIsSuitablyAdjustedWhenGameObjectMovesFromAnAdditionalOccupiedSpaceToAnotherOccupiedSpace()
             {
-            var services = new UnitTestServices();
-            var g = new GameForUnitTests(services);
+            var g = new GameForUnitTests();
 
             var instructions = new[] 
                 { 
                 new PlayerController.TimedInstruction(TimeSpan.Zero, PlayerController.Instruction.Move(Direction.Right))
                 };
-            services.PlayerController.Enqueue(instructions);
+            g.UnitTestServices.PlayerController.Enqueue(instructions);
 
             g.LoadLevel("pg");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
