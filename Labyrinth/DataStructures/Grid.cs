@@ -68,11 +68,12 @@ namespace Labyrinth.DataStructures
 
                     foreach (var item in list)
                         {
-                        if (set.Add(item))
-                            yield return item;
+                        set.Add(item);
                         }
                     }
                 }
+
+            return set;
             }
 
         public void UpdatePosition(IMovingItem item)

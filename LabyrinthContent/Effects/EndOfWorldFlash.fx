@@ -18,7 +18,7 @@ float4 PixelShaderFunction(float2 coords: TEXCOORD0) : COLOR0
 		else if (colour.r == 0 && colour.g == 0 && colour.b == 1)
 			{
 			// change blue to black
-			// colour.rgb = 0;
+			colour.rgb = 0;
 			}
 		}
 

@@ -4,7 +4,6 @@ using Labyrinth.DataStructures;
 using Labyrinth.Services.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
@@ -20,8 +19,7 @@ namespace Labyrinth.Services.Display
         private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
         private readonly GameInput _gameInput;
         private World _world;
-        private int _lives;
-        private Effect _endOfLevelEffect;
+        private int _livesRemaining;
 
         /// <summary>
         /// Constructor.
@@ -33,7 +31,7 @@ namespace Labyrinth.Services.Display
             this.TransitionOffTime = TimeSpan.FromSeconds(0.5);
             this._scoreKeeper = new ScoreKeeper.ScoreKeeper();
             this._gameInput = new GameInput(inputState);
-            this._lives = this._gameStartParameters.CountOfLives - 1;
+            this._livesRemaining = this._gameStartParameters.CountOfLives - 1;
             }
 
         /// <summary>
@@ -45,8 +43,6 @@ namespace Labyrinth.Services.Display
                 {
                 this._content = new ContentManager(ScreenManager.Game.Services, "Content");
                 }
-
-            this._endOfLevelEffect = GlobalServices.Game.Content.Load<Effect>("EndOfLevelFlash");
 
             this._headsUpDisplay.LoadContent(this._content);
             this._world = LoadWorld(this._gameStartParameters.World);
@@ -91,24 +87,24 @@ namespace Labyrinth.Services.Display
             if (!this._isGamePaused && gameTime.ElapsedGameTime != TimeSpan.Zero)
                 {
                 // ReSharper disable once PossibleNullReferenceException
-                LevelReturnType lrt = this._world.Update(gameTime);
-                switch (lrt)
+                WorldReturnType worldReturnType = this._world.Update(gameTime);
+                switch (worldReturnType)
                     {
-                    case LevelReturnType.FinishedWorld:
+                    case WorldReturnType.FinishedWorld:
                         //this._world = null;
-                        //this._lives++;
+                        //this._livesRemaining++;
                         this.ScreenManager.Game.Exit();
                         break;
             
-                    case LevelReturnType.LostLife:
+                    case WorldReturnType.LostLife:
                         GlobalServices.SoundPlayer.ActiveSoundService.Clear();
-                        if (this._lives == 0)
+                        if (this._livesRemaining == 0)
                             {
                             this.ScreenManager.Game.Exit();
                             return;
                             }
-                        this._lives--;
-                        this._world.ResetLevelAfterLosingLife();
+                        this._livesRemaining--;
+                        this._world.ResetWorldAfterLosingLife();
                         break;
                     }
                 }
@@ -172,13 +168,9 @@ namespace Labyrinth.Services.Display
             // Draw the sprite.
             if (this._world != null)
                 {
-                // flash should change every 80ms
-                var flashOn = (DateTime.Now.Second % 2) == 0;
-                this._endOfLevelEffect.Parameters["flashOn"].SetValue(flashOn);
-
-                spriteBatch.Begin(this._world.WorldWindow.WindowPosition, this._endOfLevelEffect);
                 this._world.Draw(gameTime, spriteBatch);
-                this._headsUpDisplay.DrawStatus(spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, this._scoreKeeper.CurrentScore, this._lives, this._isGamePaused, gameTime.IsRunningSlowly);
+                spriteBatch.Begin(this._world.WorldWindow.WindowPosition);
+                this._headsUpDisplay.DrawStatus(spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, this._scoreKeeper.CurrentScore, this._livesRemaining, this._isGamePaused, gameTime.IsRunningSlowly);
                 spriteBatch.End();
 
                 base.Draw(gameTime);
@@ -193,7 +185,7 @@ namespace Labyrinth.Services.Display
             {
             // Load the World.
             var world = new World(this._gameStartParameters.WorldLoader, worldData);
-            world.ResetLevelForStartingNewLife();
+            world.ResetWorldForStartingNewLife();
             return world;
             }
         }

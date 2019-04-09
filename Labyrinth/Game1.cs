@@ -18,8 +18,11 @@ namespace Labyrinth
             this.Content.RootDirectory = "Content";
 
             // Create the screen manager component.
-            var screenManager = new ScreenManager(this) { TraceEnabled = true };
+            var screenManager = new ScreenManager(this);
             this.Components.Add(screenManager);
+#if DEBUG
+            screenManager.TraceEnabled = true;
+#endif
 
             var gameStartParameters = new GameStartParameters { CountOfLives = 3, World = "World1", WorldLoader = new WorldLoader()};
             var gamePlayScreen = new GameplayScreen(gameStartParameters, screenManager.InputState);

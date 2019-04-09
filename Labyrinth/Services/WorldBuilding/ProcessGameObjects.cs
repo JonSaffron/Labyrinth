@@ -84,47 +84,47 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        private void AddMonster(XmlElement mdef, XmlNamespaceManager namespaceManager)
+        private void AddMonster(XmlElement monsterDef, XmlNamespaceManager namespaceManager)
             {
-            MonsterDef md = MonsterDef.FromXml(mdef, namespaceManager);
-            var tilePos = new TilePos(int.Parse(mdef.GetAttribute("Left")), int.Parse(mdef.GetAttribute("Top")));
+            MonsterDef md = MonsterDef.FromXml(monsterDef, namespaceManager);
+            var tilePos = new TilePos(int.Parse(monsterDef.GetAttribute("Left")), int.Parse(monsterDef.GetAttribute("Top")));
             md.Position = tilePos.ToPosition();
             this._gameState.AddMonster(md);
             }
 
-        private void AddCrystal(XmlElement cdef)
+        private void AddCrystal(XmlElement crystalDef)
             {
-            var id = int.Parse(cdef.GetAttribute("Id"));
-            var tilePos = new TilePos(int.Parse(cdef.GetAttribute("Left")), int.Parse(cdef.GetAttribute("Top")));
+            var id = int.Parse(crystalDef.GetAttribute("Id"));
+            var tilePos = new TilePos(int.Parse(crystalDef.GetAttribute("Left")), int.Parse(crystalDef.GetAttribute("Top")));
             var position = tilePos.ToPosition();
-            var score = int.Parse(cdef.GetAttribute("Score"));
-            var energy = int.Parse(cdef.GetAttribute("Energy"));
+            var score = int.Parse(crystalDef.GetAttribute("Score"));
+            var energy = int.Parse(crystalDef.GetAttribute("Energy"));
             this._gameState.AddCrystal(position, id, score, energy);
             }
 
-        private void AddBoulder(XmlElement bdef)
+        private void AddBoulder(XmlElement boulderDef)
             {
-            var tilePos = new TilePos(int.Parse(bdef.GetAttribute("Left")), int.Parse(bdef.GetAttribute("Top")));
+            var tilePos = new TilePos(int.Parse(boulderDef.GetAttribute("Left")), int.Parse(boulderDef.GetAttribute("Top")));
             var position = tilePos.ToPosition();
             this._gameState.AddBoulder(position);
             }
 
-        private void AddForceFields(XmlElement fdef)
+        private void AddForceFields(XmlElement forceFieldDef)
             {
-            int crystalRequired = int.Parse(fdef.GetAttribute("CrystalRequired"));
-            Rectangle r = RectangleExtensions.GetRectangleFromDefinition(fdef);
+            int crystalRequired = int.Parse(forceFieldDef.GetAttribute("CrystalRequired"));
+            Rectangle r = RectangleExtensions.GetRectangleFromDefinition(forceFieldDef);
             foreach (var tp in r.PointsInside())
                 {
                 this._gameState.AddForceField(tp.ToPosition(), crystalRequired);
                 }
             }
 
-        private void AddCrumblyWall(XmlElement wdef)
+        private void AddCrumblyWall(XmlElement wallDef)
             {
-            var tilePos = new TilePos(int.Parse(wdef.GetAttribute("Left")), int.Parse(wdef.GetAttribute("Top")));
+            var tilePos = new TilePos(int.Parse(wallDef.GetAttribute("Left")), int.Parse(wallDef.GetAttribute("Top")));
             var position = tilePos.ToPosition();
-            var energy = int.Parse(wdef.GetAttribute("Energy"));
-            var textureName = wdef.GetAttribute("Texture");
+            var energy = int.Parse(wallDef.GetAttribute("Energy"));
+            var textureName = wallDef.GetAttribute("Texture");
             this._gameState.AddCrumblyWall(position, "Tiles/" + textureName, energy);
             }
 

@@ -1804,20 +1804,21 @@ static object injured (b)
 1A5B 29 07     AND #07                  -- first 3 bits (result = 0 to 7)
 1A5D F0 ED     BEQ 1A4C                 -- if zero, then jump to random direction
 
-1A5F BD 01 0C  LDA 0C01,X               -- get current tile number
-1A62 20 83 1C  JSR 1C83                 -- seperate into x and y
+1A5F BD 01 0C  LDA 0C01,X               -- get monster's current tile number
+1A62 20 83 1C  JSR 1C83                 -- put column/x into &85, row/y into &86
 1A65 AD 01 0C  LDA 0C01                 -- get player's current tile
-1A68 29 0F     AND #0F                  -- extract just the column
+1A68 29 0F     AND #0F                  -- extract just the column/x
 1A6A 38        SEC                      
-1A6B E5 85     SBC 85                   -- subtract monster column
+1A6B E5 85     SBC 85                   -- subtract monster column/x
 1A6D F0 1C     BEQ 1A8B                 -- if equal then branch
+
 1A6F A9 00     LDA #00                  -- default direction is left
-1A71 90 02     BCC 1A75                 
-1A73 A9 01     LDA #01                  -- direction is right
+1A71 90 02     BCC 1A75                 -- subtraction led to a minus number, so keep left as the result
+1A73 A9 01     LDA #01                  -- direction is actually right
 1A75 9D 04 0C  STA 0C04,X               -- store new direction
-1A78 20 EE 1C  JSR 1CEE                 -- get contents of new position
+1A78 20 EE 1C  JSR 1CEE                 -- get contents of what would be the new position
 1A7B C9 20     CMP #20                  
-1A7D 90 0C     BCC 1A8B                 -- less then 20, so branch to next bit
+1A7D 90 0C     BCC 1A8B                 -- less then 20 is a wall, in which case branch to look at row/y
 1A7F B0 1F     BCS 1AA0                 -- jump to test and update routine
 1A81 EA        NOP                      
 1A82 EA        NOP                      
@@ -1829,17 +1830,18 @@ static object injured (b)
 1A88 EA        NOP                      
 1A89 EA        NOP                      
 1A8A EA        NOP                      
+
 1A8B AD 01 0C  LDA 0C01                 -- get player's current tile
-1A8E 29 F0     AND #F0                  -- extract just the row
+1A8E 29 F0     AND #F0                  -- extract just the row/y
 1A90 4A        LSR A                    
 1A91 4A        LSR A                    
 1A92 4A        LSR A                    
-1A93 4A        LSR A                    -- shift to bits 0 to 3
+1A93 4A        LSR A                    -- shift down to bits 0 to 3
 1A94 38        SEC                      
-1A95 E5 86     SBC 86                   -- subtract monster row
+1A95 E5 86     SBC 86                   -- subtract the monster's row/y
 1A97 A9 02     LDA #02                  -- default direction is up
-1A99 90 02     BCC 1A9D                 
-1A9B A9 03     LDA #03                  -- direction is down
+1A99 90 02     BCC 1A9D                 -- subtraction led to a minus number, so keep up as the result
+1A9B A9 03     LDA #03                  -- direction is actually down
 1A9D 9D 04 0C  STA 0C04,X               -- store new direction
 1AA0 4C F6 1A  JMP 1AF6                 -- jump to test and update routine
 

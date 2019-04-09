@@ -82,15 +82,8 @@ namespace Labyrinth.GameObjects.Motility
             if (intendedDirection == Direction.None)
                 intendedDirection = RandomDirection();
 
-            TilePos tp = m.TilePosition;
             for (int i = 0; i < 3; i++, intendedDirection = GetNextDirection(intendedDirection))
                 {
-                TilePos potentiallyMovingTowardsTile = tp.GetPositionAfterOneMove(intendedDirection);
-                Vector2 potentiallyMovingTowards = potentiallyMovingTowardsTile.ToPosition();
-
-                if (m.ChangeRooms == ChangeRooms.StaysWithinRoom && !IsInSameRoom(m.Position, potentiallyMovingTowards))
-                    continue;
-
                 if (m.CanMoveInDirection(intendedDirection))
                     return intendedDirection;
                 }
@@ -122,18 +115,19 @@ namespace Labyrinth.GameObjects.Motility
         /// <returns>The direction that brings the monster closer to the player</returns>
         public static Direction DetermineDirectionTowardsPlayer(Monster m)
             {
-            TilePos playerPos = TilePos.TilePosFromPosition(GlobalServices.GameState.Player.Position);
+            TilePos playerPos = GlobalServices.GameState.Player.TilePosition;
             int diffX = m.TilePosition.X - playerPos.X; 
             Direction result;
             if (diffX != 0)
                 {
                 result = diffX > 0 ? Direction.Left : Direction.Right;
+
+                if (m.CanMoveInDirection(result))
+                    return result;
                 }
-            else
-                {
-                int diffY = m.TilePosition.Y - playerPos.Y;
-                result = diffY > 0 ? Direction.Up : Direction.Down;
-                }
+
+            int diffY = m.TilePosition.Y - playerPos.Y;
+            result = diffY > 0 ? Direction.Up : Direction.Down;
             return result;
             }
         }

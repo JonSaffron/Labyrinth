@@ -788,13 +788,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Effect1.fx">
-      <Name>Effect1</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Sounds\ForceFieldShutsDown.wav">
       <Name>ForceFieldShutsDown</Name>
       <Importer>WavImporter</Importer>
@@ -802,10 +795,17 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EndOfLevelFlash.fx">
-      <Name>EndOfLevelFlash</Name>
+    <Compile Include="Effects\EndOfWorldFlash.fx">
+      <Name>EndOfWorldFlash</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="NewTiles\clock.png">
+      <Name>clock</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

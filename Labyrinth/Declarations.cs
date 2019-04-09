@@ -121,7 +121,7 @@ namespace Labyrinth
         [UsedImplicitly] Acorn = 6
         }
 
-    public enum LevelReturnType
+    public enum WorldReturnType
         {
         Normal,
         LostLife,

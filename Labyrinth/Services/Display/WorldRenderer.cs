@@ -12,29 +12,57 @@ using Microsoft.Xna.Framework;
 // http://www.shawnhargreaves.com/blog/spritebatch-sorting-part-2.html
 // http://www.shawnhargreaves.com/blog/return-of-the-spritebatch-sorting-part-3.html
 
-
 namespace Labyrinth.Services.Display
     {
     class WorldRenderer
         {
-        private readonly ISpriteLibrary _spriteLibrary;
-        private readonly Tile[,] _tiles;
+        private readonly TileRect _viewOfWorld;
+        [NotNull] private readonly ISpriteBatch _spriteBatch;
+        [NotNull] private readonly ISpriteLibrary _spriteLibrary;
 
-
-        public WorldRenderer([NotNull] ISpriteLibrary spriteLibrary, ref Tile[,] tiles)
+        public WorldRenderer(TileRect viewOfWorld, [NotNull] ISpriteBatch spriteBatch, [NotNull] ISpriteLibrary spriteLibrary)
             {
+            this._viewOfWorld = viewOfWorld;
+            this._spriteBatch = spriteBatch ?? throw new ArgumentNullException(nameof(spriteBatch));
             this._spriteLibrary = spriteLibrary ?? throw new ArgumentNullException(nameof(spriteLibrary));
-            this._tiles = tiles;
             }
 
-        public void RenderWorld(GameTime gameTime, TileRect viewOfWorld, [NotNull] ISpriteBatch spriteBatch)
+        /// <summary>
+        /// Draws the floor of the current view
+        /// </summary>
+        public void RenderFloorTiles(ref Tile[,] tiles)
             {
-            if (spriteBatch == null) 
-                throw new ArgumentNullException(nameof(spriteBatch));
+            DrawParameters drawParameters = default;
+            drawParameters.AreaWithinTexture = Constants.TileRectangle;
+            drawParameters.Centre = Vector2.Zero;
 
-            DrawFloorTiles(viewOfWorld, spriteBatch);
+            for (int j = 0; j < this._viewOfWorld.Height; j++)
+                {
+                int y = this._viewOfWorld.TopLeft.Y + j;
 
-            var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(viewOfWorld);
+                for (int i = 0; i < this._viewOfWorld.Width; i++)
+                    {
+                    int x = this._viewOfWorld.TopLeft.X + i;
+
+                    string textureName = tiles[x, y].TextureName;
+                    if (textureName == null)
+                        continue;
+
+                    var pathToTexture = textureName.Contains("/") ? textureName : "Tiles/" + textureName;
+                    drawParameters.Texture = this._spriteLibrary.GetSprite(pathToTexture);
+                    drawParameters.Position = new Vector2(x, y) * Constants.TileSize;
+                    this._spriteBatch.DrawTexture(drawParameters);
+                    }
+                }
+            }
+
+        /// <summary>
+        /// Draws all the gameobjects within the current view
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public void RenderWorld(GameTime gameTime)
+            {
+            var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(this._viewOfWorld);
             var drawQueue = new PriorityQueue<int, IGameObject>(100);
             foreach (var item in itemsToDraw)
                 {
@@ -49,36 +77,7 @@ namespace Labyrinth.Services.Display
                     item.Update(gameTime);
                 var renderAnimation = item.RenderAnimation;
 
-                renderAnimation?.Draw(spriteBatch, this._spriteLibrary);
-                }
-            }
-
-        /// <summary>
-        /// Draws the floor of the current view
-        /// </summary>
-        private void DrawFloorTiles(TileRect tr, ISpriteBatch spriteBatch)
-            {
-            DrawParameters drawParameters = default;
-            drawParameters.AreaWithinTexture = Constants.TileRectangle;
-            drawParameters.Centre = Vector2.Zero;
-
-            for (int j = 0; j < tr.Height; j++)
-                {
-                int y = tr.TopLeft.Y + j;
-
-                for (int i = 0; i < tr.Width; i++)
-                    {
-                    int x = tr.TopLeft.X + i;
-
-                    string textureName = this._tiles[x, y].TextureName;
-                    if (textureName == null)
-                        continue;
-
-                    var pathToTexture = textureName.Contains("/") ? textureName : "Tiles/" + textureName;
-                    drawParameters.Texture = this._spriteLibrary.GetSprite(pathToTexture);
-                    drawParameters.Position = new Vector2(x, y) * Constants.TileSize;
-                    spriteBatch.DrawTexture(drawParameters);
-                    }
+                renderAnimation?.Draw(this._spriteBatch, this._spriteLibrary);
                 }
             }
         }

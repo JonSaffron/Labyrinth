@@ -257,7 +257,7 @@ namespace Labyrinth.GameObjects
         protected override void UponDeath(bool wasDeathInstant)
             {
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, 
-                (sender, args) => GlobalServices.World.SetLevelReturnType(LevelReturnType.LostLife));
+                (sender, args) => GlobalServices.World.WorldReturnType = WorldReturnType.LostLife);
             GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             GlobalServices.GameState.AddGrave(this.TilePosition);
             }

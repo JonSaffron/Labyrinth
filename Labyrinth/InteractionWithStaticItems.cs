@@ -90,7 +90,6 @@ namespace Labyrinth
 
         private static void PlayerTakesCrystal(World world, Player player, Crystal crystal)
             {
-            // todo this didn't seem to end the world - test that checking IsExtant fixes the problem
             player.AddEnergy(crystal.Energy);
             var crystalTaken = new CrystalTaken(crystal);
             Messenger.Default.Send(crystalTaken);
@@ -110,8 +109,7 @@ namespace Labyrinth
 
                 // todo some graphical effect - original game changed colours
                 GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
-                    (sender, args) => world.SetLevelReturnType(LevelReturnType.FinishedWorld));
-                world.SetDoNotUpdate();
+                    (sender, args) => world.WorldReturnType = WorldReturnType.FinishedWorld);
                 }
             }
 
