@@ -17,8 +17,7 @@ namespace Labyrinth.Services.Display
 
         public FrameRateCounter(Game game) : base(game)
             {
-            this._content = new ContentManager(game.Services);
-            this._content.RootDirectory = game.Content.RootDirectory;
+            this._content = new ContentManager(game.Services, game.Content.RootDirectory);
             }
 
         protected override void LoadContent()

@@ -31,11 +31,11 @@ namespace Labyrinth.GameObjects
             {
             if (!this._animationPlayer.HasReachedEndOfAnimation)
                 {
-                this._isExtant = false;
+                this._animationPlayer.Update(gameTime);
                 }
             else
                 {
-                this._animationPlayer.Update(gameTime);
+                this._isExtant = false;
                 }
             return this._isExtant;
             }

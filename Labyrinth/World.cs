@@ -12,6 +12,7 @@ using Labyrinth.GameObjects;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Messages;
 using Labyrinth.Services.PathFinder;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth
@@ -24,7 +25,7 @@ namespace Labyrinth
         [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
         [NotNull] private readonly Player _player;
         [NotNull] private readonly WorldClock _worldClock;
-        private readonly Effect _endOfWorldEffect;
+        private Effect _endOfWorldEffect;
         private readonly WorldWindow _worldWindow;
         private bool _applyEndOfWorldEffect;
         private WorldReturnType _worldReturnType = WorldReturnType.Normal;
@@ -60,10 +61,13 @@ namespace Labyrinth
 
             ValidateGameState(gameState);
 
-            this._endOfWorldEffect = GlobalServices.Game.Content.Load<Effect>("EndOfWorldFlash");
-
             Messenger.Default.Register<WorldCompleted>(this, WorldCompleted);
             Messenger.Default.Register<LifeLost>(this, LostLife);
+            }
+
+        public void LoadContent(ContentManager contentManager)
+            {
+            this._endOfWorldEffect = contentManager.Load<Effect>("Effects/EndOfWorldFlash");
             }
 
         private void ValidateGameState(GameState gameState)

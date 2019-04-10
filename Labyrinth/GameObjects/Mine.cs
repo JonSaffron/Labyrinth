@@ -163,6 +163,7 @@ namespace Labyrinth.GameObjects
 
             public override bool Update(GameTime gameTime)
                 {
+                this._animationPlayer.Update(gameTime);
                 return true;
                 }
 

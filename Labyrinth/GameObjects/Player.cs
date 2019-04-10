@@ -113,6 +113,30 @@ namespace Labyrinth.GameObjects
             }
 
         /// <summary>
+        /// Removes the specified amount of energy from the object
+        /// </summary>
+        /// <param name="energyToRemove">The amount to reduce the object's energy by</param>
+        public override void ReduceEnergy(int energyToRemove)
+            {
+            if (energyToRemove <= 0)
+                throw new ArgumentOutOfRangeException(nameof(energyToRemove), energyToRemove, "Must be above 0.");
+            if (!this.IsExtant)
+                return;
+
+            if (energyToRemove > this.Energy)
+                {
+                this.Energy = 0;
+                this._countBeforeDecrementingEnergy = 0;
+                UponDeath(false);
+                }
+            else
+                {
+                this.Energy -= energyToRemove;
+                UponInjury();
+                }
+            }
+
+        /// <summary>
         /// Handles input, performs physics
         /// </summary>
         public override bool Update(GameTime gameTime)

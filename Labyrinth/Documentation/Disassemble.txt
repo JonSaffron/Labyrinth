@@ -63,12 +63,12 @@ current monster data 400 to 7bf
 0b00 to 0b9f	-- map of current room
 
 0ba0 to 0ba5	-- temporary storage when generating room layout
-0ba0			-- top and bottom rows
-0ba1			-- 2nd and penultimate rows
-0ba2			-- first and last column
-0ba3			-- 3rd, 4th, 7th and 8th rows
-0ba4			-- centre shape
-0ba5			-- exits (up is lowest 2 bits, down next, then right, left is highest bits. 
+  0ba0			-- top and bottom rows
+  0ba1			-- 2nd and penultimate rows
+  0ba2			-- first and last column
+  0ba3			-- 3rd, 4th, 7th and 8th rows
+  0ba4			-- centre shape
+  0ba5			-- exits (up is lowest 2 bits, down next, then right, left is highest bits. 
 							0 indicates no exit, 1 a small exit, 2 is not used, 3 is large gap)
 
 0ba6			-- 2 for world 1, 0 for 2nd world	
@@ -108,7 +108,7 @@ bdc				-- delay until game's main loop ends
 
 0c00 to 0cff	-- room occupant information (16 slots of 16 bytes each)
 					the player is always the first slot
-	offset 0	-- type of object (0 slot is empty, 1 is monster, 4 crystal, 5 player, fe block, ff shot)
+	offset 0	-- type of object (0 slot is empty, 1 is monster, 4 crystal, 5 player whilst alive, 6 player inactive/dead, fe block, ff shot)
 	offset 1	-- current tile number
 	offset 2	-- previous/future tile number?
 	offset 3	-- position between tiles (between 0 and 3)
@@ -3647,7 +3647,7 @@ static object injured (b)
 2659 49 FF     EOR #FF                  
 265B 18        CLC                      
 265C 69 01     ADC #01                  -- negate the negative value to give a positive result which is the player's remaining energy
-265E F0 0B     BEQ 266B                 -- does the player have any energy left?
+265E F0 0B     BEQ 266B                 -- branch if the player has no energy left
 2660 8D 0E 0C  STA 0C0E                 -- store new energy
 2663 A9 04     LDA #04                  
 2665 20 D6 2D  JSR 2DD6					-- play clang sound               
@@ -5687,28 +5687,43 @@ static object injured (b)
 33F9 85 74     STA 74                   
 33FB A9 F0     LDA #F0                  
 33FD 85 88     STA 88                   
-33FF AD 0E 0C  LDA 0C0E                 
+33FF AD 0E 0C  LDA 0C0E                 -- get player energy
 3402 C9 04     CMP #04                  
-3404 B0 1E     BCS 3424                 
+3404 B0 1E     BCS 3424                 -- branch if energy greater or equal to 4
+
 3406 C9 00     CMP #00                  
-3408 D0 09     BNE 3413                 
-340A AD 00 0C  LDA 0C00                 
+3408 D0 09     BNE 3413                 -- branch if player has at least some energy
+
+340A AD 00 0C  LDA 0C00                 -- get player's status
 340D C9 05     CMP #05                  
-340F D0 13     BNE 3424                 
+340F D0 13     BNE 3424                 -- branch if dead/inactive
+
+		-- draw for no energy
+
 3411 A9 00     LDA #00                  
+
+		-- draw for some energy: 
+			0 will be drawn as 25%, 
+			1 will be drawn as 50%, 
+			2 will be drawn as 75%,
+			3 will be drawn as 100%
+
 3413 18        CLC                      
-3414 69 01     ADC #01                  
-3416 0A        ASL A                    
-3417 0A        ASL A                    
+3414 69 01     ADC #01                  -- add 1 to energy amount
+3416 0A        ASL A                    -- double it
+3417 0A        ASL A                    -- double it again
 3418 85 77     STA 77                   
 341A A9 0F     LDA #0F                  
 341C 85 88     STA 88                   
 341E A9 00     LDA #00                  
 3420 85 76     STA 76                   
 3422 F0 0F     BEQ 3433                 
-3424 AD 0E 0C  LDA 0C0E                 
-3427 4A        LSR A                    
-3428 4A        LSR A                    
+
+		-- draw for when energy green (4 or above)
+
+3424 AD 0E 0C  LDA 0C0E                 -- get player energy
+3427 4A        LSR A                    -- divide by 2
+3428 4A        LSR A                    -- divide by 2
 3429 48        PHA                      
 342A 29 03     AND #03                  
 342C 85 76     STA 76                   
@@ -5716,6 +5731,7 @@ static object injured (b)
 342F 4A        LSR A                    
 3430 4A        LSR A                    
 3431 85 77     STA 77                   
+
 3433 A2 10     LDX #10                  
 3435 A5 77     LDA 77                   
 3437 F0 0F     BEQ 3448                 

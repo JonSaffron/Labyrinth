@@ -86,7 +86,7 @@ namespace Labyrinth.GameObjects
                 throw new ArgumentOutOfRangeException(nameof(energyToRemove), energyToRemove, "Must be above 0.");
             if (!this.IsExtant)
                 return;
-
+            
             this.Energy = (this.Energy > energyToRemove) ? this.Energy - energyToRemove : 0;
             if (this.IsExtant)
                 UponInjury();

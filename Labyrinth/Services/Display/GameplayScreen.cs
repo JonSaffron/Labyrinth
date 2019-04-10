@@ -32,6 +32,7 @@ namespace Labyrinth.Services.Display
             this._scoreKeeper = new ScoreKeeper.ScoreKeeper();
             this._gameInput = new GameInput(inputState);
             this._livesRemaining = this._gameStartParameters.CountOfLives - 1;
+            this._content = new ContentManager(GlobalServices.Game.Services, GlobalServices.Game.Content.RootDirectory);
             }
 
         /// <summary>
@@ -39,13 +40,9 @@ namespace Labyrinth.Services.Display
         /// </summary>
         public override void LoadContent()
             {
-            if (this._content == null)
-                {
-                this._content = new ContentManager(ScreenManager.Game.Services, "Content");
-                }
-
             this._headsUpDisplay.LoadContent(this._content);
             this._world = LoadWorld(this._gameStartParameters.WorldToLoad);
+            this._world.LoadContent(this._content);
             GlobalServices.SetWorld(this._world);
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
