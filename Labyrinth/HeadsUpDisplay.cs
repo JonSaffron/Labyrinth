@@ -29,6 +29,8 @@ namespace Labyrinth
 
         public void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, decimal score, int livesLeft, bool isPaused, bool isGameRunningSlowly)
             {
+            spriteBatch.Begin();
+
             if (!isPaused)
                 {
                 UpdateDisplayValues(playerEnergy, score);
@@ -46,6 +48,8 @@ namespace Labyrinth
                 {
                 DrawPausedMessage(spriteBatch);
                 }
+
+            spriteBatch.End();
             }
 
         private void UpdateDisplayValues(int playerEnergy, decimal score)

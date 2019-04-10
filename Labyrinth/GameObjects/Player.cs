@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
 using Labyrinth.Services.Display;
+using Labyrinth.Services.Messages;
 using Microsoft.Xna.Framework;
 
 /* If at grid point: On new keypress
@@ -256,10 +258,9 @@ namespace Labyrinth.GameObjects
 
         protected override void UponDeath(bool wasDeathInstant)
             {
-            GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, 
-                (sender, args) => GlobalServices.World.WorldReturnType = WorldReturnType.LostLife);
             GlobalServices.GameState.AddBang(this.Position, BangType.Long);
             GlobalServices.GameState.AddGrave(this.TilePosition);
+            Messenger.Default.Send(new LifeLost());
             }
 
         public void CrystalCollected(Crystal c)

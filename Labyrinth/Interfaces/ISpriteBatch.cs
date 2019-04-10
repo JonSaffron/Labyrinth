@@ -8,12 +8,15 @@ namespace Labyrinth
     public interface ISpriteBatch : IDisposable  
         {
         /// <summary>
+        /// Gets or sets the offset for the view on the world for relative positioning
+        /// </summary>
+        Vector2 WindowPosition { get; set; }
+        
+        /// <summary>
         /// Begins a drawing batch
         /// </summary>
-        /// <param name="windowPosition">Sets the top-left co-ordinates of the game window's view upon the world</param>
-        void Begin(Vector2 windowPosition);
-
-        void Begin(Vector2 windowPosition, Effect effect);
+        /// <param name="effect">The pixel shader to apply to the batch</param>
+        void Begin(Effect effect = null);
 
         /// <summary>
         /// Signals the end of a drawing batch

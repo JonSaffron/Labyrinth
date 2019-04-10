@@ -8,14 +8,11 @@ namespace Labyrinth
     {
     class InteractionWithStaticItems : IInteraction
         {
-        private readonly World _world;
         private readonly IGameObject _staticItem;
         private readonly IMovingItem _movingItem;
 
-        public InteractionWithStaticItems(World world, IGameObject staticItem, IMovingItem movingItem)
+        public InteractionWithStaticItems(IGameObject staticItem, IMovingItem movingItem)
             {
-            this._world = world ?? throw new ArgumentNullException(nameof(world));
-
             if (staticItem == null)
                 throw new ArgumentNullException(nameof(staticItem));
 
@@ -34,7 +31,7 @@ namespace Labyrinth
 
             if (this._movingItem is Player player)
                 {
-                InteractionInvolvesPlayer(this._world, player, this._staticItem);
+                InteractionInvolvesPlayer(player, this._staticItem);
                 return;
                 }
 
@@ -45,11 +42,11 @@ namespace Labyrinth
                 }
             }
 
-        private static void InteractionInvolvesPlayer(World world, Player player, IGameObject staticItem)
+        private static void InteractionInvolvesPlayer(Player player, IGameObject staticItem)
             {
             if (staticItem is Crystal crystal)
                 {
-                PlayerTakesCrystal(world, player, crystal);
+                PlayerTakesCrystal(player, crystal);
                 return;
                 }
 
@@ -88,7 +85,7 @@ namespace Labyrinth
             fruit.SetTaken();
             }
 
-        private static void PlayerTakesCrystal(World world, Player player, Crystal crystal)
+        private static void PlayerTakesCrystal(Player player, Crystal crystal)
             {
             player.AddEnergy(crystal.Energy);
             var crystalTaken = new CrystalTaken(crystal);
@@ -102,14 +99,7 @@ namespace Labyrinth
                 }
             else
                 {
-                foreach (IMonster monster in GlobalServices.GameState.DistinctItemsOfType<IMonster>())
-                    {
-                    monster.InstantlyExpire();
-                    }
-
-                // todo some graphical effect - original game changed colours
-                GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
-                    (sender, args) => world.WorldReturnType = WorldReturnType.FinishedWorld);
+                Messenger.Default.Send(new WorldCompleted());
                 }
             }
 

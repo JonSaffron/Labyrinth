@@ -3,7 +3,7 @@
     class GameStartParameters
         {
         public int CountOfLives;
-        public string World;
+        public string WorldToLoad;
         public IWorldLoader WorldLoader;
         }
     }

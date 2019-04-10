@@ -135,7 +135,7 @@ namespace Labyrinth.Services.Display
                 Color color = Color.White * TransitionAlpha;
 
                 // Draw the text.
-                spriteBatch.Begin(Vector2.Zero);
+                spriteBatch.Begin();
                 spriteBatch.DrawCentredString(font, message, y, color);
 
                 if (this._loadingMessage != null)

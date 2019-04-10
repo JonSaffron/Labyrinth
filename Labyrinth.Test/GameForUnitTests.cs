@@ -23,7 +23,7 @@ namespace Labyrinth.Test
             {
             var gameStartParameters = new GameStartParameters
                 {
-                World = worldData, 
+                WorldToLoad = worldData, 
                 WorldLoader = new WorldLoaderForTest()
                 };
 

@@ -25,9 +25,9 @@ namespace Labyrinth
         [NotNull] private readonly Player _player;
         [NotNull] private readonly WorldClock _worldClock;
         private readonly Effect _endOfWorldEffect;
-
-        public readonly WorldWindow WorldWindow;
-        public WorldReturnType WorldReturnType = WorldReturnType.Normal;
+        private readonly WorldWindow _worldWindow;
+        private bool _applyEndOfWorldEffect;
+        private WorldReturnType _worldReturnType = WorldReturnType.Normal;
 
         public World([NotNull] IWorldLoader worldLoader, [NotNull] string world)
             {
@@ -55,12 +55,15 @@ namespace Labyrinth
                 this._worldClock.AddEventHandler(replenishFruit);
                 }
 
-            this.WorldWindow = new WorldWindow();
-            GlobalServices.SetCentrePointProvider(this.WorldWindow);
+            this._worldWindow = new WorldWindow();
+            GlobalServices.SetCentrePointProvider(this._worldWindow);
 
             ValidateGameState(gameState);
 
             this._endOfWorldEffect = GlobalServices.Game.Content.Load<Effect>("EndOfWorldFlash");
+
+            Messenger.Default.Register<WorldCompleted>(this, WorldCompleted);
+            Messenger.Default.Register<LifeLost>(this, LostLife);
             }
 
         private void ValidateGameState(GameState gameState)
@@ -117,13 +120,14 @@ namespace Labyrinth
         public void ResetWorldForStartingNewLife()
             {
             Point roomStart = GetContainingRoom(this._player.Position).Location;
-            this.WorldWindow.ResetPosition(new Vector2(roomStart.X, roomStart.Y));
+            this._worldWindow.ResetPosition(new Vector2(roomStart.X, roomStart.Y));
             this._player.Reset();
 
             MoveNearbyMonstersToASafeDistance();
 
             GlobalServices.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
-            this.WorldReturnType = WorldReturnType.Normal;
+            this._worldReturnType = WorldReturnType.Normal;
+            GlobalServices.PlayerInput.Enabled = true;
             }
 
         private void MoveNearbyMonstersToASafeDistance()
@@ -187,12 +191,12 @@ namespace Labyrinth
         /// </summary>
         public WorldReturnType Update(GameTime gameTime)
             {
-            this.WorldWindow.RecalculateWindow(gameTime);
+            this._worldWindow.RecalculateWindow(gameTime);
             this._worldClock.Update(gameTime);
             
             UpdateGameItems(gameTime);
             
-            return this.WorldReturnType;
+            return this._worldReturnType;
             }
 
         private void UpdateGameItems(GameTime gameTime)
@@ -243,13 +247,13 @@ namespace Labyrinth
         /// Builds an interaction object from the two specified game objects
         /// </summary>
         /// <param name="updatedItem">An object that has just moved position</param>
-        /// <param name="thatGameItem">An object whose position overlaps the first object</param>
+        /// <param name="actedUponItem">An object whose position overlaps the first object</param>
         /// <returns>An instance of an interaction object</returns>
-        private IInteraction BuildInteraction(IMovingItem updatedItem, IGameObject thatGameItem)
+        private IInteraction BuildInteraction(IMovingItem updatedItem, IGameObject actedUponItem)
             {
-            var result = thatGameItem is IMovingItem secondMovingItem
+            var result = actedUponItem is IMovingItem secondMovingItem
                 ? (IInteraction) new InteractionWithMovingItems(updatedItem, secondMovingItem)
-                : new InteractionWithStaticItems(this, thatGameItem, updatedItem);
+                : new InteractionWithStaticItems(actedUponItem, updatedItem);
             return result;
             }
 
@@ -281,18 +285,15 @@ namespace Labyrinth
             }
 
         /// <summary>
-        /// Draw everything in the World from background to foreground.
+        /// Draw everything in the WorldToLoad from background to foreground.
         /// </summary>
         public void Draw(GameTime gameTime, [NotNull] ISpriteBatch spriteBatch)
             {
-            // flash should change every 80ms
-            var flashOn = (DateTime.Now.Second % 2) == 0;
-            this._endOfWorldEffect.Parameters["flashOn"].SetValue(flashOn);
-
-            var windowPosition = this.WorldWindow.WindowPosition;
+            var windowPosition = this._worldWindow.WindowPosition;
+            spriteBatch.WindowPosition = this._worldWindow.WindowPosition;
             var tileRectangle = GetRectangleEnclosingTilesThatAreCurrentlyInView(windowPosition);
 
-            spriteBatch.Begin(this.WorldWindow.WindowPosition, this._endOfWorldEffect);
+            spriteBatch.Begin(this._applyEndOfWorldEffect ? this._endOfWorldEffect : null);
             WorldRenderer worldRenderer = new WorldRenderer(tileRectangle, spriteBatch, GlobalServices.SpriteLibrary);
             worldRenderer.RenderFloorTiles(ref this._tiles);
             worldRenderer.RenderWorld(gameTime);
@@ -326,7 +327,7 @@ namespace Labyrinth
             var crystals = GlobalServices.GameState.DistinctItemsOfType<Crystal>().Where(c => this.GetWorldAreaIdForTilePos(c.TilePosition) == currentWorldAreaId);
             foreach (var c in crystals)
                 {
-                var i = new InteractionWithStaticItems(this, c, this._player);
+                var i = new InteractionWithStaticItems(c, this._player);
                 i.Collide();
                 }
             this._player.ResetPositionAndEnergy(newState.Position.ToPosition(), newState.Energy);
@@ -341,7 +342,7 @@ namespace Labyrinth
                     }
                 }
             Point roomStart = GetContainingRoom(this._player.Position).Location;
-            this.WorldWindow.ResetPosition(new Vector2(roomStart.X, roomStart.Y));
+            this._worldWindow.ResetPosition(new Vector2(roomStart.X, roomStart.Y));
             }
 
         private static bool GetFreeTileWithinRoom(TilePos startPos, out TilePos tilePos)
@@ -396,6 +397,53 @@ namespace Labyrinth
             {
             var result = this._tiles[tp.X, tp.Y].WorldAreaId;
             return result;
+            }
+
+        private void LostLife(LifeLost lifeLost)
+            {
+            GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, 
+                (sender, args) => this._worldReturnType = WorldReturnType.LostLife);
+            }
+
+        private void WorldCompleted(WorldCompleted worldCompleted)
+            {
+            foreach (IMonster monster in GlobalServices.GameState.DistinctItemsOfType<IMonster>())
+                {
+                monster.InstantlyExpire();
+                }
+
+            GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
+                (sender, args) => this._worldReturnType = WorldReturnType.FinishedWorld);
+
+            GlobalServices.PlayerInput.Enabled = false;
+
+            GlobalServices.Game.Components.Add(new FlashEffectTimer(this));
+            }
+
+        private class FlashEffectTimer : GameComponent
+            {
+            private double _timeElapsed;
+            private bool _flashState;
+            private const double SecondsToShowEachColour = 0.080d;
+            private readonly World _world;
+
+            public FlashEffectTimer([NotNull] World world) : base(GlobalServices.Game)
+                {
+                this._world = world ?? throw new ArgumentNullException(nameof(world));
+                this._world._applyEndOfWorldEffect = true;
+                }
+
+            public override void Update(GameTime gameTime)
+                {
+                this._timeElapsed += gameTime.ElapsedGameTime.TotalSeconds;
+                while (this._timeElapsed >= SecondsToShowEachColour)
+                    {
+                    this._timeElapsed -= SecondsToShowEachColour;
+                    this._flashState = !this._flashState;
+                    }
+
+                this._world._endOfWorldEffect.Parameters["flashOn"].SetValue(this._flashState);
+                }
             }
         }
     }

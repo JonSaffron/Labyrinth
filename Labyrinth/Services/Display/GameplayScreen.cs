@@ -45,7 +45,7 @@ namespace Labyrinth.Services.Display
                 }
 
             this._headsUpDisplay.LoadContent(this._content);
-            this._world = LoadWorld(this._gameStartParameters.World);
+            this._world = LoadWorld(this._gameStartParameters.WorldToLoad);
             GlobalServices.SetWorld(this._world);
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
@@ -169,21 +169,17 @@ namespace Labyrinth.Services.Display
             if (this._world != null)
                 {
                 this._world.Draw(gameTime, spriteBatch);
-                spriteBatch.Begin(this._world.WorldWindow.WindowPosition);
                 this._headsUpDisplay.DrawStatus(spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, this._scoreKeeper.CurrentScore, this._livesRemaining, this._isGamePaused, gameTime.IsRunningSlowly);
-                spriteBatch.End();
-
-                base.Draw(gameTime);
                 }
 
             // If the game is transitioning on or off, fade it out to black.
-            if (TransitionPosition > 0)
-                ScreenManager.FadeBackBufferToBlack(1f - TransitionAlpha);
+            if (this.TransitionPosition > 0f)
+                this.ScreenManager.FadeBackBufferToBlack(1f - this.TransitionAlpha);
             }
 
         public World LoadWorld(string worldData)
             {
-            // Load the World.
+            // Load the WorldToLoad.
             var world = new World(this._gameStartParameters.WorldLoader, worldData);
             world.ResetWorldForStartingNewLife();
             return world;

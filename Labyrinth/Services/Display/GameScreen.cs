@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
-using System.IO;
 
 namespace Labyrinth.Services.Display
     {
@@ -27,27 +26,27 @@ namespace Labyrinth.Services.Display
         /// Indicates how long the screen takes to
         /// transition on when it is activated.
         /// </summary>
-        public TimeSpan TransitionOnTime { get; protected set; } = TimeSpan.Zero;
+        protected TimeSpan TransitionOnTime { get; set; } = TimeSpan.Zero;
 
         /// <summary>
         /// Indicates how long the screen takes to
         /// transition off when it is deactivated.
         /// </summary>
-        public TimeSpan TransitionOffTime { get; protected set; } = TimeSpan.Zero;
+        protected TimeSpan TransitionOffTime { get; set; } = TimeSpan.Zero;
 
         /// <summary>
         /// Gets the current position of the screen transition, ranging
         /// from zero (fully active, no transition) to one (transitioned
         /// fully off to nothing).
         /// </summary>
-        public float TransitionPosition { get; protected set; } = 1;
+        protected float TransitionPosition { get; set; } = 1;
 
         /// <summary>
         /// Gets the current alpha of the screen transition, ranging
         /// from 1 (fully active, no transition) to 0 (transitioned
         /// fully off to nothing).
         /// </summary>
-        public float TransitionAlpha => 1f - TransitionPosition;
+        protected float TransitionAlpha => 1f - TransitionPosition;
 
         /// <summary>
         /// Gets the current screen transition state.
@@ -212,23 +211,7 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// This is called when the screen should draw itself.
         /// </summary>
-        public virtual void Draw(GameTime gameTime)
-            {
-            }
-
-        /// <summary>
-        /// Tells the screen to serialise its state into the given stream.
-        /// </summary>
-        public virtual void Serialise(Stream stream)
-            {
-            }
-
-        /// <summary>
-        /// Tells the screen to deserialise its state from the given stream.
-        /// </summary>
-        public virtual void Deserialise(Stream stream)
-            {
-            }
+        public abstract void Draw(GameTime gameTime);
 
         /// <summary>
         /// Tells the screen to go away. Unlike ScreenManager.RemoveScreen, which

@@ -13,6 +13,8 @@ namespace Labyrinth.Services.Input
         private Direction _previousRequestedDirectionOfMovement;
         private static readonly List<DirectionForKey> KeysList = BuildKeys();
 
+        public bool Enabled { get; set; }
+
         public PlayerInput([NotNull] InputState inputState)
             {
             this._inputState = inputState ?? throw new ArgumentNullException(nameof(inputState));
@@ -23,6 +25,11 @@ namespace Labyrinth.Services.Input
         /// </summary>
         public PlayerControl Update()
             {
+            if (!this.Enabled)
+                {
+                return PlayerControl.NoAction;
+                }
+
             return new PlayerControl(
                 GetDirection(this._inputState),
                 this._inputState.IsKeyCurrentlyPressed(Keys.LeftControl) ? (this._inputState.WasKeyPressed(Keys.LeftControl) ? FiringState.Continuous : FiringState.Pulse) : FiringState.None,

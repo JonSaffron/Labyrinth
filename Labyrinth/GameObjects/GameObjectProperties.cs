@@ -1,4 +1,5 @@
-﻿using Labyrinth.DataStructures;
+﻿using System;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects
     {
@@ -31,6 +32,14 @@ namespace Labyrinth.GameObjects
         /// Indicates whether the player scores for killing the monster
         /// </summary>
         public static readonly PropertyDef<bool> MonsterScoresWhenKilled = new PropertyDef<bool>(nameof(MonsterScoresWhenKilled), false);
+
+        public static readonly PropertyDef<bool> DeadlyToPlayer = new PropertyDef<bool>(nameof(DeadlyToPlayer), false);
+
+        public static readonly PropertyDef<Func<Player, int>> InjuriousToPlayer = new PropertyDef<Func<Player, int>>(nameof(InjuriousToPlayer), player => 0);
+
+        public static readonly PropertyDef<Func<Player, int>> CurativeToPlayer = new PropertyDef<Func<Player, int>>(nameof(CurativeToPlayer), player => 0);
+
+
 
         // todo effect of forcefield on player
         // todo filter for gameobject solidity

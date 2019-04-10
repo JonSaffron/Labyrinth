@@ -6,12 +6,14 @@ namespace Labyrinth.Services.Display
     public abstract class SpriteBatchBase : ISpriteBatch
         {
         private readonly Texture2D _pointTexture;
-        private Vector2 _windowPosition;
         protected float Zoom;
         protected int ScreenCentreWidth;
 
         protected SpriteBatch SpriteBatch { get; }
         
+        /// <inheritdoc />
+        public Vector2 WindowPosition { get; set; }
+
         protected SpriteBatchBase(GraphicsDevice graphicsDevice)
             {
             this.SpriteBatch = new SpriteBatch(graphicsDevice);
@@ -20,15 +22,8 @@ namespace Labyrinth.Services.Display
             }
 
         /// <inheritdoc />
-        public virtual void Begin(Vector2 windowPosition)
+        public void Begin(Effect effect = null)
             {
-            this._windowPosition = windowPosition;
-            this.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            }
-
-        public void Begin(Vector2 windowPosition, Effect effect)
-            {
-            this._windowPosition = windowPosition;
             this.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, effect);
             }
 
@@ -47,9 +42,10 @@ namespace Labyrinth.Services.Display
                 }
             }
 
+        /// <inheritdoc />
         public void DrawTexture(DrawParameters drawParameters)
             {
-            var absolutePosition = drawParameters.Position - this._windowPosition;
+            var absolutePosition = drawParameters.Position - this.WindowPosition;
             this.DrawTexture(drawParameters.Texture, absolutePosition, drawParameters.AreaWithinTexture, drawParameters.Opacity, drawParameters.Rotation, drawParameters.Centre, drawParameters.Effects);
             }
 

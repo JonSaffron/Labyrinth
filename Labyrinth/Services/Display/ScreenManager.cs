@@ -247,7 +247,7 @@ namespace Labyrinth.Services.Display
             Viewport viewport = GraphicsDevice.Viewport;
             var r = new Rectangle(0, 0, viewport.Width, viewport.Height);
 
-            this.SpriteBatch.Begin(Vector2.Zero);
+            this.SpriteBatch.Begin();
             SpriteBatch.DrawRectangle(r, Color.Black * alpha);
             SpriteBatch.End();
             }

@@ -16,7 +16,7 @@ namespace Labyrinth.DataStructures
         /// </remarks>
         public string Name { get; }
 
-        // Factory method used to provide a default value when a propertybag
+        // Factory method used to provide a default value when a PropertyBag
         // does not contain data for this property
         private readonly Func<T> _createDefaultValueFunc;
 
@@ -24,7 +24,7 @@ namespace Labyrinth.DataStructures
         /// Constructs a new property definition with a constant default value
         /// </summary>
         /// <param name="name">The name of this property</param>
-        /// <param name="defaultValue">The value which will be returned if the propertybag does not contain an entry for this property.</param>
+        /// <param name="defaultValue">The value which will be returned if the PropertyBag does not contain an entry for this property.</param>
         /// <remarks>
         /// Use this constructor if the default value is a constant or a value type.
         /// </remarks>
@@ -41,7 +41,7 @@ namespace Labyrinth.DataStructures
         /// <param name="createDefaultValueFunc"></param>
         /// <remarks>
         /// Use this constructor if the default value is a reference type, and you
-        /// do not want to share the same instance in multiple propertybags.  
+        /// do not want to share the same instance in multiple PropertyBags.  
         /// </remarks>
         public PropertyDef(string name, Func<T> createDefaultValueFunc)
             {

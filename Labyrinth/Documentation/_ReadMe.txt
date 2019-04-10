@@ -22,3 +22,6 @@ https://gmjosack.github.io/posts/my-first-2d-pixel-shaders-part-1/
 
 XNA blog by Shawn Hargreaves
 http://www.shawnhargreaves.com/blogindex.html
+
+To sync the solution explorer with the active document
+Shift-Alt-L
