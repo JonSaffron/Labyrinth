@@ -151,6 +151,17 @@ namespace Labyrinth.DataStructures
             var result = new TileRect(topLeft, diameter, diameter);
             return result;
             }
+
+        /// <summary>Calculates the squared distance between two TilePos instances.</summary>
+        /// <param name="value1">First TilePos.</param>
+        /// <param name="value2">Second TilePos.</param>
+        public static float DistanceSquared(TilePos value1, TilePos value2)
+            {
+            int num1 = value1.X - value2.X;
+            int num2 = value1.Y - value2.Y;
+            return num1*num1 + num2*num2;
+            }
+
 /*
         /// <summary>
         /// Returns the Morton Code for this instance

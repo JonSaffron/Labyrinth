@@ -6,6 +6,7 @@ namespace Labyrinth.GameObjects.Motility
         {
         protected Direction CurrentDirection { get; private set; }
 
+        [UsedImplicitly]
         public StandardRolling([NotNull] Monster monster) : base(monster)
             {
             }
@@ -15,24 +16,21 @@ namespace Labyrinth.GameObjects.Motility
             this.CurrentDirection = initialDirection;
             }
 
-        public override Direction DetermineDirection()
+        protected override Direction DetermineDirection()
             {
-            if (this.Monster.ChangeRooms == ChangeRooms.FollowsPlayer 
-                && !MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster) 
-                && MonsterMovement.IsPlayerNearby(this.Monster))
+            if (this.CurrentDirection == Direction.None)
                 {
-                var pursuitResult = CautiousPursuit.MoveTowardsPlayer(this.Monster);
-                return pursuitResult;
+                return ShouldMonsterFollowPlayerIntoAnotherRoom() 
+                    ? this.Monster.DetermineDirectionTowardsPlayer()
+                    : MonsterMovement.RandomDirection();
                 }
 
-            if (this.CurrentDirection == Direction.None)
-                this.CurrentDirection = MonsterMovement.RandomDirection();
-
-            bool changeDirection = GlobalServices.Randomness.Test(7);
-            if (changeDirection)
+            bool shouldChangeDirection = GlobalServices.Randomness.Test(7);
+            if (shouldChangeDirection)
                 {
-                var result = MonsterMovement.AlterDirection(this.CurrentDirection);
-                return result;
+                return ShouldMonsterFollowPlayerIntoAnotherRoom() 
+                    ? this.Monster.DetermineDirectionTowardsPlayer()
+                    : MonsterMovement.AlterDirectionByVeeringAway(this.CurrentDirection);
                 }
 
             if (this.Monster.CanMoveInDirection(this.CurrentDirection))
@@ -42,10 +40,20 @@ namespace Labyrinth.GameObjects.Motility
             return reversed;
             }
 
+        private bool ShouldMonsterFollowPlayerIntoAnotherRoom()
+            {
+            bool shouldMonsterFollowPlayerIntoAnotherRoom =
+                this.Monster.ChangeRooms == ChangeRooms.FollowsPlayer
+                && !MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster)
+                && MonsterMovement.IsPlayerNearby(this.Monster);
+            return shouldMonsterFollowPlayerIntoAnotherRoom;
+            }
+
         public override bool SetDirectionAndDestination()
             {
             Direction direction = DetermineDirection();
-            direction = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, direction);
+            this.Monster.ConfirmDirectionToMoveIn(direction, out Direction feasibleDirection);
+            direction = feasibleDirection;
 
             if (direction == Direction.None)
                 {

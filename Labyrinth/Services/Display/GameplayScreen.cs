@@ -13,7 +13,7 @@ namespace Labyrinth.Services.Display
     class GameplayScreen : GameScreen
         {
         private readonly GameStartParameters _gameStartParameters;
-        private ContentManager _content;
+        private readonly ContentManager _content;
         private bool _isGamePaused;
         [NotNull] private readonly IScoreKeeper _scoreKeeper;
         private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();

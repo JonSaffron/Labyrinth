@@ -34,7 +34,7 @@ namespace Labyrinth.GameObjects.Motility
             this._attachment = AttachmentToWall.FollowWallOnLeft;
             }
 
-        public override Direction DetermineDirection()
+        protected override Direction DetermineDirection()
             {
             Direction result;
 

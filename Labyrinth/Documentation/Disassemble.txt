@@ -1759,7 +1759,7 @@ static object injured (b)
 1A14 BD 03 0C  LDA 0C03,X               
 1A17 D0 FA     BNE 1A13                 
 1A19 BD 0F 0C  LDA 0C0F,X               -- get movement type
-1A1C 29 0F     AND #0F                  
+1A1C 29 0F     AND #0F                  -- mask to get only the lower bits which identify the current type of movement
 1A1E F0 F3     BEQ 1A13                 -- if zero (static), then return
 
 1A20 C9 01     CMP #01                  
@@ -1768,10 +1768,10 @@ static object injured (b)
 		-- 81 full chase
 
 1A24 20 5F 1A  JSR 1A5F                 -- determine which direction in order to get closer to player
-1A27 20 90 1C  JSR 1C90                 -- combine x & y to tile number
-1A2A CD 01 0C  CMP 0C01                 -- compare to player's tile number
-1A2D D0 E4     BNE 1A13                 -- not equal, so return
-1A2F 4C EE 1A  JMP 1AEE                 -- alter direction by right angle
+1A27 20 90 1C  JSR 1C90                 -- combine column/x & row/y in &85 and &86 to tile number
+1A2A CD 01 0C  CMP 0C01                 -- compare the potential tile number to player's current tile number
+1A2D D0 E4     BNE 1A13                 -- not equal, so direction confirmed: return
+1A2F 4C EE 1A  JMP 1AEE                 -- alter direction by right angle, and test movement before returning
 
 1A32 C9 02     CMP #02                  
 1A34 D0 12     BNE 1A48                 
@@ -1799,26 +1799,34 @@ static object injured (b)
 1A56 D0 4B     BNE 1AA3                 
 
 		-- 84 cautious in pursuit
+		-- falls through into basic pursuit routine
 
 1A58 20 80 1E  JSR 1E80                 -- get random number
 1A5B 29 07     AND #07                  -- first 3 bits (result = 0 to 7)
 1A5D F0 ED     BEQ 1A4C                 -- if zero, then jump to random direction
 
+		-- subroutine for determining the direction that brings the monster closer to the player
+		-- on entry, X identifies the animation slot
+		-- on exit, 0C04,X will contain the direction to move in (or 4 if no move possible)
+		--			&85 contains what would be the new column/x, &86 contains what would be the new row/y
+
 1A5F BD 01 0C  LDA 0C01,X               -- get monster's current tile number
 1A62 20 83 1C  JSR 1C83                 -- put column/x into &85, row/y into &86
+
+		-- check horizontal difference in position first
+
 1A65 AD 01 0C  LDA 0C01                 -- get player's current tile
 1A68 29 0F     AND #0F                  -- extract just the column/x
 1A6A 38        SEC                      
 1A6B E5 85     SBC 85                   -- subtract monster column/x
-1A6D F0 1C     BEQ 1A8B                 -- if equal then branch
-
+1A6D F0 1C     BEQ 1A8B                 -- if equal then branch to look at vertical difference instead
 1A6F A9 00     LDA #00                  -- default direction is left
 1A71 90 02     BCC 1A75                 -- subtraction led to a minus number, so keep left as the result
 1A73 A9 01     LDA #01                  -- direction is actually right
-1A75 9D 04 0C  STA 0C04,X               -- store new direction
-1A78 20 EE 1C  JSR 1CEE                 -- get contents of what would be the new position
+1A75 9D 04 0C  STA 0C04,X               -- store new left or right direction
+1A78 20 EE 1C  JSR 1CEE                 -- get contents of what would be the new position for the monster
 1A7B C9 20     CMP #20                  
-1A7D 90 0C     BCC 1A8B                 -- less then 20 is a wall, in which case branch to look at row/y
+1A7D 90 0C     BCC 1A8B                 -- less then 20 is a wall, in which case branch to look at vertical difference instead
 1A7F B0 1F     BCS 1AA0                 -- jump to test and update routine
 1A81 EA        NOP                      
 1A82 EA        NOP                      
@@ -1830,6 +1838,8 @@ static object injured (b)
 1A88 EA        NOP                      
 1A89 EA        NOP                      
 1A8A EA        NOP                      
+
+		-- check vertical difference in position second
 
 1A8B AD 01 0C  LDA 0C01                 -- get player's current tile
 1A8E 29 F0     AND #F0                  -- extract just the row/y
@@ -1895,30 +1905,39 @@ static object injured (b)
 1AEB 4C 36 1A  JMP 1A36                 -- jump to patrol routine
 
 		-- alter direction left->up, right->down, up->left, down->right
+		-- fall through to confirm and update move to something possible
 
 1AEE BD 04 0C  LDA 0C04,X               
 1AF1 49 02     EOR #02                  
-1AF3 9D 04 0C  STA 0C04,X               
 
 		-- test if move is possible, update to next if not
+		-- on entry, X identifies the animation slot
+		--			 A identifies the intended direction
+		-- on exit, 0C04,X will be updated with a possible direction or 4 if no direction possible
+		-- effectively, a monster will not move into a wall or the boulder
+
+1AF3 9D 04 0C  STA 0C04,X               
+
+		-- alternative entry point
 
 1AF6 BD 04 0C  LDA 0C04,X               -- get direction of travel
-1AF9 85 71     STA 71                   
+1AF9 85 71     STA 71                   -- store the current direction
 
-1AFB 9D 04 0C  STA 0C04,X				
-1AFE BD 01 0C  LDA 0C01,X               -- get current tile position
+1AFB 9D 04 0C  STA 0C04,X				-- loop start - store the current direction being examined
+1AFE BD 01 0C  LDA 0C01,X               -- get subject's current tile position
 1B01 20 EB 1C  JSR 1CEB                 -- get contents of new tile position
 1B04 85 89     STA 89                   
-1B06 C9 1F     CMP #1F                  -- out of range?
-1B08 F0 04     BEQ 1B0E                 -- yes, so branch
+1B06 C9 1F     CMP #1F                  -- #1F is the off-screen status value
+1B08 F0 04     BEQ 1B0E                 -- if offscreen then no move possible, branch to increment loop
 1B0A C9 14     CMP #14                  
-1B0C B0 10     BCS 1B1E                 -- 14 or more, RTS
-1B0E BC 04 0C  LDY 0C04,X               -- get direction
-1B11 C8        INY                      -- increment
+1B0C B0 10     BCS 1B1E                 -- 14 or more means we can move so RTS
+1B0E BC 04 0C  LDY 0C04,X               -- get current direction
+1B11 C8        INY                      -- increment direction (order is left, right, up, down)
 1B12 98        TYA                      
-1B13 29 03     AND #03                  -- direction 0 to 3
-1B15 C5 71     CMP 71                   -- back at 1st selected direction?
-1B17 D0 E2     BNE 1AFB                 -- loop
+1B13 29 03     AND #03                  -- keep direction to 0 to 3
+1B15 C5 71     CMP 71                   -- are we back at the originally selected direction?
+1B17 D0 E2     BNE 1AFB                 -- loop back round to examine the next direction
+
 1B19 A9 04     LDA #04                  
 1B1B 9D 04 0C  STA 0C04,X               -- store direction 4 (static) as direction
 1B1E 60        RTS                      
@@ -2143,7 +2162,8 @@ static object injured (b)
 1C80 E6 86     INC 86                   
 1C82 60        RTS                      
 
-		-- separate out tile position, low nibble to &85 (columm), high nibble to &86 (row)
+		-- separate out tile position, low nibble to &85 (columm/x), high nibble to &86 (row/y)
+		-- on entry A is the tile position
 		
 1C83 48        PHA                      
 1C84 29 0F     AND #0F                  
@@ -2228,12 +2248,21 @@ static object injured (b)
 1CE8 4C 23 1C  JMP 1C23                 -- calculate sprite index
 
 		-- get contents of tile according to direction
+		-- on entry, X is the animation slot
+		--			 A is the current tile number
+		-- on exit, returns the tile contents in A
+		--          the new column/x will be in &85, the new row/y will be in &86
 
-1CEB 20 83 1C  JSR 1C83                 -- seperate out into row and position
+1CEB 20 83 1C  JSR 1C83                 -- put column/x into &85, row/y into &86
+
+		-- alternative entry point
+
 1CEE BD 04 0C  LDA 0C04,X               -- get direction of travel
 
-1CF1 20 67 1C  JSR 1C67                 -- adjust row & column according to direction A
-1CF4 20 90 1C  JSR 1C90                 -- combine row & column
+		-- alternative entry point
+
+1CF1 20 67 1C  JSR 1C67                 -- adjust row in &86 and column in &85 according to direction A
+1CF4 20 90 1C  JSR 1C90                 -- combine row & column in &85/&86 into A
 1CF7 A8        TAY                      
 1CF8 B9 00 0B  LDA 0B00,Y               -- get the contents of the tile
 1CFB A4 85     LDY 85                   -- get column
@@ -2246,7 +2275,7 @@ static object injured (b)
 1D09 B0 01     BCS 1D0C                 -- 10 or more than branch
 1D0B 60        RTS                      
 
-1D0C A9 1F     LDA #1F                  -- return 
+1D0C A9 1F     LDA #1F                  -- return value indicating off-screen
 1D0E 60        RTS                      
 
 		-- initialise monster slot

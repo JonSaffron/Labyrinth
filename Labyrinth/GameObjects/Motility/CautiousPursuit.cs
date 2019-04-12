@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace Labyrinth.GameObjects.Motility
     {
@@ -8,14 +9,12 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        private Direction _currentDirection;
-
-        public override Direction DetermineDirection()
+        protected override Direction DetermineDirection()
             {
-            var result = IsScaredOfPlayer(this.Monster) 
-                    ? MoveAwayFromPlayer(this.Monster) 
-                    : MoveTowardsPlayer(this.Monster);
-            return result;
+            var method = IsScaredOfPlayer(this.Monster) 
+                ? (Func<Monster, Direction>) MoveAwayFromPlayer 
+                                           : MoveTowardsPlayer;
+            return method(this.Monster);
             }
 
         private static bool IsScaredOfPlayer(Monster m)
@@ -25,42 +24,26 @@ namespace Labyrinth.GameObjects.Motility
             return result;
             }
 
-        private Direction MoveAwayFromPlayer(Monster monster)
-            {
-            var towardsPlayer = MonsterMovement.DetermineDirectionTowardsPlayer(monster);
-            bool alterDirection = GlobalServices.Randomness.Test(3);
-            Direction result = !alterDirection || this._currentDirection == Direction.None
-                ? towardsPlayer.Reversed() 
-                : MonsterMovement.AlterDirection(this._currentDirection);
-            return result;
-            }
-
         public static Direction MoveTowardsPlayer(Monster monster)
             {
-            bool alterDirection = GlobalServices.Randomness.Test(7);
-            Direction result = alterDirection 
+            bool shouldMoveRandomly = GlobalServices.Randomness.Test(7);
+            Direction result = shouldMoveRandomly
                 ? MonsterMovement.RandomDirection() 
-                : MonsterMovement.DetermineDirectionTowardsPlayer(monster);
+                : monster.DetermineDirectionTowardsPlayer();
             return result;
             }
 
-        public override bool SetDirectionAndDestination()
+        private static Direction MoveAwayFromPlayer(Monster monster)
             {
-            Direction direction = DetermineDirection();
-            if (direction != Direction.None)
+            var awayFromPlayer = monster.DetermineDirectionAwayFromPlayer();
+            bool shouldDodgeWhilstFleeing = GlobalServices.Randomness.Test(3);
+            if (shouldDodgeWhilstFleeing)
                 {
-                direction = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, direction);
+                var alteredDirection = MonsterMovement.AlterDirectionByVeeringAway(awayFromPlayer);
+                return alteredDirection;
                 }
-
-            if (direction == Direction.None)
-                {
-                this.Monster.StandStill();
-                return false;
-                }
-
-            this.Monster.Move(direction, this.Monster.CurrentSpeed);
-            this._currentDirection = direction;
-            return true;
+            
+            return awayFromPlayer;
             }
         }
     }

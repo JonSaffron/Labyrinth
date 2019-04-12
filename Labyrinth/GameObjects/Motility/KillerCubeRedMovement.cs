@@ -39,7 +39,7 @@ namespace Labyrinth.GameObjects.Motility
             return newDirection;
             }
 
-        public override Direction DetermineDirection()
+        protected override Direction DetermineDirection()
             {
             var result = 
                 ShouldMakeAnAggressiveMove(this.Monster)

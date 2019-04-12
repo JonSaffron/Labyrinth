@@ -8,7 +8,7 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        public override Direction DetermineDirection()
+        protected override Direction DetermineDirection()
             {
             if (this.Monster.ChangeRooms == ChangeRooms.FollowsPlayer 
                 && !MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster) 

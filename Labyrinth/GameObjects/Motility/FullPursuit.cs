@@ -3,24 +3,30 @@ using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
+    [UsedImplicitly]
     class FullPursuit : MonsterMotionBase
         {
+        // Determine which direction gets closer to player
+        // Horizontal movement is preferred, but if the move isn't possible or the monster is already
+        // on the same column as the player then vertical movement will be tried.
+        // 
         public FullPursuit([NotNull] Monster monster) : base(monster)
             {
             }
 
-        public override Direction DetermineDirection()
+        protected override Direction DetermineDirection()
             {
-            Direction intendedDirection = MonsterMovement.DetermineDirectionTowardsPlayer(this.Monster);
-            var alternativeDirectionWhenBlocked = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, intendedDirection);
-            if (alternativeDirectionWhenBlocked == Direction.None || alternativeDirectionWhenBlocked != intendedDirection)
-                return alternativeDirectionWhenBlocked;
+            Direction directionTowardsPlayer = this.Monster.DetermineDirectionTowardsPlayer();
+            bool canMoveTowardsPlayer = this.Monster.ConfirmDirectionToMoveIn(directionTowardsPlayer, out Direction feasibleDirection);
+            if (!canMoveTowardsPlayer || feasibleDirection == Direction.None)
+                return feasibleDirection;
 
-            TilePos potentiallyMovingTowards = this.Monster.TilePosition.GetPositionAfterOneMove(intendedDirection);
-            if (potentiallyMovingTowards == GlobalServices.GameState.Player.TilePosition)
-                intendedDirection = MonsterMovement.AlterDirection(intendedDirection);
+            TilePos potentiallyMovingTowards = this.Monster.TilePosition.GetPositionAfterOneMove(directionTowardsPlayer);
+            if (potentiallyMovingTowards != GlobalServices.GameState.Player.TilePosition)
+                return directionTowardsPlayer;
 
-            var result = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, intendedDirection);
+            var directionAwayFromPlayer = MonsterMovement.AlterDirectionByVeeringAway(feasibleDirection);
+            this.Monster.ConfirmDirectionToMoveIn(directionAwayFromPlayer, out Direction result);
             return result;
             }
 

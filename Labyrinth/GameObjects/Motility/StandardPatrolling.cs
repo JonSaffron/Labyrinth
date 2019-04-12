@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace Labyrinth.GameObjects.Motility
     {
+    [UsedImplicitly]
     class StandardPatrolling : MonsterMotionBase
         {
         private Direction _currentDirection;
@@ -14,7 +15,7 @@ namespace Labyrinth.GameObjects.Motility
             this._currentDirection = initialDirection;
             }
 
-        public override Direction DetermineDirection()
+        protected override Direction DetermineDirection()
             {
             if (this.Monster.CanMoveInDirection(this._currentDirection))
                 return this._currentDirection;

@@ -13,7 +13,7 @@ namespace Labyrinth.GameObjects.Motility
             this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
-        public virtual Direction DetermineDirection()
+        protected virtual Direction DetermineDirection()
             {
             return Direction.None;
             }
@@ -23,7 +23,8 @@ namespace Labyrinth.GameObjects.Motility
             Direction direction = DetermineDirection();
             if (direction != Direction.None)
                 {
-                direction = MonsterMovement.UpdateDirectionWhereMovementBlocked(this.Monster, direction);
+                this.Monster.ConfirmDirectionToMoveIn(direction, out Direction feasibleDirection);
+                direction = feasibleDirection;
                 }
 
             if (direction == Direction.None)
