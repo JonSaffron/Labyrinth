@@ -149,7 +149,7 @@
     <Compile Include="GameObjects\Motility\PatrolPerimeter.cs" />
     <Compile Include="GameObjects\Motility\Stationary.cs" />
     <Compile Include="GameObjects\MovementChecker.cs" />
-    <Compile Include="GameObjects\MovementOfAnother.cs" />
+    <Compile Include="GameObjects\MovementCheckerForMonsters.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
@@ -167,6 +167,7 @@
     <Compile Include="Interfaces\IGameObject.cs" />
     <Compile Include="Interfaces\IMonster.cs" />
     <Compile Include="Interfaces\IMonsterMovement.cs" />
+    <Compile Include="Interfaces\IMovementChecker.cs" />
     <Compile Include="Interfaces\IMovingItem.cs" />
     <Compile Include="Interfaces\IPlayer.cs" />
     <Compile Include="Interfaces\IRandomness.cs" />

@@ -1,27 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects
     {
-    public class MovementChecker
+    public class MovementChecker : IMovementChecker
         {
-        protected readonly IMovingItem Source;
-
-        public MovementChecker([NotNull] IMovingItem source)
+        public bool CanMove(IMovingItem source, Direction direction)
             {
-            this.Source = source ?? throw new ArgumentNullException(nameof(source));
-            }
-
-        public bool CanMove(Direction direction)
-            {
-            bool canCauseBounceBack = this.Source.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
-            var result = CanMove(this.Source, direction, canCauseBounceBack);
+            if (source == null) 
+                throw new ArgumentNullException(nameof(source));
+            bool canCauseBounceBack = source.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
+            var result = CanMove(source, direction, canCauseBounceBack);
             return result;
             }
 
-        private static bool CanMove(IMovingItem objectToCheck, Direction direction, bool isBounceBackPossible)
+        /// <summary>
+        /// Initiates a push or bounce involving this object
+        /// </summary>
+        /// <param name="initiatingObject">The object that is starting a push/bounce</param>
+        /// <param name="moveableObject">The object that is potentially being moved</param>
+        /// <param name="direction">The direction that the specified object is directing this object</param>
+        public void PushOrBounce(IMovingItem initiatingObject, IMovingItem moveableObject, Direction direction)
+            {
+            bool canCauseBounceBack = initiatingObject.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
+            var ps = CanBePushedOrBounced(moveableObject, initiatingObject, direction, canCauseBounceBack);
+            switch (ps)
+                {
+                case PushStatus.Yes:
+                    {
+                    moveableObject.Move(direction, Constants.PushSpeed);
+                    return;
+                    }
+
+                case PushStatus.Bounce:
+                    {
+                    var reverseDirection = direction.Reversed();
+                    moveableObject.Move(reverseDirection, Constants.BounceBackSpeed);
+                    initiatingObject.BounceBack(reverseDirection, Constants.BounceBackSpeed);
+                    initiatingObject.PlaySound(GameSound.BoulderBounces);
+                    return;
+                    }
+
+                case PushStatus.No:
+                    {
+                    return;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+                }
+            }
+
+        private bool CanMove(IMovingItem objectToCheck, Direction direction, bool isBounceBackPossible)
             {
             if (objectToCheck.MovementBoundary == null)
                 {
@@ -39,42 +70,48 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private static bool CanObjectOccupySameTile(IMovingItem gameObject, IEnumerable<IGameObject> objectsOnTile, Direction direction, bool isBounceBackPossible)
+        private bool CanObjectOccupySameTile(IMovingItem gameObject, IEnumerable<IGameObject> objectsOnTile, Direction direction, bool isBounceBackPossible)
             {
             foreach (var item in objectsOnTile)
                 {
-                var solidity = item.Properties.Get(GameObjectProperties.Solidity);
-                switch (solidity)
-                    {
-                    case ObjectSolidity.Stationary:
-                    case ObjectSolidity.Insubstantial:
-                        // neither of these will stop this object moving onto the same tile
-                        continue;
-
-                    case ObjectSolidity.Impassable:
-                        // the target tile is already occupied and this object cannot move onto it
-                        return false;
-
-                    case ObjectSolidity.Moveable:
-                        {
-                        if (!(item is MovingItem mi))
-                            // There shouldn't be any Moveable objects that are not MovingItems as that would be a contradiction
-                            return false;
-                        var canMove = CanBePushedOrBounced(mi, gameObject, direction, isBounceBackPossible);
-                        if (canMove == PushStatus.Yes || canMove == PushStatus.Bounce)
-                            continue;
-                        return false;
-                        }
-
-                    default:
-                        throw new InvalidOperationException();
-                    }
+                if (!CanObjectOccupySameTile(gameObject, item, direction, isBounceBackPossible))
+                    return false;
                 }
 
             return true;
             }
 
-        protected static PushStatus CanBePushedOrBounced(IMovingItem toBeMoved, IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
+        protected virtual bool CanObjectOccupySameTile(IMovingItem gameObject, IGameObject objectAlreadyOnTile, Direction direction, bool isBounceBackPossible)
+            {
+            var solidity = objectAlreadyOnTile.Properties.Get(GameObjectProperties.Solidity);
+            switch (solidity)
+                {
+                case ObjectSolidity.Stationary:
+                case ObjectSolidity.Insubstantial:
+                    // neither of these will stop this object moving onto the same tile
+                    return true;
+
+                case ObjectSolidity.Impassable:
+                    // the target tile is already occupied and this object cannot move onto it
+                    return false;
+
+                case ObjectSolidity.Moveable:
+                    {
+                    if (!(objectAlreadyOnTile is MovingItem moveableItem))
+                        // There shouldn't be any Moveable objects that are not MovingItems as that would be a contradiction
+                        return false;
+                    var canMove = CanBePushedOrBounced(moveableItem, gameObject, direction, isBounceBackPossible);
+                    if (canMove == PushStatus.Yes || canMove == PushStatus.Bounce)
+                        return true;
+                    return false;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+                }
+            }
+
+        protected PushStatus CanBePushedOrBounced(IMovingItem toBeMoved, IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
             {
             // if this object is not moveable then the answer's no
             if (toBeMoved.Properties.Get(GameObjectProperties.Solidity) != ObjectSolidity.Moveable)

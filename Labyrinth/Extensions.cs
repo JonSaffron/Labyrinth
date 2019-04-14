@@ -139,15 +139,15 @@ namespace Labyrinth
 
         public static bool CanMoveInDirection(this IMovingItem gameObject, Direction direction)
             {
-            var mc = new MovementChecker(gameObject);
-            var result = mc.CanMove(direction);
+            IMovementChecker mc = gameObject.Properties.Get(GameObjectProperties.MovementChecker);
+            var result = mc.CanMove(gameObject, direction);
             return result;
             }
 
         public static void PushOrBounce(this IMovingItem objectDoingThePushing, IMovingItem objectBeingPushed, Direction direction)
             {
-            var moa = new MovementOfAnother(objectDoingThePushing);
-            moa.PushOrBounce(objectBeingPushed, direction);
+            IMovementChecker mc = objectDoingThePushing.Properties.Get(GameObjectProperties.MovementChecker);
+            mc.PushOrBounce(objectDoingThePushing, objectBeingPushed, direction);
             }
 
         [NotNull]

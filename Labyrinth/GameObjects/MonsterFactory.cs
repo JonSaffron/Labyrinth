@@ -14,6 +14,7 @@ namespace Labyrinth.GameObjects
     class MonsterFactory
         {
         private static readonly Dictionary<string, Breed> Breeds = BuildBreedDefinitions();
+        private static readonly MovementCheckerForMonsters MovementCheckerForMonsters = new MovementCheckerForMonsters();
 
         public IMonster BuildMonster(MonsterDef monsterDef)
             {
@@ -92,7 +93,8 @@ namespace Labyrinth.GameObjects
                 }
 
             result.SetMonsterMotion();
-            
+            result.Properties.Set(GameObjectProperties.MovementChecker, MovementCheckerForMonsters);
+
             return result;
             }
 
