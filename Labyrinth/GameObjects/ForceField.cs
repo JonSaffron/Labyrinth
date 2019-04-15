@@ -16,11 +16,10 @@ namespace Labyrinth.GameObjects
             this._animationPlayer = new LoopedAnimation(this, "Sprites/Props/ForceField", 6);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Reflection);
             this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.ForceField);
+            this.Properties.Set(GameObjectProperties.DeadlyToTouch, true);
             }
 
         public override bool IsExtant => this._forceFieldState.IsExtent;
-
-        public bool IsActive => this._forceFieldState is ActiveState;
 
         public override IRenderAnimation RenderAnimation => this._animationPlayer;
 
@@ -66,7 +65,6 @@ namespace Labyrinth.GameObjects
             {
             public NeutralisedState(ForceField forceField) : base(forceField)
                 {
-                this.ForceField.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
                 }
 
             public override void Update(GameTime gameTime)
@@ -84,6 +82,7 @@ namespace Labyrinth.GameObjects
             {
             private const float FadeTime = 2f;
             private double _fadeRemaining;
+            private bool _forceFieldDisabled;
 
             public FadingState(ForceField forceField) : base(forceField)
                 {
@@ -96,7 +95,15 @@ namespace Labyrinth.GameObjects
                 this._fadeRemaining -= gameTime.ElapsedGameTime.TotalSeconds;
                 if (this._fadeRemaining > 0)
                     {
-                    this.ForceField._animationPlayer.Opacity = (float) (this._fadeRemaining / FadeTime);
+                    float fadePercentRemaining = (float) (this._fadeRemaining / FadeTime);
+                    this.ForceField._animationPlayer.Opacity = fadePercentRemaining;
+
+                    if (!this._forceFieldDisabled && fadePercentRemaining < 0.5f)
+                        {
+                        this.ForceField.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
+                        this.ForceField.Properties.Set(GameObjectProperties.DeadlyToTouch, false);
+                        this._forceFieldDisabled = true;
+                        }
                     }
                 else
                     {

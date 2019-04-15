@@ -29,6 +29,12 @@ namespace Labyrinth
             if (!this._movingItem.IsExtant || !this._staticItem.IsExtant)
                 return;
 
+            if (this._staticItem.Properties.Get(GameObjectProperties.DeadlyToTouch) && (this._movingItem != null || this._movingItem is IMonster))
+                {
+                this._movingItem.InstantlyExpire();
+                return;
+                }
+
             if (this._movingItem is Player player)
                 {
                 InteractionInvolvesPlayer(player, this._staticItem);
@@ -38,8 +44,9 @@ namespace Labyrinth
             if (this._movingItem is IMunition munition)
                 {
                 InteractionInvolvesMunition(munition, this._staticItem);
-                // return;
+                return;
                 }
+
             }
 
         private static void InteractionInvolvesPlayer(Player player, IGameObject staticItem)
@@ -47,12 +54,6 @@ namespace Labyrinth
             if (staticItem is Crystal crystal)
                 {
                 PlayerTakesCrystal(player, crystal);
-                return;
-                }
-
-            if (staticItem is ForceField ff && ff.IsActive)
-                {
-                player.InstantlyExpire();
                 return;
                 }
 
