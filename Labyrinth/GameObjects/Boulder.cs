@@ -31,11 +31,10 @@ namespace Labyrinth.GameObjects
             {
             var elapsed = gameTime.ElapsedGameTime.TotalSeconds;
 
-            bool result = false;
-            if (this.CurrentMovement.IsMoving)
+            bool result = this.CurrentMovement.IsMoving;
+            if (result)
                 {
                 this.TryToCompleteMoveToTarget(ref elapsed);
-                result = true;
                 }
             return result;
             }

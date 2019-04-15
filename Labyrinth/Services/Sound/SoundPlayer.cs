@@ -1,6 +1,5 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
     {
@@ -8,9 +7,6 @@ namespace Labyrinth.Services.Sound
         {
         public SoundLibrary SoundLibrary { get; }
         public IActiveSoundService ActiveSoundService { get; }
-
-        private const int TopVolume = 11;
-        private int _currentVolume = 8;    // todo save and restore this value
 
         public SoundPlayer(SoundLibrary soundLibrary, IActiveSoundService activeSoundService)
             {
@@ -55,46 +51,6 @@ namespace Labyrinth.Services.Sound
             AddCallback(gameSound, callback);
             }
 
-        public void Unmute()
-            {
-            SetVolume();
-            }
-
-        public void Mute()
-            {
-            SoundEffect.MasterVolume = 0;
-            }
-
-        public bool IsMuted
-            {
-            get
-                {
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                var result = (SoundEffect.MasterVolume == 0);
-                return result;
-                }
-            }
-
-        public void TurnUpTheVolume()
-            {
-            this._currentVolume = IsMuted ? 1 : Math.Min(this._currentVolume + 1, TopVolume);
-            SetVolume();
-            }
-
-        public void TurnDownTheVolume()
-            {
-            if (IsMuted)
-                return;
-            this._currentVolume = Math.Max(0, this._currentVolume - 1);
-            SetVolume();
-            }
-
-        private void SetVolume()
-            {
-            float volume = 1.0f / TopVolume * this._currentVolume;
-            SoundEffect.MasterVolume = volume;
-            }
-
         private void InternalPlay(GameSound gameSound)
             {
 #if DEBUG
@@ -129,12 +85,6 @@ namespace Labyrinth.Services.Sound
             {
             var si = gameSound.GetAttributeOfType<SoundInfoAttribute>() ?? new SoundInfoAttribute();
             bool result = si.RequiresGameObject;
-            return result;
-            }
-
-        public override string ToString()
-            {
-            var result = "Volume is " + (IsMuted ? "muted" : this._currentVolume + "/" + TopVolume);
             return result;
             }
         }

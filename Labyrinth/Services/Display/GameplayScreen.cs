@@ -2,6 +2,7 @@ using System;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
@@ -136,15 +137,15 @@ namespace Labyrinth.Services.Display
                     
             int changeToEnabled = (gameInput.HasSoundOnBeenTriggered ? 1 : 0) + (gameInput.HasSoundOffBeenTriggered ? -1 : 0);
             if (changeToEnabled < 0)
-                GlobalServices.SoundPlayer.Mute();
+                VolumeControl.Instance.Mute();
             else if (changeToEnabled > 0)
-                GlobalServices.SoundPlayer.Unmute();
+                VolumeControl.Instance.Unmute();
 
             int changeToVolume = (gameInput.HasSoundIncreaseBeenTriggered ? 1 : 0) + (gameInput.HasSoundDecreaseBeenTriggered  ? -1 : 0);
             if (changeToVolume < 0)
-                GlobalServices.SoundPlayer.TurnDownTheVolume();
+                VolumeControl.Instance.TurnDownTheVolume();
             else if (changeToVolume > 0)
-                GlobalServices.SoundPlayer.TurnUpTheVolume();
+                VolumeControl.Instance.TurnUpTheVolume();
 
             if (gameInput.HasMoveToNextLevelBeenTriggered)
                 {

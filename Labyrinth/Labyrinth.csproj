@@ -187,6 +187,7 @@
     <Compile Include="ClockEvents\ReplenishFruit.cs" />
     <Compile Include="DataStructures\PropertyBag.cs" />
     <Compile Include="DataStructures\PropertyDef.cs" />
+    <Compile Include="Interfaces\IVolumeControl.cs" />
     <Compile Include="Services\Display\FrameRateCounter.cs" />
     <Compile Include="Services\Display\GameplayScreen.cs" />
     <Compile Include="Services\Display\LinearAnimation.cs" />
@@ -252,6 +253,7 @@
     <Compile Include="Services\Sound\SoundEffectInstance.cs" />
     <Compile Include="Services\Sound\SoundEffectInstanceCache.cs" />
     <Compile Include="Services\Sound\SoundInfoAttribute.cs" />
+    <Compile Include="Services\Sound\VolumeControl.cs" />
     <Compile Include="Services\StandardRandom.cs" />
     <Compile Include="Services\WorldBuilding\DiceRoll.cs" />
     <Compile Include="Services\WorldBuilding\FruitDefinition.cs" />

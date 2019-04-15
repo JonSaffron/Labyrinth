@@ -33,27 +33,6 @@ namespace Labyrinth
         void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider, EventHandler callback);
 
         /// <summary>
-        /// Return volume to its unmuted level
-        /// </summary>
-        void Unmute();
-        /// <summary>
-        /// Mute the volume
-        /// </summary>
-        void Mute();
-        /// <summary>
-        /// Returns a value that indicates whether the volume is muted or not
-        /// </summary>
-        bool IsMuted { get; }
-        /// <summary>
-        /// Turn up the volume
-        /// </summary>
-        void TurnUpTheVolume();
-        /// <summary>
-        /// Turn down the volume
-        /// </summary>
-        void TurnDownTheVolume();
-
-        /// <summary>
         /// Returns the instance of the sound library that is in use by this object
         /// </summary>
         SoundLibrary SoundLibrary { get; }
