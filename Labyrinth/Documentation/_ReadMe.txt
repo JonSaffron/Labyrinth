@@ -28,3 +28,6 @@ Shift-Alt-L
 
 To remove files that are listed in .gitignore
 https://stackoverflow.com/questions/13541615/how-to-remove-files-that-are-listed-in-the-gitignore-but-still-on-the-repositor
+
+SN76489 sound chip
+http://www.smspower.org/Development/SN76489

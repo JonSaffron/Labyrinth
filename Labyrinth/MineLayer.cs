@@ -21,8 +21,9 @@ namespace Labyrinth
             if (GlobalServices.GameState.IsStaticItemOnTile(tp))
                 return;
 
-            GlobalServices.GameState.AddMine(tp.ToPosition());
-            // todo play an appropriate sound here
+            var mine = GlobalServices.GameState.AddMine(tp.ToPosition());
+            mine.PlaySound(GameSound.MineLaid);
+
             this._countOfMinesRemaining--;
             }
         }

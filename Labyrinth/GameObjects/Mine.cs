@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.GameObjects
     {
-    class Mine : MovingItem
+    public class Mine : MovingItem
         {
         [NotNull] private MineState _mineState;
         private TimeSpan _countdown;

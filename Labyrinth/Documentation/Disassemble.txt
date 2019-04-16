@@ -27,23 +27,36 @@ current monster data 400 to 7bf
 						bit 6 set indicates that the monster lays eggs
 						bit 7 set indicates that the monster is currently an egg
 
-0840			-- sound data
-					initial frequency
+0840			-- envelope data in 5 byte chunks (see below)
+					initial pitch
 					initial volume
-					control 
-						top nibble: 0=no change, 1=add freq adj, 2=eor freq adj, 3=eor then add freq adj, else=random
-						low nibble: 1=hold vol then fade out, 2=hold vol then fade up, 3=infinite, 4=hold, 5=rise and fall
-					volume adjustment
-					frequency adjustment
+					pitch and/or volume change
+						top nibble pitch control: 
+							0=no change, 
+							1=add pitch adj in 08d4 each step 
+							2=eor pitch adj in 08d4 each step
+							3=eor pitch adj in 08d4 then add pitch adj in 08d4
+							else=random (not used)
+						low nibble volume control: 
+							1=hold volume for the count given by the volume parameter then fade out 1 step at a time
+							2=hold volume for the count given by the volume parameter then fade up to maximum 1 step at a time
+							3=infinite (not used), 
+							4=hold without changing for the count given by the volume parameter,
+							else=rise from the initial volume to maximum and then fall back to 0 (volume parameter controls which direction)
+					volume parameter
+					pitch adjustment
 
-08c0 to 08c3	-- current channel frequency
-08c4 to 08c7	-- current channel volume
-08c8 to 08cb	-- channel control
+08c0 to 08c3	-- current pitch for channel
+08c4 to 08c7	-- current volume for channel
+08c8 to 08cb	-- pitch (top nibble)/volume (bottom nibble) control for channel (0 if channel not in use)
+
 08cd			-- sound on/off (&10 or 0)
 08ce			-- temp storage of A
 08cf			-- temp storage of X
-08d0 to 08d3	-- channel volume adjustment
-08d4 to 08d7	-- channel frequency adjustment
+
+08d0 to 08d3	-- envelope volume parameter
+08d4 to 08d7	-- envelope pitch parameter
+08d8			-- stores the last channel that played a note (1 to 3)
 
 08d9			-- countdown timer before decrementing player energy
 
@@ -104,7 +117,7 @@ bdc				-- delay until game's main loop ends
 					one byte is the monster id, the other is the delay remaining before monster changes rooms
 
 0bf0-0bff		-- list of crystals
-					1st byte is the room, 2nd byte is the tile number
+					1st byte is the room (or &ff after being taken), 2nd byte is the tile number
 
 0c00 to 0cff	-- room occupant information (16 slots of 16 bytes each)
 					the player is always the first slot
@@ -129,9 +142,9 @@ bdc				-- delay until game's main loop ends
 					80 static, 81 full chase, 82 patrol, 83 random, 84 cautious - pursuit,
 					85 not used, 86 aggressive, 87 cautious afraid, 88 rolling
 
-	-- static object data
+	-- static object data - room, tile, type and energy
 
-0e00 to 0e7f	-- room containing static object or FF if empty (0e7f is for boulder)
+0e00 to 0e7f	-- room containing static object or FF if empty (0e7f is reserved for boulder)
 0e80 to 0eff	-- tile number of static object or FF if not set/undefined (0eff is for boulder)
 0f00 to 0f7f	-- type of object (12 wall, 20 free tile, 5a apple, 13 block)
 0f80 to 0fff	-- energy of static object
@@ -240,7 +253,8 @@ The first 16x16 sprite in the top-left corner is located at the following memory
 5a06
 5a07	5a0f	5a17	5a1f	5a27	5a2f	5a37	5a3f
 
-sounds
+sound combinations
+------------------
 
 bounce block (17)
 collect crystal (c, d)
@@ -265,6 +279,10 @@ shot bounces (3)
 	spawn diamon demon (18)
 start new life (43)
 static object injured (b)
+
+definitions (initial frequency, initial volume, data change control, volume adjustment, frequency adjustment)
+						top nibble: 0=no change, 1=add freq adj, 2=eor freq adj, 3=eor then add freq adj, else=random
+						low nibble: 1=hold vol then fade out, 2=hold vol then fade up, 3=infinite, 4=hold, 5=rise and fall
 
 	-- channel 0 
 00		-- bang (05 0F 01 05 00)
@@ -292,7 +310,7 @@ static object injured (b)
 15		-- death slide - jointly played (36 0D 11 35 03)
 16		-- enter new level (FE 0F 11 11 F8)
 17		-- bounce block (32 0B 11 00 FD)
-18		-- spawn new diamond demon 26 0F 31 2D 0D
+18		-- spawn new diamond demon (26 0F 31 2D 0D)
 43		-- start new life (FF FE 0F 11 C8)
 
 
@@ -582,48 +600,52 @@ static object injured (b)
 0AAF 85 70     STA 70                   
 0AB1 60        RTS                      
 
-		-- Set sound frequency
+		-- Set pitch for specified channel
 		-- On entry, Y is the channel number
 
 0AB2 20 A7 0A  JSR 0AA7                 -- turn channel number into number to output to sound chip
 0AB5 98        TYA                      
 0AB6 F0 16     BEQ 0ACE                 -- is it channel 0 then branch
 
-			-- channels 1 to 3
+		-- set pitch for channels 1 to 3
+		-- Y is the channel number
+		-- Pitch is the value in 08C0,Y and is effectively multiplied by 4 when sent to the sound chip
 
 0AB8 B9 C0 08  LDA 08C0,Y               -- get frequency data
 0ABB 29 03     AND #03                  -- clear all but bits 0 and 1
 0ABD 0A        ASL A                    -- shift left
 0ABE 0A        ASL A                    -- shift left
 0ABF 05 70     ORA 70                   -- merge with channel 
-0AC1 09 80     ORA #80                  -- set bit 7
-0AC3 20 F3 0A  JSR 0AF3                 -- send a byte to the sound chip
+0AC1 09 80     ORA #80                  -- set bit 7 (latch bit)
+0AC3 20 F3 0A  JSR 0AF3                 -- send a byte to the sound chip to set channel frequency
 0AC6 B9 C0 08  LDA 08C0,Y               -- get frequency data
 0AC9 4A        LSR A                    -- shift right
 0ACA 4A        LSR A                    -- shift right
 0ACB 4C F3 0A  JMP 0AF3                 -- send a byte to the sound chip
 
-0ACE B9 C0 08  LDA 08C0,Y               -- get data
+		-- set pitch for channel 0
+
+0ACE B9 C0 08  LDA 08C0,Y               -- get frequency data
 0AD1 05 70     ORA 70                   -- OR with channel code 
-0AD3 09 80     ORA #80                  -- set bit 7
+0AD3 09 80     ORA #80                  -- set bit 7 (latch bit)
 0AD5 4C F3 0A  JMP 0AF3                 -- send byte setting noise type to the sound chip
 
-		-- Set sound volume
+		-- Set volume for specified channel
 		-- On entry, Y is the channel number
 
 0AD8 B9 C4 08  LDA 08C4,Y               -- get volume data
 0ADB 48        PHA                      
-0ADC 20 A7 0A  JSR 0AA7                 
+0ADC 20 A7 0A  JSR 0AA7                 -- turn channel number into number to output to sound chip
 0ADF 68        PLA                      
-0AE0 29 0F     AND #0F                  
+0AE0 29 0F     AND #0F                  -- mask to get relevant lowest 4 bits of volume data
 0AE2 38        SEC                      
 0AE3 ED CD 08  SBC 08CD                 -- get sound enabled flag
 0AE6 10 02     BPL 0AEA                 -- is enabled?
-0AE8 A9 00     LDA #00                  -- set volume to 0
+0AE8 A9 00     LDA #00                  -- set volume to 0 (mute)
 
-0AEA 49 0F     EOR #0F                  
-0AEC 09 90     ORA #90                  
-0AEE 05 70     ORA 70                   
+0AEA 49 0F     EOR #0F                  -- negate the volume data
+0AEC 09 90     ORA #90                  -- set bits 7 (the latch bit) and bit 4 (the volume bit)
+0AEE 05 70     ORA 70                   -- add the channel number information
 0AF0 4C F3 0A  JMP 0AF3                 -- send a byte to the sound chip
 
 0AF3 20 8B 0A  JSR 0A8B                 -- send a byte to the sound chip
@@ -2313,14 +2335,14 @@ static object injured (b)
 1D46 A8        TAY                      
 1D47 60        RTS                      
 
-		-- process playing sounds
+		-- update current state of playing envelopes
 		
-1D50 A0 03     LDY #03					-- initialise loop counter
-1D52 B9 C8 08  LDA 08C8,Y               -- get data
+1D50 A0 03     LDY #03					-- initialise loop counter for each channel
+1D52 B9 C8 08  LDA 08C8,Y               -- get channel control data
 1D55 F0 03     BEQ 1D5A                 -- branch if not in use
-1D57 20 6C 1D  JSR 1D6C                 -- process
+1D57 20 6C 1D  JSR 1D6C                 -- process envelope
 1D5A 88        DEY                      -- decrement counter
-1D5B 10 F5     BPL 1D52                 -- loop
+1D5B 10 F5     BPL 1D52                 -- loop for next channel
 1D5D 60        RTS                      -- return
 
 		-- reset sound channel
@@ -2335,25 +2357,27 @@ static object injured (b)
 1D6A EA        NOP                      
 1D6B EA        NOP                      
 
-		-- deal with channel of sound
-		-- On entry, Y is channel, A is data in 08C8,Y
+		-- update the state of the envelope playing on the specified channel
+		-- On entry, Y is channel, A is pitch/volume control data from 08C8,Y
 
 1D6C 48        PHA                      
-1D6D 29 F0     AND #F0                  -- extract top 4 bits
+1D6D 29 F0     AND #F0                  -- extract top 4 bits to get pitch effect
 1D6F 4A        LSR A                    -- shift right to bits 0 to 3
 1D70 4A        LSR A                    
 1D71 4A        LSR A                    
 1D72 4A        LSR A                    
-1D73 20 DD 1D  JSR 1DDD                 -- update frequency
+1D73 20 DD 1D  JSR 1DDD                 -- update and set pitch in 08c0
 1D76 68        PLA                      -- restore data
 1D77 29 0F     AND #0F                  -- extract bottom 4 bits
 
 1D79 C9 01     CMP #01                  -- is it 1?
 1D7B D0 19     BNE 1D96                 -- nope, so branch
 
-1D7D B9 D0 08  LDA 08D0,Y               -- get volume adjustment
+		-- volume effect 1 (hold then get softer)
+
+1D7D B9 D0 08  LDA 08D0,Y               -- get volume parameter
 1D80 F0 03     BEQ 1D85                 -- zero? then branch
-1D82 4C C3 1D  JMP 1DC3                 -- not zero - jump
+1D82 4C C3 1D  JMP 1DC3                 -- not zero - jump to decrement the volume parameter
 
 1D85 B9 C4 08  LDA 08C4,Y               -- get current volume
 1D88 38        SEC                      
@@ -2366,9 +2390,11 @@ static object injured (b)
 1D96 C9 02     CMP #02                  -- is it 2?
 1D98 D0 18     BNE 1DB2                 -- nope, so branch
 
-1D9A B9 D0 08  LDA 08D0,Y               -- get volume adjustment
+		-- volume effect 2 (hold then get louder)
+
+1D9A B9 D0 08  LDA 08D0,Y               -- get volume parameter
 1D9D F0 03     BEQ 1DA2                 -- zero, so branch over jump
-1D9F 4C C3 1D  JMP 1DC3                 -- jump to decrement volume adjustment
+1D9F 4C C3 1D  JMP 1DC3                 -- not zero - jump to decrement the volume parameter
 
 1DA2 B9 C4 08  LDA 08C4,Y               -- get current volume
 1DA5 18        CLC                      
@@ -2380,79 +2406,104 @@ static object injured (b)
 
 1DB2 C9 03     CMP #03                  -- is it 3?
 1DB4 D0 01     BNE 1DB7                 -- nope, so branch
+
+		-- volume effect 3 (infinite)
+
 1DB6 60        RTS                      
 
 1DB7 C9 04     CMP #04                  -- is it 4?
 1DB9 D0 0F     BNE 1DCA                 -- nope, so branch
 
-1DBB B9 D0 08  LDA 08D0,Y               -- get volume adjustment
-1DBE D0 03     BNE 1DC3                 -- not zero so jump to decrement adjustment
+		-- volume effect 4 (no change)
+
+1DBB B9 D0 08  LDA 08D0,Y               -- get volume parameter
+1DBE D0 03     BNE 1DC3                 -- not zero so jump to decrement parameter
 1DC0 4C 5E 1D  JMP 1D5E                 -- reset channel
 
-1DC3 38        SEC                      -- decrement volume adjustment
+		-- decrement volume parameter
+		-- on entry, A is the current value of the volume parameter from 08D0,Y
+		--			 Y is the channel number
+
+1DC3 38        SEC                      -- decrement volume parameter
 1DC4 E9 01     SBC #01                  
-1DC6 99 D0 08  STA 08D0,Y               -- store new volume adjustment
+1DC6 99 D0 08  STA 08D0,Y               -- store new volume parameter
 1DC9 60        RTS                      
 
-1DCA B9 C4 08  LDA 08C4,Y               -- control nibble not 0 to 4
+		-- all other volume effects
+
+1DCA B9 C4 08  LDA 08C4,Y               -- get current volume
 1DCD C9 0F     CMP #0F                  -- is current volume max?
 1DCF D0 05     BNE 1DD6                 -- nope, so branch
 
-1DD1 A9 00     LDA #00                  -- set volume adjustment to 0
+1DD1 A9 00     LDA #00                  -- set volume parameter to 0
 1DD3 99 D0 08  STA 08D0,Y               
 1DD6 B9 D0 08  LDA 08D0,Y               
 1DD9 D0 C7     BNE 1DA2                 -- jump to raise volume
 1DDB F0 A8     BEQ 1D85                 -- jump to fade volume
 
-		-- update and set sound frequency
+		-- update and set sound pitch
+		-- on entry, A indicates effect to use in bottom (only lower 4 bits used)
 
 1DDD F0 EA     BEQ 1DC9                 - on zero then RTS
 
 1DDF C9 01     CMP #01                  
 1DE1 D0 0D     BNE 1DF0                 
 
-1DE3 B9 C0 08  LDA 08C0,Y               -- add set amount to frequency
+		-- pitch effect 1 (add to pitch)
+
+1DE3 B9 C0 08  LDA 08C0,Y               -- add set amount to pitch
 1DE6 18        CLC                      
 1DE7 79 D4 08  ADC 08D4,Y               
 1DEA 99 C0 08  STA 08C0,Y               
-1DED 4C B2 0A  JMP 0AB2                 -- set sound frequency
+1DED 4C B2 0A  JMP 0AB2                 -- set sound pitch
 
 1DF0 C9 02     CMP #02                  
 1DF2 D0 0C     BNE 1E00                 
 
-1DF4 B9 C0 08  LDA 08C0,Y               -- eor frequency by set amount
+		-- pitch effect 2 (eor pitch)
+
+1DF4 B9 C0 08  LDA 08C0,Y               -- eor pitch by set amount
 1DF7 59 D4 08  EOR 08D4,Y               
 1DFA 99 C0 08  STA 08C0,Y               
-1DFD 4C B2 0A  JMP 0AB2                 -- set sound frequency
+1DFD 4C B2 0A  JMP 0AB2                 -- set sound pitch
 
 1E00 C9 03     CMP #03                  
 1E02 D0 10     BNE 1E14                 
 
-1E04 B9 C0 08  LDA 08C0,Y               -- eor then add set amount to frequency
+		-- pitch effect 3 (eor then add to pitch)
+
+1E04 B9 C0 08  LDA 08C0,Y               -- eor then add set amount to pitch
 1E07 59 D4 08  EOR 08D4,Y               
 1E0A 18        CLC                      
 1E0B 79 D4 08  ADC 08D4,Y               
 1E0E 99 C0 08  STA 08C0,Y               
-1E11 4C B2 0A  JMP 0AB2                 -- set sound frequency
+1E11 4C B2 0A  JMP 0AB2                 -- set sound pitch
+
+		-- any other pitch effect value
 
 1E14 AD 44 FE  LDA FE44                 -- get sysvia t1 low order counter
 1E17 99 C0 08  STA 08C0,Y               --	(set to random number really)
 1E1A 4C B2 0A  JMP 0AB2                 -- set sound frequency
 
 		-- play a new sound effect
+		-- on entry, A is the envelope definition to use
 
-1E1D 8D CE 08  STA 08CE                 
+1E1D 8D CE 08  STA 08CE                 -- store envelope number for later
 1E20 8E CF 08  STX 08CF                 
-1E23 C9 06     CMP #06                  
-1E25 B0 04     BCS 1E2B                 -- branch when 6 or more
+1E23 C9 06     CMP #06                  -- is the envelope to be played on the noise channel or not
+1E25 B0 04     BCS 1E2B                 -- branch when 6 or more (it's a note rather than a noise)
 1E27 A0 00     LDY #00                  -- set channel 0
 1E29 F0 15     BEQ 1E40                 -- jump
 
-1E2B A0 03     LDY #03                  -- try to locate a free channel
+		-- try to locate a free channel to play a note on
+
+1E2B A0 03     LDY #03                  -- initialise loop counter
 1E2D B9 C8 08  LDA 08C8,Y               
-1E30 F0 0E     BEQ 1E40                 
+1E30 F0 0E     BEQ 1E40                 -- branch if channel is free
 1E32 88        DEY                      
 1E33 D0 F8     BNE 1E2D                 
+
+		-- all channels are busy, identify the channel to reuse
 
 1E35 CE D8 08  DEC 08D8                 -- rotate to use a different channel number
 1E38 AD D8 08  LDA 08D8                 
@@ -2460,24 +2511,26 @@ static object injured (b)
 1E3D F0 F6     BEQ 1E35                 -- don't use channel 0!
 1E3F A8        TAY                      
 
-1E40 8C D8 08  STY 08D8                 -- store last channel used
-1E43 AD CE 08  LDA 08CE                 -- get sound number
+		-- play the envelope on the channel specified by Y
+
+1E40 8C D8 08  STY 08D8                 -- record the channel being used
+1E43 AD CE 08  LDA 08CE                 -- get envelope number
 1E46 0A        ASL A                    -- multiply by 5
 1E47 0A        ASL A                    
 1E48 18        CLC                      
 1E49 6D CE 08  ADC 08CE                 
 1E4C AA        TAX                      
-1E4D BD 40 08  LDA 0840,X               -- get initial frequency 
-1E50 99 C0 08  STA 08C0,Y               
+1E4D BD 40 08  LDA 0840,X               -- get initial pitch 
+1E50 99 C0 08  STA 08C0,Y               -- store in current pitch
 1E53 BD 41 08  LDA 0841,X               -- get initial volume
-1E56 99 C4 08  STA 08C4,Y               
-1E59 BD 42 08  LDA 0842,X               -- get control 
-1E5C 99 C8 08  STA 08C8,Y               
+1E56 99 C4 08  STA 08C4,Y               -- store in current volume
+1E59 BD 42 08  LDA 0842,X               -- get pitch/volume control 
+1E5C 99 C8 08  STA 08C8,Y               -- store in current pitch/volume control
 1E5F BD 43 08  LDA 0843,X               -- get adjustment to volume
-1E62 99 D0 08  STA 08D0,Y               
-1E65 BD 44 08  LDA 0844,X               -- get adjustment to frequency
-1E68 99 D4 08  STA 08D4,Y               
-1E6B AE CF 08  LDX 08CF                 -- restore x
+1E62 99 D0 08  STA 08D0,Y               -- store in current volume adjustment
+1E65 BD 44 08  LDA 0844,X               -- get adjustment to pitch
+1E68 99 D4 08  STA 08D4,Y               -- store in current pitch adjustment
+1E6B AE CF 08  LDX 08CF                 -- restore X
 1E6E 20 B2 0A  JSR 0AB2                 -- set frequency
 1E71 4C D8 0A  JMP 0AD8                 -- set volume
 
@@ -4797,6 +4850,7 @@ static object injured (b)
 2DD5 60        RTS                      
 
 		-- play a sound
+		-- on entry, A is the envelope definition to use
 
 2DD6 84 8F     STY 8F                   
 2DD8 20 1D 1E  JSR 1E1D                 

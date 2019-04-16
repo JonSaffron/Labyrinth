@@ -241,10 +241,11 @@ namespace Labyrinth
             this._gameObjectCollection.Add(e);
             }
         
-        public void AddMine(Vector2 position)
+        public Mine AddMine(Vector2 position)
             {
-            var m = new Mine(position);
-            this._gameObjectCollection.Add(m);
+            var mine = new Mine(position);
+            this._gameObjectCollection.Add(mine);
+            return mine;
             }
 
         public IMonster AddMonster(MonsterDef monsterDef)
