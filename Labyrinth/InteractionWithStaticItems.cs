@@ -44,6 +44,7 @@ namespace Labyrinth
             if (this._movingItem is IMunition munition)
                 {
                 InteractionInvolvesMunition(munition, this._staticItem);
+                // ReSharper disable once RedundantJumpStatement
                 return;
                 }
 

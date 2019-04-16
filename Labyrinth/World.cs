@@ -253,7 +253,7 @@ namespace Labyrinth
         /// <param name="updatedItem">An object that has just moved position</param>
         /// <param name="actedUponItem">An object whose position overlaps the first object</param>
         /// <returns>An instance of an interaction object</returns>
-        private IInteraction BuildInteraction(IMovingItem updatedItem, IGameObject actedUponItem)
+        private static IInteraction BuildInteraction(IMovingItem updatedItem, IGameObject actedUponItem)
             {
             var result = actedUponItem is IMovingItem secondMovingItem
                 ? (IInteraction) new InteractionWithMovingItems(updatedItem, secondMovingItem)

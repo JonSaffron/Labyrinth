@@ -34,6 +34,7 @@ namespace Labyrinth.Services.Display
             this._gameInput = new GameInput(inputState);
             this._livesRemaining = this._gameStartParameters.CountOfLives - 1;
             this._content = new ContentManager(GlobalServices.Game.Services, GlobalServices.Game.Content.RootDirectory);
+            VolumeControl.Instance.LoadState();
             }
 
         /// <summary>
@@ -91,6 +92,8 @@ namespace Labyrinth.Services.Display
                     case WorldReturnType.FinishedWorld:
                         //this._world = null;
                         //this._livesRemaining++;
+                        // todo this isn't the ideal place for this
+                        VolumeControl.Instance.SaveState();
                         this.ScreenManager.Game.Exit();
                         break;
             
@@ -98,6 +101,8 @@ namespace Labyrinth.Services.Display
                         GlobalServices.SoundPlayer.ActiveSoundService.Clear();
                         if (this._livesRemaining == 0)
                             {
+                            // todo this isn't the ideal place for this
+                            VolumeControl.Instance.SaveState();
                             this.ScreenManager.Game.Exit();
                             return;
                             }
