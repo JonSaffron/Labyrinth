@@ -75,6 +75,6 @@ namespace Labyrinth
         /// <summary>
         /// Magnification factor whilst in a window
         /// </summary>
-        public const int ZoomWhilstWindowed = 2;
+        public static float ZoomWhilstWindowed = 2.0f;
         }
     }

@@ -150,6 +150,7 @@
     <Compile Include="GameObjects\Motility\Stationary.cs" />
     <Compile Include="GameObjects\MovementChecker.cs" />
     <Compile Include="GameObjects\MovementCheckerForMonsters.cs" />
+    <Compile Include="GameObjects\Potion.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />

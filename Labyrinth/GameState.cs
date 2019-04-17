@@ -314,5 +314,12 @@ namespace Labyrinth
             this._gameObjectCollection.Add(result);
             return result;
             }
+
+        public Potion AddPotion(Vector2 position)
+            {
+            var result = new Potion(position);
+            this._gameObjectCollection.Add(result);
+            return result;
+            }
         }
     }

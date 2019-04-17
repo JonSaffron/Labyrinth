@@ -56,8 +56,8 @@ namespace Labyrinth.Services.Display
             TouchPanel.EnabledGestures = GestureType.None;
             this._gdm = new GraphicsDeviceManager(game)
                             {
-                                PreferredBackBufferWidth = (int) Constants.RoomSizeInPixels.X * Constants.ZoomWhilstWindowed,
-                                PreferredBackBufferHeight = (int) Constants.RoomSizeInPixels.Y * Constants.ZoomWhilstWindowed
+                                PreferredBackBufferWidth = (int) (Constants.RoomSizeInPixels.X * (float) Constants.ZoomWhilstWindowed),
+                                PreferredBackBufferHeight = (int) (Constants.RoomSizeInPixels.Y * (float) Constants.ZoomWhilstWindowed)
                             };
             var playerInput = new PlayerInput(this.InputState);
             GlobalServices.SetPlayerInput(playerInput);
@@ -260,7 +260,7 @@ namespace Labyrinth.Services.Display
 
         private static ISpriteBatch GetSpriteBatch(GraphicsDevice graphicsDevice, bool isFullScreen)
             {
-            var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, Constants.ZoomWhilstWindowed);
+            var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, (float) Constants.ZoomWhilstWindowed);
             return result;
             }
 

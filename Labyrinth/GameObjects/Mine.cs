@@ -154,6 +154,7 @@ namespace Labyrinth.GameObjects
             public PrimedState(Mine mine) : base(mine)
                 {
                 this._animationPlayer = new LoopedAnimation(mine, "Sprites/Shot/MineArmed", 48);
+                mine.PlaySound(GameSound.MineArmed);
                 }
 
             public override void SteppedOnBy(IMovingItem movingItem)

@@ -245,7 +245,8 @@ namespace Labyrinth
         [SoundInfo]                         PlayerStartsNewLife,                // single instance
         [SoundInfo(3, true)]                StaticObjectShotAndInjured,         // position of object
         [SoundInfo(1, true)]                ForceFieldShutsDown,                // position of forcefield
-        [SoundInfo(3, true)]                MineLaid                            // position of mine
+        [SoundInfo(3, true)]                MineLaid,                           // position of mine
+        [SoundInfo(3, true)]                MineArmed                           // position of mine
         }
 
     /// <summary>
