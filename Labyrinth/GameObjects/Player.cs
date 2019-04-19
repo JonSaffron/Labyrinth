@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GalaSoft.MvvmLight.Messaging;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Messages;
 using Microsoft.Xna.Framework;
@@ -282,8 +283,9 @@ namespace Labyrinth.GameObjects
 
         protected override void UponDeath(bool wasDeathInstant)
             {
-            GlobalServices.GameState.AddBang(this.Position, BangType.Long);
-            GlobalServices.GameState.AddGrave(this.TilePosition);
+            var deathTilePos = this.CurrentMovement.IsMoving ? TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards) : this.TilePosition;
+            GlobalServices.GameState.AddBang(deathTilePos.ToPosition(), BangType.Long);
+            GlobalServices.GameState.AddGrave(deathTilePos);
             Messenger.Default.Send(new LifeLost());
             }
 
