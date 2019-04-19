@@ -5,11 +5,11 @@ namespace Labyrinth.GameObjects
     {
     public class Potion : StaticItem
         {
-        private readonly StaticAnimation _animationPlayer;
+        private readonly LoopedAnimation _animationPlayer;
 
         public Potion(Vector2 position) : base(position)
             {
-            this._animationPlayer = new StaticAnimation(this, "Sprites/Flask");
+            this._animationPlayer = new LoopedAnimation(this, "Sprites/Flask", 48);
             }
 
         public override bool IsExtant => true;
@@ -18,7 +18,7 @@ namespace Labyrinth.GameObjects
 
         public override bool Update(GameTime gameTime)
             {
-            //this._animationPlayer.Update(gameTime);
+            this._animationPlayer.Update(gameTime);
             return false;
             }
         }
