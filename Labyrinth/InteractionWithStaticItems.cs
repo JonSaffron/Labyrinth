@@ -29,7 +29,7 @@ namespace Labyrinth
             if (!this._movingItem.IsExtant || !this._staticItem.IsExtant)
                 return;
 
-            if (this._staticItem.Properties.Get(GameObjectProperties.DeadlyToTouch) && (this._movingItem != null || this._movingItem is IMonster))
+            if (this._staticItem.Properties.Get(GameObjectProperties.DeadlyToTouch) && (this._movingItem is Player || this._movingItem is IMonster))
                 {
                 this._movingItem.InstantlyExpire();
                 return;
