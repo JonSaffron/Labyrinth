@@ -32,7 +32,7 @@ namespace Labyrinth.GameObjects
 
             string textureName = originator is Player ? "Sprites/Shot/RedShot" : "Sprites/Shot/GreenShot";
             this._animationPlayer = new StaticAnimation(this, textureName);
-            ResetTimeToTravel();
+            ResetTimeToTravel(true);
 
             this._boundingRectangles = GetBoundingRectangles();
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
@@ -56,17 +56,17 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private void ResetTimeToTravel()
+        private void ResetTimeToTravel(bool isInitialMove)
             {
             double distanceToTravel;
             switch (this._directionOfTravel.Orientation())
                 {
                 case Orientation.Horizontal:
-                    distanceToTravel = Constants.RoomSizeInPixels.X * 1.25d;
+                    distanceToTravel = Constants.RoomSizeInPixels.X * (isInitialMove ? 1.25d : 0.75d);
                     this._animationPlayer.Rotation = 0.0f;
                     break;
                 case Orientation.Vertical:
-                    distanceToTravel = Constants.RoomSizeInPixels.Y * 1.25d;
+                    distanceToTravel = Constants.RoomSizeInPixels.Y * (isInitialMove ? 1.25d : 0.75d);
                     this._animationPlayer.Rotation = (float)(Math.PI * 90.0f / 180f);
                     break;
                 default:
@@ -131,7 +131,7 @@ namespace Labyrinth.GameObjects
                         {
                         var startTime = this._remainingTime;
                         bool didMoveComplete = this.TryToCompleteMoveToTarget(ref this._remainingTime);
-                        this._timeToTravel -= (this._remainingTime - startTime);
+                        this._timeToTravel -= (startTime - this._remainingTime);
                         if (didMoveComplete)
                             {
                             break;
@@ -168,7 +168,7 @@ namespace Labyrinth.GameObjects
             this._directionOfTravel = this._directionOfTravel.Reversed();
             this.PlaySound(GameSound.ShotBounces);
             this.HasRebounded = true;
-            ResetTimeToTravel();
+            ResetTimeToTravel(false);
             }
 
         private const decimal StandardSpeed = Constants.BaseSpeed * 4;
