@@ -71,10 +71,5 @@ namespace Labyrinth
         /// Size of a room measured in pixels 512 x 320
         /// </summary>
         public static readonly Vector2 RoomSizeInPixels = new Vector2(RoomSizeInTiles.X * TileLength, RoomSizeInTiles.Y * TileLength);
-
-        /// <summary>
-        /// Magnification factor whilst in a window
-        /// </summary>
-        public static float ZoomWhilstWindowed = 2.0f;
         }
     }

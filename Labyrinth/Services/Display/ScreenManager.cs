@@ -1,12 +1,13 @@
-using System.Diagnostics;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using JetBrains.Annotations;
+using Labyrinth.Services.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-using System.Linq;
-using JetBrains.Annotations;
-using Labyrinth.Services.Input;
 
 namespace Labyrinth.Services.Display
     {
@@ -47,6 +48,11 @@ namespace Labyrinth.Services.Display
         public InputState InputState { get; } = new InputState();
 
         /// <summary>
+        /// Magnification factor whilst in a window 
+        /// </summary>
+        private float _zoomWhilstWindowed;
+
+        /// <summary>
         /// Constructs a new screen manager component.
         /// </summary>
         public ScreenManager([NotNull] Game game) : base(game)
@@ -54,13 +60,84 @@ namespace Labyrinth.Services.Display
             // we must set EnabledGestures before we can query for them, but
             // we don't assume the game wants to read them.
             TouchPanel.EnabledGestures = GestureType.None;
-            this._gdm = new GraphicsDeviceManager(game)
-                            {
-                                PreferredBackBufferWidth = (int) (Constants.RoomSizeInPixels.X * (float) Constants.ZoomWhilstWindowed),
-                                PreferredBackBufferHeight = (int) (Constants.RoomSizeInPixels.Y * (float) Constants.ZoomWhilstWindowed)
-                            };
+            this._gdm = new GraphicsDeviceManager(game);
+            this._zoomWhilstWindowed = GetInitialZoom();
+            SetBackBufferSize(true);
             var playerInput = new PlayerInput(this.InputState);
             GlobalServices.SetPlayerInput(playerInput);
+            }
+
+        private IEnumerable<float> GetPossibleZoomLevels()
+            {
+            yield return 1f;
+            foreach (float item in new[] {1.25f, 1.5f, 2f, 2.5f, 3f})
+                {
+                if (DoesScaleFactorFitScreen(item))
+                    yield return item;
+                else
+                    {
+                    yield break;
+                    }
+                }
+            for (int i = 4; DoesScaleFactorFitScreen(i); i++)
+                {
+                yield return i;
+                }
+            }
+
+        private bool DoesScaleFactorFitScreen(float scaleFactor)
+            {
+            if (Constants.RoomSizeInPixels.X * scaleFactor > GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width)
+                return false;
+            if (Constants.RoomSizeInPixels.Y * scaleFactor > GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height)
+                return false;
+            return true;
+            }
+
+        private float GetInitialZoom()
+            {
+            var zoomLevels = GetPossibleZoomLevels().ToArray();
+            var result = zoomLevels.Length > 1 ? zoomLevels[zoomLevels.Length - 2] : zoomLevels[0];
+            return result;
+            }
+
+        public void IncreaseZoom()
+            {
+            if (this._gdm.IsFullScreen)
+                return;
+
+            float[] greaterZoomLevels = GetPossibleZoomLevels().Where(level => level > this._zoomWhilstWindowed).ToArray();
+            if (greaterZoomLevels.Length == 0)
+                return;
+            float nextZoomLevel = greaterZoomLevels.Min();
+            if (!DoesScaleFactorFitScreen(nextZoomLevel))
+                return;
+            this._zoomWhilstWindowed = nextZoomLevel;
+            SetBackBufferSize(false);
+            }
+
+        public void DecreaseZoom()
+            {
+            if (this._gdm.IsFullScreen)
+                return;
+
+            float[] lesserZoomLevels = GetPossibleZoomLevels().Where(level => level < this._zoomWhilstWindowed).ToArray();
+            if (lesserZoomLevels.Length == 0)
+                return;
+            float previousZoomLevel = lesserZoomLevels.Max();
+            this._zoomWhilstWindowed = previousZoomLevel;
+            SetBackBufferSize(false);
+            }
+
+        private void SetBackBufferSize(bool isInitialSize)
+            {
+            this._gdm.PreferredBackBufferWidth = (int) (Constants.RoomSizeInPixels.X * this._zoomWhilstWindowed);
+            this._gdm.PreferredBackBufferHeight = (int) (Constants.RoomSizeInPixels.Y * this._zoomWhilstWindowed);
+            if (!isInitialSize)
+                {
+                this._gdm.ApplyChanges();
+                this.SpriteBatch = GetSpriteBatch();
+                }
             }
 
         /// <summary>
@@ -81,7 +158,7 @@ namespace Labyrinth.Services.Display
             // Load content belonging to the screen manager.
             ContentManager content = Game.Content;
 
-            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
+            this.SpriteBatch = GetSpriteBatch();
             this.Font = content.Load<SpriteFont>("Display/MenuFont");
             this._blankTexture = new Texture2D(this.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             this._blankTexture.SetData(new[] { Color.White });
@@ -254,15 +331,25 @@ namespace Labyrinth.Services.Display
 
         public void ToggleFullScreen()
             {
+            if (!this._gdm.IsFullScreen)
+                {
+                this._gdm.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                this._gdm.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+                }
+            else
+                {
+                SetBackBufferSize(true);
+                }
             this._gdm.ToggleFullScreen();
-            this.SpriteBatch = GetSpriteBatch(this.GraphicsDevice, this._gdm.IsFullScreen);
+            this.SpriteBatch = GetSpriteBatch();
             }
 
-        private static ISpriteBatch GetSpriteBatch(GraphicsDevice graphicsDevice, bool isFullScreen)
+        private ISpriteBatch GetSpriteBatch()
             {
-            var result = isFullScreen ? (ISpriteBatch) new SpriteBatchFullScreen(graphicsDevice) : new SpriteBatchWindowed(graphicsDevice, (float) Constants.ZoomWhilstWindowed);
+            var result = this._gdm.IsFullScreen 
+                ? (ISpriteBatch) new SpriteBatchFullScreen(this.GraphicsDevice) 
+                : new SpriteBatchWindowed(this.GraphicsDevice, this._zoomWhilstWindowed);
             return result;
             }
-
         }
     }

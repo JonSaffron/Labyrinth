@@ -139,6 +139,12 @@ namespace Labyrinth.Services.Display
 
             if (gameInput.HasToggleFullScreenBeenTriggered)
                 this.ScreenManager.ToggleFullScreen();
+
+            if (gameInput.HasIncreaseZoomBeenTriggered)
+                this.ScreenManager.IncreaseZoom();
+
+            if (gameInput.HasDecreaseZoomBeenTriggered)
+                this.ScreenManager.DecreaseZoom();
                     
             int changeToEnabled = (gameInput.HasSoundOnBeenTriggered ? 1 : 0) + (gameInput.HasSoundOffBeenTriggered ? -1 : 0);
             if (changeToEnabled < 0)
