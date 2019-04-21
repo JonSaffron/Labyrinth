@@ -32,7 +32,7 @@ namespace Labyrinth.GameObjects.Motility
                 return false;
                 }
 
-            this.Monster.Move(direction, this.Monster.CurrentSpeed);
+            this.Monster.Move(direction);
             return true;
             }
         }

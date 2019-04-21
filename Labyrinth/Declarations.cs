@@ -111,6 +111,24 @@ namespace Labyrinth
         Bounce
         }
 
+    public enum MovementType
+        {
+        /// <summary>
+        /// Object should move at it's usual speed
+        /// </summary>
+        Normal,
+
+        /// <summary>
+        /// Object should move due to being pushed
+        /// </summary>
+        Pushed,
+
+        /// <summary>
+        /// Object should move due to being bounced back
+        /// </summary>
+        BounceBack
+        }
+
     public enum FruitType
         {
         [UsedImplicitly] Apple = 1,

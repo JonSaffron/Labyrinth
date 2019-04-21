@@ -51,7 +51,7 @@ namespace Labyrinth.GameObjects.Behaviour
 
         protected bool IsInSameRoom()
             {
-            var result = MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster);
+            var result = this.Monster.IsPlayerInSameRoom();
             return result;
             }
 

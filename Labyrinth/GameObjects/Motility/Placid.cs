@@ -11,8 +11,8 @@ namespace Labyrinth.GameObjects.Motility
         protected override Direction DetermineDirection()
             {
             if (this.Monster.ChangeRooms == ChangeRooms.FollowsPlayer 
-                && !MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster) 
-                && MonsterMovement.IsPlayerNearby(this.Monster))
+                && !this.Monster.IsPlayerInSameRoom() 
+                && this.Monster.IsPlayerNearby())
                 {
                 var pursuitResult = CautiousPursuit.MoveTowardsPlayer(this.Monster);
                 return pursuitResult;

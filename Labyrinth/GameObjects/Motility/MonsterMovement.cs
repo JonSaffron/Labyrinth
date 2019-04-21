@@ -17,7 +17,7 @@ namespace Labyrinth.GameObjects.Motility
         public static bool IsPlayerInWeaponSights(this Monster m)
             {
             Player p = GlobalServices.GameState.Player;
-            if (!p.IsAlive() || !IsPlayerInSameRoomAsMonster(m))
+            if (!p.IsAlive() || !IsPlayerInSameRoom(m))
                 return false;
 
             var result = (m.TilePosition.X == p.TilePosition.X)
@@ -40,7 +40,7 @@ namespace Labyrinth.GameObjects.Motility
             return result;
             }
 
-        public static bool IsPlayerInSameRoomAsMonster(this IMonster m)
+        public static bool IsPlayerInSameRoom(this IMonster m)
             {
             Player p = GlobalServices.GameState.Player;
             if (!p.IsAlive())

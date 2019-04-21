@@ -17,7 +17,7 @@
         public override void Perform()
             {
             this._doubleSpeed = !this._doubleSpeed;
-            this.Monster.CurrentSpeed = Constants.BaseSpeed << (this._doubleSpeed ? 1 : 0);
+            this.Monster.SpeedAdjustmentFactor = (this._doubleSpeed ? 2 : 1);
             }
         }
     }

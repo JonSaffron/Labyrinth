@@ -43,11 +43,56 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <param name="direction">The direction to move in</param>
         /// <param name="speed">The speed to move at</param>
-        public void Move(Direction direction, decimal speed)
+        protected void Move(Direction direction, decimal speed)
             {
             var movingTowardsTilePos = this.TilePosition.GetPositionAfterOneMove(direction);
             var movingTowards = movingTowardsTilePos.ToPosition();
             this.CurrentMovement = new Movement(direction, movingTowards, speed);
+            }
+
+        public virtual void Move(Direction direction, MovementType movementType)
+            {
+            switch (movementType)
+                {
+                case MovementType.Normal:
+                    {
+                    Move(direction, Constants.BaseSpeed);
+                    return;
+                    }
+
+                case MovementType.Pushed:
+                    {
+                    if (this.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
+                        {
+                        Move(direction, Constants.PushSpeed);
+                        return;
+                        }
+
+                    break;
+                    }
+
+                case MovementType.BounceBack:
+                    {
+                    if (this.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
+                        {
+                        Move(direction, Constants.BounceBackSpeed);
+                        return;
+                        }
+
+                    if (this.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack)
+                        {
+                        var originallyMovingTowards = TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards);
+                        var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);
+                        var movingTowards = movingTowardsTilePos.ToPosition();
+                        this.CurrentMovement = new Movement(direction, movingTowards, Constants.BounceBackSpeed);
+                        return;
+                        }
+
+                    break;
+                    }
+                }
+
+                throw new InvalidOperationException("Cannot move in that way.");
             }
 
         /// <summary>
@@ -56,20 +101,6 @@ namespace Labyrinth.GameObjects
         public void StandStill()
             {
             this.CurrentMovement = Movement.Still;
-            }
-
-        /// <summary>
-        /// Makes this object bounce backwards two tiles from where it is currently headed towards
-        /// </summary>
-        /// <param name="direction">The direction to move in</param>
-        /// <param name="speed">The speed to move at</param>
-        /// <remarks>This is used by an object that can move another, currently this will only be the player</remarks>
-        public virtual void BounceBack(Direction direction, decimal speed)
-            {
-            var originallyMovingTowards = TilePos.TilePosFromPosition(this.CurrentMovement.MovingTowards);
-            var movingTowardsTilePos = originallyMovingTowards.GetPositionAfterMoving(direction, 2);
-            var movingTowards = movingTowardsTilePos.ToPosition();
-            this.CurrentMovement = new Movement(direction, movingTowards, speed);
             }
 
         /// <summary>

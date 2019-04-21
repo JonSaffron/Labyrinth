@@ -29,15 +29,15 @@ namespace Labyrinth.GameObjects
                 {
                 case PushStatus.Yes:
                     {
-                    moveableObject.Move(direction, Constants.PushSpeed);
+                    moveableObject.Move(direction, MovementType.Pushed);
                     return;
                     }
 
                 case PushStatus.Bounce:
                     {
                     var reverseDirection = direction.Reversed();
-                    moveableObject.Move(reverseDirection, Constants.BounceBackSpeed);
-                    initiatingObject.BounceBack(reverseDirection, Constants.BounceBackSpeed);
+                    moveableObject.Move(reverseDirection, MovementType.BounceBack);
+                    initiatingObject.Move(reverseDirection, MovementType.BounceBack);
                     initiatingObject.PlaySound(GameSound.BoulderBounces);
                     return;
                     }

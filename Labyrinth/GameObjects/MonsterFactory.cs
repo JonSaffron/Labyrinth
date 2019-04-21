@@ -92,7 +92,7 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Monster of type " + monsterDef.Breed + " at " + monsterDef.Position + " has no movement boundary. Presumably ChangeRooms has not been set.");
                 }
 
-            result.SetMonsterMotion();
+            result.SetMonsterMotion(true);
             result.Properties.Set(GameObjectProperties.MovementChecker, MovementCheckerForMonsters);
 
             return result;
@@ -146,7 +146,7 @@ namespace Labyrinth.GameObjects
                 }
             if (movement.Speed.HasValue)
                 {
-                monster.CurrentSpeed = (int) (Constants.BaseSpeed * movement.Speed.Value);
+                monster.SpeedAdjustmentFactor = movement.Speed.Value;
                 }
 
             foreach (var move in breedInfo.BreedMovement.Moves)

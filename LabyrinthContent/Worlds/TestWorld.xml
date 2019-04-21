@@ -2,17 +2,17 @@
 <World Name="TestWorld" Height="20" Width="32" RestartInSameRoom="true" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
   <Layout>
     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    OS       #     OO              O
-    O        #P    OO              O
-    O        ######OO              O
+    OS       #     OOr             O
+    O        #     OO              O
+    O        # ####OO              O
     O                              O
     O                              O
     O              OO              O
     O              OO              O
-    O              OO              O
+    O         P    OO              O
     OOOOOO    OOOOOOOOOOO    OOOOOOO
     OOOOOO    OOOOOOOOOOO    OOOOOOO
-    O              OO              O
+    Or             OOr             O
     O              OO              O
     O              OO              O
     O                              O
@@ -27,10 +27,11 @@
       <PlayerStartState Id="1" Left="1" Top="1" Energy="50" WorldStart="true"/>
       <TileDefinitions>
         <Wall Symbol="O" Tile="NewTiles/RedAndBlueLarge" />
-        <Floor Symbol=" " Tile="NewTiles/Borgen" />
+        <Floor Symbol=" " Tile="NewTiles/AllBlack" />
         <Object Symbol="S" Description="Player Start" />
-        <Object Symbol="P" Description="PatrolPerimiterTest" />
+        <Object Symbol="P" Description="TestMonster" />
         <Object Symbol="#" Description="CrumblyWall" />
+        <Object Symbol="r" Description="Reserved" />
       </TileDefinitions>
     </Area>
 
@@ -39,6 +40,7 @@
       <TileDefinitions>
         <Wall Symbol="O" Tile="NewTiles/RedAndBlueSmall" />
         <Floor Symbol=" " Tile="NewTiles/Jagged" />
+        <Object Symbol="r" Description="Reserved" />
       </TileDefinitions>
     </Area>
     
@@ -47,6 +49,7 @@
       <TileDefinitions>
         <Wall Symbol="O" Tile="NewTiles/RedAndBlueLarge" />
         <Floor Symbol=" " Tile="NewTiles/SquareInSquare" />
+        <Object Symbol="r" Description="Reserved" />
       </TileDefinitions>
     </Area>
 
@@ -56,6 +59,7 @@
         <Wall Symbol="O" Tile="NewTiles/RedAndBlueSmall" />
         <Floor Symbol=" " Tile="NewTiles/Web" />
         <Object Symbol="C" Description="Crystal" />
+        <Object Symbol="r" Description="Reserved" />
       </TileDefinitions>
     </Area>
   </Areas>
@@ -65,11 +69,11 @@
     <CrumblyWall Energy="20" Left="9" Top="1" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="9" Top="2" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="9" Top="3" Texture="CrumblyWall3" />
-    <CrumblyWall Energy="20" Left="10" Top="3" Texture="CrumblyWall3" />
+<!--<CrumblyWall Energy="20" Left="10" Top="3" Texture="CrumblyWall3" />-->
     <CrumblyWall Energy="20" Left="11" Top="3" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="12" Top="3" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="13" Top="3" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="14" Top="3" Texture="CrumblyWall3" />
-    <Monster Breed="PatrolPerimiterTest" Left="10" Top="2" Energy="10" Mobility="Patrolling" InitialDirection="Right" ChangeRooms="MovesRoom" />
+    <Monster Breed="Tank" Left="10" Top="8" Energy="10" Mobility="Patrolling" InitialDirection="Up" ChangeRooms="MovesRoom" IsActive="true" />
   </Objects>
 </World>

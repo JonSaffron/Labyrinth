@@ -76,7 +76,7 @@ namespace Labyrinth.GameObjects
         public void Reset()
             {
             this.CurrentDirectionFaced = Direction.Left;
-            this.CurrentMovement = DataStructures.Movement.Still;
+            this.CurrentMovement = Movement.Still;
             this._time = 0;
 
             this._weapon1.Reset();
@@ -192,10 +192,11 @@ namespace Labyrinth.GameObjects
             // ReSharper disable once IteratorNeverReturns - this is deliberate
             }
 
-        public override void BounceBack(Direction direction, decimal speed)
+        public override void Move(Direction direction, MovementType movementType)
             {
-            this._playerAnimation.ResetAnimation();
-            base.BounceBack(direction, speed);
+            if (movementType == MovementType.BounceBack && this.CurrentMovement.IsMoving)
+                this._playerAnimation.ResetAnimation();
+            base.Move(direction, movementType);
             }
 
         private void UpdateEnergy(GameTime gameTime)

@@ -55,7 +55,7 @@ namespace Labyrinth.GameObjects
         public override bool Update(GameTime gameTime)
             {
             this._animationPlayer.Update(gameTime);
-            bool inSameRoom = MonsterMovement.IsPlayerInSameRoomAsMonster(this);
+            bool inSameRoom = this.IsPlayerInSameRoom();
             this._hatchingTimer.Enabled = inSameRoom;
             return false;
             }

@@ -44,8 +44,8 @@ namespace Labyrinth.GameObjects.Motility
             {
             bool shouldMonsterFollowPlayerIntoAnotherRoom =
                 this.Monster.ChangeRooms == ChangeRooms.FollowsPlayer
-                && !MonsterMovement.IsPlayerInSameRoomAsMonster(this.Monster)
-                && MonsterMovement.IsPlayerNearby(this.Monster);
+                && !this.Monster.IsPlayerInSameRoom()
+                && this.Monster.IsPlayerNearby();
             return shouldMonsterFollowPlayerIntoAnotherRoom;
             }
 
@@ -61,7 +61,7 @@ namespace Labyrinth.GameObjects.Motility
                 return false;
                 }
 
-            this.Monster.Move(direction, this.Monster.CurrentSpeed);
+            this.Monster.Move(direction);
             this.CurrentDirection = direction;
             return true;
             }

@@ -9,8 +9,7 @@ namespace Labyrinth
         Vector2 OriginalPosition { get; set; }
         IBoundMovement MovementBoundary { get; } 
 
-        void Move(Direction direction, decimal speed);
-        void BounceBack(Direction direction, decimal speed);
+        void Move(Direction direction, MovementType movementType);
 
         // todo are these required?
         // void ResetPosition(Vector2 position);

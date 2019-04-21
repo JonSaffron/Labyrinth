@@ -32,7 +32,6 @@ namespace Labyrinth.GameObjects
             this.Definition = definition;
             this._animationPlayer = new LoopedAnimation(this, textureName, baseMovesDuringAnimation);
             this.Energy = definition.Energy;
-            this.CurrentSpeed = Constants.BaseSpeed;
             this.Behaviours = new BehaviourCollection(this);
             }
             
@@ -125,6 +124,11 @@ namespace Labyrinth.GameObjects
             this._movementIterator = null;
             }
 
+        public void Move(Direction direction)
+            {
+            base.Move(direction, Constants.BaseSpeed * this.SpeedAdjustmentFactor);
+            }
+
         private IEnumerable<bool> Move()
             {
             bool hasMovedSinceLastCall = false;
@@ -162,7 +166,7 @@ namespace Labyrinth.GameObjects
             {
             while (true)
                 {
-                var timeItWouldTakeToMakeAMove = Constants.TileLength / (double) this.CurrentSpeed;
+                var timeItWouldTakeToMakeAMove = Constants.TileLength / (double) (Constants.BaseSpeed * this.SpeedAdjustmentFactor);
                 if (timeStationary < timeItWouldTakeToMakeAMove)
                     break;
 
@@ -190,7 +194,7 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        public int CurrentSpeed { get; set; }
+        public decimal SpeedAdjustmentFactor { get; set; } = 1m;
 
         [NotNull]
         public BehaviourCollection Behaviours { get; }
