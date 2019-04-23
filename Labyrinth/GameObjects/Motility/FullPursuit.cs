@@ -14,33 +14,24 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        protected override Direction DetermineDirection()
+        public override Direction GetDirection()
             {
-            Direction directionTowardsPlayer = this.Monster.DetermineDirectionTowardsPlayer();
-            bool canMoveTowardsPlayer = this.Monster.ConfirmDirectionToMoveIn(directionTowardsPlayer, out Direction feasibleDirection);
-            if (!canMoveTowardsPlayer || feasibleDirection == Direction.None)
-                return feasibleDirection;
-
-            TilePos potentiallyMovingTowards = this.Monster.TilePosition.GetPositionAfterOneMove(directionTowardsPlayer);
-            if (potentiallyMovingTowards != GlobalServices.GameState.Player.TilePosition)
-                return directionTowardsPlayer;
-
-            var directionAwayFromPlayer = MonsterMovement.AlterDirectionByVeeringAway(feasibleDirection);
-            this.Monster.ConfirmDirectionToMoveIn(directionAwayFromPlayer, out Direction result);
-            return result;
-            }
-
-        public override bool SetDirectionAndDestination()
-            {
-            Direction direction = DetermineDirection();
-            if (direction == Direction.None)
+            var directionTowardsPlayer = this.Monster.DetermineDirectionTowardsPlayer();
+            if (!directionTowardsPlayer.IsConfirmedSafe)
                 {
-                this.Monster.StandStill();
-                return false;
+                bool canReallyMoveTowardsPlayer = this.Monster.ConfirmDirectionToMoveIn(directionTowardsPlayer.Direction, out Direction feasibleDirection);
+                if (!canReallyMoveTowardsPlayer || feasibleDirection == Direction.None)
+                    return feasibleDirection;
                 }
 
-            this.Monster.Move(direction);
-            return true;
+            // not allowed to actually step onto the same tile as the player
+            TilePos potentiallyMovingTowards = this.Monster.TilePosition.GetPositionAfterOneMove(directionTowardsPlayer.Direction);
+            if (potentiallyMovingTowards != GlobalServices.GameState.Player.TilePosition)
+                return directionTowardsPlayer.Direction;
+
+            var directionAwayFromPlayer = MonsterMovement.AlterDirectionByVeeringAway(directionTowardsPlayer.Direction);
+            this.Monster.ConfirmDirectionToMoveIn(directionAwayFromPlayer.Direction, out Direction result);
+            return result;
             }
         }
     }

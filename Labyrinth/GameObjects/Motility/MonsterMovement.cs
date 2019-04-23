@@ -8,10 +8,10 @@ namespace Labyrinth.GameObjects.Motility
         {
         private static readonly Direction[] Directions = { Direction.Left, Direction.Right, Direction.Up, Direction.Down };
         
-        public static Direction RandomDirection()
+        public static SelectedDirection RandomDirection()
             {
             int d = GlobalServices.Randomness.Next(256) & 3;
-            return Directions[d];
+            return SelectedDirection.UnsafeDirection(Directions[d]);
             }
 
         public static bool IsPlayerInWeaponSights(this Monster m)
@@ -102,18 +102,18 @@ namespace Labyrinth.GameObjects.Motility
                 }
             }
 
-        public static Direction AlterDirectionByVeeringAway(Direction d)
+        public static SelectedDirection AlterDirectionByVeeringAway(Direction d)
             {
             switch (d)
                 {
                 case Direction.Left:
-                    return Direction.Up;
+                    return SelectedDirection.UnsafeDirection(Direction.Up);
                 case Direction.Right:
-                    return Direction.Down;
+                    return SelectedDirection.UnsafeDirection(Direction.Down);
                 case Direction.Up:
-                    return Direction.Left;
+                    return SelectedDirection.UnsafeDirection(Direction.Left);
                 case Direction.Down:
-                    return Direction.Right;
+                    return SelectedDirection.UnsafeDirection(Direction.Right);
                 default:
                     throw new InvalidOperationException();
                 }
@@ -125,7 +125,7 @@ namespace Labyrinth.GameObjects.Motility
         /// <param name="m">The monster to determine the movement for</param>
         /// <returns>The direction that brings the monster closer to the player</returns>
         /// <remarks>This will never return Direction.None</remarks>
-        public static Direction DetermineDirectionTowardsPlayer(this Monster m)
+        public static SelectedDirection DetermineDirectionTowardsPlayer(this Monster m)
             {
             TilePos playerPos = GlobalServices.GameState.Player.TilePosition;
             int diffX = m.TilePosition.X - playerPos.X; 
@@ -135,15 +135,15 @@ namespace Labyrinth.GameObjects.Motility
                 result = diffX > 0 ? Direction.Left : Direction.Right;
 
                 if (m.CanMoveInDirection(result))
-                    return result;
+                    return SelectedDirection.SafeDirection(result);
                 }
 
             int diffY = m.TilePosition.Y - playerPos.Y;
             result = diffY > 0 ? Direction.Up : Direction.Down;
-            return result;
+            return SelectedDirection.UnsafeDirection(result);
             }
 
-        public static Direction DetermineDirectionAwayFromPlayer(this Monster m)
+        public static SelectedDirection DetermineDirectionAwayFromPlayer(this Monster m)
             {
             TilePos playerPos = GlobalServices.GameState.Player.TilePosition;
             int diffX = m.TilePosition.X - playerPos.X;
@@ -153,12 +153,12 @@ namespace Labyrinth.GameObjects.Motility
                 result = diffX > 0 ? Direction.Right : Direction.Left;
 
                 if (m.CanMoveInDirection(result))
-                    return result;
+                    return SelectedDirection.SafeDirection(result);
                 }
 
             int diffY = m.TilePosition.Y - playerPos.Y;
             result = diffY > 0 ? Direction.Down : Direction.Up;
-            return result;
+            return SelectedDirection.UnsafeDirection(result);
             }
         }
     }

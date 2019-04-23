@@ -213,7 +213,7 @@
   <Breed Name="Tank" Texture="Tank" BaseMovesDuringAnimation="8">
     <Movement Default="Placid" ChangeRooms="FollowsPlayer" Speed="0.0625">  <!-- this is 1 / 16 -->
       <Move Type="Placid" Implementation="StandardRolling" />
-      <Move Type="Patrolling" Implementation="StandardPatrolling" />
+      <Move Type="Patrolling" Implementation="PatrolPerimeter" />
     </Movement>
   </Breed>
 </Monsters>

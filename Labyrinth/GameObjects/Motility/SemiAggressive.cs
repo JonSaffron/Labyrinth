@@ -10,20 +10,20 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        protected override Direction DetermineDirection()
+        public override Direction GetDirection()
             {
             var result = 
                 ShouldMakeAnAggressiveMove(this.Monster) 
                     ? this.Monster.DetermineDirectionTowardsPlayer() 
                     : MonsterMovement.RandomDirection();
             
-            return result;
+            return base.GetConfirmedSafeDirection(result);
             }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool ShouldMakeAnAggressiveMove(Monster monster)
             {
-            return GlobalServices.Randomness.Test(1) && MonsterMovement.IsPlayerNearby(monster);
+            return GlobalServices.Randomness.Test(1) && monster.IsPlayerNearby();
             }   
         }
     }

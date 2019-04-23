@@ -3,13 +3,13 @@
   <Layout>
     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
     OS       #     OOr             O
-    O        #     OO              O
-    O        # ####OO              O
+    O        #P    OO              O
+    O        ######OO              O
     O                              O
     O                              O
     O              OO              O
     O              OO              O
-    O         P    OO              O
+    O              OO              O
     OOOOOO    OOOOOOOOOOO    OOOOOOO
     OOOOOO    OOOOOOOOOOO    OOOOOOO
     Or             OOr             O
@@ -69,11 +69,11 @@
     <CrumblyWall Energy="20" Left="9" Top="1" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="9" Top="2" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="9" Top="3" Texture="CrumblyWall3" />
-<!--<CrumblyWall Energy="20" Left="10" Top="3" Texture="CrumblyWall3" />-->
+    <CrumblyWall Energy="20" Left="10" Top="3" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="11" Top="3" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="12" Top="3" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="13" Top="3" Texture="CrumblyWall3" />
     <CrumblyWall Energy="20" Left="14" Top="3" Texture="CrumblyWall3" />
-    <Monster Breed="Tank" Left="10" Top="8" Energy="10" Mobility="Patrolling" InitialDirection="Up" ChangeRooms="MovesRoom" IsActive="true" />
+    <Monster Breed="Tank" Left="10" Top="2" Energy="10" Mobility="Patrolling" InitialDirection="Up" ChangeRooms="MovesRoom" IsActive="true" />
   </Objects>
 </World>

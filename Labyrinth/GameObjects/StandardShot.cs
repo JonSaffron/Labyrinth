@@ -67,7 +67,7 @@ namespace Labyrinth.GameObjects
                     break;
                 case Orientation.Vertical:
                     distanceToTravel = Constants.RoomSizeInPixels.Y * (isInitialMove ? 1.25d : 0.75d);
-                    this._animationPlayer.Rotation = (float)(Math.PI * 90.0f / 180f);
+                    this._animationPlayer.Rotation = MathHelper.PiOver2;
                     break;
                 default:
                     throw new InvalidOperationException();

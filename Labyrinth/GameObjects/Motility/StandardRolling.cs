@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
@@ -16,7 +17,15 @@ namespace Labyrinth.GameObjects.Motility
             this.CurrentDirection = initialDirection;
             }
 
-        protected override Direction DetermineDirection()
+        public override Direction GetDirection()
+            {
+            SelectedDirection desiredDirection = GetDesiredDirection();
+            var result = GetConfirmedSafeDirection(desiredDirection);
+            this.CurrentDirection = result;
+            return result;
+            }
+
+        protected SelectedDirection GetDesiredDirection()
             {
             if (this.CurrentDirection == Direction.None)
                 {
@@ -34,10 +43,10 @@ namespace Labyrinth.GameObjects.Motility
                 }
 
             if (this.Monster.CanMoveInDirection(this.CurrentDirection))
-                return this.CurrentDirection;
+                return SelectedDirection.SafeDirection(this.CurrentDirection);
 
             var reversed = this.CurrentDirection.Reversed();
-            return reversed;
+            return SelectedDirection.UnsafeDirection(reversed);
             }
 
         private bool ShouldMonsterFollowPlayerIntoAnotherRoom()
@@ -47,23 +56,6 @@ namespace Labyrinth.GameObjects.Motility
                 && !this.Monster.IsPlayerInSameRoom()
                 && this.Monster.IsPlayerNearby();
             return shouldMonsterFollowPlayerIntoAnotherRoom;
-            }
-
-        public override bool SetDirectionAndDestination()
-            {
-            Direction direction = DetermineDirection();
-            this.Monster.ConfirmDirectionToMoveIn(direction, out Direction feasibleDirection);
-            direction = feasibleDirection;
-
-            if (direction == Direction.None)
-                {
-                this.Monster.StandStill();
-                return false;
-                }
-
-            this.Monster.Move(direction);
-            this.CurrentDirection = direction;
-            return true;
             }
         }
     }

@@ -2,6 +2,6 @@
     {
     public interface IMonsterMotion
         {
-        bool SetDirectionAndDestination();
+        Direction GetDirection();
         }
     }

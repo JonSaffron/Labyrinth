@@ -1,19 +1,28 @@
+using System;
 using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
+    [UsedImplicitly]
     class KillerCubeRedMovement : StandardRolling
         {
         public KillerCubeRedMovement([NotNull] Monster monster) : base(monster)
             {
             }
 
-        private Direction GetIntendedDirection(Monster monster)
+        public override Direction GetDirection()
             {
-            TilePos tp = monster.TilePosition;
+            var direction = ShouldMakeAnAggressiveMove() ? GetIntendedDirection() : base.GetDesiredDirection();
+            var result = base.GetConfirmedSafeDirection(direction);
+            return result;
+            }
+
+        private SelectedDirection GetIntendedDirection()
+            {
+            TilePos tp = this.Monster.TilePosition;
                 
-            Direction newDirection;
+            SelectedDirection newDirection;
             TilePos playerPosition = GlobalServices.GameState.Player.TilePosition;
             int yDiff = tp.Y - playerPosition.Y;    // +ve and the player is above, -ve and the player is below
             int xDiff = tp.X - playerPosition.X;    // +ve and the player is to the left, -ve and the player is to the right
@@ -23,29 +32,20 @@ namespace Labyrinth.GameObjects.Motility
                 newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
             else if ((this.CurrentDirection == Direction.Left && xDiff <= -5) || (this.CurrentDirection == Direction.Right && xDiff >= 5))
                 {
-                newDirection = yDiff > 0 ? Direction.Up : Direction.Down;
+                newDirection = SelectedDirection.UnsafeDirection(yDiff > 0 ? Direction.Up : Direction.Down);
                 }
             else if ((this.CurrentDirection == Direction.Up && yDiff <= -5) || (this.CurrentDirection == Direction.Down && yDiff >= 5))
                 {
-                newDirection = xDiff > 0 ? Direction.Left : Direction.Right;
+                newDirection = SelectedDirection.UnsafeDirection(xDiff > 0 ? Direction.Left : Direction.Right);
                 }
             else if (GlobalServices.Randomness.Next(16) == 0)
                 {
                 newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
                 }
             else
-                newDirection = this.CurrentDirection;
+                newDirection = SelectedDirection.UnsafeDirection(this.CurrentDirection);
                 
             return newDirection;
-            }
-
-        protected override Direction DetermineDirection()
-            {
-            var result = 
-                ShouldMakeAnAggressiveMove(this.Monster)
-                    ? GetIntendedDirection(this.Monster)
-                    : base.DetermineDirection();
-            return result;
             }
 
         private static bool ShouldMakeMoveToAvoidTrouble()
@@ -53,20 +53,26 @@ namespace Labyrinth.GameObjects.Motility
             return GlobalServices.Randomness.Next(8) == 0; 
             }
 
-        private static Direction GetRandomPerpendicularDirection(Direction currentDirection)
+        private static SelectedDirection GetRandomPerpendicularDirection(Direction currentDirection)
             {
+            if (currentDirection == Direction.None)
+                return MonsterMovement.RandomDirection();
+
+            bool whichWay = GlobalServices.Randomness.Next(2) == 0;
             var orientation = currentDirection.Orientation();
-            if (orientation == Orientation.Horizontal)
-                return GlobalServices.Randomness.Next(2) == 0 ? Direction.Up : Direction.Down;
-            if (orientation == Orientation.Vertical)
-                return GlobalServices.Randomness.Next(2) == 0 ? Direction.Left : Direction.Right;
-            return MonsterMovement.RandomDirection();
+            switch (orientation)
+                {
+                case Orientation.Horizontal:
+                    return SelectedDirection.UnsafeDirection(whichWay ? Direction.Up : Direction.Down);
+                case Orientation.Vertical:
+                    return SelectedDirection.UnsafeDirection(whichWay ? Direction.Left : Direction.Right);
+                }
+            throw new InvalidOperationException();
             }
 
-        private static bool ShouldMakeAnAggressiveMove(Monster monster)
+        private bool ShouldMakeAnAggressiveMove()
             {
-            var result = MonsterMovement.IsPlayerNearby(monster);
-            return result;
+            return this.Monster.IsPlayerNearby();
             }
         }
     }

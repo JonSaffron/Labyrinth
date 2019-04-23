@@ -15,7 +15,14 @@ namespace Labyrinth.GameObjects.Motility
             this._currentDirection = initialDirection;
             }
 
-        protected override Direction DetermineDirection()
+        public override Direction GetDirection()
+            {
+            var result = GetDesiredDirection();
+            this._currentDirection = result;
+            return result;
+            }
+
+        private Direction GetDesiredDirection()
             {
             if (this.Monster.CanMoveInDirection(this._currentDirection))
                 return this._currentDirection;
@@ -23,20 +30,6 @@ namespace Labyrinth.GameObjects.Motility
             if (this.Monster.CanMoveInDirection(reversed))
                 return reversed;
             return Direction.None;
-            }
-
-        public override bool SetDirectionAndDestination()
-            {
-            Direction direction = DetermineDirection();
-            if (direction == Direction.None)
-                {
-                this.Monster.StandStill();
-                return false;
-                }
-
-            this.Monster.Move(direction);
-            this._currentDirection = direction;
-            return true;
             }
         }
     }

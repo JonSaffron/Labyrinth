@@ -125,6 +125,7 @@
     <Compile Include="DataStructures\GameStartParameters.cs" />
     <Compile Include="DataStructures\Grid.cs" />
     <Compile Include="DataStructures\PlayerControl.cs" />
+    <Compile Include="DataStructures\SelectedDirection.cs" />
     <Compile Include="DataStructures\SimpleList.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoundaryCurrentRoom.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="GameObjects\MovementChecker.cs" />
     <Compile Include="GameObjects\MovementCheckerForMonsters.cs" />
     <Compile Include="GameObjects\Potion.cs" />
+    <Compile Include="GameObjects\Tank.cs" />
     <Compile Include="GameObjects\TileReservation.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GlobalServices.cs" />
@@ -205,6 +207,7 @@
     <Compile Include="Services\Display\DrawParameters.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />
     <Compile Include="Services\Display\SpriteLibrary.cs" />
+    <Compile Include="Services\Display\TankAnimation.cs" />
     <Compile Include="Services\Display\WorldRenderer.cs" />
     <Compile Include="Services\Input\InputState.cs" />
     <Compile Include="Services\Input\PlayerController.cs" />

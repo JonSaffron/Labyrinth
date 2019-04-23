@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
@@ -12,7 +13,18 @@ namespace Labyrinth.GameObjects.Motility
             this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
-        protected virtual Direction DetermineDirection()
+        public abstract Direction GetDirection();
+
+        protected Direction GetConfirmedSafeDirection(SelectedDirection selectedDirection)
+            {
+            if (selectedDirection.IsConfirmedSafe || selectedDirection.Direction == Direction.None)
+                return selectedDirection.Direction;
+            
+            this.Monster.ConfirmDirectionToMoveIn(selectedDirection.Direction, out Direction feasibleDirection);
+            return feasibleDirection;
+            }
+
+/*        protected virtual Direction DetermineDirection()
             {
             return Direction.None;
             }
@@ -34,6 +46,6 @@ namespace Labyrinth.GameObjects.Motility
 
             this.Monster.Move(direction);
             return true;
-            }
+            }*/
         }
     }

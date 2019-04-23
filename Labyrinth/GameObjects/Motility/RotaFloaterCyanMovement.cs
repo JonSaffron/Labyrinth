@@ -9,7 +9,16 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
             
-        private Direction GetIntendedDirection(Monster monster)
+        public override Direction GetDirection()
+            {
+            var result = 
+                ShouldMakeAnAggressiveMove(this.Monster) 
+                    ? GetIntendedDirection(this.Monster) 
+                    : base.GetDesiredDirection();
+            return base.GetConfirmedSafeDirection(result);
+            }
+
+        private SelectedDirection GetIntendedDirection(Monster monster)
             {
             TilePos tp = monster.TilePosition;
             TilePos playerPosition = GlobalServices.GameState.Player.TilePosition;
@@ -20,28 +29,19 @@ namespace Labyrinth.GameObjects.Motility
             if (orientation == Orientation.Horizontal)
                 {
                 if (yDiff > 0)
-                    return Direction.Up;
+                    return SelectedDirection.UnsafeDirection(Direction.Up);
                 if (yDiff < 0)
-                    return Direction.Down;
+                    return SelectedDirection.UnsafeDirection(Direction.Down);
                 }
             else if (orientation == Orientation.Vertical)
                 {
                 if (xDiff > 0)
-                    return Direction.Left;
+                    return SelectedDirection.UnsafeDirection(Direction.Left);
                 if (xDiff < 0)
-                    return Direction.Right;
+                    return SelectedDirection.UnsafeDirection(Direction.Right);
                 }
 
             return MonsterMovement.RandomDirection();
-            }
-
-        protected override Direction DetermineDirection()
-            {
-            var result = 
-                ShouldMakeAnAggressiveMove(this.Monster) 
-                    ? GetIntendedDirection(this.Monster) 
-                    : base.DetermineDirection();
-            return result;
             }
 
         private static bool ShouldMakeAnAggressiveMove(Monster monster)

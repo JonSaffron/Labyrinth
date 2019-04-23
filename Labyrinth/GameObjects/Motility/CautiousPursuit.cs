@@ -1,20 +1,23 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
+    [UsedImplicitly]
     class CautiousPursuit : MonsterMotionBase
         {
         public CautiousPursuit([NotNull] Monster monster) : base(monster)
             {
             }
 
-        protected override Direction DetermineDirection()
+        public override Direction GetDirection()
             {
             var method = IsScaredOfPlayer(this.Monster) 
-                ? (Func<Monster, Direction>) MoveAwayFromPlayer 
+                ? (Func<Monster, SelectedDirection>) MoveAwayFromPlayer 
                                            : MoveTowardsPlayer;
-            return method(this.Monster);
+            var selectedDirection = method(this.Monster);
+            return GetConfirmedSafeDirection(selectedDirection);
             }
 
         private static bool IsScaredOfPlayer(Monster m)
@@ -24,22 +27,22 @@ namespace Labyrinth.GameObjects.Motility
             return result;
             }
 
-        public static Direction MoveTowardsPlayer(Monster monster)
+        public static SelectedDirection MoveTowardsPlayer(Monster monster)
             {
             bool shouldMoveRandomly = GlobalServices.Randomness.Test(7);
-            Direction result = shouldMoveRandomly
+            SelectedDirection result = shouldMoveRandomly
                 ? MonsterMovement.RandomDirection() 
                 : monster.DetermineDirectionTowardsPlayer();
             return result;
             }
 
-        private static Direction MoveAwayFromPlayer(Monster monster)
+        private static SelectedDirection MoveAwayFromPlayer(Monster monster)
             {
             var awayFromPlayer = monster.DetermineDirectionAwayFromPlayer();
             bool shouldDodgeWhilstFleeing = GlobalServices.Randomness.Test(3);
             if (shouldDodgeWhilstFleeing)
                 {
-                var alteredDirection = MonsterMovement.AlterDirectionByVeeringAway(awayFromPlayer);
+                var alteredDirection = MonsterMovement.AlterDirectionByVeeringAway(awayFromPlayer.Direction);
                 return alteredDirection;
                 }
             

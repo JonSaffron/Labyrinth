@@ -8,10 +8,9 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        public override bool SetDirectionAndDestination()
+        public override Direction GetDirection()
             {
-            this.Monster.StandStill();
-            return false;
+            return Direction.None;
             }
         }
     }

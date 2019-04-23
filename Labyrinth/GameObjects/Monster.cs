@@ -15,33 +15,37 @@ namespace Labyrinth.GameObjects
         private MonsterMobility _mobility;
         public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
         [CanBeNull] private IMonsterMotion _determineDirection;
-        private readonly LoopedAnimation _animationPlayer;
+        protected IDynamicAnimation AnimationPlayer;
 
         public IBoundMovement SightBoundary { get; private set; }
 
         public readonly MonsterDef Definition;
 
         private IEnumerator<bool> _movementIterator;
-        private double _remainingTime;
+        protected double RemainingTime;
         private ChangeRooms _changeRooms;
-        private bool _isActive;
+
         [CanBeNull] public IMonsterWeapon Weapon { get; set; }
 
-        public Monster(MonsterDef definition, string textureName, int baseMovesDuringAnimation) : base(definition.Position)
+        public Monster(MonsterDef definition, string textureName, int baseMovesDuringAnimation) : this(definition)
+            {
+            this.AnimationPlayer = new LoopedAnimation(this, textureName, baseMovesDuringAnimation);
+            }
+
+        protected Monster(MonsterDef definition) : base(definition.Position)
             {
             this.Definition = definition;
-            this._animationPlayer = new LoopedAnimation(this, textureName, baseMovesDuringAnimation);
             this.Energy = definition.Energy;
             this.Behaviours = new BehaviourCollection(this);
             }
-            
-        public bool IsActive => this._isActive;
+
+        public bool IsActive { get; private set; }
 
         public void Activate()
             {
             if (!this.IsActive)
                 {
-                this._isActive = true;
+                this.IsActive = true;
                 SetMonsterMotion(true);
                 }
             }
@@ -92,24 +96,15 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private bool SetDirectionAndDestination()
-            {
-            if (this._determineDirection == null)
-                throw new InvalidOperationException("Determine Direction object reference not set.");
-
-            var result = this._determineDirection.SetDirectionAndDestination();
-            return result;
-            }
-
         /// <summary>
         /// Update the monster's position, and run its behaviours
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            this._animationPlayer.Update(gameTime);
+            this.AnimationPlayer.Update(gameTime);
 
             // move the monster
-            this._remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
+            this.RemainingTime = gameTime.ElapsedGameTime.TotalSeconds;
             if (this._movementIterator == null)
                 this._movementIterator = this._movementIterator = Move().GetEnumerator();
             this._movementIterator.MoveNext();
@@ -124,37 +119,53 @@ namespace Labyrinth.GameObjects
             this._movementIterator = null;
             }
 
-        public void Move(Direction direction)
+        protected void Move(Direction direction)
             {
             base.Move(direction, Constants.BaseSpeed * this.SpeedAdjustmentFactor);
             }
 
-        private IEnumerable<bool> Move()
+        protected virtual IEnumerable<bool> Move()
             {
             bool hasMovedSinceLastCall = false;
-            double timeStationary = 0;
             while (true)
                 {
-                if (this.SetDirectionAndDestination())
+                Direction direction = this.GetDirection();
+                if (direction == Direction.None)
                     {
-                    hasMovedSinceLastCall = true;
-                    timeStationary = 0;
+                    double timeLeftStationary = Constants.TileLength / (double) (Constants.BaseSpeed * this.SpeedAdjustmentFactor);
                     while (true)
                         {
-                        if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
-                            break;
-                        
-                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.MovingMonster);
-                        yield return true;  // we have moved
-                        }
+                        bool hasMoveCompleted = timeLeftStationary <= this.RemainingTime;
+                        if (hasMoveCompleted)
+                            {
+                            this.RemainingTime -= timeLeftStationary;
+                            break;  // end of stationary move, so do behaviours and get next direction
+                            }
 
-                    this.Behaviours.Perform<IMovementBehaviour>();
+                        timeLeftStationary -= this.RemainingTime;
+                        this.RemainingTime = 0;
+                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
+                        yield return hasMovedSinceLastCall;
+                        hasMovedSinceLastCall = false;
+                        }
                     }
                 else
                     {
-                    timeStationary += this._remainingTime;
-                    DoActionsWhilstStationary(ref timeStationary);
-                    this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
+                    Move(direction);
+                    while (true)
+                        {
+                        hasMovedSinceLastCall = true;
+                        if (this.TryToCompleteMoveToTarget(ref this.RemainingTime))
+                            break;
+
+                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.MovingMonster);
+                        yield return true; // we have moved
+                        }
+                    }
+
+                this.Behaviours.Perform<IMovementBehaviour>();
+                if (this.RemainingTime <= Double.Epsilon * 2)
+                    {
                     yield return hasMovedSinceLastCall;
                     hasMovedSinceLastCall = false;
                     }
@@ -162,17 +173,13 @@ namespace Labyrinth.GameObjects
             // ReSharper disable once IteratorNeverReturns - this is deliberate
             }
 
-        private void DoActionsWhilstStationary(ref double timeStationary)
+        protected Direction GetDirection()
             {
-            while (true)
-                {
-                var timeItWouldTakeToMakeAMove = Constants.TileLength / (double) (Constants.BaseSpeed * this.SpeedAdjustmentFactor);
-                if (timeStationary < timeItWouldTakeToMakeAMove)
-                    break;
+            if (this._determineDirection == null)
+                throw new InvalidOperationException("Determine Direction object reference not set.");
 
-                timeStationary -= timeItWouldTakeToMakeAMove;
-                this.Behaviours.Perform<IMovementBehaviour>();
-                }
+            var result = this._determineDirection.GetDirection();
+            return result;
             }
 
         /// <inheritdoc cref="MovingItem.TryToCompleteMoveToTarget" />
@@ -199,7 +206,7 @@ namespace Labyrinth.GameObjects
         [NotNull]
         public BehaviourCollection Behaviours { get; }
 
-        public override IRenderAnimation RenderAnimation => this._animationPlayer;
+        public override IRenderAnimation RenderAnimation => this.AnimationPlayer;
 
         public ChangeRooms ChangeRooms
             {

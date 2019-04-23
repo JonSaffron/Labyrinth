@@ -9,7 +9,7 @@ namespace Labyrinth.Services.Display
     /// Controls playback of an Animation that loops repeatedly
     /// </summary>
     /// <remarks>Only suitable for a animation which is the same size as a tile</remarks>
-    public class LoopedAnimation : IRenderAnimation
+    public class LoopedAnimation : IDynamicAnimation
         {
         private readonly IGameObject _gameObject;
 

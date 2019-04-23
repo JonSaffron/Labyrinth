@@ -112,6 +112,8 @@ namespace Labyrinth.GameObjects
         private static Monster BuildMonsterFromBreed([NotNull] Breed breedInfo, MonsterDef monsterDef)
             {
             var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
+            if (breedInfo.Name == "Tank")
+                return new Tank(monsterDef);
             var result = new Monster(monsterDef, pathToTexture, breedInfo.BaseMovesDuringAnimation);
             return result;
             }

@@ -46,6 +46,13 @@ namespace Labyrinth
         Horizontal
         }
 
+    public enum Motion
+        {
+        Still = 0,
+        Forwards = 1,
+        Backwards = -1
+        }
+
     /// <summary>
     /// Describes how solid an object is
     /// </summary>
