@@ -58,20 +58,20 @@ namespace Labyrinth.Services.Display
         protected abstract void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, float opacity, float rotation, Vector2 origin, SpriteEffects effects);
 
         /// <inheritdoc />
-        public virtual void DrawRectangle(Rectangle destinationRectangle, Color color)
+        public virtual void DrawRectangle(Rectangle destinationRectangle, Color colour)
             {
-            this.DrawTexture(this._pointTexture, destinationRectangle, color);
+            this.DrawTexture(this._pointTexture, destinationRectangle, colour);
             }
 
         protected abstract void DrawTexture(Texture2D texture, Rectangle absoluteArea, Color colour);
 
         /// <inheritdoc />
-        public void DrawCentredString(SpriteFont font, string text, int y, Color color)
+        public void DrawCentredString(SpriteFont font, string text, int y, Color colour)
             {
             float textWidth = font.MeasureString(text).X;
             Vector2 pos = new Vector2(this.ScreenCentreWidth, y);
             Vector2 origin = new Vector2(textWidth / 2f, 0f);
-            this.SpriteBatch.DrawString(spriteFont: font, text: text, position: pos, color: color, rotation: 0, origin: origin, scale: this.Zoom, effects: SpriteEffects.None, layerDepth: 0);
+            this.SpriteBatch.DrawString(spriteFont: font, text: text, position: pos, color: colour, rotation: 0, origin: origin, scale: this.Zoom, effects: SpriteEffects.None, layerDepth: 0);
             }
         }
     }

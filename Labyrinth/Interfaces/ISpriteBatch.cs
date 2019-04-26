@@ -51,7 +51,7 @@ namespace Labyrinth
         /// <param name="font">The font to render the text in</param>
         /// <param name="text">The text to draw</param>
         /// <param name="y">The Y co-ordinate to draw the text at</param>
-        /// <param name="color">The colour to draw the text in</param>
-        void DrawCentredString(SpriteFont font, string text, int y, Color color);
+        /// <param name="colour">The colour to draw the text in</param>
+        void DrawCentredString(SpriteFont font, string text, int y, Color colour);
         }
     }
