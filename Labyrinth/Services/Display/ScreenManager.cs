@@ -328,6 +328,30 @@ namespace Labyrinth.Services.Display
             SpriteBatch.End();
             }
 
+        public void ShrinkViewport(float alpha)
+            {
+            int cx = (int) Constants.RoomSizeInPixels.X;
+            int cy = (int) Constants.RoomSizeInPixels.Y;
+            RenderTarget2D target = new RenderTarget2D(this.GraphicsDevice, cx, cy, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            this.GraphicsDevice.SetRenderTarget(target);
+            this.SpriteBatch.Begin();
+            this.SpriteBatch.DrawRectangle(new Rectangle(0, 0, cx, cy), Color.Black);
+            int x = (int) (cx * alpha / 2.0f);
+            int y = (int) (cy * alpha / 2.0f);
+            var whiteRect = new Rectangle(x, y, cx - (2 * x), cy - (2 * y));
+            this.SpriteBatch.DrawRectangle(whiteRect, Color.White);
+            x += 1;
+            y += 1;
+            var transparentRect = new Rectangle(x, y, cx - (2 * x) , cy - (2 * y));
+            this.SpriteBatch.DrawRectangle(transparentRect, Color.Transparent);
+            this.SpriteBatch.End();
+
+            this.GraphicsDevice.SetRenderTarget(null);
+            this.SpriteBatch.Begin();
+            this.SpriteBatch.DrawTexture(target, Vector2.Zero, null);
+            this.SpriteBatch.End();
+            }
+
         public void ToggleFullScreen()
             {
             if (!this._gdm.IsFullScreen)

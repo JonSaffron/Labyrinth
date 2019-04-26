@@ -183,7 +183,8 @@ namespace Labyrinth.Services.Display
 
             // If the game is transitioning on or off, fade it out to black.
             if (this.TransitionPosition > 0f)
-                this.ScreenManager.FadeBackBufferToBlack(1f - this.TransitionAlpha);
+                this.ScreenManager.ShrinkViewport(1f - this.TransitionAlpha);
+                //this.ScreenManager.FadeBackBufferToBlack(1f - this.TransitionAlpha);
             }
 
         public World LoadWorld(string worldData)
