@@ -115,19 +115,67 @@
       <RandomMonsterDistribution DiceToRoll="2D8" CountOfMonsters="190">
         <MonsterTemplates>
           <Monster MatchingDiceRoll="2" Breed="RotaFloaterCyan" Energy="110" Mobility="Placid" ChangeRooms="FollowsPlayer" />
-          <Monster MatchingDiceRoll="3" Breed="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- lays eggs and shoots -->
+          <Monster MatchingDiceRoll="3" Breed="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <LaysEggs/>
+              <ShootsAtPlayer value="Immediately"/>
+            </Apply>
+          </Monster>
           <Monster MatchingDiceRoll="4" Breed="FlitterbugRed" Energy="100" Mobility="Aggressive" ChangeRooms="FollowsPlayer" />
-          <Monster MatchingDiceRoll="5" Breed="ThresherCyan" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" /> <!-- lays mushrooms -->
-          <Monster MatchingDiceRoll="6" Breed="KillerCubeRed" Energy="150" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- shoots immediately -->
-          <Monster MatchingDiceRoll="7" Breed="FlitterbugRed" Energy="110" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" />
-          <Monster MatchingDiceRoll="8" Breed="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer" /> <!-- lays eggs and shoots -->
+          <Monster MatchingDiceRoll="5" Breed="ThresherCyan" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <LaysEggs/>
+              <LaysMushrooms/>
+            </Apply>
+          </Monster>
+          <Monster MatchingDiceRoll="6" Breed="KillerCubeRed" Energy="150" Mobility="Placid" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <ShootsAtPlayer value="Immediately"/>
+            </Apply>
+          </Monster>
+          <Monster MatchingDiceRoll="7" Breed="FlitterbugRed" Energy="110" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <LaysEggs/>
+            </Apply>
+          </Monster>
+          <Monster MatchingDiceRoll="8" Breed="DiamondDemon" Energy="50" Mobility="Placid" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <LaysEggs/>
+              <ShootsAtPlayer value="Immediately"/>
+            </Apply>
+          </Monster>
           <Monster MatchingDiceRoll="9" Breed="CrazyCrawler" Energy="40" Mobility="Aggressive" ChangeRooms="FollowsPlayer" />
           <Monster MatchingDiceRoll="10" Breed="FlitterbugCyan" Energy="150" Mobility="Cautious" ChangeRooms="FollowsPlayer" />
-          <Monster MatchingDiceRoll="11" Breed="TigerMoth" Energy="120" Mobility="Aggressive" ChangeRooms="MovesRoom" /> <!-- shoots once shot lays mushrooms -->
-          <Monster MatchingDiceRoll="12" Breed="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> <!-- splits -->
-          <Monster MatchingDiceRoll="13" Breed="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer" LaysEggs="true" /> <!-- splits -->
-          <Monster MatchingDiceRoll="14" Breed="Butterfly" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> <!-- shoots lays eggs -->
-          <Monster MatchingDiceRoll="15" Breed="Joker" Energy="120" Mobility="Cautious" ChangeRooms="FollowsPlayer" /> <!-- shoots, splits, lays eggs -->
+          <Monster MatchingDiceRoll="11" Breed="TigerMoth" Energy="120" Mobility="Aggressive" ChangeRooms="MovesRoom">
+            <Apply>
+              <ShootsAtPlayer value="OnceInjured"/>
+              <LaysMushrooms/>
+            </Apply>
+          </Monster>
+          <Monster MatchingDiceRoll="12" Breed="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <SplitsOnHit/>
+            </Apply>
+          </Monster>
+          <Monster MatchingDiceRoll="13" Breed="FlitterbugBrown" Energy="160" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <LaysEggs/>
+              <SplitsOnHit/>
+            </Apply>
+          </Monster>
+          <Monster MatchingDiceRoll="14" Breed="Butterfly" Energy="120" Mobility="Aggressive" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <ShootsAtPlayer value="Immediately"/>
+              <LaysEggs/>
+            </Apply>
+          </Monster>
+          <Monster MatchingDiceRoll="15" Breed="Joker" Energy="120" Mobility="Cautious" ChangeRooms="FollowsPlayer">
+            <Apply>
+              <ShootsAtPlayer value="Immediately"/>
+              <SplitsOnHit/>
+              <LaysEggs/>
+            </Apply>
+          </Monster>
           <Monster MatchingDiceRoll="16" Breed="CrazyCrawler" Energy="40" Mobility="Aggressive" ChangeRooms="FollowsPlayer" /> 
         </MonsterTemplates>
       </RandomMonsterDistribution>
