@@ -24,7 +24,7 @@ namespace Labyrinth
             screenManager.TraceEnabled = true;
 #endif
 
-            var gameStartParameters = new GameStartParameters { CountOfLives = 3, WorldToLoad = "TestWorld", WorldLoader = new WorldLoader()};
+            var gameStartParameters = new GameStartParameters { CountOfLives = 3, WorldToLoad = "World2", WorldLoader = new WorldLoader()};
             var gamePlayScreen = new GameplayScreen(gameStartParameters, screenManager.InputState);
             LoadingScreen.Load(screenManager, true, null, gamePlayScreen);
 

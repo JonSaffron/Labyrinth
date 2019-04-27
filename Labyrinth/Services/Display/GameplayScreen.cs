@@ -98,16 +98,9 @@ namespace Labyrinth.Services.Display
                         break;
             
                     case WorldReturnType.LostLife:
-                        GlobalServices.SoundPlayer.ActiveSoundService.Clear();
-                        if (this._livesRemaining == 0)
-                            {
-                            // todo this isn't the ideal place for this
-                            VolumeControl.Instance.SaveState();
-                            this.ScreenManager.Game.Exit();
-                            return;
-                            }
-                        this._livesRemaining--;
-                        this._world.ResetWorldAfterLosingLife();
+                        var screenWipe = new ScreenWipe();
+                        screenWipe.Wiped += LostLife;
+                        ScreenManager.AddScreen(screenWipe, this.ControllingPlayer);
                         break;
                     }
                 }
@@ -117,6 +110,23 @@ namespace Labyrinth.Services.Display
                 string text = $"{gameTime.TotalGameTime}: Running slowly";
                 System.Diagnostics.Trace.WriteLine(text);
                 }
+            }
+
+        private void LostLife(object source, EventArgs eventArgs)
+            {
+            GlobalServices.SoundPlayer.ActiveSoundService.Clear();
+            this.ScreenManager.RemoveScreen((GameScreen) source);
+            if (this._livesRemaining == 0)
+                {
+                // todo this isn't the ideal place for this
+                VolumeControl.Instance.SaveState();
+                this.ScreenManager.Game.Exit();
+                return;
+                }
+            this._livesRemaining--;
+            this._world.ResetWorldAfterLosingLife();
+            this.ScreenState = ScreenState.TransitionOn;
+            this.TransitionPosition = 1f;
             }
 
         /// <summary>
@@ -183,8 +193,9 @@ namespace Labyrinth.Services.Display
 
             // If the game is transitioning on or off, fade it out to black.
             if (this.TransitionPosition > 0f)
-                this.ScreenManager.ShrinkViewport(1f - this.TransitionAlpha);
-                //this.ScreenManager.FadeBackBufferToBlack(1f - this.TransitionAlpha);
+                {
+                this.ScreenManager.FadeBackBufferToBlack(1f - this.TransitionAlpha);
+                }
             }
 
         public World LoadWorld(string worldData)

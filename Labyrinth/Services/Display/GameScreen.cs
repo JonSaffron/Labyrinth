@@ -39,7 +39,7 @@ namespace Labyrinth.Services.Display
         /// from zero (fully active, no transition) to one (transitioned
         /// fully off to nothing).
         /// </summary>
-        protected float TransitionPosition { get; set; } = 1;
+        protected float TransitionPosition { get; set; } = 1f;
 
         /// <summary>
         /// Gets the current alpha of the screen transition, ranging

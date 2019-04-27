@@ -203,6 +203,7 @@
     <Compile Include="Services\Display\PlayerAnimation.cs" />
     <Compile Include="Services\Display\ScreenManager.cs" />
     <Compile Include="Services\Display\ScreenState.cs" />
+    <Compile Include="Services\Display\ScreenWipe.cs" />
     <Compile Include="Services\Display\StaticAnimation.cs" />
     <Compile Include="Services\Display\DrawParameters.cs" />
     <Compile Include="Services\Display\SpriteBatchBase.cs" />

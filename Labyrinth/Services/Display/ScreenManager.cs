@@ -66,7 +66,7 @@ namespace Labyrinth.Services.Display
             GlobalServices.SetPlayerInput(playerInput);
             }
 
-        private IEnumerable<float> GetPossibleZoomLevels()
+        private static IEnumerable<float> GetPossibleZoomLevels()
             {
             yield return 1f;
             foreach (float item in new[] {1.25f, 1.5f, 2f, 2.5f, 3f})
@@ -84,7 +84,7 @@ namespace Labyrinth.Services.Display
                 }
             }
 
-        private bool DoesScaleFactorFitScreen(float scaleFactor)
+        private static bool DoesScaleFactorFitScreen(float scaleFactor)
             {
             if (Constants.RoomSizeInPixels.X * scaleFactor > GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width)
                 return false;
@@ -93,7 +93,7 @@ namespace Labyrinth.Services.Display
             return true;
             }
 
-        private float GetInitialZoom()
+        private static float GetInitialZoom()
             {
             var zoomLevels = GetPossibleZoomLevels().ToArray();
             var result = zoomLevels.Length > 1 ? zoomLevels[zoomLevels.Length - 2] : zoomLevels[0];
@@ -326,30 +326,6 @@ namespace Labyrinth.Services.Display
             this.SpriteBatch.Begin();
             SpriteBatch.DrawRectangle(r, Color.Black * alpha);
             SpriteBatch.End();
-            }
-
-        public void ShrinkViewport(float alpha)
-            {
-            int cx = (int) Constants.RoomSizeInPixels.X;
-            int cy = (int) Constants.RoomSizeInPixels.Y;
-            RenderTarget2D target = new RenderTarget2D(this.GraphicsDevice, cx, cy, false, SurfaceFormat.Color, DepthFormat.Depth24);
-            this.GraphicsDevice.SetRenderTarget(target);
-            this.SpriteBatch.Begin();
-            this.SpriteBatch.DrawRectangle(new Rectangle(0, 0, cx, cy), Color.Black);
-            int x = (int) (cx * alpha / 2.0f);
-            int y = (int) (cy * alpha / 2.0f);
-            var whiteRect = new Rectangle(x, y, cx - (2 * x), cy - (2 * y));
-            this.SpriteBatch.DrawRectangle(whiteRect, Color.White);
-            x += 1;
-            y += 1;
-            var transparentRect = new Rectangle(x, y, cx - (2 * x) , cy - (2 * y));
-            this.SpriteBatch.DrawRectangle(transparentRect, Color.Transparent);
-            this.SpriteBatch.End();
-
-            this.GraphicsDevice.SetRenderTarget(null);
-            this.SpriteBatch.Begin();
-            this.SpriteBatch.DrawTexture(target, Vector2.Zero, null);
-            this.SpriteBatch.End();
             }
 
         public void ToggleFullScreen()

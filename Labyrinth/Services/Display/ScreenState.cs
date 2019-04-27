@@ -23,6 +23,6 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// The screen is currently obscured by another
         /// </summary>
-        Hidden,
+        Hidden
         }
     }
