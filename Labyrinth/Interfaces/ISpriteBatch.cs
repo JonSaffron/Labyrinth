@@ -35,7 +35,7 @@ namespace Labyrinth
         /// <param name="texture">Specifies the texture to draw</param>
         /// <param name="absolutePosition">Specifies the top-left corner co-ordinate to draw the texture</param>
         /// <param name="sourceRectangle">Specifies the section of the texture to draw</param>
-        /// <remarks>Used to draw the score</remarks>
+        /// <remarks>Used to draw anything for the heads up display</remarks>
         void DrawTexture(Texture2D texture, Vector2 absolutePosition, Rectangle? sourceRectangle);
 
         /// <summary>

@@ -46,14 +46,7 @@ namespace Labyrinth.Services.ScoreKeeper
             this._score += crystalTaken.Crystal.Score;
             }
 
-        public decimal CurrentScore
-            {
-            get
-                {
-                var result = this._score * 10m;
-                return result;
-                }
-            }
+        public decimal CurrentScore => this._score * 10m;
 
         public void Dispose()
             {

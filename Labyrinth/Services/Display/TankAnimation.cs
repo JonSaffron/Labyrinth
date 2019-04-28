@@ -87,16 +87,19 @@ namespace Labyrinth.Services.Display
 
         private void DrawTurret(ISpriteBatch spriteBatch, ISpriteLibrary spriteLibrary)
             {
-            const int adjustment = 3;
-
+            Vector2 centreOfRotationForTurret = new Vector2(0, 3);
+            double x = centreOfRotationForTurret.Y * Math.Sin(this._tank.HullRotation) + centreOfRotationForTurret.X * Math.Cos(this._tank.HullRotation);
+            double y = centreOfRotationForTurret.Y * Math.Cos(this._tank.HullRotation) - centreOfRotationForTurret.X * Math.Sin(this._tank.HullRotation);
+            Vector2 centreOfRotationForTurretAfterRotation = new Vector2((float) -x, (float) y);
+            
             DrawParameters drawParameters = default;
             drawParameters.Texture = spriteLibrary.GetSprite(TextureName);
 
             // Calculate the source rectangle of the current frame.
             drawParameters.AreaWithinTexture = new Rectangle(32, 0, Constants.TileLength, Constants.TileLength);
-            drawParameters.Position = new Vector2(this._tank.Position.X, this._tank.Position.Y + adjustment);
+            drawParameters.Position = this._tank.Position + centreOfRotationForTurretAfterRotation;
             drawParameters.Rotation = this._tank.TurretRotation;
-            drawParameters.Centre = new Vector2(16, 16 + adjustment);
+            drawParameters.Centre = new Vector2(16, 19);    // this is always the same - this is the point where we rotate the turret around in the source rectangle
 
             // Draw the current frame.
             spriteBatch.DrawTexture(drawParameters);
