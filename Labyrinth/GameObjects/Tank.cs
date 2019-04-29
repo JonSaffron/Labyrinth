@@ -12,6 +12,7 @@ namespace Labyrinth.GameObjects
         private static readonly Dictionary<Direction, decimal> RotationForDirection = BuildRotationForDirection();
         private decimal _hullRotation;
         private decimal _turretRotation;
+        private readonly Turret _turret;
 
         public Motion LeftTrack { get; private set; } = Motion.Still;
         public Motion RightTrack { get; private set; } = Motion.Still;
@@ -19,6 +20,7 @@ namespace Labyrinth.GameObjects
         public Tank(MonsterDef definition) : base(definition)
             {
             this.AnimationPlayer = new TankAnimation(this);
+            this._turret = new Turret(this);
             }
 
         private static Dictionary<Direction, decimal> BuildRotationForDirection()
@@ -35,6 +37,13 @@ namespace Labyrinth.GameObjects
 
         public float HullRotation => (float) this._hullRotation * MathHelper.Pi;
         public float TurretRotation => (float) this._turretRotation * MathHelper.Pi + HullRotation;
+
+        public override bool Update(GameTime gameTime)
+            {
+            var result = base.Update(gameTime);
+            this._turret.Update(gameTime);
+            return result;
+            }
 
         protected override IEnumerable<bool> Move()
             {
@@ -157,6 +166,7 @@ namespace Labyrinth.GameObjects
         private class Turret
             {
             private readonly Tank _tank;
+            private decimal _desiredRotation;
 
             public Turret([NotNull] Tank tank)
                 {
