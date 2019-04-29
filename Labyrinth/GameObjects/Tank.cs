@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -151,6 +152,21 @@ namespace Labyrinth.GameObjects
             else if (difference < -1m)
                 difference += 2m;
             return difference;
+            }
+
+        private class Turret
+            {
+            private readonly Tank _tank;
+
+            public Turret([NotNull] Tank tank)
+                {
+                this._tank = tank ?? throw new ArgumentNullException(nameof(tank));
+                }
+
+            public void Update(GameTime gameTime)
+                {
+
+                }
             }
         }
     }

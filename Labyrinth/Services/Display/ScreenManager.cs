@@ -320,8 +320,7 @@ namespace Labyrinth.Services.Display
         /// </summary>
         public void FadeBackBufferToBlack(float alpha)
             {
-            Viewport viewport = GraphicsDevice.Viewport;
-            var r = new Rectangle(0, 0, viewport.Width, viewport.Height);
+            var r = this.GraphicsDevice.Viewport.Bounds;
 
             this.SpriteBatch.Begin();
             SpriteBatch.DrawRectangle(r, Color.Black * alpha);

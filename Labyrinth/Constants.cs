@@ -10,9 +10,9 @@ namespace Labyrinth
         public const int TileLength = 32;
 
         /// <summary>
-        /// Smallest unit of movement that a sprite can make is a quarter of a tile
+        /// In the original game the smallest unit of movement that a sprite can make is a quarter of a tile
         /// </summary>
-        public const int BaseDistance = TileLength / 4;
+        private const int BaseDistance = TileLength / 4;
 
         /// <summary>
         /// Number of base distances a sprite can make per second
