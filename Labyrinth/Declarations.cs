@@ -46,11 +46,18 @@ namespace Labyrinth
         Horizontal
         }
 
-    public enum Motion
+    public enum LinearMotion
         {
         Still = 0,
         Forwards = 1,
         Backwards = -1
+        }
+
+    public enum RotationalMotion
+        {
+        Still = 0,
+        Clockwise = 1,
+        Anticlockwise = -1
         }
 
     /// <summary>

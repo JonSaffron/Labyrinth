@@ -10,12 +10,23 @@ namespace Labyrinth.GameObjects
     class Tank : Monster
         {
         private static readonly Dictionary<Direction, decimal> RotationForDirection = BuildRotationForDirection();
+        
+        /// <summary>
+        /// The current angle of the hull expressed in multiples of π
+        /// </summary>
+        /// <remarks>0 indicates facing upwards, -1 would be anticlockwise to down, 1 would be clockwise to down</remarks>
         private decimal _hullRotation;
+
+        /// <summary>
+        /// The current angle of the turret relative to the hull expressed in multiples of π
+        /// </summary>
+        /// <remarks>0 indicates facing the same way as the hull, -1 would be anticlockwise to down, 1 would be clockwise to down</remarks>
         private decimal _turretRotation;
+
         private readonly Turret _turret;
 
-        public Motion LeftTrack { get; private set; } = Motion.Still;
-        public Motion RightTrack { get; private set; } = Motion.Still;
+        public LinearMotion LeftTrack { get; private set; } = LinearMotion.Still;
+        public LinearMotion RightTrack { get; private set; } = LinearMotion.Still;
 
         public Tank(MonsterDef definition) : base(definition)
             {
@@ -36,7 +47,7 @@ namespace Labyrinth.GameObjects
             }
 
         public float HullRotation => (float) this._hullRotation * MathHelper.Pi;
-        public float TurretRotation => (float) this._turretRotation * MathHelper.Pi + HullRotation;
+        public float TurretRotation => (float) (this._turretRotation + this._hullRotation) * MathHelper.Pi;
 
         public override bool Update(GameTime gameTime)
             {
@@ -53,8 +64,8 @@ namespace Labyrinth.GameObjects
                 Direction direction = this.GetDirection();
                 if (direction == Direction.None)
                     {
-                    this.RightTrack = Motion.Still;
-                    this.LeftTrack = Motion.Still;
+                    this.RightTrack = LinearMotion.Still;
+                    this.LeftTrack = LinearMotion.Still;
                     double timeLeftStationary = Constants.TileLength / (double) (Constants.BaseSpeed * this.SpeedAdjustmentFactor);
                     while (true)
                         {
@@ -74,16 +85,15 @@ namespace Labyrinth.GameObjects
                     }
                 else
                     {
-                    var changeOfRotation = GetChangeOfRotationRequired(direction);
-                    if (changeOfRotation != 0)
-                        {
-                        this.LeftTrack = changeOfRotation < 0 ? Motion.Backwards : Motion.Forwards;
-                        this.RightTrack = changeOfRotation < 0 ? Motion.Forwards : Motion.Backwards;
-                        }
+                    var targetRotation = RotationForDirection[direction];
+                    var directionOfTravel = GetDirectionOfTravel(targetRotation);
 
-                    while (changeOfRotation != 0)
+                    this.LeftTrack = (LinearMotion) directionOfTravel;
+                    this.RightTrack = (LinearMotion) (- (int) directionOfTravel);
+
+                    while (this._hullRotation != targetRotation)
                         {
-                        if (this.TryToCompleteRotationToTarget(ref this.RemainingTime, ref changeOfRotation))
+                        if (this.TryToCompleteRotationToTarget(ref this.RemainingTime, targetRotation, directionOfTravel))
                             break;
 
                         this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
@@ -97,8 +107,8 @@ namespace Labyrinth.GameObjects
                         }
 
                     Move(direction);
-                    this.RightTrack = Motion.Forwards;
-                    this.LeftTrack = Motion.Forwards;
+                    this.RightTrack = LinearMotion.Forwards;
+                    this.LeftTrack = LinearMotion.Forwards;
                     while (true)
                         {
                         hasMovedSinceLastCall = true;
@@ -111,7 +121,7 @@ namespace Labyrinth.GameObjects
                     }
 
                 this.Behaviours.Perform<IMovementBehaviour>();
-                if (this.RemainingTime <= Double.Epsilon * 2)
+                if (this.RemainingTime <= double.Epsilon * 2)
                     {
                     yield return hasMovedSinceLastCall;
                     hasMovedSinceLastCall = false;
@@ -120,52 +130,59 @@ namespace Labyrinth.GameObjects
             // ReSharper disable once IteratorNeverReturns - this is deliberate
             }
 
-        private bool TryToCompleteRotationToTarget(ref double remainingTime, ref decimal changeOfRotation)
+        private bool TryToCompleteRotationToTarget(ref double remainingTime, decimal targetRotation, RotationalMotion directionOfTravel)
             {
-            decimal speedOfRotation = Math.Sign(changeOfRotation) * 0.5m * Constants.BaseDistancesMovedPerSecond * this.SpeedAdjustmentFactor;
+            decimal speedOfRotation = (int) directionOfTravel * 0.5m * Constants.BaseDistancesMovedPerSecond * this.SpeedAdjustmentFactor;
+            decimal changeOfRotation = GetChangeOfRotationRequired(this._hullRotation, targetRotation);
             double timeNeededToFinishRotation = (double) (changeOfRotation / speedOfRotation);
             bool hasCompletedRotation = timeNeededToFinishRotation <= remainingTime;
             if (hasCompletedRotation)
                 {
                 remainingTime -= timeNeededToFinishRotation;
-                this._hullRotation += changeOfRotation;
-                if (this._hullRotation >= 2m)
-                    this._hullRotation -= 2m;
-                else if (this._hullRotation <= -2m)
-                    this._hullRotation += 2m;
-                changeOfRotation = 0;
+                this._hullRotation = targetRotation;
                 }
             else
                 {
                 decimal changeInRotation = (decimal) ((double) speedOfRotation * remainingTime);
                 this._hullRotation += changeInRotation;
-                changeOfRotation -= changeInRotation;
                 remainingTime = 0;
                 }
+            NormaliseRotation(ref this._hullRotation);
 
             return hasCompletedRotation;
+            }
+
+        private RotationalMotion GetDirectionOfTravel(decimal requiredRotation)
+            {
+            var difference = GetChangeOfRotationRequired(this._hullRotation, requiredRotation);
+            return (RotationalMotion) Math.Sign(difference);
             }
 
         /// <summary>
         /// Returns the angle of change needed to go from the current position of the hull to the desired position
         /// </summary>
-        /// <param name="direction">The direction to change towards</param>
+        /// <param name="currentRotation">The current angle</param>
+        /// <param name="targetRotation">The angle to change towards</param>
         /// <returns>A value between -1 (indicating -180°) to 1 (indicating 180°).</returns>
-        private decimal GetChangeOfRotationRequired(Direction direction)
+        private static decimal GetChangeOfRotationRequired(decimal currentRotation, decimal targetRotation)
             {
-            var currentRotation = this._hullRotation;
-            var requiredRotation = RotationForDirection[direction];
-            var difference = requiredRotation - currentRotation;
-            if (difference > 1m)
-                difference -= 2m;
-            else if (difference < -1m)
-                difference += 2m;
+            var difference = targetRotation - currentRotation;
+            NormaliseRotation(ref difference);
             return difference;
+            }
+
+        private static void NormaliseRotation(ref decimal rotation)
+            {
+            if (rotation > 1m)
+                rotation -= 2m;
+            else if (rotation < -1m)
+                rotation += 2m;
             }
 
         private class Turret
             {
             private readonly Tank _tank;
+            private decimal _relativeRotation;
             private decimal _desiredRotation;
 
             public Turret([NotNull] Tank tank)
@@ -175,8 +192,25 @@ namespace Labyrinth.GameObjects
 
             public void Update(GameTime gameTime)
                 {
-
+                decimal differenceInRotation = GetChangeOfRotationRequired(this._relativeRotation, this._desiredRotation);
+                RotationalMotion directionOfTravel = (RotationalMotion) Math.Sign(differenceInRotation);
+                decimal speedOfRotation = (int) directionOfTravel * 0.75m * Constants.BaseDistancesMovedPerSecond;
+                double timeNeededToFinishRotation = (double) (differenceInRotation / speedOfRotation);
+                var remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
+                bool hasCompletedRotation = timeNeededToFinishRotation <= remainingTime;
+                if (hasCompletedRotation)
+                    {
+                    this._relativeRotation = this._desiredRotation;
+                    }
+                else
+                    {
+                    decimal changeInRotation = (decimal) ((double) speedOfRotation * remainingTime);
+                    this._relativeRotation += changeInRotation;
+                    }
+                NormaliseRotation(ref this._relativeRotation);
                 }
+
+
             }
         }
     }
