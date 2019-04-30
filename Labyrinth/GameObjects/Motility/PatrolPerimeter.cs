@@ -183,6 +183,10 @@ namespace Labyrinth.GameObjects.Motility
         public AttachmentToWall CurrentAttachmentToWall { get; private set; }
 
         // ReSharper disable once UnusedMember.Global - potentially useful
-        public string CurrentAttachmentMode => this._state.GetType().Name;
+        public bool IsAttached => this._state is AttachedState;
+
+        public bool IsTurningCorner => this._state is TurningCornerState;
+
+        public bool IsDetached => this._state is DetachedState;
         }
     }

@@ -14,7 +14,7 @@ namespace Labyrinth.GameObjects
         {
         private MonsterMobility _mobility;
         public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
-        [CanBeNull] private IMonsterMotion _determineDirection;
+        [CanBeNull] protected IMonsterMotion DetermineDirection;
         protected IDynamicAnimation AnimationPlayer;
 
         public IBoundMovement SightBoundary { get; private set; }
@@ -66,14 +66,14 @@ namespace Labyrinth.GameObjects
             {
             if (this.IsStationary)
                 {
-                this._determineDirection = new Stationary(this);
+                this.DetermineDirection = new Stationary(this);
                 return;
                 }
 
             if (!this.MovementMethods.TryGetValue(this.Mobility, out var movementType))
                 throw new InvalidOperationException("Monster is not set for movement " + this.Mobility);
             var initialDirection = isInitialActivation ? this.Definition.InitialDirection.GetValueOrDefault(Direction.None) : Direction.None;
-            this._determineDirection = GetImplementationForMotion(this, movementType, initialDirection);
+            this.DetermineDirection = GetImplementationForMotion(this, movementType, initialDirection);
             }
 
         /// <inheritdoc cref="IMonster" />
@@ -175,10 +175,10 @@ namespace Labyrinth.GameObjects
 
         protected Direction GetDirection()
             {
-            if (this._determineDirection == null)
+            if (this.DetermineDirection == null)
                 throw new InvalidOperationException("Determine Direction object reference not set.");
 
-            var result = this._determineDirection.GetDirection();
+            var result = this.DetermineDirection.GetDirection();
             return result;
             }
 

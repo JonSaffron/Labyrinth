@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Labyrinth.GameObjects.Motility;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
@@ -12,17 +13,10 @@ namespace Labyrinth.GameObjects
         private static readonly Dictionary<Direction, decimal> RotationForDirection = BuildRotationForDirection();
         
         /// <summary>
-        /// The current angle of the hull expressed in multiples of π
+        /// The current angle of the hull
         /// </summary>
-        /// <remarks>0 indicates facing upwards, -1 would be anticlockwise to down, 1 would be clockwise to down</remarks>
+        /// <remarks>0 indicates facing upwards, -1 would be 180° anticlockwise, 1 would be 180° clockwise</remarks>
         private decimal _hullRotation;
-
-        /// <summary>
-        /// The current angle of the turret relative to the hull expressed in multiples of π
-        /// </summary>
-        /// <remarks>0 indicates facing the same way as the hull, -1 would be anticlockwise to down, 1 would be clockwise to down</remarks>
-        private decimal _turretRotation;
-
         private readonly Turret _turret;
 
         public LinearMotion LeftTrack { get; private set; } = LinearMotion.Still;
@@ -47,7 +41,7 @@ namespace Labyrinth.GameObjects
             }
 
         public float HullRotation => (float) this._hullRotation * MathHelper.Pi;
-        public float TurretRotation => (float) (this._turretRotation + this._hullRotation) * MathHelper.Pi;
+        public float TurretRotation => (float) (this._turret.CurrentRotation) * MathHelper.Pi;
 
         public override bool Update(GameTime gameTime)
             {
@@ -182,7 +176,7 @@ namespace Labyrinth.GameObjects
         private class Turret
             {
             private readonly Tank _tank;
-            private decimal _relativeRotation;
+            private decimal _currentRotationRelativeToHull;
             private decimal _desiredRotation;
 
             public Turret([NotNull] Tank tank)
@@ -190,9 +184,11 @@ namespace Labyrinth.GameObjects
                 this._tank = tank ?? throw new ArgumentNullException(nameof(tank));
                 }
 
+            public decimal CurrentRotation => this._currentRotationRelativeToHull + this._tank._hullRotation;
+
             public void Update(GameTime gameTime)
                 {
-                decimal differenceInRotation = GetChangeOfRotationRequired(this._relativeRotation, this._desiredRotation);
+                decimal differenceInRotation = GetChangeOfRotationRequired(this.CurrentRotation, this._desiredRotation);
                 RotationalMotion directionOfTravel = (RotationalMotion) Math.Sign(differenceInRotation);
                 decimal speedOfRotation = (int) directionOfTravel * 0.75m * Constants.BaseDistancesMovedPerSecond;
                 double timeNeededToFinishRotation = (double) (differenceInRotation / speedOfRotation);
@@ -200,17 +196,27 @@ namespace Labyrinth.GameObjects
                 bool hasCompletedRotation = timeNeededToFinishRotation <= remainingTime;
                 if (hasCompletedRotation)
                     {
-                    this._relativeRotation = this._desiredRotation;
+                    this._currentRotationRelativeToHull = this._desiredRotation;
                     }
                 else
                     {
                     decimal changeInRotation = (decimal) ((double) speedOfRotation * remainingTime);
-                    this._relativeRotation += changeInRotation;
+                    this._currentRotationRelativeToHull += changeInRotation;
                     }
-                NormaliseRotation(ref this._relativeRotation);
+                NormaliseRotation(ref this._currentRotationRelativeToHull);
                 }
 
-
+            public void ReviewDirectionFaced()
+                {
+                var patrol = this._tank.DetermineDirection as PatrolPerimeter;
+                if (patrol == null || patrol.IsDetached)
+                    {
+                    this._desiredRotation = 0m;
+                    return;
+                    }
+                
+                // todo
+                }
             }
         }
     }
