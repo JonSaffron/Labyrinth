@@ -204,6 +204,8 @@ Effectively running in a mode 5 screen setup modified to have 256 pixels horizon
 						right is bits 4 & 5 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
 						left is bits 6 & 7 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
 
+4400-440F		-- conversion from decimal to binary coded decimal low byte
+4410-441F		-- conversion from decimal to binary coded decimal high byte
 4420-442f		-- scores per crystal (in decimal)
 4430-4437		-- start energy per level
 4438-443f		-- energy from crystal
@@ -395,6 +397,10 @@ definitions (initial frequency, initial volume, data change control, volume adju
 097F B0 03     BCS 0984                 -- branch if not wall
 0981 4C 38 1D  JMP 1D38                 -- draw wall to screen
 0984 4C 39 1C  JMP 1C39                 -- draw non-wall sprite to screen
+
+		-- draw animation
+		-- on entry, Y is the animation slot
+		-- &88 is the tile to draw
 
 0987 B9 09 0C  LDA 0C09,Y               -- get current frame of animation
 098A 20 23 1C  JSR 1C23                 -- get address of sprite data
@@ -651,6 +657,45 @@ definitions (initial frequency, initial volume, data change control, volume adju
 0AF3 20 8B 0A  JSR 0A8B                 -- send a byte to the sound chip
 0AF6 58        CLI                      
 0AF7 60        RTS                      
+
+0AF8 - 0AFF								-- zero bytes
+
+0B00 - 0B9F								-- current room layout
+0BA0 - 0BFF								-- game data and state
+0C00 - 0CFF								-- animation slots
+
+0D00 40		   RTI						-- Non maskable interrupt handler
+
+0D01 - 0D80								-- Exits for world 2
+
+0D81 C9 04     CMP #04                  -- 
+0D83 F0 03     BEQ 0D88                 
+0D85 18        CLC                      
+0D86 B8        CLV                      
+0D87 60        RTS                      
+0D88 C0 07     CPY #07                  
+0D8A F0 02     BEQ 0D8E                 
+0D8C 18        CLC                      
+0D8D 60        RTS                      
+0D8E 48        PHA                      
+0D8F 98        TYA                      
+0D90 48        PHA                      
+0D91 8A        TXA                      
+0D92 48        PHA                      
+0D93 A9 DA     LDA #DA                  
+0D95 A2 00     LDX #00                  
+0D97 A0 FF     LDY #FF                  
+0D99 20 F4 FF  JSR FFF4                 
+0D9C 18        CLC                      
+0D9D 8A        TXA                      
+0D9E D0 01     BNE 0DA1                 
+0DA0 38        SEC                      
+0DA1 68        PLA                      
+0DA2 AA        TAX                      
+0DA3 68        PLA                      
+0DA4 A8        TAY                      
+0DA5 68        PLA                      
+0DA6 60        RTS                      
 
 		-- calculate the address of screen memory
 		-- on entry X and Y indicate the logical co-ordinates required (x 0->63, y 0->19)
@@ -2100,9 +2145,10 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1C20 85 7A     STA 7A                   
 1C22 60        RTS                      
 
-		-- Get address for the specified sprite (from &3f00 onwards. Each sprite occupies 64 bytes)
-		-- On entry, A is the sprite index
-		-- On exit, &72 and &73 are set. &72 is low byte, &73 is high byte.
+		-- Get address for the specified sprite (from &4100 onwards)
+		-- Each sprite occupies 64 bytes - 16x16 pixels with 2 bits of colour
+		-- On entry, A is the sprite index, 8 to 5F
+		-- On exit, &72 is low byte of address, &73 is high byte of address
 
 1C23 85 73     STA 73                   -- store sprite index in &73 (high byte of result)
 1C25 A9 00     LDA #00                  -- initialise for low byte
@@ -6204,7 +6250,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 371D D0 2C     BNE 374B	                -- branch if escape pressed
 371F A5 8A     LDA 8A                   
 3721 D0 33     BNE 3756                 -- branch if completed world
-3723 AD C2 0B  DEC 0BC2                 -- decrement lives
+3723 CE C2 0B  DEC 0BC2                 -- decrement lives
 3726 30 2B     BMI 3753                 -- branch if no more lives
 
 3728 AD A6 0B  LDA 0BA6                 -- get world number
@@ -6300,8 +6346,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- change screen mode
 
 37C7 48        PHA                      
-37C8 20 10 38  JSR 3810                 
-37CB 20 7E 38  JSR 387E                 
+37C8 20 10 38  JSR 3810                 -- wait for screen refresh and clear colour palette to black
+37CB 20 7E 38  JSR 387E                 -- clear mode 7 screen memory
 37CE A9 13     LDA #13                  
 37D0 20 F4 FF  JSR FFF4                 -- osbyte &13: wait for vertical sync
 37D3 A9 16     LDA #16                  
@@ -6381,7 +6427,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 384D 20 7E 38  JSR 387E                 -- clear screen memory
 3850 20 7E 38  JSR 387E                 -- clear screen memory
 3853 20 7E 38  JSR 387E                 -- clear screen memory
-3856 20 C4 38  JSR 38C4                 -- ??? generate screen of high scores ???
+3856 20 C4 38  JSR 38C4                 -- check for new high score, show high scores
 
 		-- outside game, wait for trigger to start new game
 
@@ -6455,161 +6501,389 @@ definitions (initial frequency, initial volume, data change control, volume adju
 38C2 73
 38C3 00
 
-38C4 20 B5 39  JSR 39B5                 
-38C7 20 C3 39  JSR 39C3                 
-38CA AD 08 10  LDA 1008                 
-38CD 85 70     STA 70                   
-38CF A9 10     LDA #10                  
-38D1 85 71     STA 71                   
-38D3 85 73     STA 73                   
-38D5 A0 02     LDY #02                  
-38D7 B9 D5 0B  LDA 0BD5,Y               
-38DA 91 70     STA (70),Y               
-38DC 88        DEY                      
-38DD 10 F8     BPL 38D7                 
-38DF A2 08     LDX #08                  
-38E1 BD FF 0F  LDA 0FFF,X               
-38E4 85 72     STA 72                   
-38E6 A0 02     LDY #02                  
-38E8 B1 70     LDA (70),Y               
-38EA D1 72     CMP (72),Y               
-38EC 90 15     BCC 3903                 
-38EE D0 05     BNE 38F5                 
-38F0 88        DEY                      
-38F1 10 F5     BPL 38E8                 
-38F3 30 0E     BMI 3903                 
-38F5 BD FF 0F  LDA 0FFF,X               
-38F8 9D 00 10  STA 1000,X               
+		-- show high scores
+
+38C4 20 B5 39  JSR 39B5                 -- flush buffer
+38C7 20 C3 39  JSR 39C3                 -- enable cursor keys
+38CA AD 08 10  LDA 1008                 -- get offset for virtual 9th high score
+38CD 85 70     STA 70                   -- store offset
+38CF A9 10     LDA #10                  -- this will be most significant byte for addressing
+38D1 85 71     STA 71                   -- page &10 for recent score
+38D3 85 73     STA 73                   -- page &10 for score to compare against
+
+38D5 A0 02     LDY #02                  -- initialise loop
+38D7 B9 D5 0B  LDA 0BD5,Y               -- get byte of score
+38DA 91 70     STA (70),Y               -- copy it to temporary storage
+38DC 88        DEY                      -- decrement loop counter
+38DD 10 F8     BPL 38D7                 -- loop around
+
+		-- check for high score
+
+38DF A2 08     LDX #08                  -- initialise loop counter
+
+38E1 BD FF 0F  LDA 0FFF,X               -- get offset for high score X 
+38E4 85 72     STA 72                   -- store offset
+
+38E6 A0 02     LDY #02                  -- initialise loop counter for 3 bytes of score
+
+38E8 B1 70     LDA (70),Y               -- get byte of recent score
+38EA D1 72     CMP (72),Y               -- compare against high score X
+38EC 90 15     BCC 3903                 -- branch if recent score not higher
+38EE D0 05     BNE 38F5                 -- score is higher
+38F0 88        DEY                      -- decrement Y for another byte of score
+38F1 10 F5     BPL 38E8                 -- loop around for next byte of score
+38F3 30 0E     BMI 3903                 -- score is not higher than X so branch out of check
+
+38F5 BD FF 0F  LDA 0FFF,X               -- get offset for previous rank
+38F8 9D 00 10  STA 1000,X               -- store i
 38FB A5 70     LDA 70                   
-38FD 9D FF 0F  STA 0FFF,X               
-3900 CA        DEX                      
-3901 D0 DE     BNE 38E1                 
-3903 86 78     STX 78                   
-3905 E0 08     CPX #08                  
-3907 F0 20     BEQ 3929                 
+38FD 9D FF 0F  STA 0FFF,X               -- store new offset
+3900 CA        DEX                      -- decrement loop counter to previous score
+3901 D0 DE     BNE 38E1                 -- loop around to check previous score
+
+		-- score has been checked against the current high score table
+		-- X is the ranking (8 if didn't make a new high score)
+
+3903 86 78     STX 78                   -- store the ranking the player achieved
+3905 E0 08     CPX #08                  -- are we looking at the lowest high score
+3907 F0 20     BEQ 3929                 -- if yes, then no high score achieved so jump straight to display table
+
 3909 A2 EE     LDX #EE                  
 390B A0 39     LDY #39                  
-390D 20 9F 39  JSR 399F                 
-3910 A6 70     LDX 70                   
+390D 20 9F 39  JSR 399F                 -- display character string at &39EE (new high score)
+
+3910 A6 70     LDX 70                   -- restore address of high score entry
 3912 E8        INX                      
 3913 E8        INX                      
-3914 E8        INX                      
-3915 8E 94 39  STX 3994                 
-3918 A9 00     LDA #00                  
-391A A2 94     LDX #94                  
-391C A0 39     LDY #39                  
-391E 20 F1 FF  JSR FFF1                 
-3921 90 06     BCC 3929                 
+3914 E8        INX                      -- skip past 3 byte score
+3915 8E 94 39  STX 3994                 -- change address where input will be stored
+
+3918 A9 00     LDA #00                  -- osword 0 - input line
+391A A2 94     LDX #94                  -- lowbyte of parameters
+391C A0 39     LDY #39                  -- highbyte of parameters
+391E 20 F1 FF  JSR FFF1                 -- osword
+3921 90 06     BCC 3929                 -- branch if return terminated input
 3923 A0 03     LDY #03                  
 3925 A9 0D     LDA #0D                  
-3927 91 70     STA (70),Y               
+3927 91 70     STA (70),Y               -- store c/r in address contained at &71/&72 + 3
+
+			-- display high score table
+
 3929 A2 75     LDX #75                  
 392B A0 3A     LDY #3A                  
-392D 20 9F 39  JSR 399F                 
-3930 A2 00     LDX #00                  
+392D 20 9F 39  JSR 399F                 -- display character string at &3A75 (high score table top and bottom)
+
+3930 A2 00     LDX #00                  -- initialise loop counter
 3932 A9 05     LDA #05                  
-3934 85 77     STA 77                   
+3934 85 77     STA 77                   -- initialise y co-ordinate for displaying entry
+
 3936 A9 1F     LDA #1F                  
-3938 20 EE FF  JSR FFEE                 
+3938 20 EE FF  JSR FFEE                 -- vdu 31 (move text cursor)
 393B A9 04     LDA #04                  
-393D 20 EE FF  JSR FFEE                 
+393D 20 EE FF  JSR FFEE                 -- set x co-ordinate to 4
 3940 A5 77     LDA 77                   
-3942 20 EE FF  JSR FFEE                 
-3945 A9 20     LDA #20                  
-3947 E4 78     CPX 78                   
-3949 D0 02     BNE 394D                 
-394B A9 88     LDA #88                  
-394D 20 EE FF  JSR FFEE                 
-3950 8A        TXA                      
+3942 20 EE FF  JSR FFEE                 -- set y co-ordinate
+
+3945 A9 20     LDA #20                  -- prepare space character
+3947 E4 78     CPX 78                   -- is this entry the new high score entry?
+3949 D0 02     BNE 394D                 -- if not, branch
+394B A9 88     LDA #88                  -- prepare flash control character
+394D 20 EE FF  JSR FFEE                 -- output either a space, or the flash character
+
+3950 8A        TXA                      -- get loop counter
 3951 18        CLC                      
-3952 69 31     ADC #31                  
-3954 20 EE FF  JSR FFEE                 
+3952 69 31     ADC #31                  -- add to get ascii character digits 1 to 8
+3954 20 EE FF  JSR FFEE                 -- output rank
 3957 A9 2E     LDA #2E                  
-3959 20 EE FF  JSR FFEE                 
-395C BD 00 10  LDA 1000,X               
-395F 85 72     STA 72                   
-3961 A9 10     LDA #10                  
-3963 85 73     STA 73                   
-3965 A0 02     LDY #02                  
+3959 20 EE FF  JSR FFEE                 -- output .
+
+395C BD 00 10  LDA 1000,X               -- get offset for high score entry X
+395F 85 72     STA 72                   -- store as low byte of address
+3961 A9 10     LDA #10                  -- this is the high byte
+3963 85 73     STA 73                   -- store high byte of address
+
+3965 A0 02     LDY #02                  -- initialise loop counter
 3967 A9 00     LDA #00                  
 3969 85 79     STA 79                   
-396B B1 72     LDA (72),Y               
-396D 20 CC 39  JSR 39CC                 
-3970 88        DEY                      
-3971 10 F8     BPL 396B                 
+
+396B B1 72     LDA (72),Y               -- get byte of score
+396D 20 CC 39  JSR 39CC                 -- display 2 digits
+3970 88        DEY                      -- decrement loop counter
+3971 10 F8     BPL 396B                 -- loop around
+
 3973 8A        TXA                      
-3974 48        PHA                      
+3974 48        PHA                      -- save X (loop counter)
 3975 A2 99     LDX #99                  
 3977 A0 39     LDY #39                  
-3979 20 9F 39  JSR 399F                 
+3979 20 9F 39  JSR 399F                 -- output string at 3999 "0 .. "
 397C 68        PLA                      
-397D AA        TAX                      
-397E A0 03     LDY #03                  
-3980 B1 72     LDA (72),Y               
-3982 20 EE FF  JSR FFEE                 
-3985 C8        INY                      
-3986 C9 0D     CMP #0D                  
-3988 D0 F6     BNE 3980                 
-398A E6 77     INC 77                   
-398C E6 77     INC 77                   
-398E E8        INX                      
-398F E0 08     CPX #08                  
-3991 D0 A3     BNE 3936                 
+397D AA        TAX                      -- restore X
+
+397E A0 03     LDY #03                  -- initialise loop counter
+3980 B1 72     LDA (72),Y               -- get byte of high scoring name
+3982 20 EE FF  JSR FFEE                 -- output character
+3985 C8        INY                      -- increment loop counter
+3986 C9 0D     CMP #0D                  -- was character carriage return (end of string)
+3988 D0 F6     BNE 3980                 -- if not, loop around
+398A E6 77     INC 77                   -- increment y co-ordinate
+398C E6 77     INC 77                   -- increment y co-ordinate
+398E E8        INX                      -- increment loop counter
+398F E0 08     CPX #08                  -- have 8 scores been output?
+3991 D0 A3     BNE 3936                 -- if not, loop around
 3993 60        RTS                      
-3994 00        BRK                      
-3995 10 13     BPL 39AA                 
-3997 20 FF 06  JSR 06FF                 
-399A 30 20     BMI 39BC                 
-399C 2E 2E 20  ROL 202E                 
-399F 86 74     STX 74                   
-39A1 84 75     STY 75                   
+
+		-- osword parameters for read line from input
+
+3994 00 10                              -- input buffer at &1000 (address will be modified)
+3996 13                                 -- maximum line length 19
+3997 20									-- minimum acceptable ascii value is space
+3998 FF									-- maximum acceptable ascii value is 255
+
+		-- output string data
+
+3999 06									-- length of string to output
+399A 30 20 2E 2E 20						-- "0 .. "
+
+		-- display the specified string of characters
+		-- on entry, X is the low byte of the address, Y is the high byte
+		-- the first byte of the address is the number of characters to display
+
+399F 86 74     STX 74                   -- store address low byte
+39A1 84 75     STY 75                   -- store address high byte
 39A3 A0 00     LDY #00                  
-39A5 B1 74     LDA (74),Y               
-39A7 85 76     STA 76                   
-39A9 C8        INY                      
-39AA B1 74     LDA (74),Y               
-39AC 20 EE FF  JSR FFEE                 
-39AF C8        INY                      
-39B0 C4 76     CPY 76                   
-39B2 D0 F6     BNE 39AA                 
+39A5 B1 74     LDA (74),Y               -- get length of string
+39A7 85 76     STA 76                   -- store length
+39A9 C8        INY                      -- initialise loop
+
+39AA B1 74     LDA (74),Y               -- get next character
+39AC 20 EE FF  JSR FFEE                 -- oswrch
+39AF C8        INY                      -- increment loop counter
+39B0 C4 76     CPY 76                   -- have all characters been displayed?
+39B2 D0 F6     BNE 39AA                 -- if not yet, loop around
 39B4 60        RTS                      
-39B5 A9 0F     LDA #0F                  
-39B7 A2 01     LDX #01                  
+
+		-- flush buffer
+
+39B5 A9 0F     LDA #0F                  -- osbyte &F flush selected buffer
+39B7 A2 01     LDX #01                  -- RS423 buffer
 39B9 4C C7 39  JMP 39C7                 
-39BC A9 04     LDA #04                  
-39BE A2 01     LDX #01                  
+
+		-- disable cursor keys
+
+39BC A9 04     LDA #04                  -- osbyte &4 set cursor editing
+39BE A2 01     LDX #01                  -- disable cursor editing
 39C0 4C C7 39  JMP 39C7                 
-39C3 A9 04     LDA #04                  
-39C5 A2 00     LDX #00                  
+
+		-- enable cursor keys
+
+39C3 A9 04     LDA #04                  -- osbyte &4 set cursor editing
+39C5 A2 00     LDX #00                  -- enable cursor editing
+
+		-- osbyte call
+
 39C7 A0 00     LDY #00                  
-39C9 4C F4 FF  JMP FFF4                 
-39CC 48        PHA                      
+39C9 4C F4 FF  JMP FFF4                 -- osbyte
+
+		-- output 2 digits of score
+		-- on entry A is the digit in BCD
+
+39CC 48        PHA                      -- save A
 39CD 4A        LSR A                    
 39CE 4A        LSR A                    
 39CF 4A        LSR A                    
-39D0 4A        LSR A                    
-39D1 20 DB 39  JSR 39DB                 
-39D4 68        PLA                      
-39D5 29 0F     AND #0F                  
-39D7 C0 00     CPY #00                  
-39D9 F0 0E     BEQ 39E9                 
-39DB 48        PHA                      
-39DC 05 79     ORA 79                   
-39DE 85 79     STA 79                   
-39E0 D0 06     BNE 39E8                 
+39D0 4A        LSR A                    -- shift to get most significant nibble into low 4 bits
+39D1 20 DB 39  JSR 39DB                 -- output the digit
+
+39D4 68        PLA                      -- restore A
+39D5 29 0F     AND #0F                  -- clear top 4 bits
+39D7 C0 00     CPY #00                  -- 
+39D9 F0 0E     BEQ 39E9                 -- output character
+
+39DB 48        PHA                      -- store digit
+39DC 05 79     ORA 79                   -- merge with record of anything output as yet
+39DE 85 79     STA 79                   -- set the record
+39E0 D0 06     BNE 39E8                 -- not zero, so output digit
+
 39E2 68        PLA                      
-39E3 A9 20     LDA #20                  
-39E5 4C EE FF  JMP FFEE                 
+39E3 A9 20     LDA #20                  -- space character
+39E5 4C EE FF  JMP FFEE                 -- jump to oswrch and return
+
 39E8 68        PLA                      
-39E9 09 30     ORA #30                  
-39EB 4C EE FF  JMP FFEE                 
-39EE 87        ?87                      
-39EF 16 07     ASL 07,X                 
-39F1 1F        ?1F                      
-39F2 06 05     ASL 05                   
-39F4 8D 86 9D  STA 9D86                 
-39F7 84 43     STY 43                   
-39F9 6F        ?6F                      
+39E9 09 30     ORA #30                  -- set bits to turn into ascii digit 0 to 9
+39EB 4C EE FF  JMP FFEE                 -- jump to oswrch and return
+
+		-- output string data
+
+39EE 87									-- length of string to output
+39EF 16 07								-- vdu 22 - mode 7
+39F1 1F 06 05							-- vdu 31 - move text cursor to 6, 5
+39F4 8D 86 9D 84						-- double height, cyan text colour, set background colour, blue text colour
+39F8 "Congratulations !!!  "
+3A0D 9C									-- black background
+3A0E 1F 06 06							-- vdu 31 - move text cursor to 6, 6
+3A11 8D 86 9D 84						-- double height, cyan text colour, set background colour, blue text colour
+3A15 "Congratulations !!!  "
+3A2A 9C									-- black background
+3A2B 1F 04 0A							-- vdu 31 - move text cursor to 4, 10
+3A2E 81									-- red text colour
+3A2F "Your score is in the top eight"
+3A4D 1F 07 0D							-- vdu 31 - move text cursor to 7, 13
+3A50 82									-- green text colour
+3A51 "Please enter your name:"
+3A68 1F 07 12							-- vdu 31 - move text cursor to 7, 18
+3A6B 86 9D 84							-- cyan text colour, set background colour, blue text colour
+3A6E 1F 1F 12							-- vdu 31 - move text cursor to 31, 18
+3A71 9C									-- black background
+3A72 1F 0A 12							-- vdu 31 - move text cursor to 10, 18
+
+		-- output string data
+
+3A75 8B									-- length of string to output
+3A76 16 07								-- vdu 22 - mode 7
+3A78 17 00 0A 20 00 00 00 00 00 00		-- vdu 23 - set start line of cursor
+3A82 1F 00 00							-- vdu 31 - move text cursor to 0, 0
+3A85 8D 84 9D 83 						-- double height, blue, set background colour, yellow
+3A89 1F 0B 00							-- vdu 31 - move text cursor to 11, 1
+3A8C "Labyrinthine Scores"
+3A9F 1F 00 01							-- vdu 31 - move text cursor to 0, 1
+3AA2 8D 84 9D 83						-- double height, blue, set background colour, yellow
+3AA6 1F 0B 01							-- vdu 31 - move text cursor to 11, 2
+3AA9 "Labyrinthine Scores"
+3ABC 1F 04 17							-- vdu 31 - move text cursor to 4, 23
+3ABF 88 86								-- flash, cyan
+3AC1 "Press SPACE BAR or fire button"
+3ADF 1F 05 18							-- vdu 31 - move text cursor to 5, 24
+3AE2 88 86								-- flash, cyan
+3AE4 "on joystick for another game"
+
+		-- standing data
+
+3B00 - 3BBF								-- initial monster room numbers
+3BC0 - 3C7F								-- initial monster behaviours
+3C80 - 3D3F								-- initial tile positions
+3D40 - 3DFF								-- initial monster energy
+3E00 - 3E7F								-- room's top and bottom rows
+3E80 - 3EFF								-- room's 2nd and penultimate rows
+3F00 - 3F7F								-- room's first and last columns
+3F80 - 3FFF								-- room's 3rd, 4th, 7th and 8th rows
+4000 - 407F								-- room's centre shape
+4080 - 40FF								-- room's exits
+
+		-- sprite definitions
+
+4100 - 413F								-- 8 wall mask rounded bottom left
+4140 - 417F								-- 9 wall mask rounded top right
+4180 - 41BF								-- A wall mask rounded top left
+41C0 - 41FF								-- B wall mask rounded bottom right
+4200 - 423F								-- C wall mask straight bottom left
+4240 - 427F								-- D wall mask straight top right
+4280 - 42BF								-- E wall mask straight top left
+42C0 - 42FF								-- F wall mask straight bottom right
+4300 - 433F								-- 10 horizontal player shot
+4340 - 437F								-- 11 vertical player shot
+4380 - 43BF								-- 12 wall mask solid
+43C0 - 43FF								-- 13 boulder
+
+		-- lookup tables (these replace sprite 14)
+
+4400 - 440F 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15
+										-- conversion from decimal to binary coded decimal low byte
+4410 - 441F	00 16 32 48 64 80 96 12 28 44 60 76 92 08 24 40
+										-- conversion from decimal to binary coded decimal high byte
+4420 - 442f 50 00 00 05 00 10 00 20 00 40 00 60 00 80 00 A0
+										-- scores per crystal (in decimal)
+4430 - 4437 32 64 96 C8 C8 FF FF FF		-- start energy per level
+4438 - 443f 19 32 4B 64 C8 FF FF FF		-- energy from crystal
+
+		-- sprite definitions continued
+
+4440 - 447F								-- 15 Floor levels 2 & 3
+4480 - 44BF								-- 16 Wall level 3
+44C0 - 44FF								-- 17 Wall level 4
+4500 - 453F								-- 18 Floor level 1
+4540 - 457F								-- 19 Floor levels 4 & 7
+4580 - 45BF								-- 1A Wall levels 1 & 2
+45C0 - 45FF								-- 1B Floor level 5
+4600 - 463F								-- 1C Wall level 5
+4640 - 467F								-- 1D Floor level 6
+4680 - 46BF								-- 1E Wall level 6
+46C0 - 46FF								-- 1F Wall level 7
+4700 - 473F								-- 20 (empty space)
+4740 - 477F								-- 21 Mushroom
+4780 - 47BF								-- 22 Player facing left 1/2
+47C0 - 47FF								-- 23 Player facing left 2/2
+4800 - 483F								-- 24 Player facing right 1/2
+4840 - 487F								-- 25 Player facing right 2/2
+4880 - 48BF								-- 26 Player facing up 1/2
+48C0 - 48FF								-- 27 Player facing up 2/2
+4900 - 493F								-- 28 Player facing down 1/2
+4940 - 497F								-- 29 Player facing down 2/2
+4980 - 49BF								-- 2A Forcefield 1/2
+49C0 - 49FF								-- 2B Forcefield 2/2
+4A00 - 4A3F								-- 2C Brown thresher 1/2
+4A40 - 4A7F								-- 2D Brown thresher 2/2
+4A80 - 4ABF								-- 2E Cyan thresher 1/2
+4AC0 - 4AFF								-- 2F Cyan thresher 2/2
+4B00 - 4B3F								-- 30 Brown rotafloater 1/3
+4B40 - 4B7F								-- 31 Brown rotafloater 2/3
+4B80 - 4BBF								-- 32 Brown rotafloater 3/3
+4BC0 - 4BFF								-- 33 Green killercube 1/2
+4C00 - 4C3F								-- 34 Green killercube 2/2
+4C40 - 4C7F								-- 35 Red flitterbug 1/2
+4C80 - 4CBF								-- 36 Red flitterbug 2/2
+4CC0 - 4CFF								-- 37 Cyan flitterbug 1/2
+4D00 - 4D3F								-- 38 Cyan flitterbug 2/2
+4D40 - 4D7F								-- 39 Red killercube 1/2
+4D80 - 4DBF								-- 3A Red killercube 2/2
+4DC0 - 4DFF								-- 3B Diamond demon 1/2
+4E00 - 4E3F								-- 3C Diamond demon 2/2
+4E40 - 4E7F								-- 3D Cyan rotafloater 1/3
+4E80 - 4EBF								-- 3E Cyan rotafloater 2/3
+4EC0 - 4EFF								-- 3F Cyan rotafloater 3/3
+4F00 - 4F3F								-- 40 Deathcube 1/2
+4F40 - 4F7F								-- 41 Deathcube 2/2
+4F80 - 4FBF								-- 42 Crazy crawler 1/2
+4FC0 - 4FFF								-- 43 Crazy crawler 2/2
+5000 - 503F								-- 44 Brown flitterbug 1/2
+5040 - 507F								-- 45 Brown flitterbug 2/2
+5080 - 50BF								-- 46 Tiger moth 1/2
+50C0 - 50FF								-- 47 Tiger moth 2/2
+5100 - 513F								-- 48 Butterfly 1/2
+5140 - 517F								-- 49 Butterfly 2/2
+5180 - 51BF								-- 4A Joker 1/2
+51C0 - 51FF								-- 4B Joker 2/2
+5200 - 523F								-- 4C Copyright (never used)
+5240 - 527F								-- 4D horizontal monster shot
+5280 - 52BF								-- 4E vertical monster shot
+52C0 - 52FF								-- 4F grave
+5300 - 533F								-- 50 digits & life 1/2
+5340 - 537F								-- 51 digits & life 2/2
+5380 - 53BF								-- 52 egg 1/2
+53C0 - 53FF								-- 53 egg 2/2
+5400 - 543F								-- 54 bang 1/4
+5440 - 547F								-- 55 bang 2/4
+5480 - 54BF								-- 56 bang 3/4
+54C0 - 54FF								-- 57 bang 4/4
+5500 - 553F								-- 58 crystal off
+5540 - 557F								-- 59 crystal on
+5580 - 55BF								-- 5A apple
+55C0 - 55FF								-- 5B watermelon
+5600 - 563F								-- 5C pineapple
+5640 - 567F								-- 5D strawberry
+5680 - 56BF								-- 5E cherries
+56C0 - 56FF								-- 5F acorn
+
+5700 - 57BF								-- initial monster type
+57C0 - 57FF								-- monster templates for world 2
+
+		-- Start of screen memory (5800 to 7FFF)
+		-- Anything after this point is relocated or used once then discarded
+
+5800 - 58FF								-- code relocated to &0900
+5900 - 59FF								-- code relocated to &0A00
+5A00 - 5AFF								-- code relocated to &0800
+5B00 - 5BFF								-- code relocated to &1000
+5C00 - 5CFF								-- code relocated to &0D00
 
 		-- Instructions page
 
@@ -6626,7 +6900,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 5D17 A2 04     LDX #04                  
 5D19 20 F4 FF  JSR FFF4                 -- set duration of 2nd flashing colour to 4 * 20ms
 
-5D1C A9 09     LDA #09                  -- reallocate code from &5800 to &0900
+5D1C A9 09     LDA #09                  -- relocate code from &5800 to &0900
 5D1E 85 71     STA 71                   
 5D20 A9 58     LDA #58                  
 5D22 85 73     STA 73                   
@@ -6656,21 +6930,21 @@ definitions (initial frequency, initial volume, data change control, volume adju
 5D4E 85 73     STA 73                   
 5D50 20 AF 5D  JSR 5DAF                 
 
-5D53 A9 E1     LDA #E1                  
+5D53 A9 E1     LDA #E1                  -- left key
 5D55 8D D0 0B  STA 0BD0                 
-5D58 A9 C2     LDA #C2                  
+5D58 A9 C2     LDA #C2                  -- right key
 5D5A 8D D1 0B  STA 0BD1                 
-5D5D A9 C8     LDA #C8                  
+5D5D A9 C8     LDA #C8                  -- up key
 5D5F 8D D2 0B  STA 0BD2                 
-5D62 A9 E8     LDA #E8                  
+5D62 A9 E8     LDA #E8                  -- down key
 5D64 8D D3 0B  STA 0BD3                 
-5D67 A9 D8     LDA #D8                  
+5D67 A9 D8     LDA #D8                  -- fire key
 5D69 8D D4 0B  STA 0BD4                 
 
 5D6C A9 81     LDA #81                  
-5D6E 8D 24 02  STA 0224                 
+5D6E 8D 24 02  STA 0224                 -- set econet vector handler address
 5D71 A9 0D     LDA #0D                  
-5D73 8D 25 02  STA 0225                 
+5D73 8D 25 02  STA 0225                 -- to OD81
 
 5D76 A9 D0     LDA #D0                  
 5D78 A2 FF     LDX #FF                  
@@ -6713,33 +6987,37 @@ definitions (initial frequency, initial volume, data change control, volume adju
 5DBB D0 F9     BNE 5DB6                 
 5DBD 60        RTS                      
 
-6249 A5 70     LDA 70
-624B 4C 6E 62  JMP 626E
+		-- Display Acornsoft loading screen
+
+6249 A5 70     LDA 70					-- get current graphics colour character
+624B 4C 6E 62  JMP 626E					-- jump to output via oswrch
 
 		-- ENTRY POINT
 
 624E A9 E5     LDA #E5                  
 6250 A2 01     LDX #01                  
 6252 20 F4 FF  JSR FFF4                 -- escape key to return ascii code
-6255 A9 16     LDA #16                  3w
+6255 A9 16     LDA #16                  -- vdu 22
 6257 20 EE FF  JSR FFEE                 -- set screen mode
 625A A9 07     LDA #07                  
 625C 20 EE FF  JSR FFEE                 -- set mode 7
 
-625F A9 91     LDA #91                  -- graphics red
-6261 85 70     STA 70                   
+625F A9 91     LDA #91                  -- start with graphics red
+6261 85 70     STA 70                   -- store
 6263 A2 04     LDX #04                  -- initialise outer loop counter
 6265 A0 00     LDY #00                  -- initialise inner loop counter
-6267 B9 FF 62  LDA 62FF,Y               -- get data from memory
+
+6267 B9 FF 62  LDA 62FF,Y               -- get data from memory (starts with #40)
 626A C9 40     CMP #40                  
-626C F0 DB     BEQ 6249                 -- get control character instead
-626E 20 EE FF  JSR FFEE                 -- vdu
+626C F0 DB     BEQ 6249                 -- get current colour graphics character instead
+626E 20 EE FF  JSR FFEE                 -- oswrch
 6271 C8        INY                      
-6272 C0 C7     CPY #C7                  -- check for end of inner loop
+6272 C0 C7     CPY #C7                  -- check for end of inner loop (200 characters, 5 lines of 40 characters)
 6274 D0 F1     BNE 6267                 -- continue inner loop
+
 6276 E6 70     INC 70                   -- next colour for graphics
 6278 E0 01     CPX #01                  
-627A F0 16     BEQ 6292                 
+627A F0 16     BEQ 6292                 -- break out of outer loop
 
 627C A9 0D     LDA #0D                  
 627E 20 EE FF  JSR FFEE                 -- carriage return
@@ -6748,20 +7026,20 @@ definitions (initial frequency, initial volume, data change control, volume adju
 6286 A9 0A     LDA #0A                  
 6288 20 EE FF  JSR FFEE                 -- new line
 628B E0 03     CPX #03                  
-628D F0 68     BEQ 62F7                 -- another new line
+628D F0 68     BEQ 62F7                 -- extra new line in the middle
 628F CA        DEX                      
 6290 D0 D3     BNE 6265                 -- continue outer loop
 
 6292 A9 1C     LDA #1C                  
 6294 20 EE FF  JSR FFEE                 -- vdu 28 : define text window
 6297 A9 0D     LDA #0D                  
-6299 20 EE FF  JSR FFEE                 
+6299 20 EE FF  JSR FFEE                 -- bottom left x = 13
 629C A9 0D     LDA #0D                  
-629E 20 EE FF  JSR FFEE                 
+629E 20 EE FF  JSR FFEE                 -- bottom left y = 13
 62A1 A9 1B     LDA #1B                  
-62A3 20 EE FF  JSR FFEE                 
+62A3 20 EE FF  JSR FFEE                 -- top right x = 27
 62A6 A9 0A     LDA #0A                  
-62A8 20 EE FF  JSR FFEE                 
+62A8 20 EE FF  JSR FFEE                 -- top right y = 10
 
 62AB A9 0C     LDA #0C                  
 62AD 20 EE FF  JSR FFEE                 -- CLS
@@ -6801,8 +7079,52 @@ definitions (initial frequency, initial volume, data change control, volume adju
 62ED A9 0F     LDA #0F                  
 62EF A2 01     LDX #01                  
 62F1 20 F4 FF  JSR FFF4                 -- flush keyboard buffer
-62F4 4C 00 5D  JMP 5D00                 
+62F4 4C 00 5D  JMP 5D00                 -- goto instructions page
+
+		-- output newline
 
 62F7 A9 0A     LDA #0A                  
 62F9 20 EE FF  JSR FFEE                 -- new line
 62FC 4C 8F 62  JMP 628F                 
+
+		-- first line of Acornsoft
+
+62FF 40 9A								-- current graphics colour, separated graphics
+6300 A0 A0 A0 FC B4 E0 FC FC B0 A0 F8 FC F4 A0 FC FC FC B0 E8 F4 A0 E8 B4 F8 FC FC B0 A0 FE FF B4 A0 FC FC FC FC FC FC 
+
+		-- second line of Acornsoft
+
+6327 40 9A 								-- current graphics colour, separated graphics
+6329 A0 A0 FA FF B5 FF A7 AB FF EA BF A3 EF B5 FF A3 EB B5 EA FF B4 EA B5 FF B1 AB A5 EA FF FF FF A0 FF A3 A3 A3 FF A3
+
+		-- third line of Acornsoft
+
+634F 40 9A 								-- current graphics colour, separated graphics
+6351 A0 E8 BF EB B5 FF A0 A0 A0 EA B5 A0 EA B5 FF FC FE A5 EA BF FF FA B5 AB FF FD B0 FF FF FF FF B5 FF FF FF A0 FF A0
+
+		-- fourth line of Acornsoft
+
+6377 40 9A 								-- current graphics colour, separated graphics
+6379 E0 FF FD FE B5 FF B0 E0 FC EA F5 A0 FA B5 FF AB FD A0 EA B5 EB FF B5 F0 A0 EB FF F3 F3 F3 F3 B1 FF A0 A0 A0 FF A0
+
+		-- fifth line of Acornsoft
+
+6395 40 9A								-- current graphics colour, separated graphics
+6397 FE B7 A0 EA B5 AB FF FF A7 A2 EF FF BF A1 FF A0 EB F5 EA B5 A0 EF B5 EF FF FF A5 EF FF FF FF A5 FF A0 A0 A0 FF
+
+		-- output string data
+
+63C6 17 01 00 00 00 00 00 00 00 00		-- vdu 23 - turn off cursor
+63D0 1C 07 13 21 11						-- vdu 28 - define text window bottom right 7, 13  top left 21, 11
+63D5 0C									-- vdu 12 - cls
+63D6 0A									-- newline
+63D7 88 85								-- flash, magenta
+63D9 "Press 'RETURN' to start"
+
+		-- output string data
+
+63F0 8D									-- double height
+63F1 "  Labyrinth  "
+63FE 0D									-- carriage return
+
+-- end of file --
