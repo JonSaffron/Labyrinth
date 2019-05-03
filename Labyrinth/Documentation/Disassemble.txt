@@ -1,3 +1,8 @@
+zero page
+---------
+80 & 81			-- address of current wall sprite
+82 & 83			-- address of current floor sprite (82 will be 0, 40, 80, C0)
+
 current monster data 400 to 7bf
 -------------------------------
 400 to 4bf		-- room number - FF indicates this is a free slot, FE indicates this is a template
@@ -92,7 +97,7 @@ current monster data 400 to 7bf
 0bc1			-- current vertical scroll position for moving up/down between 0 and 19
 0bc2			-- number of lives left
 0bc3			-- 0 normally, 1 when being bounced backward by block
-0bc4			-- holds direction
+0bc4			-- holds player's requested direction from keyboard/joystick
 0bc5			-- row number during room generation, calculation result during fruit population
 0bc6			-- current room being shown. 
 0bc7			-- firing flag to enforce one shot per key press
@@ -123,15 +128,15 @@ bdc				-- delay until game's main loop ends
 					the player is always the first slot
 	offset 0	-- type of object (0 slot is empty, 1 is monster, 4 crystal, 5 player whilst alive, 6 player inactive/dead, fe block, ff shot)
 	offset 1	-- current tile number
-	offset 2	-- previous/future tile number?
+	offset 2	-- future tile number?
 	offset 3	-- position between tiles (between 0 and 3)
 	offset 4	-- direction (0 left, 1 right, 2 up, 3 down, 4 still)
-	offset 5	-- contents of tile being occupied
+	offset 5	-- previous tile number
 	offset 6	-- when a monster, this is the monster id
 				   for a shot, this is 1 for a player shot, 2 for a player or monster rebound, or x0 for a monster shot (indicating the animation slot that spawned the shot)
 				   for the boulder, this is 3
-	offset 7	-- toggle flag with &FF indicating moving at double speed, 0 at normal speed
-	offset 8	-- not really used
+	offset 7	-- toggle flag with &FF indicating moving at double speed, 0 at normal speed. Toggled only when a move is complete.
+	offset 8	-- not used
 	offset 9	-- the base index of the animation to show
 	offset A	-- count of frames in animation
 	offset B	-- time to show each frame
@@ -140,7 +145,7 @@ bdc				-- delay until game's main loop ends
 	offset E	-- energy					
 	offset F	-- < 80 then counter to hatching, 
 					80 static, 81 full chase, 82 patrol, 83 random, 84 cautious - pursuit,
-					85 not used, 86 aggressive, 87 cautious afraid, 88 rolling
+					85 player, 86 aggressive, 87 cautious afraid, 88 rolling
 
 	-- static object data - room, tile, type and energy
 
@@ -236,24 +241,24 @@ F: 26 02 64		cyan thresher,		cautious,		follows player, lays mushrooms,						100
 5800			-- start of screen memory
 
 memory mapping as follows:
-Each sprite is 16 x 16 pixels and occupies 64 bytes
+Each sprite is 16 x 16 pixels with 2 bits of colour and occupies 64 bytes
 The first 16x16 sprite in the top-left corner is located at the following memory locations:
-5800	5808	5810	5818	5820	5828	5830	5838
-5801	5809	5811	5819	
-5802	580a	5812	581a
-5803	580b	
-5804	580c
-5805	580d
-5806	580e
-5807	580f	5817	581f	5827	582f	5837	583f
-5a00	5a08	5a10	5a18	5a20	5a28	5a30	5a38
+5800	5808	5810	5818		5820	5828	5830	5838	...	59E0	59E8	59F0	59F8
+5801	5809	5811	5819										...	59E1	59E9	59F1	59F9
+5802	580a	5812	581a										...	59E2	59EA	59F2	59FA
+5803	580b														...	59E3	59EB	59F3	59FB
+5804	580c														...	59E4	59EC	59F4	59FC
+5805	580d														...	59E5	59ED	59F5	59FD
+5806	580e														...	59E6	59EE	59F6	59FE
+5807	580f	5817	581f		5827	582f	5837	583f	... 59E7	59EF	59F7	59FF
+5a00	5a08	5a10	5a18		5a20	5a28	5a30	5a38	...	5BE0	5BE8	5BF0	5BF8
 5a01
 5a02
 5a03
 5a04
 5a05
 5a06
-5a07	5a0f	5a17	5a1f	5a27	5a2f	5a37	5a3f
+5a07	5a0f	5a17	5a1f		5a27	5a2f	5a37	5a3f	... 5BE7	5BEF	5BF7	5BFF
 
 sound combinations
 ------------------
@@ -562,7 +567,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 0A76 A9 01     LDA #01                  
 0A78 8D 0A 0C  STA 0C0A                 -- set count of animation frames to 1 (enables animation)
-0A7B 8C C4 0B  STY 0BC4                 
+0A7B 8C C4 0B  STY 0BC4                 -- store player's requested direction of movement
 
 0A7E 84 7E     STY 7E                   
 0A80 98        TYA                      
@@ -664,84 +669,132 @@ definitions (initial frequency, initial volume, data change control, volume adju
 0BA0 - 0BFF								-- game data and state
 0C00 - 0CFF								-- animation slots
 
-0D00 40		   RTI						-- Non maskable interrupt handler
+		-- Non maskable interrupt handler
+
+0D00 40		   RTI						-- NMI ignored
 
 0D01 - 0D80								-- Exits for world 2
 
-0D81 C9 04     CMP #04                  -- 
-0D83 F0 03     BEQ 0D88                 
-0D85 18        CLC                      
+		-- ECONET handler
+		-- on entry, A contains the reason code
+
+0D81 C9 04     CMP #04                  -- reason 4 is OSWRCH call made
+0D83 F0 03     BEQ 0D88                 -- branch if it is
+0D85 18        CLC                      -- clear carry to indicate call should be carried out
 0D86 B8        CLV                      
-0D87 60        RTS                      
-0D88 C0 07     CPY #07                  
-0D8A F0 02     BEQ 0D8E                 
-0D8C 18        CLC                      
-0D8D 60        RTS                      
-0D8E 48        PHA                      
+0D87 60        RTS                      -- return
+0D88 C0 07     CPY #07                  -- on entry, Y contains the original value in A (reason code 4). 7 is beep
+0D8A F0 02     BEQ 0D8E                 -- branch if it is
+0D8C 18        CLC                      -- clear carry to indicate call should be carried out
+0D8D 60        RTS                      -- return
+
+0D8E 48        PHA                      -- save regs
 0D8F 98        TYA                      
 0D90 48        PHA                      
 0D91 8A        TXA                      
 0D92 48        PHA                      
-0D93 A9 DA     LDA #DA                  
-0D95 A2 00     LDX #00                  
-0D97 A0 FF     LDY #FF                  
-0D99 20 F4 FF  JSR FFF4                 
+0D93 A9 DA     LDA #DA                  -- OSBYTE &DA read/write number of items in VDU queue
+0D95 A2 00     LDX #00                  -- don't modify result
+0D97 A0 FF     LDY #FF                  -- get all bits
+0D99 20 F4 FF  JSR FFF4                 -- call OSBYTE - result is returned in X
 0D9C 18        CLC                      
 0D9D 8A        TXA                      
-0D9E D0 01     BNE 0DA1                 
-0DA0 38        SEC                      
-0DA1 68        PLA                      
+0D9E D0 01     BNE 0DA1                 -- branch if more than one item in queue
+0DA0 38        SEC                      -- set carry to prevent call being carried out
+0DA1 68        PLA                      -- restore regs
 0DA2 AA        TAX                      
 0DA3 68        PLA                      
 0DA4 A8        TAY                      
 0DA5 68        PLA                      
-0DA6 60        RTS                      
+0DA6 60        RTS                      -- return
 
-		-- calculate the address of screen memory
-		-- on entry X and Y indicate the logical co-ordinates required (x 0->63, y 0->19)
-		-- 0BC0 and 0BC1 indicate the current offset due to hardware scrolling
-		-- on exit 70 and 71 indicate the absolute memory address between &5800 and &7FFF
-		-- each movement along X is an increase in 8 bytes, each movement along Y is an increase in 0x200 bytes
+0DA7 - 0DFF								-- looks unused, contains strings "84 ACORNSOFT", "MICHAEL MATHISON"
+
+0E00 - 0E7F								-- room containing static object or FF if empty (0e7f is reserved for boulder)
+0E80 - 0EFF								-- tile number of static object or FF if not set/undefined (0eff is for boulder)
+
+0F00 - 0F7F								-- type of object (12 wall, 20 free tile, 5a apple, 13 block)
+0F80 - 0FFF								-- energy of static object
+
+1000 - 10D7								-- High score table
+
+1000 - 1008								-- Offsets into the table for each entry
+1009 - 100B								-- Score for entry 1 (in BCD)
+100C - 101F								-- Name for entry 1 (terminated with C/R)
+1020 - 1022								-- Score for entry 2 (in BCD)
+1023 - 1036								-- Name for entry 2 (terminated with C/R)
+1037 - 1039								-- Score for entry 3 (in BCD)
+103A - 104D								-- Name for entry 3 (terminated with C/R)
+104E - 1050								-- Score for entry 4 (in BCD)
+1051 - 1064								-- Name for entry 4 (terminated with C/R)
+1065 - 1067								-- Score for entry 5 (in BCD)
+1068 - 10xx								-- Name for entry 5 (terminated with C/R)
+107C - 107E								-- Score for entry 6 (in BCD)
+107F - 10xx								-- Name for entry 6 (terminated with C/R)
+1093 - 1095								-- Score for entry 7 (in BCD)
+1096 - 10xx								-- Name for entry 7 (terminated with C/R)
+10AA - 10AC								-- Score for entry 8 (in BCD)
+10AD - 10xx								-- Name for entry 8 (terminated with C/R)
+10C1 - 10C3								-- Score for entry 9 (in BCD)
+10C4 - 10D7								-- Name for entry 9 (terminated with C/R)
+
+10D8 - 10FF								-- unused, copy of code normally located in 09D8 - 09FF
+
+		-- calculate the desination address in screen memory
+		-- on entry X and Y indicate the screen co-ordinates required (y value needs to be halved first)
+		-- this is affected by 0BC0 and 0BC1 which indicate the current offset due to hardware scrolling
+		-- x co-ordinate has 64 (&40) possible positions and each movement along X increases the result by 8 bytes
+		-- y co-ordinate has 20 (&14) possible positions and each movement along Y increases the result by &200 bytes
+		-- on exit 70 (low byte) and 71 (high byte) indicate the absolute memory address between &5800 and &7FFF
 
 1100 8A        TXA                      
 1101 18        CLC                      
 1102 6D C0 0B  ADC 0BC0                 -- add X co-ord to current offset
 1105 48        PHA                      
-1106 10 04     BPL 110C                 -- result 0 or more? It always is.
-1108 A9 FF     LDA #FF                  -- not used
-110A D0 02     BNE 110E                 
-110C A9 00     LDA #00                  
-110E 85 71     STA 71                   
-1110 68        PLA                      
-1111 85 70     STA 70                   
+1106 10 04     BPL 110C                 -- result 0 or more? It always seems to be.
+1108 A9 FF     LDA #FF                  -- start high byte at -1
+110A D0 02     BNE 110E                 -- always jump
 
-1113 06 70     ASL 70                   
-1115 26 71     ROL 71                   
-1117 06 70     ASL 70                   
-1119 26 71     ROL 71                   
-111B 06 70     ASL 70                   
-111D 26 71     ROL 71                   
+110C A9 00     LDA #00                  -- start high byte at 0
+110E 85 71     STA 71                   
+1110 68        PLA                      -- pull x address
+1111 85 70     STA 70                   -- store in low byte result
+
+		-- multiply x by 8
+
+1113 06 70     ASL 70                   -- double 70, carry gets old bit 7
+1115 26 71     ROL 71                   -- double 71, add carry bit to bit 0
+
+1117 06 70     ASL 70                   -- double 70, carry gets old bit 7
+1119 26 71     ROL 71                   -- double 71, add carry bit to bit 0
+
+111B 06 70     ASL 70                   -- double 70, carry gets old bit 7
+111D 26 71     ROL 71                   -- double 71, add carry bit to bit 0
 
 111F 98        TYA                      
 1120 18        CLC                      
 1121 6D C1 0B  ADC 0BC1                 
-1124 0A        ASL A                    
+1124 0A        ASL A                    -- double y result (each y adds &200)
 1125 18        CLC                      
 1126 69 58     ADC #58                  -- &5800 is the start of screen memory for mode 5
 1128 18        CLC                      
-1129 65 71     ADC 71                   
-112B 30 07     BMI 1134                 -- is high byte of address over &7F
+1129 65 71     ADC 71                   -- add any overspill from x
+112B 30 07     BMI 1134                 -- branch if high byte of address over &7F
 112D C9 58     CMP #58                  
-112F 90 09     BCC 113A                 
+112F 90 09     BCC 113A                 -- branch if high byte of address under &58
 1131 85 71     STA 71                   
 1133 60        RTS                      
 
-1134 38        SEC                      -- reduce high byte of address to be between 58 and 7F
+		-- reduce high byte of address to be between 58 and 7F
+
+1134 38        SEC                      
 1135 E9 28     SBC #28                  
 1137 85 71     STA 71                   
 1139 60        RTS                      
 
-113A 18        CLC                      -- increase high byte of address to be between 58 and 7F
+		-- increase high byte of address to be between 58 and 7F
+
+113A 18        CLC                      
 113B 69 28     ADC #28                  
 113D 85 71     STA 71                   
 113F 60        RTS                      
@@ -882,100 +935,136 @@ definitions (initial frequency, initial volume, data change control, volume adju
 121C 60        RTS                      
 
 		-- draw non-wall sprite to screen
+		-- on entry, X and Y are the screen co-ordinates to draw at
+		--           &72 and &73 are the memory address of the sprite to draw
 
-121D 20 9C 12  JSR 129C                 
+121D 20 9C 12  JSR 129C                 -- get address into floor sprite using x,y offset (sets 74/75)
 1220 98        TYA                      
 1221 48        PHA                      
-1222 4A        LSR A                    
+1222 4A        LSR A                    -- divide y co-ordinate in half
 1223 A8        TAY                      
-1224 20 00 11  JSR 1100                 
-1227 68        PLA                      
-1228 0A        ASL A                    
-1229 0A        ASL A                    
-122A 29 04     AND #04                  
-122C 85 76     STA 76                   
-122E A5 72     LDA 72                   
-1230 48        PHA                      
-1231 A9 04     LDA #04                  
-1233 85 77     STA 77                   
-1235 A2 00     LDX #00                  
-1237 A4 76     LDY 76                   
-1239 A9 10     LDA #10                  
-123B 85 78     STA 78                   
-123D A1 72     LDA (72,X)               
-123F D0 02     BNE 1243                 
-1241 A1 74     LDA (74,X)               
-1243 91 70     STA (70),Y               
-1245 E6 72     INC 72                   
-1247 E6 74     INC 74                   
-1249 C8        INY                      
+1224 20 00 11  JSR 1100                 -- get destination screen address into 70 / 71
+1227 68        PLA                      -- restore y co-ordinate
+1228 0A        ASL A                    -- double it
+1229 0A        ASL A                    -- double it again
+122A 29 04     AND #04                  -- get bit 3 (which will indicate whether y was odd or even)
+122C 85 76     STA 76                   -- store 4 or 0 
+
+122E A5 72     LDA 72                   -- get low byte of sprite address
+1230 48        PHA                      -- push
+
+1231 A9 04     LDA #04                  -- initialise loop counter for x
+1233 85 77     STA 77                   -- store outer loop counter in 77
+
+1235 A2 00     LDX #00                  -- keep X = 0 for the indirect addressing to work
+1237 A4 76     LDY 76                   -- get the y odd/even offset into Y - this resets the y destination for the inner loop
+1239 A9 10     LDA #10                  -- initialise loop counter for y
+123B 85 78     STA 78                   -- store inner loop counter in 78
+
+		-- get source data
+
+123D A1 72     LDA (72,X)               -- get sprite data
+123F D0 02     BNE 1243                 -- if not zero then branch
+1241 A1 74     LDA (74,X)               -- get floor sprite data instead
+
+		-- set destination data
+
+1243 91 70     STA (70),Y               -- store data at destination address + odd/even offset
+
+		-- increment source addresses
+
+1245 E6 72     INC 72                   -- increment low byte of source sprite address
+1247 E6 74     INC 74                   -- increment low byte of source floor sprite address
+
+		-- increment destination
+
+1249 C8        INY                      -- increment y offset
 124A 98        TYA                      
-124B 29 07     AND #07                  
-124D D0 0E     BNE 125D                 
-124F A8        TAY                      
-1250 E6 71     INC 71                   
-1252 E6 71     INC 71                   
-1254 10 07     BPL 125D                 
-1256 A5 71     LDA 71                   
+124B 29 07     AND #07                  -- examine lowest 3 bits to see if we need to carry over
+124D D0 0E     BNE 125D                 -- no carry, skip next bit
+
+124F A8        TAY                      -- get latest high byte address for destination
+1250 E6 71     INC 71                   -- add &100
+1252 E6 71     INC 71                   -- add &100 
+1254 10 07     BPL 125D                 -- branch if result is still in the range of screen memory
+1256 A5 71     LDA 71                   -- get current high byte which is negative so we need to wrap around to &58 - &7f range
 1258 38        SEC                      
-1259 E9 28     SBC #28                  
-125B 85 71     STA 71                   
-125D A5 74     LDA 74                   
-125F 29 0F     AND #0F                  
-1261 D0 07     BNE 126A                 
-1263 A5 74     LDA 74                   
+1259 E9 28     SBC #28                  -- bring result back into range
+125B 85 71     STA 71                   -- store result
+
+		-- keep source of floor data in range
+
+125D A5 74     LDA 74                   -- get current source floor address
+125F 29 0F     AND #0F                  -- look at the lowest 4 bits
+1261 D0 07     BNE 126A                 -- branch over if not wrapping round
+
+1263 A5 74     LDA 74                   -- get current source floor address
 1265 38        SEC                      
-1266 E9 10     SBC #10                  
-1268 85 74     STA 74                   
-126A C6 78     DEC 78                   
-126C D0 CF     BNE 123D                 
-126E A5 70     LDA 70                   
+1266 E9 10     SBC #10                  -- wrap back around to the top of the sprite
+1268 85 74     STA 74                   -- and save the new value
+
+		-- end of inner loop
+
+126A C6 78     DEC 78                   -- decrement inner loop counter
+126C D0 CF     BNE 123D					-- loop
+
+126E A5 70     LDA 70                   -- get destination low byte
 1270 38        SEC                      
-1271 E9 F8     SBC #F8                  
-1273 85 70     STA 70                   
-1275 A5 71     LDA 71                   
-1277 E9 03     SBC #03                  
+1271 E9 F8     SBC #F8                  -- subtract -8 / add 8 
+1273 85 70     STA 70                   -- store new value
+
+1275 A5 71     LDA 71                   -- get high byte of destination
+1277 E9 03     SBC #03                  -- subtract 3 with the carry
 1279 C9 58     CMP #58                  
-127B B0 03     BCS 1280                 
+127B B0 03     BCS 1280                 -- is result below screen memory
 127D 18        CLC                      
-127E 69 28     ADC #28                  
-1280 85 71     STA 71                   
-1282 A5 74     LDA 74                   
+127E 69 28     ADC #28                  -- wrap back to the end of screen memory
+
+1280 85 71     STA 71                   -- store new destination high byte
+
+1282 A5 74     LDA 74                   -- get floor sprite low
 1284 18        CLC                      
-1285 69 10     ADC #10                  
-1287 85 74     STA 74                   
-1289 29 30     AND #30                  
-128B D0 07     BNE 1294                 
-128D A5 74     LDA 74                   
+1285 69 10     ADC #10                  -- add to low byte to find the next column
+1287 85 74     STA 74                   -- store result
+1289 29 30     AND #30                  -- look at the low 2 bits
+128B D0 07     BNE 1294                 -- no need to wrap around
+
+128D A5 74     LDA 74                   -- get the floor low bit
 128F 38        SEC                      
-1290 E9 40     SBC #40                  
-1292 85 74     STA 74                   
+1290 E9 40     SBC #40                  -- go back 40 to get wrap back to the start
+1292 85 74     STA 74                   -- store the result
+
+		-- end of outer loop
+
 1294 C6 77     DEC 77                   
 1296 D0 9F     BNE 1237                 
+
 1298 68        PLA                      
 1299 85 72     STA 72                   
 129B 60        RTS                      
 
-		-- ???
+		-- Get address of floor tile with an offset based on the x,y co-ordinate
+		-- On entry, X and Y specify the screen co-ordinate
+		-- On exit, the address is placed into 74 and 75
 
 129C 8A        TXA                      
-129D 29 03     AND #03                  -- mask out lowest two bits
+129D 29 03     AND #03                  -- get offset from tile along X axis
 129F 0A        ASL A                    
 12A0 0A        ASL A                    
 12A1 0A        ASL A                    
-12A2 0A        ASL A                    -- multiply by 16
-12A3 85 74     STA 74                   
+12A2 0A        ASL A                    -- multiply by 16 (to make 0, 10, 20, 30)
+12A3 85 74     STA 74                   -- store for later
 
 12A5 98        TYA                      
-12A6 29 03     AND #03                  -- mask out lowest two bits
+12A6 29 03     AND #03                  -- get offset from tile along Y axis
 12A8 0A        ASL A                    
-12A9 0A        ASL A                    -- multiply by 4
+12A9 0A        ASL A                    -- multiply by 4 (to make 0, 4, 8, 12)
 12AA 18        CLC                      
-12AB 65 82     ADC 82                   
-12AD 65 74     ADC 74                   
-12AF 85 74     STA 74                   
-12B1 A5 83     LDA 83                   
-12B3 85 75     STA 75                   
+12AB 65 82     ADC 82                   -- add low byte of address of floor sprite
+12AD 65 74     ADC 74                   -- add x offset
+12AF 85 74     STA 74                   -- store low byte of result in 74
+12B1 A5 83     LDA 83                   -- get high byte of source address
+12B3 85 75     STA 75                   -- store high byte of result in 75
 12B5 60        RTS                      
 
 		-- draw sprite with offset column (left or right of tile)
@@ -1681,15 +1770,16 @@ definitions (initial frequency, initial volume, data change control, volume adju
 17F3 85 71     STA 71                   
 17F5 6C 70 00  JMP (0070)               -- jump to routine
 
-
+1800 - 1813								-- address lookup table as used just above
+1820 - 188F								-- unknown data table used in above routines
 1890 to 18e1 assorted data documented at the top of this document
 
-
-		-- update animation frame for monster
+		-- process animation main routine: 
+		-- increment the sprite shown, move position, draw it, determine where it moves next
 		-- on entry, X is the index into C00 identifying the monster to update
 
 1900 A9 FF     LDA #FF                  
-1902 85 88     STA 88                   
+1902 85 88     STA 88                   -- set that no collision has been detected
 1904 85 89     STA 89                   
 1906 DE 0D 0C  DEC 0C0D,X               -- decrement count until animation frame needs to change
 1909 10 11     BPL 191C                 -- if not there yet, branch onwards
@@ -1703,7 +1793,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 191C BD 0F 0C  LDA 0C0F,X               -- get monster movement (egg = <80)
 191F C9 80     CMP #80                 
 1921 B0 53     BCS 1976                 -- jump to move monster
-1923 DE 0F 0C  DEC 0C0F,X               -- decrement delay counter
+1923 DE 0F 0C  DEC 0C0F,X               -- decrement counter to monster hatching
 1926 10 4E     BPL 1976                 -- always jump to move monster (will never be negative)
 
 		-- draw background tiles behind monster/player
@@ -1746,21 +1836,25 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 		-- move monster
 
-1976 BD 07 0C  LDA 0C07,X               -- get flag for double speed movement
-1979 30 08     BMI 1983                 -- branch if currently negative
-197B DE 08 0C  DEC 0C08,X               -- set to &FF
-197E 30 6C     BMI 19EC                 -- always JUMP 
+1976 BD 07 0C  LDA 0C07,X               -- get current state of flitter flag (will be FF or 0)
+1979 30 08     BMI 1983                 -- branch if currently negative (this indicates a double-speed movement is needed)
+197B DE 08 0C  DEC 0C08,X               -- this might be from a previous implementation of flittering. it achieves nothing now 0C08,X will always be 0
+197E 30 6C     BMI 19EC                 -- always JUMP to move at normal speed
 
-1980 4C 48 1B  JMP 1B48                 
+1980 4C 48 1B  JMP 1B48                 -- draw sprite. continues afterwards at 1BFF
 
 		-- move monster at double speed
 
 1983 BD 04 0C  LDA 0C04,X               -- get current direction
 1986 C9 04     CMP #04                  -- is it static?
 1988 F0 F6     BEQ 1980                 -- yes, so branch and jump
+
 198A 20 E1 1C  JSR 1CE1                 -- calculate which sprite to render
 198D BD 03 0C  LDA 0C03,X               -- get position between tiles
 1990 D0 32     BNE 19C4                 -- not zero (i.e. not dead on tile) then branch
+
+		-- move monster (at double speed) to half way between tiles
+
 1992 A9 02     LDA #02                  -- set position to mid-point between tiles
 1994 9D 03 0C  STA 0C03,X               -- store position
 1997 BC 01 0C  LDY 0C01,X               -- get current tile number
@@ -1768,7 +1862,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 199B EA        NOP                      
 199C EA        NOP                      
 199D 98        TYA                      
-199E 20 83 1C  JSR 1C83                 -- seperate out tile number into x & y
+199E 20 83 1C  JSR 1C83                 -- separate out tile number into x & y
 19A1 BD 04 0C  LDA 0C04,X               -- get direction
 19A4 20 67 1C  JSR 1C67                 -- update tile number according to direction
 19A7 20 90 1C  JSR 1C90                 -- combine x & y back to tile number
@@ -1782,6 +1876,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 19BE 20 DE 19  JSR 19DE                 -- draw sprite to screen with offset
 19C1 4C FF 19  JMP 19FF                 
 
+		-- move monster (at double speed) to destination tile
+
 19C4 BC 01 0C  LDY 0C01,X               -- get current tile
 19C7 BD 02 0C  LDA 0C02,X               -- get tile moving towards
 19CA 9D 01 0C  STA 0C01,X               -- update current tile number
@@ -1793,23 +1889,29 @@ definitions (initial frequency, initial volume, data change control, volume adju
 19DC EA        NOP                      
 19DD EA        NOP                      
 
+		-- draw sprite to screen when moving at double speed
+
 19DE 20 AC 1C  JSR 1CAC                 -- calculate position with offset and draw sprite
 19E1 BD 04 0C  LDA 0C04,X               -- get direction
 19E4 49 01     EOR #01                  -- reverse it
 19E6 20 67 1C  JSR 1C67                 -- adjust co-ordinates according to direction
 19E9 4C AC 1C  JMP 1CAC                 -- calculate position with offset and draw sprite
 
-		-- move monster at normal speed
+		-- move monster
 
 19EC BD 07 0C  LDA 0C07,X               -- get 0
 19EF 9D 08 0C  STA 0C08,X               -- store 0
 19F2 BD 04 0C  LDA 0C04,X               -- get current direction
-19F5 C9 04     CMP #04                  -- is it static?
-19F7 B0 87     BCS 1980                 -- yes, so branch
-19F9 20 E1 1C  JSR 1CE1                 -- calculate which animation frame to show
-19FC 20 7B 1B  JSR 1B7B                 -- update sprite position and draw it
+19F5 C9 04     CMP #04                  -- is it still?
+19F7 B0 87     BCS 1980                 -- yes, so branch to display sprite. will return after to 19FF
 
-19FF 20 1F 1B  JSR 1B1F                 -- is there someone else occupying the same tile?
+19F9 20 E1 1C  JSR 1CE1                 -- calculate memory address of animation frame to show
+19FC 20 7B 1B  JSR 1B7B                 -- update sprite position (for normal movement) and draw it
+
+		-- continue processing animation slot
+		-- (will be jumped to directly)
+
+19FF 20 1F 1B  JSR 1B1F                 -- do collision detection
 1A02 BD 0F 0C  LDA 0C0F,X               -- get monster movement type
 1A05 C9 80     CMP #80                  -- is it egg (< 80) or monster?
 1A07 B0 0B     BCS 1A14                 -- if monster so branch to determine which direction to go in
@@ -1925,20 +2027,20 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1AA3 C9 05     CMP #05                  
 1AA5 D0 1C     BNE 1AC3                 
 
-		-- 85 not used
+		-- 85 player movement
 
-1AA7 AD C4 0B  LDA 0BC4                 -- get player direction
-1AAA 9D 04 0C  STA 0C04,X               -- store as monster direction
-1AAD BD 01 0C  LDA 0C01,X               -- get monster tile
-1AB0 20 EB 1C  JSR 1CEB                 -- get contents of tile
+1AA7 AD C4 0B  LDA 0BC4                 -- get input direction
+1AAA 9D 04 0C  STA 0C04,X               -- store animation direction
+1AAD BD 01 0C  LDA 0C01,X               -- get current player tile
+1AB0 20 EB 1C  JSR 1CEB                 -- get contents of the tile in the specified direction
 1AB3 85 89     STA 89                   
 1AB5 C9 13     CMP #13                  
-1AB7 B0 09     BCS 1AC2                 -- 13 or more then return
-1AB9 EA        NOP                      
+1AB7 B0 09     BCS 1AC2                 -- 13 or more then movement will be allowed so return
+1AB9 EA        NOP                      -- less than 12 and player is trying to walk into a wall
 1ABA EA        NOP                      
 1ABB EA        NOP                      
 1ABC EA        NOP                      
-1ABD A9 04     LDA #04                  
+1ABD A9 04     LDA #04                  -- reset direction to still
 1ABF 9D 04 0C  STA 0C04,X               -- set direction to still
 1AC2 60        RTS                      
 
@@ -2009,18 +2111,19 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1B1B 9D 04 0C  STA 0C04,X               -- store direction 4 (static) as direction
 1B1E 60        RTS                      
 
-		-- determine if there is another sprite occupying the same ground
-		-- on entry, X is the animation slot of the shot
-		-- on exit, &84 is the number of the slot at the same position and &88 is 0
+		-- collision detection
+		-- on entry, X is the animation slot of the sprite
+		-- on exit, &84 is the number of first slot at the same position and &88 is 0
 
-1B1F 86 84     STX 84                   
+1B1F 86 84     STX 84                   -- make a note of the current animation slot
 1B21 A0 00     LDY #00                  -- initialise loop counter
-1B23 B9 00 0C  LDA 0C00,Y               -- get state of player/monster slot
+
+1B23 B9 00 0C  LDA 0C00,Y               -- get state of animation slot
 1B26 F0 11     BEQ 1B39                 -- continue loop if not in use
-1B28 C4 84     CPY 84                   
-1B2A F0 0D     BEQ 1B39                 -- continue loop if currently dealing with that slot
-1B2C BD 01 0C  LDA 0C01,X               -- get the position for the occupant of the slot we're currently dealing with
-1B2F D9 01 0C  CMP 0C01,Y               -- compare to the position of the occupant of the loop slot
+1B28 C4 84     CPY 84                   -- compare to the current animation slo
+1B2A F0 0D     BEQ 1B39                 -- continue loop if currently dealing with the same animation slot
+1B2C BD 01 0C  LDA 0C01,X               -- get the tile for the current animation slot
+1B2F D9 01 0C  CMP 0C01,Y               -- compare to the tile of the occupant of the loop slot
 1B32 F0 0D     BEQ 1B41                 -- found it to be the same, so branch
 1B34 D9 02 0C  CMP 0C02,Y               -- compare to the position where the occupant of the loop is moving toward
 1B37 F0 08     BEQ 1B41                 -- found it to be the same, so branch
@@ -2037,91 +2140,106 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1B45 85 88     STA 88                   -- set return state that someone/thing has been found
 1B47 60        RTS                      
 
+		-- show monster
 
+1B48 20 E1 1C  JSR 1CE1                 -- calculate current frame of animation to show
+1B4B BD 01 0C  LDA 0C01,X               -- get current tile number
+1B4E 20 9D 1C  JSR 1C9D                 -- get the x and y game co-ordinates for the tile
+1B51 BC 03 0C  LDY 0C03,X               -- get position between tiles
+1B54 BD 04 0C  LDA 0C04,X               -- get direction of travel
 
-1B48 20 E1 1C  JSR 1CE1                 
-1B4B BD 01 0C  LDA 0C01,X               
-1B4E 20 9D 1C  JSR 1C9D                 
-1B51 BC 03 0C  LDY 0C03,X               
-1B54 BD 04 0C  LDA 0C04,X               
-1B57 C0 00     CPY #00                  
-1B59 F0 1A     BEQ 1B75                 
-1B5B C0 01     CPY #01                  
-1B5D D0 03     BNE 1B62                 
-1B5F 20 67 1C  JSR 1C67                 
-1B62 C0 02     CPY #02                  
-1B64 D0 06     BNE 1B6C                 
-1B66 20 67 1C  JSR 1C67                 
-1B69 20 67 1C  JSR 1C67                 
-1B6C C0 03     CPY #03                  
-1B6E D0 05     BNE 1B75                 
-1B70 49 01     EOR #01                  
-1B72 20 67 1C  JSR 1C67                 
-1B75 20 39 1C  JSR 1C39                 
+1B57 C0 00     CPY #00                  -- is sprite at position 0 (dead on tile)
+1B59 F0 1A     BEQ 1B75                 -- when on tile, just goto display function
+
+1B5B C0 01     CPY #01                  -- is sprite at position 1?
+1B5D D0 03     BNE 1B62                 -- if no then branch over
+
+1B5F 20 67 1C  JSR 1C67                 -- position 1 so adjust game co-ordinate for direction of travel
+1B62 C0 02     CPY #02                  -- is sprite at position 2?
+
+1B64 D0 06     BNE 1B6C                 -- if no then branch over
+1B66 20 67 1C  JSR 1C67                 -- position 2 adjust game co-ordinate for direction of travel
+1B69 20 67 1C  JSR 1C67                 -- position 2 adjust game co-ordinate for direction of travel
+
+1B6C C0 03     CPY #03                  -- is sprite at position 3?
+1B6E D0 05     BNE 1B75                 -- if no then branch over
+
+1B70 49 01     EOR #01                  -- flip bit 0 in direction to reverse it
+1B72 20 67 1C  JSR 1C67                 -- adjust game co-ordinate for reversed direction of travel
+
+1B75 20 39 1C  JSR 1C39                 -- draw sprite to screen
 1B78 4C FF 19  JMP 19FF                 
 
 		-- update position between tiles (for normal movement) and draw sprite
 
-1B7B FE 03 0C  INC 0C03,X               
-1B7E BD 03 0C  LDA 0C03,X               
+1B7B FE 03 0C  INC 0C03,X               -- increment position between tiles
+1B7E BD 03 0C  LDA 0C03,X               -- get new position
 1B81 C9 01     CMP #01                  
-1B83 F0 0D     BEQ 1B92                 
+1B83 F0 0D     BEQ 1B92                 -- branch if now at position 1
 1B85 C9 02     CMP #02                  
-1B87 F0 22     BEQ 1BAB                 
+1B87 F0 22     BEQ 1BAB                 -- branch if now at position 2
 1B89 C9 03     CMP #03                  
-1B8B F0 47     BEQ 1BD4                 
+1B8B F0 47     BEQ 1BD4                 -- branch if now at position 3
 1B8D C9 04     CMP #04                  
-1B8F F0 61     BEQ 1BF2                 
+1B8F F0 61     BEQ 1BF2                 -- branch if now at position 4
 1B91 60        RTS                      
 
-1B92 BD 01 0C  LDA 0C01,X               
-1B95 9D 02 0C  STA 0C02,X               
-1B98 9D 05 0C  STA 0C05,X               
-1B9B A8        TAY                      
-1B9C 20 9D 1C  JSR 1C9D                 
-1B9F BD 04 0C  LDA 0C04,X               
-1BA2 20 67 1C  JSR 1C67                 
-1BA5 20 39 1C  JSR 1C39                 
-1BA8 4C AC 1C  JMP 1CAC                 
+		-- draw at position 1
 
-1BAB BD 01 0C  LDA 0C01,X               
+1B92 BD 01 0C  LDA 0C01,X               -- get current tile number
+1B95 9D 02 0C  STA 0C02,X               -- store as future/next tile
+1B98 9D 05 0C  STA 0C05,X               -- store as contents of tile ???
+1B9B A8        TAY                      
+1B9C 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1B9F BD 04 0C  LDA 0C04,X               -- get direction of travel
+1BA2 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BA5 20 39 1C  JSR 1C39                 -- draw the sprite
+1BA8 4C AC 1C  JMP 1CAC                 -- jump to calculate offset position and draw sprite
+
+		-- draw at position 2
+
+1BAB BD 01 0C  LDA 0C01,X               -- get current tile number
 1BAE A8        TAY                      
-1BAF 20 9D 1C  JSR 1C9D                 
-1BB2 BD 04 0C  LDA 0C04,X               
-1BB5 20 67 1C  JSR 1C67                 
-1BB8 20 67 1C  JSR 1C67                 
-1BBB 20 39 1C  JSR 1C39                 
-1BBE 20 AC 1C  JSR 1CAC                 
-1BC1 BD 01 0C  LDA 0C01,X               
-1BC4 20 83 1C  JSR 1C83                 
-1BC7 BD 04 0C  LDA 0C04,X               
-1BCA 20 67 1C  JSR 1C67                 
-1BCD 20 90 1C  JSR 1C90                 
-1BD0 9D 02 0C  STA 0C02,X               
+1BAF 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1BB2 BD 04 0C  LDA 0C04,X               -- get direction of travel
+1BB5 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BB8 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BBB 20 39 1C  JSR 1C39                 -- draw the sprite
+1BBE 20 AC 1C  JSR 1CAC                 -- call calculate offset position and draw sprite
+1BC1 BD 01 0C  LDA 0C01,X               -- get current tile number
+1BC4 20 83 1C  JSR 1C83                 -- get tile x,y co-ordinate
+1BC7 BD 04 0C  LDA 0C04,X               -- get direction of travel
+1BCA 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BCD 20 90 1C  JSR 1C90                 -- recombine x,y co-ordinate back to tile number
+1BD0 9D 02 0C  STA 0C02,X               -- store in future/next tile
 1BD3 60        RTS                      
 
-1BD4 BD 02 0C  LDA 0C02,X               
-1BD7 20 9D 1C  JSR 1C9D                 
-1BDA BD 04 0C  LDA 0C04,X               
-1BDD 49 01     EOR #01                  
-1BDF 20 67 1C  JSR 1C67                 
-1BE2 20 39 1C  JSR 1C39                 
-1BE5 BC 05 0C  LDY 0C05,X               
-1BE8 20 AC 1C  JSR 1CAC                 
-1BEB BD 02 0C  LDA 0C02,X               
-1BEE 9D 01 0C  STA 0C01,X               
+		-- draw at position 3
+
+1BD4 BD 02 0C  LDA 0C02,X               -- get future/next tile
+1BD7 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1BDA BD 04 0C  LDA 0C04,X               -- get direction of travel
+1BDD 49 01     EOR #01                  -- reverse it
+1BDF 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BE2 20 39 1C  JSR 1C39                 -- draw the sprite
+1BE5 BC 05 0C  LDY 0C05,X               -- get the contents of the tile
+1BE8 20 AC 1C  JSR 1CAC                 -- call calculate offset position and draw sprite
+1BEB BD 02 0C  LDA 0C02,X               -- get future/next tile
+1BEE 9D 01 0C  STA 0C01,X               -- set current tile
 1BF1 60        RTS                      
 
-1BF2 BC 05 0C  LDY 0C05,X               
-1BF5 BD 01 0C  LDA 0C01,X               
-1BF8 20 9D 1C  JSR 1C9D                 
-1BFB 20 39 1C  JSR 1C39                 
-1BFE 20 AC 1C  JSR 1CAC                 
+		-- draw at position 4
+
+1BF2 BC 05 0C  LDY 0C05,X               -- get contents of tile
+1BF5 BD 01 0C  LDA 0C01,X               -- get current tile
+1BF8 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1BFB 20 39 1C  JSR 1C39                 -- draw the sprite
+1BFE 20 AC 1C  JSR 1CAC                 -- call calculate offset position and draw sprite
 
 		-- reset position between tiles
 
-1C01 A9 00     LDA #00                  
-1C03 9D 03 0C  STA 0C03,X               
+1C01 A9 00     LDA #00                  -- position 0
+1C03 9D 03 0C  STA 0C03,X               -- store revised position between tiles
 1C06 EA        NOP                      
 1C07 EA        NOP                      
 1C08 EA        NOP                      
@@ -2166,6 +2284,10 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1C38 60        RTS                      
 
 		-- draw non-wall sprite to screen
+		-- on entry, &85 has the game co-ordinate for X
+		--           &86 has the game co-ordinate for Y
+		--			 &72 is the low byte of the memory address of the sprite to draw
+		--			 &73 is the high byte of the memory address of the sprite to draw
 
 1C39 98        TYA                      
 1C3A 48        PHA                      
@@ -2307,13 +2429,14 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1CDC E9 01     SBC #01                  -- subtract 1
 1CDE 4C 58 1C  JMP 1C58                 -- draw sprite
 
-		-- calculate current frame of animation to show
+		-- calculate memory address for frame of animation to show
 		-- on entry, X is the monster slot
+		-- on exit, &72 and &73 will contain the address of the sprite to display
 
 1CE1 BD 09 0C  LDA 0C09,X               -- get base index of animation
 1CE4 18        CLC                      
 1CE5 7D 0C 0C  ADC 0C0C,X               -- add current frame index
-1CE8 4C 23 1C  JMP 1C23                 -- calculate sprite index
+1CE8 4C 23 1C  JMP 1C23                 -- calculate memory address of sprite
 
 		-- get contents of tile according to direction
 		-- on entry, X is the animation slot
@@ -2771,7 +2894,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1FB5 BD 00 0C  LDA 0C00,X               -- get slot status/occupant
 1FB8 F0 CE     BEQ 1F88                 -- slot empty, do delay loop then goto 1FD6
 1FBA 30 C6     BMI 1F82                 -- branch if -ve (shot or block) then goto 1FD6
-1FBC 20 00 19  JSR 1900                 -- update animation
+1FBC 20 00 19  JSR 1900                 -- process animation
 1FBF BD 04 0C  LDA 0C04,X               -- get direction
 1FC2 C9 04     CMP #04                  -- is it still?
 1FC4 D0 10     BNE 1FD6                 -- skip delay loop if not
@@ -2792,7 +2915,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1FD6 20 6B 36  JSR 366B                 -- get input from keyboard or joystick
 1FD9 A5 89     LDA 89                   -- get contents of tile that sprite is moving towards
 1FDB 8D FF 0D  STA 0DFF                 
-1FDE 20 CD 20  JSR 20CD                 -- collision detection
+1FDE 20 CD 20  JSR 20CD                 -- process any collision detected
 
 		-- if X = 0 (which indicates the animation slot for the player)
 
@@ -2814,7 +2937,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1FF5 20 00 19  JSR 1900                 -- update animation, draw sprite and determine new direction
 1FF8 A5 89     LDA 89                   
 1FFA 8D FE 0D  STA 0DFE                 
-1FFD 20 CD 20  JSR 20CD                 -- collision detection
+1FFD 20 CD 20  JSR 20CD                 -- process any collision detected
 2000 20 94 20  JSR 2094                 -- update player, move offscreen monsters
 2003 AD FE 0D  LDA 0DFE                 
 2006 20 E9 20  JSR 20E9                 -- check for block movement
@@ -2949,9 +3072,12 @@ definitions (initial frequency, initial volume, data change control, volume adju
 20C9 4C 20 26  JMP 2620                 -- goto routine for dealing with occupying tile with static object
 20CC 60        RTS                      
 
-		-- check for collision between animations
+		-- check if collision decected and deal with it
+		-- on entry X is the current animation slot
+		-- &88 is 0 if a collision has been detected
+		-- &84 is the other animation slot involved in the collision
 
-20CD A5 88     LDA 88                   
+20CD A5 88     LDA 88                   -- will be set to 0 if there's a collision detected
 20CF 30 11     BMI 20E2                 -- RTS if no collision detected
 20D1 8A        TXA                      
 20D2 F0 03     BEQ 20D7                 -- skip over if animating player
@@ -3224,14 +3350,14 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2295 A8        TAY                      
 
 2296 B9 E0 08  LDA 08E0,Y               
-2299 20 23 1C  JSR 1C23                 -- calculate sprite number for wall
+2299 20 23 1C  JSR 1C23                 -- calculate address of wall sprite
 229C A5 72     LDA 72                   
 229E 85 80     STA 80                   
 22A0 A5 73     LDA 73                   
 22A2 85 81     STA 81                   
 
 22A4 B9 E1 08  LDA 08E1,Y               
-22A7 20 23 1C  JSR 1C23                 -- calculate sprite number
+22A7 20 23 1C  JSR 1C23                 -- calculate address of floor sprite
 22AA A5 72     LDA 72                   
 22AC 85 82     STA 82                   
 22AE A5 73     LDA 73                   
@@ -4383,14 +4509,14 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- deal with control key presses
 
 2A7A A5 EC     LDA EC                   -- get last key pressed
-2A7C C9 E9     CMP #E9                  
+2A7C C9 E9     CMP #E9                  -- COPY key
 2A7E F0 0D     BEQ 2A8D                 -- pause pressed
-2A80 C9 F0     CMP #F0                  
+2A80 C9 F0     CMP #F0                  -- ESCAPE key
 2A82 F0 13     BEQ 2A97                 -- escape pressed
-2A84 C9 90     CMP #90                  
-2A86 F0 16     BEQ 2A9E                 
-2A88 C9 D1     CMP #D1                  
-2A8A F0 1F     BEQ 2AAB                 
+2A84 C9 90     CMP #90                  -- Q key
+2A86 F0 16     BEQ 2A9E                 -- mute sound
+2A88 C9 D1     CMP #D1                  -- S key
+2A8A F0 1F     BEQ 2AAB                 -- un-mute sound
 2A8C 60        RTS                      
 
 		-- pause game
@@ -4580,10 +4706,11 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2BA4 A9 0E     LDA #0E                  
 2BA6 4C D6 2D  JMP 2DD6                 -- play "glub" sound
 
-		-- process shot and block
+		-- process shots and the boulder
+		-- move its position, draw it, process collisions
 
 2BA9 A9 FF     LDA #FF                  
-2BAB 85 88     STA 88                   -- reset flag. This can be used later to indicate that someone/thing has been shot
+2BAB 85 88     STA 88                   -- unset collision flag. This will be set to 0 if a collision occurs.
 2BAD BD 06 0C  LDA 0C06,X               -- get identifier (will be 1 for player shot, 3 for block, otherwise the animation slot of the monster firing)
 2BB0 C9 03     CMP #03                  -- are we dealing with the block?
 2BB2 D0 73     BNE 2C27                 -- if not, branch to process shot
@@ -4642,7 +4769,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2C21 20 23 1C  JSR 1C23                 -- get sprite number
 2C24 4C 39 1C  JMP 1C39                 -- draw non-wall sprite to screen
 
-		-- process shot
+		-- process shots
+		-- move its position, draw it, process collisions
 
 2C27 BD 03 0C  LDA 0C03,X               -- get position between tiles
 2C2A D0 03     BNE 2C2F                 -- skip over redrawing tile if not zero
@@ -4650,8 +4778,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2C2F BD 01 0C  LDA 0C01,X               -- get tile number
 2C32 A8        TAY                      
 2C33 B9 00 0B  LDA 0B00,Y               -- get contents of tile
-2C36 C9 13     CMP #13                  -- is it the block?
+2C36 C9 13     CMP #13                  -- is it the boulder?
 2C38 F0 54     BEQ 2C8E                 -- branch if so, clearing shot animation and RTS
+
 2C3A 98        TYA                      
 2C3B 20 EB 1C  JSR 1CEB                 -- get contents of tile in direction of travel
 2C3E C9 1F     CMP #1F                  -- is it off-screen?
@@ -4680,12 +4809,12 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2C78 4C 39 1C  JMP 1C39                 -- draw non-wall sprite to screen
 
 2C7B A9 00     LDA #00                  
-2C7D 85 88     STA 88                   -- set something's been hit
+2C7D 85 88     STA 88                   -- flag up that a collision between objects has been detected
 2C7F A9 FF     LDA #FF                  
-2C81 85 84     STA 84                   -- set nothing important
+2C81 85 84     STA 84                   -- indicate that the collision is with a static object
 2C83 60        RTS                      
 
-		-- hit wall or block
+		-- shot hits wall or block
 
 2C84 48        PHA                      
 2C85 20 8E 2C  JSR 2C8E                 -- clear shot animation
@@ -4693,6 +4822,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2C89 C9 13     CMP #13                  
 2C8B F0 07     BEQ 2C94                 
 2C8D 60        RTS                      
+
+		-- clear animation slot
 
 2C8E A9 00     LDA #00                  
 2C90 9D 00 0C  STA 0C00,X               
@@ -4941,7 +5072,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2E20 60        RTS                      
 
 		-- process collision between sprites
-		-- on entry, X is the animation slot (not the player though), 84 the other participant (could be FF for static object)
+		-- on entry, X is the animation slot (not the player though), &84 contains the other participant (could be FF for static object)
 
 2E21 BD 00 0C  LDA 0C00,X               -- get status/occupant of slot
 2E24 30 5F     BMI 2E85                 -- branch if negative (shot?)
@@ -6176,7 +6307,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 367E 85 8C     STA 8C                   
 3680 A5 ED     LDA ED                   -- get first key pressed
 3682 85 8D     STA 8D                   
-3684 4C 3C 0A  JMP 0A3C                 
+3684 4C 3C 0A  JMP 0A3C                 -- goto analyse keyboard/joystick input
 
 3687 20 EB 35  JSR 35EB                 -- get joystick input
 368A 4C 3C 0A  JMP 0A3C                 
@@ -6686,6 +6817,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 		-- output 2 digits of score
 		-- on entry A is the digit in BCD
+		-- Y is the byte being output, 0 if least significant digit
 
 39CC 48        PHA                      -- save A
 39CD 4A        LSR A                    
@@ -6696,8 +6828,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 39D4 68        PLA                      -- restore A
 39D5 29 0F     AND #0F                  -- clear top 4 bits
-39D7 C0 00     CPY #00                  -- 
-39D9 F0 0E     BEQ 39E9                 -- output character
+39D7 C0 00     CPY #00                  -- is this the least significant byte?
+39D9 F0 0E     BEQ 39E9                 -- if yes then always output character
 
 39DB 48        PHA                      -- store digit
 39DC 05 79     ORA 79                   -- merge with record of anything output as yet
@@ -6930,16 +7062,16 @@ definitions (initial frequency, initial volume, data change control, volume adju
 5D4E 85 73     STA 73                   
 5D50 20 AF 5D  JSR 5DAF                 
 
-5D53 A9 E1     LDA #E1                  -- left key
-5D55 8D D0 0B  STA 0BD0                 
-5D58 A9 C2     LDA #C2                  -- right key
-5D5A 8D D1 0B  STA 0BD1                 
-5D5D A9 C8     LDA #C8                  -- up key
-5D5F 8D D2 0B  STA 0BD2                 
-5D62 A9 E8     LDA #E8                  -- down key
-5D64 8D D3 0B  STA 0BD3                 
-5D67 A9 D8     LDA #D8                  -- fire key
-5D69 8D D4 0B  STA 0BD4                 
+5D53 A9 E1     LDA #E1                  -- Z key
+5D55 8D D0 0B  STA 0BD0                 -- means go left
+5D58 A9 C2     LDA #C2                  -- X key
+5D5A 8D D1 0B  STA 0BD1                 -- means go right
+5D5D A9 C8     LDA #C8                  -- : key
+5D5F 8D D2 0B  STA 0BD2                 -- means go up
+5D62 A9 E8     LDA #E8                  -- / key
+5D64 8D D3 0B  STA 0BD3                 -- means go down
+5D67 A9 D8     LDA #D8                  -- ] key
+5D69 8D D4 0B  STA 0BD4                 -- means fire
 
 5D6C A9 81     LDA #81                  
 5D6E 8D 24 02  STA 0224                 -- set econet vector handler address

@@ -73,7 +73,8 @@ namespace Labyrinth.GameObjects.Motility
                         return Direction.None;
                         }
 
-                    // monster could go in any direction as it's not next to any wall - continue current direction
+                    // monster could go in any direction as it's not next to any wall
+                    // - turn the corner to follow the wall and hopefully we'll re-attach next move 
                     this._parent._state = new TurningCornerState(this._parent);
                     return newDirection;
                     } 
