@@ -6,7 +6,7 @@ namespace Labyrinth.GameObjects
     {
     public class MovementChecker : IMovementChecker
         {
-        public bool CanMove(IMovingItem source, Direction direction)
+        public bool CanMoveForwards(IMovingItem source, Direction direction)
             {
             if (source == null) 
                 throw new ArgumentNullException(nameof(source));
@@ -15,41 +15,11 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        /// <summary>
-        /// Initiates a push or bounce involving this object
-        /// </summary>
-        /// <param name="initiatingObject">The object that is starting a push/bounce</param>
-        /// <param name="moveableObject">The object that is potentially being moved</param>
-        /// <param name="direction">The direction that the specified object is directing this object</param>
-        public void PushOrBounce(IMovingItem initiatingObject, IMovingItem moveableObject, Direction direction)
+        public bool CanBePushedBackDueToBounceBack(IMovingItem gameObject, Direction direction)
             {
-            bool canCauseBounceBack = initiatingObject.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
-            var ps = CanBePushedOrBounced(moveableObject, initiatingObject, direction, canCauseBounceBack);
-            switch (ps)
-                {
-                case PushStatus.Yes:
-                    {
-                    moveableObject.Move(direction, MovementType.Pushed);
-                    return;
-                    }
-
-                case PushStatus.Bounce:
-                    {
-                    var reverseDirection = direction.Reversed();
-                    moveableObject.Move(reverseDirection, MovementType.BounceBack);
-                    initiatingObject.Move(reverseDirection, MovementType.BounceBack);
-                    initiatingObject.PlaySound(GameSound.BoulderBounces);
-                    return;
-                    }
-
-                case PushStatus.No:
-                    {
-                    return;
-                    }
-
-                default:
-                    throw new InvalidOperationException();
-                }
+            if (gameObject == null)
+                throw new ArgumentNullException(nameof(gameObject));
+            return CanMove(gameObject, direction, false);
             }
 
         private bool CanMove(IMovingItem objectToCheck, Direction direction, bool isBounceBackPossible)
@@ -65,6 +35,12 @@ namespace Labyrinth.GameObjects
                 return false;
                 }
 
+            var result = CanMoveTo(objectToCheck, direction, proposedDestination, isBounceBackPossible);
+            return result;
+            }
+
+        private bool CanMoveTo(IMovingItem objectToCheck, Direction direction, TilePos proposedDestination, bool isBounceBackPossible)
+            {
             var objectsOnTile = GlobalServices.GameState.GetItemsOnTile(proposedDestination);
             var result = CanObjectOccupySameTile(objectToCheck, objectsOnTile, direction, isBounceBackPossible);
             return result;
@@ -97,6 +73,7 @@ namespace Labyrinth.GameObjects
 
                 case ObjectSolidity.Moveable:
                     {
+                    // todo instead of using the same movementchecker, we need to use the movement checker of the boulder instead
                     if (!(objectAlreadyOnTile is MovingItem moveableItem))
                         // There shouldn't be any Moveable objects that are not MovingItems as that would be a contradiction
                         return false;
@@ -111,7 +88,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        protected PushStatus CanBePushedOrBounced(IMovingItem toBeMoved, IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
+        public PushStatus CanBePushedOrBounced(IMovingItem toBeMoved, IMovingItem byWhom, Direction direction, bool isBounceBackPossible)
             {
             // if this object is not moveable then the answer's no
             if (toBeMoved.Properties.Get(GameObjectProperties.Solidity) != ObjectSolidity.Moveable)
@@ -131,7 +108,8 @@ namespace Labyrinth.GameObjects
                 return PushStatus.No;
 
             // this object will be able to bounceback only if the object that is pushing it can move backwards
-            var willBounceBack = CanMove(byWhom, direction.Reversed(), false);
+            IMovementChecker mc = byWhom.Properties.Get(GameObjectProperties.MovementChecker);
+            var willBounceBack = mc.CanBePushedBackDueToBounceBack(byWhom, direction.Reversed());
             var result = willBounceBack ? PushStatus.Bounce : PushStatus.No;
             return result;
             }

@@ -163,7 +163,15 @@ namespace Labyrinth.GameObjects.Motility
                 throw new InvalidOperationException();
             }
 
-         public static IEnumerable<Direction> GetPreferredDirections(Direction direction, AttachmentToWall attachment)
+        /// <summary>
+        /// Get a list of directions that could be turned towards in order of preference
+        /// </summary>
+        /// <param name="currentDirection">The current direction of travel</param>
+        /// <param name="attachment">The side that the monster is attached to</param>
+        /// <returns>A list of up to 4 directions</returns>
+        /// <remarks>The first item will be 90 degrees to the <paramref name="currentDirection"/> as specified by <paramref name="attachment"/>.
+        /// The second item will be the <paramref name="currentDirection"/>.</remarks>
+        public static IEnumerable<Direction> GetPreferredDirections(Direction currentDirection, AttachmentToWall attachment)
             {
             Direction[] directions;
             if (attachment == AttachmentToWall.FollowWallOnLeft)
@@ -172,7 +180,8 @@ namespace Labyrinth.GameObjects.Motility
                 directions = FollowWallOnRight;
             else
                 throw new InvalidOperationException();
-            var start = Array.IndexOf(directions, direction);
+
+            var start = Array.IndexOf(directions, currentDirection);
             for (int i = 0; i < 4; i++)
                 {
                 var elementIndex = (start + 5 - i) % 4;

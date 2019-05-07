@@ -50,17 +50,17 @@ namespace Labyrinth.GameObjects
             this.CurrentMovement = new Movement(direction, movingTowards, speed);
             }
 
-        public virtual void Move(Direction direction, MovementType movementType)
+        public virtual void Move(Direction direction, MovementSpeed movementSpeed)
             {
-            switch (movementType)
+            switch (movementSpeed)
                 {
-                case MovementType.Normal:
+                case MovementSpeed.Normal:
                     {
                     Move(direction, Constants.BaseSpeed);
                     return;
                     }
 
-                case MovementType.Pushed:
+                case MovementSpeed.Pushed:
                     {
                     if (this.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
                         {
@@ -71,7 +71,7 @@ namespace Labyrinth.GameObjects
                     break;
                     }
 
-                case MovementType.BounceBack:
+                case MovementSpeed.BounceBack:
                     {
                     if (this.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
                         {
@@ -101,6 +101,44 @@ namespace Labyrinth.GameObjects
         public void StandStill()
             {
             this.CurrentMovement = Movement.Still;
+            }
+
+        /// <summary>
+        /// Initiates a push or bounce involving this object
+        /// </summary>
+        /// <param name="initiatingObject">The object that is starting a push/bounce</param>
+        /// <param name="moveableObject">The object that is potentially being moved</param>
+        /// <param name="direction">The direction that the specified object is directing this object</param>
+        public void PushOrBounce(IMovingItem moveableObject, Direction direction)
+            {
+            bool canCauseBounceBack = this.Properties.Get(GameObjectProperties.Capability) == ObjectCapability.CanPushOrCauseBounceBack;
+            var moveableObjectMovementChecker = moveableObject.Properties.Get(GameObjectProperties.MovementChecker);
+            var ps = moveableObjectMovementChecker.CanBePushedOrBounced(moveableObject, this, direction, canCauseBounceBack);
+            switch (ps)
+                {
+                case PushStatus.Yes:
+                    {
+                    moveableObject.Move(direction, MovementSpeed.Pushed);
+                    return;
+                    }
+
+                case PushStatus.Bounce:
+                    {
+                    var reverseDirection = direction.Reversed();
+                    moveableObject.Move(reverseDirection, MovementSpeed.BounceBack);
+                    this.Move(reverseDirection, MovementSpeed.BounceBack);
+                    moveableObject.PlaySound(GameSound.BoulderBounces);
+                    return;
+                    }
+
+                case PushStatus.No:
+                    {
+                    return;
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+                }
             }
 
         /// <summary>

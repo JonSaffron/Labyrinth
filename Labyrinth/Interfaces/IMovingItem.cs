@@ -9,7 +9,8 @@ namespace Labyrinth
         Vector2 OriginalPosition { get; set; }
         IBoundMovement MovementBoundary { get; } 
 
-        void Move(Direction direction, MovementType movementType);
+        void Move(Direction direction, MovementSpeed movementSpeed);
+        void PushOrBounce(IMovingItem moveableObject, Direction direction);
 
         // todo are these required?
         // void ResetPosition(Vector2 position);

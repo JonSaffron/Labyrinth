@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 using Labyrinth.GameObjects.Motility;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.WorldBuilding;
@@ -188,7 +189,13 @@ namespace Labyrinth.GameObjects
 
             public void Update(GameTime gameTime)
                 {
+                ReviewDirectionFaced();
+
                 decimal differenceInRotation = GetChangeOfRotationRequired(this.CurrentRotation, this._desiredRotation);
+                if (differenceInRotation == 0)
+                    {
+                    return;
+                    }
                 RotationalMotion directionOfTravel = (RotationalMotion) Math.Sign(differenceInRotation);
                 decimal speedOfRotation = (int) directionOfTravel * 0.75m * Constants.BaseDistancesMovedPerSecond;
                 double timeNeededToFinishRotation = (double) (differenceInRotation / speedOfRotation);
@@ -209,13 +216,65 @@ namespace Labyrinth.GameObjects
             public void ReviewDirectionFaced()
                 {
                 var patrol = this._tank.DetermineDirection as PatrolPerimeter;
-                if (patrol == null || patrol.IsDetached)
+                if (patrol == null || patrol.IsDetached || !this._tank.CurrentMovement.IsMoving)
                     {
                     this._desiredRotation = 0m;
                     return;
                     }
-                
-                // todo
+
+                var tileMovingTowards = TilePos.TilePosFromPosition(this._tank.CurrentMovement.MovingTowards);
+                using (var directionList = PatrolPerimeter.GetPreferredDirections(this._tank.CurrentMovement.Direction, patrol.CurrentAttachmentToWall).GetEnumerator())
+                    {
+                    directionList.MoveNext();
+                    var preferredDirection = directionList.Current;
+                    var tileAroundCorner = tileMovingTowards.GetPositionAfterOneMove(preferredDirection);
+                    if (CouldMoveTo(tileAroundCorner))
+                        {
+                        this._desiredRotation = RotationForDirection[preferredDirection];
+                        return;
+                        }
+
+                    directionList.MoveNext();
+                    var currentDirection = directionList.Current;
+                    directionList.MoveNext();
+                    var directionAwayFromWall = directionList.Current;
+
+                    var tileAwayFromWall = this._tank.TilePosition.GetPositionAfterOneMove(directionAwayFromWall);
+                    if (CouldMoveTo(tileAwayFromWall))
+                        {
+                        this._desiredRotation = RotationForDirection[directionAwayFromWall];
+                        return;
+                        }
+
+                    directionList.MoveNext();
+                    var backwards = directionList.Current;
+
+                    var tileAhead = tileMovingTowards.GetPositionAfterOneMove(currentDirection);
+                    if (CouldMoveTo(tileAhead))
+                        {
+                        this._desiredRotation = RotationForDirection[currentDirection];
+                        return;
+                        }
+
+                    this._desiredRotation = RotationForDirection[backwards];
+                    }
+                }
+
+            private bool CouldMoveTo(TilePos tp)
+                {
+                var objectsOnTile = GlobalServices.GameState.GetItemsOnTile(tp);
+                foreach (var item in objectsOnTile)
+                    {
+                    var solidity = item.Properties.Get(GameObjectProperties.Solidity);
+                    switch (solidity)
+                        {
+                        case ObjectSolidity.Impassable:
+                        case ObjectSolidity.Moveable:
+                            return false;
+                        }
+                    }
+
+                return true;
                 }
             }
         }

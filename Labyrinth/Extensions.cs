@@ -140,14 +140,8 @@ namespace Labyrinth
         public static bool CanMoveInDirection(this IMovingItem gameObject, Direction direction)
             {
             IMovementChecker mc = gameObject.Properties.Get(GameObjectProperties.MovementChecker);
-            var result = mc.CanMove(gameObject, direction);
+            var result = mc.CanMoveForwards(gameObject, direction);
             return result;
-            }
-
-        public static void PushOrBounce(this IMovingItem objectDoingThePushing, IMovingItem objectBeingPushed, Direction direction)
-            {
-            IMovementChecker mc = objectDoingThePushing.Properties.Get(GameObjectProperties.MovementChecker);
-            mc.PushOrBounce(objectDoingThePushing, objectBeingPushed, direction);
             }
 
         [NotNull]

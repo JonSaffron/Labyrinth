@@ -192,11 +192,11 @@ namespace Labyrinth.GameObjects
             // ReSharper disable once IteratorNeverReturns - this is deliberate
             }
 
-        public override void Move(Direction direction, MovementType movementType)
+        public override void Move(Direction direction, MovementSpeed movementSpeed)
             {
-            if (movementType == MovementType.BounceBack && this.CurrentMovement.IsMoving)
+            if (movementSpeed == MovementSpeed.BounceBack && this.CurrentMovement.IsMoving)
                 this._playerAnimation.ResetAnimation();
-            base.Move(direction, movementType);
+            base.Move(direction, movementSpeed);
             }
 
         private void UpdateEnergy(GameTime gameTime)

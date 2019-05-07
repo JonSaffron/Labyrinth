@@ -125,10 +125,10 @@ namespace Labyrinth
         Bounce
         }
 
-    public enum MovementType
+    public enum MovementSpeed
         {
         /// <summary>
-        /// Object should move at it's usual speed
+        /// Object should move at its usual speed
         /// </summary>
         Normal,
 
