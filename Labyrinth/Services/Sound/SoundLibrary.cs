@@ -39,8 +39,8 @@ namespace Labyrinth.Services.Sound
             {
             if (this._disposed)
                 throw new ObjectDisposedException("SoundLibrary");
-                if (this._cachedInstances == null)
-                    throw new InvalidOperationException("Library resources have not been loaded - call LoadContent first.");
+            if (this._cachedInstances == null)
+                throw new InvalidOperationException("Library resources have not been loaded - call LoadContent first.");
 
             var result = this._cachedInstances[gameSound].SoundDuration;
             return result;

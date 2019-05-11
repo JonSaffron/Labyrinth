@@ -106,7 +106,6 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Initiates a push or bounce involving this object
         /// </summary>
-        /// <param name="initiatingObject">The object that is starting a push/bounce</param>
         /// <param name="moveableObject">The object that is potentially being moved</param>
         /// <param name="direction">The direction that the specified object is directing this object</param>
         public void PushOrBounce(IMovingItem moveableObject, Direction direction)

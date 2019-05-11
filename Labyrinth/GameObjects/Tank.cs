@@ -81,6 +81,7 @@ namespace Labyrinth.GameObjects
                 else
                     {
                     var targetRotation = RotationForDirection[direction];
+                    this._turret.SetTargetRotation(targetRotation);
                     var directionOfTravel = GetDirectionOfTravel(targetRotation);
 
                     this.LeftTrack = (LinearMotion) directionOfTravel;
@@ -197,13 +198,13 @@ namespace Labyrinth.GameObjects
                     return;
                     }
                 RotationalMotion directionOfTravel = (RotationalMotion) Math.Sign(differenceInRotation);
-                decimal speedOfRotation = (int) directionOfTravel * 0.75m * Constants.BaseDistancesMovedPerSecond;
+                decimal speedOfRotation = (int) directionOfTravel * 0.25m * Constants.BaseDistancesMovedPerSecond;
                 double timeNeededToFinishRotation = (double) (differenceInRotation / speedOfRotation);
                 var remainingTime = gameTime.ElapsedGameTime.TotalSeconds;
                 bool hasCompletedRotation = timeNeededToFinishRotation <= remainingTime;
                 if (hasCompletedRotation)
                     {
-                    this._currentRotationRelativeToHull = this._desiredRotation;
+                    this._currentRotationRelativeToHull = this._desiredRotation - this._tank._hullRotation;
                     }
                 else
                     {
@@ -213,14 +214,28 @@ namespace Labyrinth.GameObjects
                 NormaliseRotation(ref this._currentRotationRelativeToHull);
                 }
 
-            public void ReviewDirectionFaced()
+            //public void ReviewDirectionFaced()
+            //    {
+            //    var playerDirection = GlobalServices.GameState.Player.CurrentDirectionFaced;
+            //    this._desiredRotation = RotationForDirection[playerDirection];
+            //    }
+
+            public void SetTargetRotation(decimal targetRotation)
+                {
+                this._desiredRotation = targetRotation;
+                }
+
+            private void ReviewDirectionFaced()
                 {
                 var patrol = this._tank.DetermineDirection as PatrolPerimeter;
-                if (patrol == null || patrol.IsDetached || !this._tank.CurrentMovement.IsMoving)
+                if (patrol == null || patrol.IsDetached)
                     {
                     this._desiredRotation = 0m;
                     return;
                     }
+
+                if (!this._tank.CurrentMovement.IsMoving)
+                    return;
 
                 var tileMovingTowards = TilePos.TilePosFromPosition(this._tank.CurrentMovement.MovingTowards);
                 using (var directionList = PatrolPerimeter.GetPreferredDirections(this._tank.CurrentMovement.Direction, patrol.CurrentAttachmentToWall).GetEnumerator())
