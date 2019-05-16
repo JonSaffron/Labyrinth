@@ -1,4 +1,4 @@
-zero page
+﻿zero page
 ---------
 80 & 81			-- address of current wall sprite
 82 & 83			-- address of current floor sprite (82 will be 0, 40, 80, C0)
@@ -83,9 +83,9 @@ current monster data 400 to 7bf
 0ba0 to 0ba5	-- temporary storage when generating room layout
   0ba0			-- top and bottom rows
   0ba1			-- 2nd and penultimate rows
-  0ba2			-- first and last column
+  0ba2			-- overrides parts of first, second, penultimate and last columns
   0ba3			-- 3rd, 4th, 7th and 8th rows
-  0ba4			-- centre shape
+  0ba4			--      xxx todo - it's complicated! xxx
   0ba5			-- exits (up is lowest 2 bits, down next, then right, left is highest bits. 
 							0 indicates no exit, 1 a small exit, 2 is not used, 3 is large gap)
 
@@ -197,20 +197,69 @@ Effectively running in a mode 5 screen setup modified to have 256 pixels horizon
 
 38bb - 38c2		-- start room numbers per level: 0 34 8 1c/1c 6b 47 73
 
--- room data
+-- room data 
+-- note that this is stored upside down so the player starts in room 0
+-- and each move upwards means that the room number increases by 10
 
 3e00 - 3e7f		-- controls line up of top and bottom rows:
 						format is mbbbcsee
 						if c is set (it always is), 
-							then bbb is used to set the base repeating layout
+							then bbb is used to set the base repeating pattern
 							if m is set then 3, 4, 11 & 12 are set to solid walls
 						if s is set (levels 1 and 2 don't, all the rest do)
 							then ee is used to set the end walls (value is always 0)
 
 3e80 - 3eff		-- controls 2nd and penultimate lines
-3f00 - 3f7f		-- controls line up of first and last column
-3f80 - 3fff		-- controls 3rd, 4th, 7th and 8th rows
-4000 - 407f		-- controls centre shape
+						format is mbbbcsee
+						if c is set
+							bbb is used to determine a pattern
+							if m is set then 3, 4, 11 & 12 are set using the pattern
+							else the whole row is set using the pattern
+						if s is set
+							then ee is used to set the second and penultimate positions
+
+3f00 - 3f7f		-- controls override of walls at start and end of rows
+						format is uyyylxxx
+						if l is set
+							then xxx is used to determine the start and end of rows 1 to 8
+						if u is set
+							then yyy is used to determine the second and penultimate positions of rows 2 to 7
+
+3f80 - 3fff		-- adds walls in positions 2 to 6 and 9 to 13 in rows 2, 3, 6, 7
+						rows 2 & 3 : bits 0 and 1 set positions 2, 3, 4, 5, 6 (value will be 00 or 01)
+						rows 2 & 3 : bits 2 and 3 set positions 9, 10, 11, 12, 13 (value will be 00 or 01)
+						rows 6 & 7 : bits 4 and 5 set positions 2, 3, 4, 5, 6 (value will be 00 or 01)
+						rows 6 & 7 : bits 6 and 7 set positions 9, 10, 11, 12, 13 (value will be 00 or 01)
+
+4000 - 407f		-- 
+						row 2 : bits 2 and 3 set positions 7 and 8 where <> 0
+								bits 7 and 8 
+									0 does nothing
+									C0 sets solid wall at 4 and 11
+									else sets solid wall between 4 and 11
+						row 3 : bits 2 and 3 set positions 7 and 8 where <> 0
+								bits 7 and 8
+									0 does nothing
+									else sets solid wall at 4 and 11
+						row 4 : bits 0 and 1 sets top half of barriers on the middle left and right
+								bits 4 and 5 set positions 7 and 8 where <> 0
+								bits 7 and 8
+									0 does nothing
+									else sets solid wall at 4 and 11
+						row 5 : bits 0 and 1 sets bottom half of barriers on the middle left and right
+								bits 4 and 5 set positions 7 and 8 where <> 0
+								bits 7 and 8
+									0 does nothing
+									else sets solid wall at 4 and 11
+						row 6 : bits 2 and 3 set positions 7 and 8 where <> 0
+								bits 7 and 8
+									0 does nothing
+									else sets solid wall at 4 and 11
+						row 7 : bits 2 and 3 set positions 7 and 8 where <> 0
+								bits 7 and 8
+									0 does nothing
+									else sets solid wall between 4 and 11
+
 4080 - 40ff		-- controls exits:
 						up is bits 0 & 1 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
 						down is bits 2 & 3 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
@@ -341,7 +390,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 0910 8D A2 0B  STA 0BA2                 
 0913 B9 80 3F  LDA 3F80,Y               -- controls 3rd, 4th, 7th and 8th rows
 0916 8D A3 0B  STA 0BA3                 
-0919 B9 00 40  LDA 4000,Y               -- controls centre shape
+0919 B9 00 40  LDA 4000,Y               -- controls xxx todo - it's complicated! xxx
 091C 8D A4 0B  STA 0BA4                 
 
 091F AD A6 0B  LDA 0BA6                 -- get world number
@@ -1329,7 +1378,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1412 8E B6 0B  STX 0BB6                 -- create a gap in position 6
 1415 60        RTS                      
 
-		-- for rows 1, 3, 5 and 7
+		-- Sets the wall type at the start and end of the row
+		-- and is used for rows 1, 3, 5 and 7
+		-- On entry, the lower nibble of 0BA2 contains the wall type to use
 
 1416 AD A2 0B  LDA 0BA2                 -- get layout for XXXXX
 1419 29 08     AND #08                  -- mask for bit 3
@@ -1345,7 +1396,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 142E 8D BF 0B  STA 0BBF                 -- set wall at end of row
 1431 60        RTS                      
 
-		-- for rows 2, 4, 6 and 8
+		-- Sets the wall type at the start and end of the row
+		-- and is used for rows 2, 4, 6 and 8
+		-- On entry, the lower nibble of 0BA2 contains the wall type to use
 
 1432 AD A2 0B  LDA 0BA2                 -- get layout for XXXXX
 1435 29 08     AND #08                  -- mask for bit 3
@@ -1361,8 +1414,10 @@ definitions (initial frequency, initial volume, data change control, volume adju
 144A 8D BF 0B  STA 0BBF                 -- set wall at end of row
 144D 60        RTS                      
 
-		-- for rows 2, 4, 6
-
+		-- Sets the wall type at the second and penultimate positions of the row
+		-- and is used for rows 2, 4, 6
+		-- On entry, the top nibble of 0BA2 contains the wall type to use
+		
 144E AD A2 0B  LDA 0BA2                 -- get layout for XXXXX
 1451 29 80     AND #80                  -- mask for bit 7
 1453 F0 14     BEQ 1469                 -- RTS if not set
@@ -1377,7 +1432,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1466 8D BE 0B  STA 0BBE                 -- start wall at penultimate position
 1469 60        RTS                      
 
-		-- for rows 3, 5, 7
+		-- Sets the wall type at the second and penultimate positions of the row
+		-- and is used for rows 3, 5, 7
+		-- On entry, the top nibble of 0BA2 contains the wall type to use
 
 146A AD A2 0B  LDA 0BA2                 -- get layout for XXXXX
 146D 29 80     AND #80                  -- mask for bit 7
@@ -1393,104 +1450,183 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1482 8D BE 0B  STA 0BBE                 -- start wall at penultimate position
 1485 60        RTS                      
 
-1486 F0 E1     BEQ 1469                 
-1488 0A        ASL A                    
+		-- Sets the wall type at positions 7 and 8
+		-- and is used by rows 2, 4, 6
+		-- On entry, A is a value from 0 to 3 (though 0 does nothing)
+
+1486 F0 E1     BEQ 1469                 -- RTS if 0
+1488 0A        ASL A                    -- double value
 1489 A8        TAY                      
 148A B9 58 18  LDA 1858,Y               
-148D 8D B7 0B  STA 0BB7                 
+148D 8D B7 0B  STA 0BB7                 -- set position 7
 1490 B9 59 18  LDA 1859,Y               
-1493 8D B8 0B  STA 0BB8                 
+1493 8D B8 0B  STA 0BB8                 -- set position 8
 1496 60        RTS                      
-1497 F0 D0     BEQ 1469                 
-1499 0A        ASL A                    
+
+		-- Sets the wall type at positions 7 and 8
+		-- and is used by rows 3, 5, 7
+		-- On entry, A is a value from 0 to 3 (though 0 does nothing)
+		
+1497 F0 D0     BEQ 1469                 -- RTS if 0
+1499 0A        ASL A                    -- double value
 149A A8        TAY                      
 149B B9 60 18  LDA 1860,Y               
-149E 8D B7 0B  STA 0BB7                 
+149E 8D B7 0B  STA 0BB7                 -- set position 7
 14A1 B9 61 18  LDA 1861,Y               
-14A4 8D B8 0B  STA 0BB8                 
+14A4 8D B8 0B  STA 0BB8                 -- set position 8
 14A7 60        RTS                      
+
+		-- Sets solid walls at positions 6, 5, 4, 3, 2
+		-- On entry, A is a value between 0 and 3
+		-- if A = 0 then it does nothing
+		-- if A = 1 then it outputs a solid wall
+		-- if A is anything else then rubbish will be output
+
 14A8 48        PHA                      
-14A9 A2 06     LDX #06                  
+14A9 A2 06     LDX #06                  -- pattern starts at position 6
 14AB A9 01     LDA #01                  
-14AD 85 70     STA 70                   
+14AD 85 70     STA 70                   -- pattern ends at position 2
 14AF D0 07     BNE 14B8                 
+
+		-- Sets solid walls at positions 13, 12, 11, 10, 9
+		-- On entry, A is a value between 0 and 3
+		-- if A = 0 then it does nothing
+		-- if A = 1 then it outputs a solid wall
+		-- if A is anything else then rubbish will be output
+
 14B1 48        PHA                      
-14B2 A2 0D     LDX #0D                  
+14B2 A2 0D     LDX #0D                  -- pattern starts at position 13
 14B4 A9 08     LDA #08                  
-14B6 85 70     STA 70                   
+14B6 85 70     STA 70                   -- patterns ends at position 9
+
 14B8 A9 00     LDA #00                  
-14BA 85 71     STA 71                   
+14BA 85 71     STA 71                   -- no EOR so pattern is constant
 14BC 68        PLA                      
-14BD F0 06     BEQ 14C5                 
+14BD F0 06     BEQ 14C5                 -- if passed 0 then do nothing
 14BF 18        CLC                      
-14C0 69 11     ADC #11                  
-14C2 20 DF 13  JSR 13DF                 
+14C0 69 11     ADC #11                  -- add 11 to passed in value
+14C2 20 DF 13  JSR 13DF                 -- construct repeating pattern
 14C5 60        RTS                      
-14C6 A2 0B     LDX #0B                  
+
+		-- set solid wall between positions 4 and 11
+
+14C6 A2 0B     LDX #0B                  -- pattern starts at 11
 14C8 A9 03     LDA #03                  
-14CA 85 70     STA 70                   
+14CA 85 70     STA 70                   -- pattern ends at 4
 14CC A9 00     LDA #00                  
-14CE 85 71     STA 71                   
-14D0 A9 12     LDA #12                  
-14D2 4C DF 13  JMP 13DF                 
+14CE 85 71     STA 71                   -- no EOR
+14D0 A9 12     LDA #12                  -- use solid wall
+14D2 4C DF 13  JMP 13DF                 -- jump to construct repeating pattern
+
+		-- set solid wall at positions 4 and 11
+
 14D5 A9 12     LDA #12                  
-14D7 8D BB 0B  STA 0BBB                 
-14DA 8D B4 0B  STA 0BB4                 
+14D7 8D BB 0B  STA 0BBB                 -- set solid wall at position 11
+14DA 8D B4 0B  STA 0BB4                 -- set solid wall at position 4
 14DD 60        RTS                      
-14DE F0 E5     BEQ 14C5                 
+
+		-- set solid walls for positions between 4 and 11
+		-- only used by row 2
+		-- On entry, if A = 0 then do nothing
+		--           if A = C0 then sets only at positions 4 and 11
+		--           otherwise sets all positions between 4 and 11
+
+14DE F0 E5     BEQ 14C5                 -- RTS if 0
 14E0 C9 C0     CMP #C0                  
-14E2 F0 F1     BEQ 14D5                 
-14E4 D0 E0     BNE 14C6                 
-14E6 F0 DD     BEQ 14C5                 
+14E2 F0 F1     BEQ 14D5                 -- jump if C0 to set solid wall at 4 and 11
+14E4 D0 E0     BNE 14C6                 -- otherwise set solid wall between 4 and 11
+
+		-- set solid walls for positions between 4 and 11
+		-- used by rows 3, 4, 5, 6
+		-- On entry, if A = 0 then do nothing
+		--           if A = 40 then sets all positions between 4 and 11
+		--           otherwise sets only at positions 4 and 11
+
+14E6 F0 DD     BEQ 14C5                 -- RTS if 0
 14E8 C9 40     CMP #40                  
-14EA F0 DA     BEQ 14C6                 
-14EC D0 E7     BNE 14D5                 
-14EE F0 D5     BEQ 14C5                 
-14F0 D0 D4     BNE 14C6                 
+14EA F0 DA     BEQ 14C6                 -- if 40 then set solid wall between positions 4 and 11
+14EC D0 E7     BNE 14D5                 -- otherwise set solid walls at 4 and 11
+
+		-- set solid walls for positions between 4 and 11
+		-- only used by row 7
+		-- on entry, if A = 0 then do nothing
+		--           otherwise sets all positions between 4 and 11
+
+14EE F0 D5     BEQ 14C5                 -- RTS if 0
+14F0 D0 D4     BNE 14C6                 -- otherwise jump to set solid wall between 4 and 11
+
+		-- create an exit to the left or right
+		-- on entry, if A is C0 then an exit is created
+		--           otherwise does nothing
+		--           X is 0 or 14 corresponding to an exit to the left or right
+
 14F2 C9 C0     CMP #C0                  
-14F4 D0 CF     BNE 14C5                 
+14F4 D0 CF     BNE 14C5                 -- RTS if not C0
 14F6 A9 20     LDA #20                  
-14F8 9D B0 0B  STA 0BB0,X               
-14FB 9D B1 0B  STA 0BB1,X               
+14F8 9D B0 0B  STA 0BB0,X               -- remove wall at position X
+14FB 9D B1 0B  STA 0BB1,X               -- remove wall at position X + 1
 14FE 60        RTS                      
-14FF F0 C4     BEQ 14C5                 
+
+		-- create an exit to the left or right
+		-- on entry, if A is 0 then does nothing
+		--           otherwise an exit is created
+		--           X is 0 or 14 corresponding to an exit to the left or right
+
+14FF F0 C4     BEQ 14C5                 -- RTS if 0
 1501 A9 20     LDA #20                  
-1503 9D B0 0B  STA 0BB0,X               
-1506 9D B1 0B  STA 0BB1,X               
+1503 9D B0 0B  STA 0BB0,X               -- remove wall at position X
+1506 9D B1 0B  STA 0BB1,X               -- remove wall at position X + 1
 1509 60        RTS                      
-150A F0 B9     BEQ 14C5                 
+
+		-- create an exit to the left or right
+		-- on entry, if A is 0 or 40 then does nothing
+		--           otherwise an exit is created
+		--			 X is 0 or 14 corresponding to an exit to the left or right
+
+150A F0 B9     BEQ 14C5                 -- RTS if 0
 150C C9 40     CMP #40                  
-150E F0 B5     BEQ 14C5                 
+150E F0 B5     BEQ 14C5                 -- RTS if 40
 1510 A9 20     LDA #20                  
-1512 9D B0 0B  STA 0BB0,X               
-1515 9D B1 0B  STA 0BB1,X               
+1512 9D B0 0B  STA 0BB0,X               -- remove wall at position X
+1515 9D B1 0B  STA 0BB1,X               -- remove wall at position X + 1
 1518 60        RTS                      
-1519 F0 EF     BEQ 150A                 
-151B 0A        ASL A                    
+
+		-- create top half of barriers to the middle left and middle right
+		-- entry point used by row 4 only
+		-- on entry, A is 0 to 3 (although if A = 0 then do nothing)
+
+1519 F0 EF     BEQ 150A                 -- RTS if 0
+151B 0A        ASL A                    -- double it
 151C A8        TAY                      
 151D B9 58 18  LDA 1858,Y               
-1520 8D B2 0B  STA 0BB2                 
-1523 8D B9 0B  STA 0BB9                 
+1520 8D B2 0B  STA 0BB2                 -- set barrier start at position 2
+1523 8D B9 0B  STA 0BB9                 -- set barrier start at position 9
 1526 B9 59 18  LDA 1859,Y               
-1529 8D B6 0B  STA 0BB6                 
-152C 8D BD 0B  STA 0BBD                 
-152F A2 02     LDX #02                  
-1531 A9 12     LDA #12                  
-1533 9D B3 0B  STA 0BB3,X               
-1536 9D BA 0B  STA 0BBA,X               
-1539 CA        DEX                      
-153A 10 F7     BPL 1533                 
+1529 8D B6 0B  STA 0BB6                 -- set barrier end at position 6
+152C 8D BD 0B  STA 0BBD                 -- set barrier end at position 13
+
+152F A2 02     LDX #02                  -- init loop counter
+1531 A9 12     LDA #12                  -- use solid wall
+
+1533 9D B3 0B  STA 0BB3,X               -- set solid wall at 3, 4, 5
+1536 9D BA 0B  STA 0BBA,X               -- set solid wall at 10, 11, 12
+1539 CA        DEX                      -- decrement loop counter
+153A 10 F7     BPL 1533                 -- loop around
 153C 60        RTS                      
-153D F0 CB     BEQ 150A                 
-153F 0A        ASL A                    
+
+		-- create bottom of barriers to the middle left and middle right
+		-- entry point used by row 5 only
+
+153D F0 CB     BEQ 150A                 -- RTS is 0
+153F 0A        ASL A                    -- double it
 1540 A8        TAY                      
 1541 B9 60 18  LDA 1860,Y               
-1544 8D B2 0B  STA 0BB2                 
-1547 8D B9 0B  STA 0BB9                 
+1544 8D B2 0B  STA 0BB2                 -- set barrier start at position 2
+1547 8D B9 0B  STA 0BB9                 -- set barrier start at position 9
 154A B9 61 18  LDA 1861,Y               
-154D 8D B6 0B  STA 0BB6                 
-1550 8D BD 0B  STA 0BBD                 
-1553 10 DA     BPL 152F                 
+154D 8D B6 0B  STA 0BB6                 -- set barrier end at position 6
+1550 8D BD 0B  STA 0BBD                 -- set barrier end at position 13
+1553 10 DA     BPL 152F                 -- jump to set barrier interiors
 
 		-- generate row 0 of a room
 		-- on entry, 0BA0 controls the layout, 0BA5 controls the exits
@@ -1540,209 +1676,270 @@ definitions (initial frequency, initial volume, data change control, volume adju
 15A5 4C F9 13  JMP 13F9                 -- jump to generate an exit routine
 
 		-- generate row 1 of a room
+		-- on entry, 
+		--		0BA1 controls the basic layout,
+		--		0BA2 overrides the start and end positions,
+		--		0BA5 controls the exits
+		-- on exit, 0BB0 to 0BBF contain the resulting layout
+		--		20 for no wall, 12 for solid wall, 08 to 0F for various wall shapes
 
-15A8 20 D4 13  JSR 13D4                 
-15AB A9 FF     LDA #FF                  
+15A8 20 D4 13  JSR 13D4                 -- start with a row with no walls
+15AB A9 FF     LDA #FF                  -- loop in 13DF ends when loop counter has this value
 15AD 85 70     STA 70                   
-15AF A2 0F     LDX #0F                  
-15B1 AD A1 0B  LDA 0BA1                 
+15AF A2 0F     LDX #0F                  -- init loop counter
+15B1 AD A1 0B  LDA 0BA1                 -- get layout
 15B4 29 08     AND #08                  
-15B6 F0 1F     BEQ 15D7                 
-15B8 AD A1 0B  LDA 0BA1                 
-15BB 29 70     AND #70                  
-15BD 4A        LSR A                    
-15BE 4A        LSR A                    
-15BF 4A        LSR A                    
+15B6 F0 1F     BEQ 15D7                 -- branch if bit 3 not set
+
+15B8 AD A1 0B  LDA 0BA1                 -- get the layout again
+15BB 29 70     AND #70                  -- mask to get bits 4 5 and 6
+15BD 4A        LSR A                    -- move to 3 4 and 5
+15BE 4A        LSR A                    -- move to 2 3 and 4
+15BF 4A        LSR A                    -- move to 1 2 and 3
 15C0 A8        TAY                      
-15C1 B9 21 18  LDA 1821,Y               
-15C4 85 71     STA 71                   
-15C6 B9 20 18  LDA 1820,Y               
-15C9 2C A1 0B  BIT 0BA1                 
-15CC 30 06     BMI 15D4                 
-15CE 20 DF 13  JSR 13DF                 
-15D1 4C D7 15  JMP 15D7                 
-15D4 20 EA 13  JSR 13EA                 
-15D7 AD A1 0B  LDA 0BA1                 
-15DA 29 04     AND #04                  
-15DC F0 12     BEQ 15F0                 
-15DE AD A1 0B  LDA 0BA1                 
-15E1 29 03     AND #03                  
+15C1 B9 21 18  LDA 1821,Y               -- get EOR value from table
+15C4 85 71     STA 71                   -- store it for the subroutine
+15C6 B9 20 18  LDA 1820,Y               -- get the wall type
+15C9 2C A1 0B  BIT 0BA1                 -- test the layout
+15CC 30 06     BMI 15D4                 -- branch if bit 7 of the layout is set
+15CE 20 DF 13  JSR 13DF                 -- set the base repeating layout
+15D1 4C D7 15  JMP 15D7                 -- jump over setting mid positions
+15D4 20 EA 13  JSR 13EA                 -- set positions 3 4 11 and 12
+
+15D7 AD A1 0B  LDA 0BA1                 -- get layout
+15DA 29 04     AND #04                  -- mask for bit 2
+15DC F0 12     BEQ 15F0                 -- branch over to set exits if not set
+
+15DE AD A1 0B  LDA 0BA1                 -- get layout
+15E1 29 03     AND #03                  -- mask for bits 0 and 1
 15E3 A8        TAY                      
 15E4 B9 30 18  LDA 1830,Y               
-15E7 8D B1 0B  STA 0BB1                 
+15E7 8D B1 0B  STA 0BB1                 -- set wall at position 1
 15EA B9 34 18  LDA 1834,Y               
-15ED 8D BE 0B  STA 0BBE                 
-15F0 AD A5 0B  LDA 0BA5                 
+15ED 8D BE 0B  STA 0BBE                 -- set wall at next to last position
+
+15F0 AD A5 0B  LDA 0BA5                 -- get exits. bits 0 and 1 are of interest in this row
 15F3 29 03     AND #03                  
-15F5 20 F9 13  JSR 13F9                 
-15F8 4C 16 14  JMP 1416                 
+15F5 20 F9 13  JSR 13F9                 -- generate the exit
+15F8 4C 16 14  JMP 1416                 -- jump to set the wall type at the start and end of the row
 
 		-- generate row 2 of a room
+		-- on entry,
+		--		0BA2 sets positions 0, 1, 14, 15,
+		--		0BA4 sets positions 7 and 8, and/or 4 to 11
+		--		0BA3 sets positions 2 to 6 and 9 to 13
+		-- on exit, 0BB0 to 0BBF contain the resulting layout
+		--		20 for no wall, 12 for solid wall, 08 to 0F for various wall shapes
 
-15FB 20 D4 13  JSR 13D4                 
-15FE 20 32 14  JSR 1432                 
-1601 20 4E 14  JSR 144E                 
-1604 AD A4 0B  LDA 0BA4                 
-1607 4A        LSR A                    
-1608 4A        LSR A                    
-1609 29 03     AND #03                  
-160B 20 86 14  JSR 1486                 
-160E AD A3 0B  LDA 0BA3                 
+15FB 20 D4 13  JSR 13D4                 -- start with a row with no walls
+15FE 20 32 14  JSR 1432                 -- set the start and end positions
+1601 20 4E 14  JSR 144E                 -- set the second and penultimate positions
+
+1604 AD A4 0B  LDA 0BA4                 -- get layout
+1607 4A        LSR A                    -- halve it
+1608 4A        LSR A                    -- halve it again
+1609 29 03     AND #03                  -- mask to get lowest 2 bits
+160B 20 86 14  JSR 1486                 -- set positions 7 and 8
+
+160E AD A3 0B  LDA 0BA3                 -- get layout
 1611 29 03     AND #03                  
-1613 20 A8 14  JSR 14A8                 
-1616 AD A3 0B  LDA 0BA3                 
+1613 20 A8 14  JSR 14A8                 -- set positions 2, 3, 4, 5, 6
+
+1616 AD A3 0B  LDA 0BA3                 -- get layout
 1619 4A        LSR A                    
 161A 4A        LSR A                    
 161B 29 03     AND #03                  
-161D 20 B1 14  JSR 14B1                 
-1620 AD A4 0B  LDA 0BA4                 
-1623 29 C0     AND #C0                  
-1625 4C DE 14  JMP 14DE                 
+161D 20 B1 14  JSR 14B1                 -- set positions 9, 10, 11, 12, 13
+
+1620 AD A4 0B  LDA 0BA4                 -- get layout
+1623 29 C0     AND #C0                  -- mask for bits 6 and 7
+1625 4C DE 14  JMP 14DE                 -- jump to potentially set solid wall between 4 and 11
 
 		-- generate row 3 of a room
+		-- on entry,
+		--		0BA2 sets positions 0, 1, 14, 15,
+		--		
 
-1628 20 D4 13  JSR 13D4                 
-162B 20 16 14  JSR 1416                 
-162E 20 6A 14  JSR 146A                 
-1631 AD A4 0B  LDA 0BA4                 
+1628 20 D4 13  JSR 13D4                 -- start with a row with no walls
+162B 20 16 14  JSR 1416                 -- set the start and end positions
+162E 20 6A 14  JSR 146A                 -- set the second and penultimate positions
+
+1631 AD A4 0B  LDA 0BA4                 -- get layout
 1634 4A        LSR A                    
 1635 4A        LSR A                    
-1636 29 03     AND #03                  
-1638 20 97 14  JSR 1497                 
-163B AD A3 0B  LDA 0BA3                 
+1636 29 03     AND #03                  -- get bits 2 and 3 into 0 and 1
+1638 20 97 14  JSR 1497                 -- set positions 7 and 8
+
+163B AD A3 0B  LDA 0BA3                 -- get layout
 163E 29 03     AND #03                  
-1640 20 A8 14  JSR 14A8                 
-1643 AD A3 0B  LDA 0BA3                 
+1640 20 A8 14  JSR 14A8                 -- set positions 2, 3, 4, 5, 6
+
+1643 AD A3 0B  LDA 0BA3                 -- get layout
 1646 4A        LSR A                    
 1647 4A        LSR A                    
 1648 29 03     AND #03                  
-164A 20 B1 14  JSR 14B1                 
-164D AD A4 0B  LDA 0BA4                 
-1650 29 C0     AND #C0                  
-1652 20 E6 14  JSR 14E6                 
-1655 A2 00     LDX #00                  
-1657 AD A5 0B  LDA 0BA5                 
-165A 29 C0     AND #C0                  
-165C 20 F2 14  JSR 14F2                 
-165F A2 0E     LDX #0E                  
-1661 AD A5 0B  LDA 0BA5                 
+164A 20 B1 14  JSR 14B1                 -- set positions 9, 10, 11, 12, 13
+
+164D AD A4 0B  LDA 0BA4                 -- get layout
+1650 29 C0     AND #C0                  -- bits 6 and 7
+1652 20 E6 14  JSR 14E6                 -- set positions 4 to 11
+
+1655 A2 00     LDX #00                  -- will potentially be setting position 0 and 1
+1657 AD A5 0B  LDA 0BA5                 -- get all exits
+165A 29 C0     AND #C0                  -- mask for status of exit to the left
+165C 20 F2 14  JSR 14F2                 -- create exit if necessary
+
+165F A2 0E     LDX #0E                  -- will potentially be setting position 14 and 15
+1661 AD A5 0B  LDA 0BA5                 -- get all exits
 1664 0A        ASL A                    
 1665 0A        ASL A                    
-1666 29 C0     AND #C0                  
-1668 4C F2 14  JMP 14F2                 
+1666 29 C0     AND #C0                  -- mask for status of exit to the right
+1668 4C F2 14  JMP 14F2                 -- create an exit to the right if necessary
 
 		 -- generate row 4 of a room
 
-166B 20 D4 13  JSR 13D4                 
-166E 20 32 14  JSR 1432                 
-1671 20 4E 14  JSR 144E                 
-1674 AD A4 0B  LDA 0BA4                 
+166B 20 D4 13  JSR 13D4                 -- start with a row with no walls
+166E 20 32 14  JSR 1432                 -- set the start and end positions
+1671 20 4E 14  JSR 144E                 -- set the second and penultimate positions
+
+1674 AD A4 0B  LDA 0BA4                 -- get layout
 1677 29 03     AND #03                  
-1679 20 19 15  JSR 1519                 
-167C AD A4 0B  LDA 0BA4                 
+1679 20 19 15  JSR 1519                 -- create top half barriers to the left and right
+
+167C AD A4 0B  LDA 0BA4                 -- get layout
 167F 4A        LSR A                    
 1680 4A        LSR A                    
 1681 4A        LSR A                    
 1682 4A        LSR A                    
-1683 29 03     AND #03                  
-1685 20 86 14  JSR 1486                 
-1688 AD A4 0B  LDA 0BA4                 
-168B 29 C0     AND #C0                  
-168D 20 E6 14  JSR 14E6                 
-1690 A2 00     LDX #00                  
-1692 AD A5 0B  LDA 0BA5                 
-1695 29 C0     AND #C0                  
-1697 20 FF 14  JSR 14FF                 
-169A A2 0E     LDX #0E                  
-169C AD A5 0B  LDA 0BA5                 
+1683 29 03     AND #03                  -- get and mask bits 4 and 5
+1685 20 86 14  JSR 1486                 -- sets positions 7 and 8
+
+1688 AD A4 0B  LDA 0BA4                 -- get layout
+168B 29 C0     AND #C0                  -- mask bits 6 and 7
+168D 20 E6 14  JSR 14E6                 -- set positions 4 to 11
+
+1690 A2 00     LDX #00                  -- will potentially be setting position 0 and 1
+1692 AD A5 0B  LDA 0BA5                 -- get all exits
+1695 29 C0     AND #C0                  -- mask for status of exit to the left
+1697 20 FF 14  JSR 14FF                 -- create exit if necessary
+
+169A A2 0E     LDX #0E                  -- will potentially be setting position 14 and 15
+169C AD A5 0B  LDA 0BA5                 -- get all exits
 169F 0A        ASL A                    
 16A0 0A        ASL A                    
-16A1 29 C0     AND #C0                  
-16A3 4C FF 14  JMP 14FF                 
+16A1 29 C0     AND #C0                  -- mask for status of exit to the right
+16A3 4C FF 14  JMP 14FF                 -- create an exit to the right if necessary
 
 		-- generate row 5 of a room
 
-16A6 20 D4 13  JSR 13D4                 
-16A9 20 16 14  JSR 1416                 
-16AC 20 6A 14  JSR 146A                 
-16AF AD A4 0B  LDA 0BA4                 
+16A6 20 D4 13  JSR 13D4                 -- start with a row with no walls
+16A9 20 16 14  JSR 1416                 -- set the start and end positions
+16AC 20 6A 14  JSR 146A                 -- set the second and penultimate positions
+
+16AF AD A4 0B  LDA 0BA4                 -- get layout
 16B2 29 03     AND #03                  
-16B4 20 3D 15  JSR 153D                 
-16B7 AD A4 0B  LDA 0BA4                 
+16B4 20 3D 15  JSR 153D                 -- create bottom half barriers to the left and right
+
+16B7 AD A4 0B  LDA 0BA4                 -- get layout
 16BA 4A        LSR A                    
 16BB 4A        LSR A                    
 16BC 4A        LSR A                    
 16BD 4A        LSR A                    
-16BE 29 03     AND #03                  
-16C0 20 97 14  JSR 1497                 
-16C3 AD A4 0B  LDA 0BA4                 
-16C6 29 C0     AND #C0                  
-16C8 20 E6 14  JSR 14E6                 
-16CB A2 00     LDX #00                  
-16CD AD A5 0B  LDA 0BA5                 
-16D0 29 C0     AND #C0                  
-16D2 20 0A 15  JSR 150A                 
-16D5 A2 0E     LDX #0E                  
-16D7 AD A5 0B  LDA 0BA5                 
+16BE 29 03     AND #03                  -- get and mask bits 4 and 5
+16C0 20 97 14  JSR 1497                 -- sets positions 7 and 8
+
+16C3 AD A4 0B  LDA 0BA4                 -- get layout
+16C6 29 C0     AND #C0                  -- mask bits 6 and 7
+16C8 20 E6 14  JSR 14E6                 -- set positions 4 to 11
+
+16CB A2 00     LDX #00                  -- will potentially be setting position 0 and 1
+16CD AD A5 0B  LDA 0BA5                 -- get all exits
+16D0 29 C0     AND #C0                  -- mask for status of exit to the left
+16D2 20 0A 15  JSR 150A                 -- create exit if necessary
+
+16D5 A2 0E     LDX #0E                  -- will potentially be setting position 14 and 15
+16D7 AD A5 0B  LDA 0BA5                 -- get all exits
 16DA 0A        ASL A                    
 16DB 0A        ASL A                    
-16DC 29 C0     AND #C0                  
-16DE 4C 0A 15  JMP 150A                 
+16DC 29 C0     AND #C0                  -- mask for status of exit to the right
+16DE 4C 0A 15  JMP 150A                 -- create an exit to the right if necessary
 
 		-- generate row 6 of a room
+		-- on entry,
+		--		0BA2 sets positions 0, 1, 14, 15,
+		--		
 
-16E1 20 D4 13  JSR 13D4                 
-16E4 20 32 14  JSR 1432                 
-16E7 20 4E 14  JSR 144E                 
-16EA AD A4 0B  LDA 0BA4                 
+				todo !!!!
+
+16E1 20 D4 13  JSR 13D4                 -- start with a row with no walls
+16E4 20 32 14  JSR 1432                 -- set the start and end positions
+16E7 20 4E 14  JSR 144E                 -- set the second and penultimate positions
+
+16EA AD A4 0B  LDA 0BA4                 -- get layout
 16ED 4A        LSR A                    
 16EE 4A        LSR A                    
-16EF 29 03     AND #03                  
-16F1 20 86 14  JSR 1486                 
-16F4 AD A3 0B  LDA 0BA3                 
+16EF 29 03     AND #03                  -- get bits 2 and 3 into 0 and 1
+16F1 20 86 14  JSR 1486                 -- set positions 7 and 8
+
+16F4 AD A3 0B  LDA 0BA3                 -- get layout
 16F7 4A        LSR A                    
 16F8 4A        LSR A                    
 16F9 4A        LSR A                    
 16FA 4A        LSR A                    
 16FB 48        PHA                      
-16FC 29 03     AND #03                  
-16FE 20 A8 14  JSR 14A8                 
+16FC 29 03     AND #03                  -- get and mask for bits 4 and 5 into 0 and 1
+16FE 20 A8 14  JSR 14A8                 -- set positions 2, 3, 4, 5, 6
+
 1701 68        PLA                      
 1702 4A        LSR A                    
 1703 4A        LSR A                    
 1704 29 03     AND #03                  
-1706 20 B1 14  JSR 14B1                 
-1709 4C 4D 16  JMP 164D                 
+1706 20 B1 14  JSR 14B1                 -- set positions 9, 10, 11, 12, 13
+
+1709 4C 4D 16  JMP 164D                 -- goto 2nd half of row 3 code
 		
 		-- generate row 7 of a room
+		-- on entry, 
+		--		0BA2 sets positions 0, 1, 14, 15,
+		--		0BA4 sets positions 7 and 8, and/or 4 to 11
+		--		0BA3 sets positions 2 to 6 and 9 to 13
+		-- on exit, 0BB0 to 0BBF contain the resulting layout
+		--		20 for no wall, 12 for solid wall, 08 to 0F for various wall shapes
 
-170C 20 D4 13  JSR 13D4                 
-170F 20 16 14  JSR 1416                 
-1712 20 6A 14  JSR 146A                 
-1715 AD A4 0B  LDA 0BA4                 
-1718 4A        LSR A                    
-1719 4A        LSR A                    
-171A 29 03     AND #03                  
-171C 20 97 14  JSR 1497                 
-171F AD A3 0B  LDA 0BA3                 
+170C 20 D4 13  JSR 13D4                 -- start with a row with no walls
+170F 20 16 14  JSR 1416                 -- set the start and end positions
+1712 20 6A 14  JSR 146A                 -- set the second and penultimate positions
+
+1715 AD A4 0B  LDA 0BA4                 -- get layout
+1718 4A        LSR A                    -- halve it
+1719 4A        LSR A                    -- halve it again
+171A 29 03     AND #03                  -- mask to get lowest 2 bits
+171C 20 97 14  JSR 1497                 -- set positions 7 and 8
+
+171F AD A3 0B  LDA 0BA3                 -- get layout
 1722 4A        LSR A                    
 1723 4A        LSR A                    
 1724 4A        LSR A                    
-1725 4A        LSR A                    
+1725 4A        LSR A                    -- bits 4 and 5 now in bits 0 and 1
 1726 48        PHA                      
-1727 29 03     AND #03                  
-1729 20 A8 14  JSR 14A8                 
+1727 29 03     AND #03                  -- mask
+1729 20 A8 14  JSR 14A8                 -- set positions 2, 3, 4, 5, 6
+
 172C 68        PLA                      
 172D 4A        LSR A                    
-172E 4A        LSR A                    
-172F 29 03     AND #03                  
-1731 20 B1 14  JSR 14B1                 
-1734 AD A4 0B  LDA 0BA4                 
-1737 29 C0     AND #C0                  
-1739 4C EE 14  JMP 14EE                 
+172E 4A        LSR A                    -- bits 6 and 7 now in bits 0 and 1
+172F 29 03     AND #03                  -- mask
+1731 20 B1 14  JSR 14B1                 -- set positions 9, 10, 11, 12, 13
+
+1734 AD A4 0B  LDA 0BA4                 -- get layout
+1737 29 C0     AND #C0                  -- mask for bits 6 and 7
+1739 4C EE 14  JMP 14EE                 -- jump to potentially set solid wall between 4 and 11
 
 		-- generate row 8 of a room
-		-- on entry, 0BA1 controls the layout, 0BA5 controls the exits
+		-- on entry, 
+		--		0BA1 controls the basic layout, 
+		--		0BA2 overrides the start and end positions
+		--		0BA5 controls the exits
 		-- on exit, 0BB0 to 0BBF contain the resulting layout
 		--		20 for no wall, 12 for solid wall, 08 to 0F for various wall shapes
 
@@ -1786,7 +1983,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1788 4A        LSR A                    
 1789 29 03     AND #03                  -- shift interesting bits to lowest and mask
 178B 20 F9 13  JSR 13F9                 -- generate the exit
-178E 4C 32 14  JMP 1432                 
+178E 4C 32 14  JMP 1432                 -- jump to set the wall type at the start and end of the row
 
 		-- generate row 9 of a room
 		-- on entry, 0BA0 controls the layout, 0BA5 controls the exits
@@ -1867,7 +2064,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 		-- data used for generating room layouts 1820-188F
 
-		-- table used by row 0, 3 lots of 2 bytes, 1st is wall type, 2nd is EOR to apply
+		-- table used to determine wall types
+		-- table used by rows 0 and 1, 3 lots of 2 bytes, 1st is wall type, 2nd is EOR to apply
 
 1820 12 00								-- solid wall, no EOR
 1822 0A 03								-- rounded corner around top left, flip along Y
@@ -1878,24 +2076,65 @@ definitions (initial frequency, initial volume, data change control, volume adju
 182C 0D 03								-- straight corner around top right, flip along Y
 182E 05 03								-- not used
 
-		-- table used by row 0, 3 types of wall for start of row
+		-- table used to determine wall types
+		-- row 0 - used for the start of row
+		-- row 1 - used for the second position
 
 1830 12									-- solid wall
 1831 0A									-- rounded corner around top left
 1832 0E									-- straight corner around top left
 1833 06									-- probably not used
 
-		-- table used by row 0, 3 types of wall for end of row
+		-- table used to determine wall types
+		-- row 0 - used for end of row
+		-- row 1 - used for the penultimate position
 
 1834 12									-- solid wall
 1835 09									-- rounded corner around top right
 1836 0D 								-- straight corner around top right
 1837 05									-- probably not used
 
-1838 -> 1867 ???
+		-- table used to determine wall overrides 
+		-- first byte is used for wall at start of rows 1, 3, 5, 7
+		--            and the second position for rows 3, 5, 7
+		-- second byte is used for wall at end of rows 1, 3, 5, 7
+		--            and the penultimate position for rows 3, 5, 7
+		-- third byte is used for wall at start of rows 2, 4, 6, 8
+		--            and the second position for rows 2, 4, 6
+		-- fourth byte is used for wall at end of rows 2, 4, 6, 8
+		--            and the penultimate position for rows 2, 4, 6
 
+1838 12 12 12 12						-- all solid walls
+183C 08 0B 0A 09						-- rounded  ┐ ┌ ┘ └
+1840 0C 0F 0E 0D						-- straight ┐ ┌ ┘ └
+1844 06 05 04 07						-- not used
+1848 0E 0F 0E 0F						-- straight ┘ ┌ ┘ ┌
+184C 0A 09 08 0B						-- rounded  ┘ └ ┐ ┌
+1850 0E 0D 0C 0F						-- straight ┘ └ ┐ ┌
+1854 04 07 06 05						-- not used
 
-		-- table used by row 9, 8 set of 2 bytes, 1st is wall type, 2nd is EOR to apply
+		-- table used to determine wall types
+		-- first byte is used for wall position 7 in rows 2, 4, 6
+		-- second byte is used for wall position 8 in rows 2, 4, 6
+
+1858 00 00								-- not usable by code
+185A 12 12								-- solid walls
+185C 0B 08								-- rounded corners around bottom right and bottom left
+185E 0F 0C								-- straight corners around bottom right and bottom left
+
+		-- table used to determine wall types
+		-- first byte is used for wall position 7 in rows 3, 5, 7
+		-- second byte is used for wall position 8 in rows 3, 5, 7
+
+1860 00 00								-- not usable by code
+1862 12 12								-- solid walls
+1864 09 0A								-- rounded corners around top right and top left
+1866 0D 0E								-- straight corners around top right and top left
+
+		-- table used to determine pattern to fill row
+		-- 1st byte is starting wall type, 2nd byte is EOR to apply
+		-- used by rows 8 and 9
+
 1868 12 00								-- solid wall, no EOR
 186A 08 03								-- rounded corner around bottom left, flip along Y
 186C 0C 03								-- straight corner around bottom left, flip along Y
@@ -1905,20 +2144,25 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1874 0F 03								-- straight corner around bottom right, flip along Y
 1876 07 03								-- not used
 
-		-- table used by row 9, 3 types of wall for start of row
+		-- table used to determine wall types
+		-- row 8 - used for the second position
+		-- row 9 - used for the start of row
 
 1878 12									-- solid wall
 1879 08									-- rounded corner around bottom left
 187A 0C									-- straight corner around bottom left
-187B 04									-- probably not used
+187B 04									-- not used
 
-		-- table used by row 9, 3 types of wall for end of row
+		-- table used to determine wall types
+		-- row 8 - used for the penultimate position
+		-- row 9 - used for end of row
 
 187C 12									-- solid wall
 187D 0B									-- rounded corner around bottom right
 187E 0F									-- straight corner around bottom right
-187F 07									-- probably not used
+187F 07									-- not used
 
+1880 - 188F ????????
 
 1890 to 18e1 assorted data documented at the top of this document (starts with animation for sprites)
 
