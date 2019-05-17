@@ -226,51 +226,37 @@ Effectively running in a mode 5 screen setup modified to have 256 pixels horizon
 							then yyy is used to determine the second and penultimate positions of rows 2 to 7
 
 3f80 - 3fff		-- adds walls in positions 2 to 6 and 9 to 13 in rows 2, 3, 6, 7
-						rows 2 & 3 : bits 0 and 1 set positions 2, 3, 4, 5, 6 (value will be 00 or 01)
-						rows 2 & 3 : bits 2 and 3 set positions 9, 10, 11, 12, 13 (value will be 00 or 01)
-						rows 6 & 7 : bits 4 and 5 set positions 2, 3, 4, 5, 6 (value will be 00 or 01)
-						rows 6 & 7 : bits 6 and 7 set positions 9, 10, 11, 12, 13 (value will be 00 or 01)
+						format is ddccbbaa 
+							aa: if 01 then sets solid wall on positions 2, 3, 4, 5, 6 on rows 2 & 3
+							bb: if 01 then sets solid wall on positions 9, 10, 11, 12, 13 on rows 2 & 3
+							cc: if 01 then sets solid wall on positions 2, 3, 4, 5, 6 on rows 6 & 7
+							dd: if 01 then sets solid wall on positions 9, 10, 11, 12, 13 on rows 6 & 7
 
-4000 - 407f		-- 
-						row 2 : bits 2 and 3 set positions 7 and 8 where <> 0
-								bits 7 and 8 
-									0 does nothing
-									C0 sets solid wall at 4 and 11
-									else sets solid wall between 4 and 11
-						row 3 : bits 2 and 3 set positions 7 and 8 where <> 0
-								bits 7 and 8
-									0 does nothing
-									else sets solid wall at 4 and 11
-						row 4 : bits 0 and 1 sets top half of barriers on the middle left and right
-								bits 4 and 5 set positions 7 and 8 where <> 0
-								bits 7 and 8
-									0 does nothing
-									else sets solid wall at 4 and 11
-						row 5 : bits 0 and 1 sets bottom half of barriers on the middle left and right
-								bits 4 and 5 set positions 7 and 8 where <> 0
-								bits 7 and 8
-									0 does nothing
-									else sets solid wall at 4 and 11
-						row 6 : bits 2 and 3 set positions 7 and 8 where <> 0
-								bits 7 and 8
-									0 does nothing
-									else sets solid wall at 4 and 11
-						row 7 : bits 2 and 3 set positions 7 and 8 where <> 0
-								bits 7 and 8
-									0 does nothing
-									else sets solid wall between 4 and 11
+4000 - 407f		-- controls the central area
+						format is ddccbbaa
+							aa: set walls at 2 to 6 and 9 to 13 on rows 4 and 5
+							bb: set walls at 7 and 8 on rows 2, 3, 6, 7
+							cc: set walls at 7 and 8 on rows 4 and 5
+							dd: set walls at 4 and 11, or between 4 and 11 on rows 2 to 7 
+								(note that row 2 and row 7 treat the value differently from rows 3 to 6)
 
 4080 - 40ff		-- controls exits:
-						up is bits 0 & 1 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
-						down is bits 2 & 3 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
-						right is bits 4 & 5 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
-						left is bits 6 & 7 with 00 = no gap, 10 = 2 tiles wide, 11 = 4 tiles wide
+						up is bits 0 & 1 with 00 = no gap, 01 = 1 tile wide, 10 = 2 tiles wide, 11 = 4 tiles wide
+						down is bits 2 & 3 with 00 = no gap, 01 = 1 tile wide, 10 = 2 tiles wide, 11 = 4 tiles wide
+						right is bits 4 & 5 with 00 = no gap, 01 = 1 tile wide, 10 = 2 tiles wide, 11 = 4 tiles wide
+						left is bits 6 & 7 with 00 = no gap, 01 = 1 tile wide, 10 = 2 tiles wide, 11 = 4 tiles wide
+
+4100-43FF		-- sprites 8 to 13
 
 4400-440F		-- conversion from decimal to binary coded decimal low byte
 4410-441F		-- conversion from decimal to binary coded decimal high byte
 4420-442f		-- scores per crystal (in decimal)
 4430-4437		-- start energy per level
 4438-443f		-- energy from crystal
+
+4440-56ff		-- sprites 15 to 5F
+
+5700-57bf		-- initial monster types for 1st world
 
 57c0-57ff		-- monster data for world 2 in sets of four bytes
 					first byte is movement/behaviour
@@ -1508,7 +1494,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 14C2 20 DF 13  JSR 13DF                 -- construct repeating pattern
 14C5 60        RTS                      
 
-		-- set solid wall between positions 4 and 11
+		-- set solid wall at all positions between 4 and 11
 
 14C6 A2 0B     LDX #0B                  -- pattern starts at 11
 14C8 A9 03     LDA #03                  
@@ -1533,8 +1519,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 14DE F0 E5     BEQ 14C5                 -- RTS if 0
 14E0 C9 C0     CMP #C0                  
-14E2 F0 F1     BEQ 14D5                 -- jump if C0 to set solid wall at 4 and 11
-14E4 D0 E0     BNE 14C6                 -- otherwise set solid wall between 4 and 11
+14E2 F0 F1     BEQ 14D5                 -- jump if C0 to set solid wall only at 4 and 11
+14E4 D0 E0     BNE 14C6                 -- otherwise set solid wall at all positions between 4 and 11
 
 		-- set solid walls for positions between 4 and 11
 		-- used by rows 3, 4, 5, 6
@@ -1544,8 +1530,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 14E6 F0 DD     BEQ 14C5                 -- RTS if 0
 14E8 C9 40     CMP #40                  
-14EA F0 DA     BEQ 14C6                 -- if 40 then set solid wall between positions 4 and 11
-14EC D0 E7     BNE 14D5                 -- otherwise set solid walls at 4 and 11
+14EA F0 DA     BEQ 14C6                 -- if 40 then set solid wall at all positions between positions 4 and 11
+14EC D0 E7     BNE 14D5                 -- otherwise set solid walls only at 4 and 11
 
 		-- set solid walls for positions between 4 and 11
 		-- only used by row 7
@@ -1553,7 +1539,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		--           otherwise sets all positions between 4 and 11
 
 14EE F0 D5     BEQ 14C5                 -- RTS if 0
-14F0 D0 D4     BNE 14C6                 -- otherwise jump to set solid wall between 4 and 11
+14F0 D0 D4     BNE 14C6                 -- otherwise jump to set solid wall at all positions between 4 and 11
 
 		-- create an exit to the left or right
 		-- on entry, if A is C0 then an exit is created
@@ -1753,12 +1739,14 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 1620 AD A4 0B  LDA 0BA4                 -- get layout
 1623 29 C0     AND #C0                  -- mask for bits 6 and 7
-1625 4C DE 14  JMP 14DE                 -- jump to potentially set solid wall between 4 and 11
+1625 4C DE 14  JMP 14DE                 -- jump to potentially set solid wall at or between 4 and 11
 
 		-- generate row 3 of a room
 		-- on entry,
 		--		0BA2 sets positions 0, 1, 14, 15,
-		--		
+		--		0BA4 sets positions 7 and 8, and/or 4 to 11
+		--		0BA3 sets positions 2 to 6, and 9 to 13
+		--		0BA5 controls the exits
 
 1628 20 D4 13  JSR 13D4                 -- start with a row with no walls
 162B 20 16 14  JSR 1416                 -- set the start and end positions
@@ -1797,6 +1785,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1668 4C F2 14  JMP 14F2                 -- create an exit to the right if necessary
 
 		 -- generate row 4 of a room
+		 --	on entry,
+		 --		0BA2 sets positions 0, 1, 14, 15
+		 --		0BA4 sets positions 7 and 8, and/or 2 to 6 and 9 to 13, and/or 4 to 11
 
 166B 20 D4 13  JSR 13D4                 -- start with a row with no walls
 166E 20 32 14  JSR 1432                 -- set the start and end positions
@@ -1831,6 +1822,10 @@ definitions (initial frequency, initial volume, data change control, volume adju
 16A3 4C FF 14  JMP 14FF                 -- create an exit to the right if necessary
 
 		-- generate row 5 of a room
+		-- on entry,
+		--		0BA2 sets positions 0, 1, 14, 15,
+		--		0BA4 sets positions 7 and 8, and/or 2 to 6 and 9 to 13, and/or 4 to 11
+		--		0BA5 controls the exits
 
 16A6 20 D4 13  JSR 13D4                 -- start with a row with no walls
 16A9 20 16 14  JSR 1416                 -- set the start and end positions
@@ -1867,9 +1862,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- generate row 6 of a room
 		-- on entry,
 		--		0BA2 sets positions 0, 1, 14, 15,
-		--		
-
-				todo !!!!
+		--		0BA4 sets positions 7 and 8, and/or 4 to 11
+		--		0BA3 sets positions 2 to 6, and 9 to 13
+		--		0BA5 controls the exits
 
 16E1 20 D4 13  JSR 13D4                 -- start with a row with no walls
 16E4 20 32 14  JSR 1432                 -- set the start and end positions
@@ -2162,7 +2157,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 187E 0F									-- straight corner around bottom right
 187F 07									-- not used
 
-1880 - 188F ????????
+1880 - 188F								-- looks unused
 
 1890 to 18e1 assorted data documented at the top of this document (starts with animation for sprites)
 
