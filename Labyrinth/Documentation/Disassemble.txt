@@ -83,9 +83,9 @@ current monster data 400 to 7bf
 0ba0 to 0ba5	-- temporary storage when generating room layout
   0ba0			-- top and bottom rows
   0ba1			-- 2nd and penultimate rows
-  0ba2			-- overrides parts of first, second, penultimate and last columns
-  0ba3			-- 3rd, 4th, 7th and 8th rows
-  0ba4			--      xxx todo - it's complicated! xxx
+  0ba2			-- overrides for the first, second, penultimate and last columns
+  0ba3			-- control walls in positions 2 to 6 and 9 to 13 of rows 2, 3, 6, 7
+  0ba4			-- controls the central area
   0ba5			-- exits (up is lowest 2 bits, down next, then right, left is highest bits. 
 							0 indicates no exit, 1 a small exit, 2 is not used, 3 is large gap)
 
@@ -422,6 +422,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- draw the top level sprite for the specified tile
 		-- on entry 88 has the tile number to draw,
 		-- 85 & 86 have the screen co-ordinate
+		-- this is used when drawing a room when moving to a new one
 
 095C 85 88     STA 88                   
 095E A0 00     LDY #00                  -- initialise loop counter
@@ -441,7 +442,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 0973 A4 88     LDY 88                   -- restore tile number
 0975 B9 00 0B  LDA 0B00,Y               -- get the tile contents
 0978 48        PHA                      
-0979 20 23 1C  JSR 1C23                 -- get address of sprite data
+0979 20 23 1C  JSR 1C23                 -- get address of sprite data into 72 / 73
 097C 68        PLA                      
 097D C9 13     CMP #13                  -- 12 and below is wall, carry set 13 and above
 097F B0 03     BCS 0984                 -- branch if not wall
@@ -762,7 +763,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 0F00 - 0F7F								-- type of object (12 wall, 20 free tile, 5a apple, 13 block)
 0F80 - 0FFF								-- energy of static object
 
-1000 - 10D7								-- High score table
+1000 - 10D7		-- High score table
 
 1000 - 1008								-- Offsets into the table for each entry
 1009 - 100B								-- Score for entry 1 (in BCD)
@@ -848,10 +849,11 @@ definitions (initial frequency, initial volume, data change control, volume adju
 113D 85 71     STA 71                   
 113F 60        RTS                      
 
-		-- Set screen start address
+		-- Set the hardware screen start address
+		-- On entry 0BC0 and 0BC1 contain the required offset required for the current window on the game
 
-1140 A2 00     LDX #00                  
-1142 A0 00     LDY #00                  
+1140 A2 00     LDX #00                  -- x co-ordinate of top left is 0
+1142 A0 00     LDY #00                  -- y co-ordinate of top left is 0
 1144 20 00 11  JSR 1100                 -- get the current address of the top of the screen into 70/71
 
 		-- divide 16 bit address by 8 to take into account the 8 lines per character
@@ -931,23 +933,30 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- on entry X and Y indicate the screen co-ordinates required (y value needs to be halved first)
 		-- this is affected by 0BC0 and 0BC1 which indicate the current offset due to hardware scrolling
 		--           &72 and &73 are the memory address of the mask to use
+		--			 &80 and &81 has the memory address of the current level's wall sprite
+		--			 &82 and &83 has the memory address of the current level's floor sprite
 
 11B6 98        TYA                      
 11B7 4A        LSR A                    
 11B8 A8        TAY                      
-11B9 20 00 11  JSR 1100                 
-11BC A5 72     LDA 72                   
+11B9 20 00 11  JSR 1100                 -- get destination screen address into 70 / 71
+11BC A5 72     LDA 72                   -- get low byte of mask
 11BE 48        PHA                      
-11BF A5 80     LDA 80                   
+11BF A5 80     LDA 80                   -- get low byte of wall sprite address
 11C1 48        PHA                      
-11C2 A5 82     LDA 82                   
+11C2 A5 82     LDA 82                   -- get low byte of floor sprite address
 11C4 48        PHA                      
-11C5 A9 04     LDA #04                  
-11C7 85 77     STA 77                   
-11C9 A2 00     LDX #00                  
-11CB A0 00     LDY #00                  
-11CD A9 10     LDA #10                  
-11CF 85 78     STA 78                   
+11C5 A9 04     LDA #04                  -- initialise loop counter for x
+11C7 85 77     STA 77                   -- store outer loop counter in 77
+
+11C9 A2 00     LDX #00                  -- keep X = 0 for the indirect addressing to work
+11CB A0 00     LDY #00                  -- keep Y = 0 for the indirect addressing to work
+11CD A9 10     LDA #10                  -- initialise loop counter for y
+11CF 85 78     STA 78                   -- store inner loop counter in 78
+
+		-- get source data
+		-- where the mask is not 0 show the wall, otherwise show the floor
+
 11D1 A1 72     LDA (72,X)               -- get mask data
 11D3 D0 04     BNE 11D9                 -- branch where mask isn't black
 
@@ -956,36 +965,53 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 11D9 21 80     AND (80,X)               -- apply wall data to mask
 11DB 91 70     STA (70),Y               -- display the result
-11DD E6 72     INC 72                   
-11DF E6 80     INC 80                   
-11E1 E6 82     INC 82                   
-11E3 C8        INY                      
+
+		-- increment source addresses
+
+11DD E6 72     INC 72                   -- mask address
+11DF E6 80     INC 80                   -- wall address
+11E1 E6 82     INC 82                   -- floor address
+
+		-- increment destination
+
+11E3 C8        INY                      -- increment y offset
 11E4 98        TYA                      
-11E5 29 07     AND #07                  
-11E7 D0 0E     BNE 11F7                 
-11E9 A8        TAY                      
-11EA E6 71     INC 71                   
-11EC E6 71     INC 71                   
-11EE 10 07     BPL 11F7                 
-11F0 A5 71     LDA 71                   
+11E5 29 07     AND #07                  -- examine lowest 3 bits to see if we need to carry over
+11E7 D0 0E     BNE 11F7                 -- no carry, skip next bit
+
+11E9 A8        TAY                      -- get latest high byte address for destination
+11EA E6 71     INC 71                   -- add &100
+11EC E6 71     INC 71                   -- add &100
+11EE 10 07     BPL 11F7                 -- branch if result is still in the range of screen memory
+11F0 A5 71     LDA 71                   -- get current high byte which is negative so we need to wrap around to &58 - &7f range
 11F2 38        SEC                      
-11F3 E9 28     SBC #28                  
-11F5 85 71     STA 71                   
-11F7 C6 78     DEC 78                   
-11F9 D0 D6     BNE 11D1                 
-11FB A5 70     LDA 70                   
+11F3 E9 28     SBC #28                  -- bring result back into range
+11F5 85 71     STA 71                   -- store result
+
+		-- end of inner loop
+
+11F7 C6 78     DEC 78                   -- decrement inner loop counter
+11F9 D0 D6     BNE 11D1                 -- loop
+
+11FB A5 70     LDA 70                   -- get destination low byte
 11FD 38        SEC                      
-11FE E9 F8     SBC #F8                  
-1200 85 70     STA 70                   
-1202 A5 71     LDA 71                   
-1204 E9 03     SBC #03                  
+11FE E9 F8     SBC #F8                  -- subtract -8 / add 8 
+1200 85 70     STA 70                   -- store new value
+
+1202 A5 71     LDA 71                   -- get high byte of destination
+1204 E9 03     SBC #03                  -- subtract 3 with the carry
 1206 C9 58     CMP #58                  
-1208 B0 03     BCS 120D                 
+1208 B0 03     BCS 120D                 -- is result below screen memory
 120A 18        CLC                      
-120B 69 28     ADC #28                  
-120D 85 71     STA 71                   
+120B 69 28     ADC #28                  -- wrap back to the end of screen memory
+
+120D 85 71     STA 71                   -- store new destination high byte
+
+		-- end of outer loop
+
 120F C6 77     DEC 77                   
 1211 D0 B8     BNE 11CB                 
+
 1213 68        PLA                      
 1214 85 82     STA 82                   
 1216 68        PLA                      
@@ -1053,6 +1079,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 125B 85 71     STA 71                   -- store result
 
 		-- keep source of floor data in range
+		-- (necessary when drawing to an odd y co-ordinate so that we're drawing
+		-- the bottom of the floor tile followed by the top of the tile)
 
 125D A5 74     LDA 74                   -- get current source floor address
 125F 29 0F     AND #0F                  -- look at the lowest 4 bits
@@ -1082,7 +1110,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 1280 85 71     STA 71                   -- store new destination high byte
 
-1282 A5 74     LDA 74                   -- get floor sprite low
+1282 A5 74     LDA 74                   -- get floor sprite low byte
 1284 18        CLC                      
 1285 69 10     ADC #10                  -- add to low byte to find the next column
 1287 85 74     STA 74                   -- store result
@@ -1127,109 +1155,152 @@ definitions (initial frequency, initial volume, data change control, volume adju
 12B3 85 75     STA 75                   -- store high byte of result in 75
 12B5 60        RTS                      
 
-		-- draw sprite with offset column (left or right of tile)
+		-- draw a vertical quarter strip of a specified sprite (or floor)
+		-- used when a sprite moves left or right to redraw the exposed part of the room
+		-- so 16 bytes in a line will be copied to screen memory
 		-- on entry, X and Y are the screen co-ordinates to draw at
+		--			&79 and &7A specifies the address of the sprite to draw
 
 12B6 20 9C 12  JSR 129C                 -- get address into floor sprite using x,y offset (sets 74/75)
-12B9 A5 7A     LDA 7A                   
+12B9 A5 7A     LDA 7A                   -- get high byte of address of sprite to show
 12BB 85 7C     STA 7C                   
-12BD 98        TYA                      
+12BD 98        TYA                      -- get y co-ordinate
 12BE 48        PHA                      
-12BF 4A        LSR A                    
+12BF 4A        LSR A                    -- divide y co-ordinate in half
 12C0 A8        TAY                      
-12C1 20 00 11  JSR 1100                 
-12C4 68        PLA                      
-12C5 0A        ASL A                    
-12C6 0A        ASL A                    
-12C7 29 04     AND #04                  
+12C1 20 00 11  JSR 1100                 -- get destination screen address into 70 / 71
+12C4 68        PLA                      -- restore y co-ordinate
+12C5 0A        ASL A                    -- double it
+12C6 0A        ASL A                    -- double it again
+12C7 29 04     AND #04                  -- get bit 3 (which will indicate whether y was odd or even)
 12C9 A8        TAY                      
-12CA A9 10     LDA #10                  
-12CC 85 78     STA 78                   
-12CE A2 00     LDX #00                  
+12CA A9 10     LDA #10                  -- initialise loop counter for y
+12CC 85 78     STA 78                   -- store inner loop counter in 78
+12CE A2 00     LDX #00                  -- keep X = 0 for the indirect addressing to work
+
 12D0 A5 74     LDA 74                   
 12D2 29 3F     AND #3F                  
 12D4 05 79     ORA 79                   
-12D6 85 7B     STA 7B                   
-12D8 A1 7B     LDA (7B,X)               
-12DA D0 02     BNE 12DE                 
+12D6 85 7B     STA 7B                   -- reset address of source data
+
+		-- get source data
+
+12D8 A1 7B     LDA (7B,X)               -- get sprite data
+12DA D0 02     BNE 12DE                 -- if not zero then branch
 12DC A1 74     LDA (74,X)               -- get floor sprite data instead
+
+		-- store destination data
+
 12DE 91 70     STA (70),Y               
-12E0 E6 74     INC 74                   
-12E2 C8        INY                      
+
+12E0 E6 74     INC 74                   -- increment source address for floor
+
+12E2 C8        INY                      -- increment y offset
 12E3 98        TYA                      
-12E4 29 07     AND #07                  
-12E6 D0 0E     BNE 12F6                 
-12E8 A8        TAY                      
-12E9 E6 71     INC 71                   
-12EB E6 71     INC 71                   
-12ED 10 07     BPL 12F6                 
-12EF A5 71     LDA 71                   
+12E4 29 07     AND #07                  -- examine lowest 3 bits to see if we need to carry over
+12E6 D0 0E     BNE 12F6                 -- no carry, skip next bit
+
+12E8 A8        TAY                      -- get latest high byte address for destination
+12E9 E6 71     INC 71                   -- add &100
+12EB E6 71     INC 71                   -- add &100
+12ED 10 07     BPL 12F6                 -- branch if result is still in the range of screen memory
+12EF A5 71     LDA 71                   -- get current high byte which is negative so we need to wrap around to &58 - &7f range
 12F1 38        SEC                      
-12F2 E9 28     SBC #28                  
-12F4 85 71     STA 71                   
-12F6 A5 74     LDA 74                   
-12F8 29 0F     AND #0F                  
-12FA D0 07     BNE 1303                 
-12FC A5 74     LDA 74                   
+12F2 E9 28     SBC #28                  -- bring result back into range
+12F4 85 71     STA 71                   -- store result
+
+		-- keep source of floor data in range
+		-- (necessary when drawing to an odd y co-ordinate so that we're drawing
+		-- the bottom of the floor tile followed by the top of the tile)
+
+12F6 A5 74     LDA 74                   -- get current source floor address
+12F8 29 0F     AND #0F                  -- look at the lowest 4 bits
+12FA D0 07     BNE 1303                 -- branch over if not wrapping round
+
+12FC A5 74     LDA 74                   -- get current source floor address
 12FE 38        SEC                      
-12FF E9 10     SBC #10                  
-1301 85 74     STA 74                   
+12FF E9 10     SBC #10                  -- wrap back around to the top of the sprite
+1301 85 74     STA 74                   -- and save the new value
+
+		-- end of loop
+
 1303 C6 78     DEC 78                   
 1305 D0 C9     BNE 12D0                 
 1307 60        RTS                      
 
-		-- draw sprite with offset row (up or down of tile)
+		-- draw a horizontal quarter strip of a specified sprite (or floor)
+		-- used when a sprite moves up or down to redraw the exposed part of the room
+		-- so a 4 x 4 set of bytes will be copied to screen memory
+		-- on entry, X and Y are the screen co-ordinates to draw at
+		--			&79 and &7A specifies the address of the sprite to draw
 
-1308 20 9C 12  JSR 129C                 
-130B A5 7A     LDA 7A                   
+1308 20 9C 12  JSR 129C                 -- get address into floor sprite using x,y offset (sets 74/75)
+130B A5 7A     LDA 7A                   -- get high byte of address of sprite to show
 130D 85 7C     STA 7C                   
-130F 98        TYA                      
+130F 98        TYA                      -- get y co-ordinate
 1310 48        PHA                      
-1311 4A        LSR A                    
+1311 4A        LSR A                    -- divide y co-ordinate in half
 1312 A8        TAY                      
-1313 20 00 11  JSR 1100                 
-1316 68        PLA                      
-1317 0A        ASL A                    
-1318 0A        ASL A                    
-1319 29 04     AND #04                  
+1313 20 00 11  JSR 1100                 -- get destination screen address into 70 / 71
+1316 68        PLA                      -- restore y co-ordinate
+1317 0A        ASL A                    -- double it
+1318 0A        ASL A                    -- double it again
+1319 29 04     AND #04                  -- get bit 3 (which will indicate whether y was odd or even)
 131B 18        CLC                      
 131C 65 70     ADC 70                   
 131E 85 70     STA 70                   
-1320 A2 04     LDX #04                  
-1322 A5 74     LDA 74                   
+
+1320 A2 04     LDX #04                  -- init outer loop counter for x
+
+1322 A5 74     LDA 74                   -- get floor sprite low byte
 1324 29 3F     AND #3F                  
 1326 05 79     ORA 79                   
-1328 85 7B     STA 7B                   
-132A A0 03     LDY #03                  
-132C B1 7B     LDA (7B),Y               
-132E D0 02     BNE 1332                 
-1330 B1 74     LDA (74),Y               
+1328 85 7B     STA 7B                   -- reset sprite address for loop
+
+132A A0 03     LDY #03                  -- init inner loop counter for y
+
+		-- get source data
+
+132C B1 7B     LDA (7B),Y               -- get sprite data
+132E D0 02     BNE 1332                 -- if not zero then branch
+1330 B1 74     LDA (74),Y               -- get floor sprite data instead
+
+		-- store destination data
+
 1332 91 70     STA (70),Y               
+
 1334 88        DEY                      
-1335 10 F5     BPL 132C                 
-1337 A5 70     LDA 70                   
+1335 10 F5     BPL 132C                 -- loop around
+
+1337 A5 70     LDA 70                   -- get destination low byte
 1339 18        CLC                      
-133A 69 08     ADC #08                  
-133C 85 70     STA 70                   
-133E 90 0B     BCC 134B                 
-1340 E6 71     INC 71                   
-1342 10 07     BPL 134B                 
+133A 69 08     ADC #08                  -- add 8 
+133C 85 70     STA 70                   -- store new value
+
+133E 90 0B     BCC 134B                 -- branch if not carried
+1340 E6 71     INC 71                   -- add &100 to destination address
+1342 10 07     BPL 134B                 -- branch if still in range
 1344 A5 71     LDA 71                   
 1346 38        SEC                      
-1347 E9 28     SBC #28                  
-1349 85 71     STA 71                   
-134B A5 74     LDA 74                   
+1347 E9 28     SBC #28                  -- wrap back to the start of screen memory
+1349 85 71     STA 71                   -- store revised value
+
+134B A5 74     LDA 74                   -- get floor sprite low byte
 134D 18        CLC                      
-134E 69 10     ADC #10                  
-1350 85 74     STA 74                   
-1352 29 30     AND #30                  
-1354 D0 07     BNE 135D                 
-1356 A5 74     LDA 74                   
+134E 69 10     ADC #10                  -- add to low byte to find the next column
+1350 85 74     STA 74                   -- store result
+1352 29 30     AND #30                  -- look at the low 2 bits
+1354 D0 07     BNE 135D                 -- branch if no need to wrap around
+
+1356 A5 74     LDA 74                   -- get the floor low bit
 1358 38        SEC                      
-1359 E9 40     SBC #40                  
-135B 85 74     STA 74                   
+1359 E9 40     SBC #40                  -- go back 40 to get wrap back to the start
+135B 85 74     STA 74                   -- store the result
+
+		-- end of loop
+
 135D CA        DEX                      
-135E D0 C2     BNE 1322                 
+135E D0 C2     BNE 1322						                 
 1360 60        RTS                      
 
 		-- scrolling for moving down
@@ -1252,12 +1323,13 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1373 20 9D 11  JSR 119D                 
 1376 4C 9D 11  JMP 119D                 
 
-		-- ???
+		-- unlinked code
 
 1379 A5 70     LDA 70                   
 137B 38        SEC                      
 137C E9 F8     SBC #F8                  
 137E 85 00     STA 00                   
+
 1380 85 73     STA 73                   
 1382 A9 00     LDA #00                  
 1384 85 72     STA 72                   
@@ -1270,7 +1342,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1391 69 3F     ADC #3F                  
 1393 85 73     STA 73                   
 1395 60        RTS                      
-1396 8D 07 0C  STA 0C07                 
+
+1396 8D 07 0C  STA 0C07                 -- store x co-ordinate
 1399 98        TYA                      
 139A 0A        ASL A                    
 139B 0A        ASL A                    
@@ -1280,33 +1353,35 @@ definitions (initial frequency, initial volume, data change control, volume adju
 139F 6D 07 0C  ADC 0C07                 
 13A2 AA        TAX                      
 13A3 60        RTS                      
+
 13A4 98        TYA                      
 13A5 48        PHA                      
 13A6 8A        TXA                      
 13A7 48        PHA                      
-13A8 AD 09 0C  LDA 0C09                 
+13A8 AD 09 0C  LDA 0C09                 -- get x
 13AB 0A        ASL A                    
 13AC 0A        ASL A                    
 13AD AA        TAX                      
-13AE AD 0A 0C  LDA 0C0A                 
+13AE AD 0A 0C  LDA 0C0A                 -- get y
 13B1 0A        ASL A                    
 13B2 0A        ASL A                    
 13B3 A8        TAY                      
-13B4 20 B6 11  JSR 11B6                 
+13B4 20 B6 11  JSR 11B6                 -- draw wall tile at x,y
 13B7 68        PLA                      
 13B8 AA        TAX                      
 13B9 68        PLA                      
 13BA A8        TAY                      
 13BB 60        RTS                      
-13BC A9 0F     LDA #0F                  
-13BE 8D 09 0C  STA 0C09                 
+
+13BC A9 0F     LDA #0F                  -- init loop counter
+13BE 8D 09 0C  STA 0C09                 -- store in base index of player animation
 13C1 20 96 13  JSR 1396                 
-13C4 BD 00 0B  LDA 0B00,X               
+13C4 BD 00 0B  LDA 0B00,X               -- get room contents at tile X
 13C7 20 80 13  JSR 1380                 
-13CA 20 A4 13  JSR 13A4                 
-13CD CA        DEX                      
-13CE CE 09 0C  DEC 0C09                 
-13D1 10 F1     BPL 13C4                 
+13CA 20 A4 13  JSR 13A4                 -- draw wall tile
+13CD CA        DEX                      -- decrement tile number
+13CE CE 09 0C  DEC 0C09                 -- decrement loop counter
+13D1 10 F1     BPL 13C4                 -- loop around
 13D3 60        RTS                      
 
 		-- clear out BB0 to BBF area with &20
@@ -2638,9 +2713,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- Get address for the specified sprite (from &4100 onwards)
 		-- Each sprite occupies 64 bytes - 16x16 pixels with 2 bits of colour
 		-- On entry, A is the sprite index, 8 to 5F
-		-- On exit, &79is low byte of address, &7A is high byte of address
+		-- On exit, &79 is low byte of address, &7A is high byte of address
 
-1C0D 85 7A     STA 7A                  -- store sprite number in high byte of result 
+1C0D 85 7A     STA 7A					-- store sprite number in high byte of result 
 
 1C0F A9 00     LDA #00                  -- set low byte of result to 0
 1C11 85 79     STA 79                   
@@ -2893,7 +2968,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1D3B 48        PHA                      
 1D3C A6 85     LDX 85                   
 1D3E A4 86     LDY 86                   
-1D40 20 B6 11  JSR 11B6                 
+1D40 20 B6 11  JSR 11B6                 -- draw wall tile
 1D43 68        PLA                      
 1D44 AA        TAX                      
 1D45 68        PLA                      
