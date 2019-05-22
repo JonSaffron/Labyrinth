@@ -128,8 +128,8 @@ bdc				-- delay until game's main loop ends
 					the player is always the first slot
 	offset 0	-- type of object (0 slot is empty, 1 is monster, 4 crystal, 5 player whilst alive, 6 player inactive/dead, fe block, ff shot)
 	offset 1	-- current tile number
-	offset 2	-- future tile number?
-	offset 3	-- position between tiles (between 0 and 3)
+	offset 2	-- future tile number
+	offset 3	-- position between tiles (between 0 and 4)
 	offset 4	-- direction (0 left, 1 right, 2 up, 3 down, 4 still)
 	offset 5	-- previous tile number
 	offset 6	-- when a monster, this is the monster id
@@ -1159,7 +1159,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- used when a sprite moves left or right to redraw the exposed part of the room
 		-- so 16 bytes in a line will be copied to screen memory
 		-- on entry, X and Y are the screen co-ordinates to draw at
-		--			&79 and &7A specifies the address of the sprite to draw
+		--			 &79 and &7A specifies the address of the sprite to draw
 
 12B6 20 9C 12  JSR 129C                 -- get address into floor sprite using x,y offset (sets 74/75)
 12B9 A5 7A     LDA 7A                   -- get high byte of address of sprite to show
@@ -1232,7 +1232,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- used when a sprite moves up or down to redraw the exposed part of the room
 		-- so a 4 x 4 set of bytes will be copied to screen memory
 		-- on entry, X and Y are the screen co-ordinates to draw at
-		--			&79 and &7A specifies the address of the sprite to draw
+		--			 &79 and &7A specifies the address of the sprite to draw
 
 1308 20 9C 12  JSR 129C                 -- get address into floor sprite using x,y offset (sets 74/75)
 130B A5 7A     LDA 7A                   -- get high byte of address of sprite to show
@@ -2237,12 +2237,15 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1890 to 18e1 assorted data documented at the top of this document (starts with animation for sprites)
 
 		-- process animation main routine: 
-		-- increment the sprite shown, move position, draw it, determine where it moves next
+		-- increment the sprite frame shown, move sprite's position, draw the sprite, determine where it moves next
 		-- on entry, X is the index into C00 identifying the monster to update
 
 1900 A9 FF     LDA #FF                  
 1902 85 88     STA 88                   -- set that no collision has been detected
 1904 85 89     STA 89                   
+
+		-- deal with updating the animation frame
+
 1906 DE 0D 0C  DEC 0C0D,X               -- decrement count until animation frame needs to change
 1909 10 11     BPL 191C                 -- if not there yet, branch onwards
 190B BD 0B 0C  LDA 0C0B,X               -- get time to show each frame
@@ -2252,51 +2255,61 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1916 BD 0A 0C  LDA 0C0A,X               -- get number of frames in animation
 1919 9D 0C 0C  STA 0C0C,X               -- reset current frame being shown
 
+		-- decrement delay until hatching for an egg
+
 191C BD 0F 0C  LDA 0C0F,X               -- get monster movement (egg = <80)
 191F C9 80     CMP #80                 
 1921 B0 53     BCS 1976                 -- jump to move monster
 1923 DE 0F 0C  DEC 0C0F,X               -- decrement counter to monster hatching
 1926 10 4E     BPL 1976                 -- always jump to move monster (will never be negative)
 
-		-- draw background tiles behind monster/player
+		-- reset animation slot, and redraw room tiles that animation occupied
+		-- on entry, X specifies the animation slot
 
 1928 A9 00     LDA #00                  
-192A 9D 00 0C  STA 0C00,X               -- reset monster slot
-192D BD 01 0C  LDA 0C01,X               -- get tile number
-1930 20 83 1C  JSR 1C83                 -- seperate into x & y
+192A 9D 00 0C  STA 0C00,X               -- clear animation slot so it can be reused
+192D BD 01 0C  LDA 0C01,X               -- get current tile number
+1930 20 83 1C  JSR 1C83                 -- seperate into x & y in 85 and 86
 1933 BD 03 0C  LDA 0C03,X               -- get position between frames
-1936 F0 2C     BEQ 1964                 -- if zero, then positioned dead on frame so branch over
+1936 F0 2C     BEQ 1964                 -- if zero, then positioned on a single frame - branch over
 1938 EA        NOP                      
 1939 EA        NOP                      
-193A BD 04 0C  LDA 0C04,X               -- get direction
+193A BD 04 0C  LDA 0C04,X               -- get direction of travel
 193D 49 01     EOR #01                  -- reverse it
 193F BC 03 0C  LDY 0C03,X               -- get position between frames
-1942 C0 03     CPY #03                  -- compare with 3
+1942 C0 03     CPY #03                  -- compare with 3 (current tile becomes future tile at position 3)
 1944 90 03     BCC 1949                 -- when 2 or less then branch over next line
 1946 20 67 1C  JSR 1C67                 -- adjust x & y to get the tile we're moving away from
+
+		-- redraw the tile moving away from
 
 1949 20 90 1C  JSR 1C90                 -- combine x & y back to tile number
 194C 48        PHA                      -- save tile number
 194D A8        TAY                      
-194E 20 9D 1C  JSR 1C9D                 -- get screen co-ordinates for tile
+194E 20 9D 1C  JSR 1C9D                 -- get screen co-ordinates for tile into 85 and 86
 1951 B9 00 0B  LDA 0B00,Y               -- get contents of room at tile position
-1954 20 23 1C  JSR 1C23                 -- get sprite index to render
+1954 20 23 1C  JSR 1C23                 -- get address for the sprite into &72 and &73
 1957 20 39 1C  JSR 1C39                 -- draw sprite to screen
+
+		-- calculate destination tile
 
 195A 68        PLA                      -- restore tile number (could be previous tile, could be current tile)
 195B 20 83 1C  JSR 1C83                 -- seperate into x & y
 195E BD 04 0C  LDA 0C04,X               -- get direction
 1961 20 67 1C  JSR 1C67                 -- adjust x & y according to the direction of travel
+
+		-- redraw the destination tile or the current tile (if positioned solely on a single tile)
+
 1964 20 90 1C  JSR 1C90                 -- combine x & y back to a tile number
 1967 48        PHA                      -- save the tile number
 1968 A8        TAY                      
 1969 B9 00 0B  LDA 0B00,Y               -- get the room contents for that tile
-196C 20 23 1C  JSR 1C23                 -- get the sprite index into &73
+196C 20 23 1C  JSR 1C23                 -- get address for the sprite into &72 and &73
 196F 68        PLA                      -- get back tile number
-1970 20 9D 1C  JSR 1C9D                 -- get screen co-ordinates for the tile
+1970 20 9D 1C  JSR 1C9D                 -- get screen co-ordinates for the tile into &85 and &86
 1973 4C 39 1C  JMP 1C39                 -- draw sprite to screen
 
-		-- move monster
+		-- move monster (continues process animation routine began at 1900)
 
 1976 BD 07 0C  LDA 0C07,X               -- get current state of flitter flag (will be FF or 0)
 1979 30 08     BMI 1983                 -- branch if currently negative (this indicates a double-speed movement is needed)
@@ -2308,12 +2321,12 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- move monster at double speed
 
 1983 BD 04 0C  LDA 0C04,X               -- get current direction
-1986 C9 04     CMP #04                  -- is it static?
+1986 C9 04     CMP #04                  -- is it stationary?
 1988 F0 F6     BEQ 1980                 -- yes, so branch and jump
 
-198A 20 E1 1C  JSR 1CE1                 -- calculate which sprite to render
-198D BD 03 0C  LDA 0C03,X               -- get position between tiles
-1990 D0 32     BNE 19C4                 -- not zero (i.e. not dead on tile) then branch
+198A 20 E1 1C  JSR 1CE1                 -- calculate address of sprite to render into 72 and 73
+198D BD 03 0C  LDA 0C03,X               -- get current position between tiles
+1990 D0 32     BNE 19C4                 -- when not zero (i.e. not dead on tile) then branch to move it to the destination
 
 		-- move monster (at double speed) to half way between tiles
 
@@ -2329,37 +2342,38 @@ definitions (initial frequency, initial volume, data change control, volume adju
 19A4 20 67 1C  JSR 1C67                 -- update tile number according to direction
 19A7 20 90 1C  JSR 1C90                 -- combine x & y back to tile number
 19AA 9D 02 0C  STA 0C02,X               -- store new tile number
-19AD 20 9D 1C  JSR 1C9D                 -- get screen position for tile
+19AD 20 9D 1C  JSR 1C9D                 -- get screen position for destination tile
 19B0 BD 04 0C  LDA 0C04,X               -- get direction
 19B3 49 01     EOR #01                  -- reverse it
 19B5 20 67 1C  JSR 1C67                 -- update co-ordinate with direction
-19B8 20 67 1C  JSR 1C67                 -- update co-ordinate with direction
+19B8 20 67 1C  JSR 1C67                 -- update co-ordinate with direction so now half way between old and new
 19BB 20 39 1C  JSR 1C39                 -- draw sprite to screen
-19BE 20 DE 19  JSR 19DE                 -- draw sprite to screen with offset
+19BE 20 DE 19  JSR 19DE                 -- draw exposed parts of room (half a tile)
 19C1 4C FF 19  JMP 19FF                 
 
-		-- move monster (at double speed) to destination tile
+		-- move monster (at double speed) right onto destination tile
 
 19C4 BC 01 0C  LDY 0C01,X               -- get current tile
 19C7 BD 02 0C  LDA 0C02,X               -- get tile moving towards
 19CA 9D 01 0C  STA 0C01,X               -- update current tile number
-19CD 20 9D 1C  JSR 1C9D                 -- get screen position for tile
+19CD 20 9D 1C  JSR 1C9D                 -- get screen position for tile into 85 & 86
 19D0 20 39 1C  JSR 1C39                 -- draw sprite to screen
-19D3 20 DE 19  JSR 19DE                 -- draw sprite to screen with offset
+19D3 20 DE 19  JSR 19DE                 -- draw exposed parts of room (half a tile)
 19D6 20 01 1C  JSR 1C01                 -- reset position between tiles to 0
 19D9 4C FF 19  JMP 19FF                 
+
 19DC EA        NOP                      
 19DD EA        NOP                      
 
-		-- draw sprite to screen when moving at double speed
+		-- draw exposed parts of tile for a sprite moving at double speed
 
-19DE 20 AC 1C  JSR 1CAC                 -- calculate position with offset and draw sprite
+19DE 20 AC 1C  JSR 1CAC                 -- redraw exposed portion of tile
 19E1 BD 04 0C  LDA 0C04,X               -- get direction
 19E4 49 01     EOR #01                  -- reverse it
 19E6 20 67 1C  JSR 1C67                 -- adjust co-ordinates according to direction
-19E9 4C AC 1C  JMP 1CAC                 -- calculate position with offset and draw sprite
+19E9 4C AC 1C  JMP 1CAC                 -- redraw exposed portion of tile
 
-		-- move monster
+		-- move monster at normal speed
 
 19EC BD 07 0C  LDA 0C07,X               -- get 0
 19EF 9D 08 0C  STA 0C08,X               -- store 0
@@ -2370,7 +2384,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 19F9 20 E1 1C  JSR 1CE1                 -- calculate memory address of animation frame to show
 19FC 20 7B 1B  JSR 1B7B                 -- update sprite position (for normal movement) and draw it
 
-		-- continue processing animation slot
+		-- finish processing animation slot with collision detection and choose direction
 		-- (will be jumped to directly)
 
 19FF 20 1F 1B  JSR 1B1F                 -- do collision detection
@@ -2633,6 +2647,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1B78 4C FF 19  JMP 19FF                 
 
 		-- update position between tiles (for normal movement) and draw sprite
+		-- on entry, X specifies the animation slot
 
 1B7B FE 03 0C  INC 0C03,X               -- increment position between tiles
 1B7E BD 03 0C  LDA 0C03,X               -- get new position
@@ -2650,24 +2665,25 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 1B92 BD 01 0C  LDA 0C01,X               -- get current tile number
 1B95 9D 02 0C  STA 0C02,X               -- store as future/next tile
-1B98 9D 05 0C  STA 0C05,X               -- store as contents of tile ???
-1B9B A8        TAY                      
-1B9C 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1B98 9D 05 0C  STA 0C05,X               -- store as previous tile
+1B9B A8        TAY                      -- tile number transferred to Y for 1CAC to redraw
+1B9C 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile into 85 & 86
 1B9F BD 04 0C  LDA 0C04,X               -- get direction of travel
-1BA2 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BA2 20 67 1C  JSR 1C67                 -- adjust co-ordinates in 85/86 for direction of travel
 1BA5 20 39 1C  JSR 1C39                 -- draw the sprite
-1BA8 4C AC 1C  JMP 1CAC                 -- jump to calculate offset position and draw sprite
+1BA8 4C AC 1C  JMP 1CAC                 -- redraw exposed portion of tile
 
-		-- draw at position 2
+		-- draw at position 2 (half way between tiles)
 
 1BAB BD 01 0C  LDA 0C01,X               -- get current tile number
-1BAE A8        TAY                      
-1BAF 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1BAE A8        TAY                      -- tile number transferred to Y for 1CAC to redraw
+1BAF 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile into 85 & 86
 1BB2 BD 04 0C  LDA 0C04,X               -- get direction of travel
-1BB5 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
-1BB8 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BB5 20 67 1C  JSR 1C67                 -- adjust co-ordinates in 85/86 for direction of travel
+1BB8 20 67 1C  JSR 1C67                 -- adjust co-ordinates in 85/86 for direction of travel
 1BBB 20 39 1C  JSR 1C39                 -- draw the sprite
-1BBE 20 AC 1C  JSR 1CAC                 -- call calculate offset position and draw sprite
+1BBE 20 AC 1C  JSR 1CAC                 -- redraw exposed portion of tile
+
 1BC1 BD 01 0C  LDA 0C01,X               -- get current tile number
 1BC4 20 83 1C  JSR 1C83                 -- get tile x,y co-ordinate
 1BC7 BD 04 0C  LDA 0C04,X               -- get direction of travel
@@ -2679,28 +2695,26 @@ definitions (initial frequency, initial volume, data change control, volume adju
 		-- draw at position 3
 
 1BD4 BD 02 0C  LDA 0C02,X               -- get future/next tile
-1BD7 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1BD7 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile into 85 & 86
 1BDA BD 04 0C  LDA 0C04,X               -- get direction of travel
 1BDD 49 01     EOR #01                  -- reverse it
-1BDF 20 67 1C  JSR 1C67                 -- adjust co-ordinate for direction of travel
+1BDF 20 67 1C  JSR 1C67                 -- adjust co-ordinates in 85/86 for direction of travel
 1BE2 20 39 1C  JSR 1C39                 -- draw the sprite
-1BE5 BC 05 0C  LDY 0C05,X               -- get the contents of the tile
-1BE8 20 AC 1C  JSR 1CAC                 -- call calculate offset position and draw sprite
-1BEB BD 02 0C  LDA 0C02,X               -- get future/next tile
-1BEE 9D 01 0C  STA 0C01,X               -- set current tile
+1BE5 BC 05 0C  LDY 0C05,X               -- get the previous tile number for 1CAC
+1BE8 20 AC 1C  JSR 1CAC                 -- redraw exposed portion of tile on the previous tile
+1BEB BD 02 0C  LDA 0C02,X               -- get future/next tile number
+1BEE 9D 01 0C  STA 0C01,X               -- set current tile to the destination tile
 1BF1 60        RTS                      
 
-		-- draw at position 4
+		-- draw at position 4 (have arrived at destination tile)
 
-1BF2 BC 05 0C  LDY 0C05,X               -- get contents of tile
+1BF2 BC 05 0C  LDY 0C05,X               -- get previous tile number for 1CAC
 1BF5 BD 01 0C  LDA 0C01,X               -- get current tile
-1BF8 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile
+1BF8 20 9D 1C  JSR 1C9D                 -- get game co-ordinate for the tile into 85 & 86
 1BFB 20 39 1C  JSR 1C39                 -- draw the sprite
-1BFE 20 AC 1C  JSR 1CAC                 -- call calculate offset position and draw sprite
+1BFE 20 AC 1C  JSR 1CAC                 -- redraw exposed portion of tile
 
-		-- reset position between tiles
-
-1C01 A9 00     LDA #00                  -- position 0
+1C01 A9 00     LDA #00                  -- new position between tiles will be 0
 1C03 9D 03 0C  STA 0C03,X               -- store revised position between tiles
 1C06 EA        NOP                      
 1C07 EA        NOP                      
@@ -2771,27 +2785,33 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1C47 A8        TAY                      
 1C48 60        RTS                      
 
-		-- update column for offset position and draw sprite to screen
+		-- draw vertical strip of room exposed by movement
+		-- on entry, 86 has the Y co-ordinate to draw at
+		--			 A has the X co-ordinate to draw at
+		--			 &79 and &7A specifies the address of the sprite to draw
 
 1C49 86 87     STX 87                   
-1C4B AA        TAX                      
+1C4B AA        TAX                      -- prepare X co-ordinate
 1C4C 98        TYA                      
 1C4D 48        PHA                      
-1C4E A4 86     LDY 86                   
-1C50 20 B6 12  JSR 12B6                 
+1C4E A4 86     LDY 86                   -- prepare Y co-ordinate
+1C50 20 B6 12  JSR 12B6                 -- redraw vertical strip of room exposed by the movement 
 1C53 68        PLA                      
 1C54 A8        TAY                      
 1C55 A6 87     LDX 87                   
 1C57 60        RTS                      
 
-		-- update row for offset position and draw sprite to screen
+		-- draw horizontal strip of room exposed by movement
+		-- on entry, 85 has the X co-ordinate to draw at
+		--			 A has the Y co-ordinate to draw at
+		--			 &79 and &7A specifies the address of the sprite to draw
 
 1C58 84 87     STY 87                   
-1C5A A8        TAY                      
+1C5A A8        TAY                      -- prepare Y co-ordinate
 1C5B 8A        TXA                      
 1C5C 48        PHA                      
-1C5D A6 85     LDX 85                   
-1C5F 20 08 13  JSR 1308                 
+1C5D A6 85     LDX 85                   -- prepare X co-ordinate
+1C5F 20 08 13  JSR 1308                 -- redraw horizontal strip of room exposed by the movement
 1C62 68        PLA                      
 1C63 AA        TAX                      
 1C64 A4 87     LDY 87                   
@@ -2863,41 +2883,43 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1CA9 85 86     STA 86                   -- store y co-ordinate
 1CAB 60        RTS                      
 
-		-- calculate offset position and draw sprite
-		-- on entry, Y is the tile number
+		-- Draw area of room exposed by the movement
+		-- on entry, Y is the tile number that needs redrawing in part
+		--           X specifies the animation slot
+		--			 85 and 86 specify the new position of the sprite
 
 1CAC B9 00 0B  LDA 0B00,Y               -- get contents of tile Y
 1CAF 20 0D 1C  JSR 1C0D                 -- set address of sprite into 79 & 7A
-1CB2 BD 04 0C  LDA 0C04,X               -- get direction
+1CB2 BD 04 0C  LDA 0C04,X               -- get direction of sprite
 
 1CB5 C9 00     CMP #00                  -- is it left?
 1CB7 D0 08     BNE 1CC1                 -- nope, branch to next bit
 
-1CB9 A5 85     LDA 85                   -- get column position
+1CB9 A5 85     LDA 85                   -- get new column position of sprite
 1CBB 18        CLC                      
-1CBC 69 04     ADC #04                  -- add 4
-1CBE 4C 49 1C  JMP 1C49                 -- draw sprite
+1CBC 69 04     ADC #04                  -- add 4 to get position of exposed area
+1CBE 4C 49 1C  JMP 1C49                 -- draw vertical strip of room exposed by movement
 
 1CC1 C9 01     CMP #01                  -- is it right?
 1CC3 D0 08     BNE 1CCD                 -- nope, branch to next bit
 
 1CC5 A5 85     LDA 85                   -- get column position
 1CC7 38        SEC                      
-1CC8 E9 01     SBC #01                  -- subtract 1
-1CCA 4C 49 1C  JMP 1C49                 -- draw sprite
+1CC8 E9 01     SBC #01                  -- subtract 1 to get position of exposed area
+1CCA 4C 49 1C  JMP 1C49                 -- draw vertical strip of room exposed by movement
 
 1CCD C9 02     CMP #02                  -- is it up?
 1CCF D0 08     BNE 1CD9                 -- nope, branch to next bit
 
 1CD1 A5 86     LDA 86                   -- get row
 1CD3 18        CLC                      
-1CD4 69 04     ADC #04                  -- add 4
-1CD6 4C 58 1C  JMP 1C58                 -- draw sprite
+1CD4 69 04     ADC #04                  -- add 4 to get position of exposed area
+1CD6 4C 58 1C  JMP 1C58                 -- draw horizontal strip of room exposed by movement
 
 1CD9 A5 86     LDA 86                   -- get row
 1CDB 38        SEC                      
-1CDC E9 01     SBC #01                  -- subtract 1
-1CDE 4C 58 1C  JMP 1C58                 -- draw sprite
+1CDC E9 01     SBC #01                  -- subtract 1 to get position of exposed area
+1CDE 4C 58 1C  JMP 1C58                 -- draw horizontal strip of room exposed by movement
 
 		-- calculate memory address for frame of animation to show
 		-- on entry, X is the monster slot
@@ -3688,8 +3710,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 21B7 68        PLA                      
 21B8 60        RTS                      -- return
 
-21B9 20 28 19  JSR 1928                 -- draw background tiles behind sprite
-21BC A9 38     LDA #38                  
+21B9 20 28 19  JSR 1928                 -- reset animation slot and draw tiles where the monster used to be
+21BC A9 38     LDA #38                  -- set delay 
 21BE 20 5B 23  JSR 235B                 -- add monster to list of recently met
 21C1 BD 06 0C  LDA 0C06,X               -- get monster number
 21C4 A8        TAY                      
@@ -3930,6 +3952,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2358 4C D0 22  JMP 22D0                 -- continue loop
 
 		-- insert item into monster countdown list
+		-- on entry, A is the delay until the monster re-appears
+		--			 X is the animation slot containing the monster details to store
+		-- on exit, 0BC9 = FF for success (there was space in the list)
 
 235B 48        PHA                      -- push delay
 235C A0 0E     LDY #0E                  -- initialise loop counter
@@ -3939,7 +3964,9 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2365 88        DEY                      
 2366 88        DEY                      
 2367 10 F5     BPL 235E                 -- loop
-2369 30 0E     BMI 2379                 -- no free slots
+
+2369 30 0E     BMI 2379                 -- no free slots - RTS
+
 236B 8D C9 0B  STA 0BC9                 -- store &FF in the flag for the recent monster list
 236E BD 06 0C  LDA 0C06,X               -- get monster id
 2371 99 E0 0B  STA 0BE0,Y               -- store in slot
@@ -4683,7 +4710,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 2856 68        PLA                      
 2857 48        PHA                      
 2858 AA        TAX                      
-2859 20 28 19  JSR 1928                 -- draw background over monster position
+2859 20 28 19  JSR 1928                 -- reset animation slot, and draw tiles where egg used to be
 285C A9 11     LDA #11                  
 285E 4C 7D 28  JMP 287D                 -- play shot egg sound
 
