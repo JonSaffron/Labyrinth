@@ -38,7 +38,7 @@ namespace Labyrinth
 
             DrawEnergyRect(spriteBatch, isGameRunningSlowly);
             if (isPlayerExtant)
-                DrawEnergyBar(spriteBatch, this._displayedEnergy);
+                DrawRemainingEnergy(spriteBatch, this._displayedEnergy);
 
             DrawScoreAndLivesRect(spriteBatch);
             DrawScore(spriteBatch, this._displayedScore);
@@ -72,17 +72,20 @@ namespace Labyrinth
 
         private static void DrawEnergyRect(ISpriteBatch spriteBatch, bool isGameRunningSlowly)
             {
+            // outer frame
             var r = new Rectangle(22, 6, 148, 20);
             spriteBatch.DrawRectangle(r, isGameRunningSlowly ? Color.Red : Color.Blue);
             
+            // clear inner area
             r.Inflate(-2, -2);
             spriteBatch.DrawRectangle(r, Color.Black);
             
+            // always start off with energy bar in blue
             r = new Rectangle(32, 12, 128, 8);
             spriteBatch.DrawRectangle(r, Color.Blue);
             }
         
-        private void DrawEnergyBar(ISpriteBatch spriteBatch, int playerEnergy)
+        private void DrawRemainingEnergy(ISpriteBatch spriteBatch, int playerEnergy)
             {
             bool isAboutToDie = playerEnergy < 4;
             int barLength = isAboutToDie ? (playerEnergy + 1) << 4 : Math.Min(playerEnergy >> 2, 64);
