@@ -112,7 +112,7 @@ current monster data 400 to 7bf
 
 0bd0 - 0bd3		-- internal key number for directions left, right, up and down)
 0bd4			-- internal key number for fire
-bd5 bd6 bd7		-- score
+0bd5 0bd6 0bd7	-- score stored in Binary Coded Decimal so room for 6 digits with least significant in 0BD5
 
 bd9 bda bdb		-- ticks since start of game. bd9 is incremented every time the game loop has covered all animation slots
 
@@ -193,7 +193,8 @@ No.	Base 	Total	Flitter	Time/	Name				Index
 
 Effectively running in a mode 5 screen setup modified to have 256 pixels horizontally, and 160 pixels vertically, and rendered in the usual 4 colours
 
-18e0 - 18e1		-- joystick input information
+18E0			-- stores the ADC channel number (2 or 4)
+18E1			-- records which fire button is being used (bit 0 or bit 1)
 
 38bb - 38c2		-- start room numbers per level: 0 34 8 1c/1c 6b 47 73
 
@@ -497,10 +498,10 @@ definitions (initial frequency, initial volume, data change control, volume adju
 09C5 A6 88     LDX 88                   
 
 09C7 8A        TXA                      
-09C8 29 0F     AND #0F                  
-09CA 0A        ASL A                    
-09CB 0A        ASL A                    
-09CC 85 85     STA 85                   
+09C8 29 0F     AND #0F                  -- get low nibble of loop counter for x co-ordinate
+09CA 0A        ASL A                    -- double it
+09CB 0A        ASL A                    -- double it again
+09CC 85 85     STA 85                   -- store x co-ordinate
 09CE 8A        TXA                      
 09CF 20 5C 09  JSR 095C                 -- draw tile
 09D2 CA        DEX                      
@@ -521,8 +522,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 09E4 A2 00     LDX #00                  
 
 09E6 86 88     STX 88                   
-09E8 20 73 13  JSR 1373                 
-09EB 20 50 1D  JSR 1D50                 
+09E8 20 73 13  JSR 1373                 -- scroll screen right
+09EB 20 50 1D  JSR 1D50                 -- process playing sounds
 09EE A6 88     LDX 88                   
 09F0 8A        TXA                      
 09F1 29 F0     AND #F0                  
@@ -530,7 +531,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 09F4 4A        LSR A                    
 09F5 85 86     STA 86                   
 09F7 8A        TXA                      
-09F8 20 5C 09  JSR 095C                 
+09F8 20 5C 09  JSR 095C                 -- draw tile
 09FB 8A        TXA                      
 09FC 18        CLC                      
 09FD 69 10     ADC #10                  
@@ -553,8 +554,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 0A13 A2 9F     LDX #9F                  
 
 0A15 86 88     STX 88                   
-0A17 20 6D 13  JSR 136D                 
-0A1A 20 50 1D  JSR 1D50                 
+0A17 20 6D 13  JSR 136D                 -- scroll screen left
+0A1A 20 50 1D  JSR 1D50                 -- process playing sounds
 0A1D A6 88     LDX 88                   
 0A1F 8A        TXA                      
 0A20 29 F0     AND #F0                  
@@ -562,7 +563,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 0A23 4A        LSR A                    
 0A24 85 86     STA 86                   
 0A26 8A        TXA                      
-0A27 20 5C 09  JSR 095C                 
+0A27 20 5C 09  JSR 095C                 -- draw tile
 0A2A 8A        TXA                      
 0A2B 38        SEC                      
 0A2C E9 10     SBC #10                  
@@ -3219,8 +3220,8 @@ definitions (initial frequency, initial volume, data change control, volume adju
 1E8E 48        PHA                      
 1E8F 98        TYA                      
 1E90 48        PHA                      
-1E91 A9 13     LDA #13                  
-1E93 20 F4 FF  JSR FFF4                 
+1E91 A9 13     LDA #13                  -- osbyte &13 - wait for vertical refresh
+1E93 20 F4 FF  JSR FFF4                 -- call osbyte
 1E96 A2 00     LDX #00                  
 1E98 AC FD 0D  LDY 0DFD                 
 1E9B CA        DEX                      
@@ -3369,7 +3370,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 		-- initialise main game loop
 
-1F9A 20 7A 34  JSR 347A                 
+1F9A 20 7A 34  JSR 347A                 -- draw heads up display
 1F9D 20 6B 36  JSR 366B                 -- get input from keyboard or joystick
 1FA0 A2 00     LDX #00                  
 1FA2 AD C8 0B  LDA 0BC8                 -- get count of shots before decrementing energy
@@ -6060,7 +6061,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 315A 8D 00 0C  STA 0C00                 -- set player status
 315D A9 00     LDA #00                  
 315F 8D 0E 0C  STA 0C0E                 -- set energy to 0
-3162 20 E9 33  JSR 33E9                 
+3162 20 E9 33  JSR 33E9                 -- redraw energy bar
 3165 A9 13     LDA #13                  
 3167 20 D6 2D  JSR 2DD6                 -- play death sound 1
 316A A9 14     LDA #14                  
@@ -6353,98 +6354,121 @@ definitions (initial frequency, initial volume, data change control, volume adju
 3369 85 71     STA 71                   
 336B 60        RTS                      
 
-336C 29 0F     AND #0F                  
+		-- draw digit or life
+		-- on entry, A is the digit/life 
+
+336C 29 0F     AND #0F                  -- only look at bottom 4 bits
 336E 0A        ASL A                    
 336F 0A        ASL A                    
-3370 0A        ASL A                    
-3371 85 72     STA 72                   
-3373 A9 53     LDA #53                  
-3375 85 73     STA 73                   
-3377 A0 03     LDY #03                  
-3379 B1 72     LDA (72),Y               
-337B 91 74     STA (74),Y               
-337D 88        DEY                      
-337E 10 F9     BPL 3379                 
-3380 A5 72     LDA 72                   
+3370 0A        ASL A                    -- multiply by 8 to get the start of the required data
+3371 85 72     STA 72                   -- store low byte of address
+3373 A9 53     LDA #53                  -- digits and life stored at 5300 - 534f
+3375 85 73     STA 73                   -- store high byte of address
+
+		-- output top half of digit or life
+
+3377 A0 03     LDY #03                  -- init loop counter
+3379 B1 72     LDA (72),Y               -- get source
+337B 91 74     STA (74),Y               -- display it
+337D 88        DEY                      -- decrement loop counter
+337E 10 F9     BPL 3379                 -- loop around
+
+		-- output bottom half of digit or life
+
+3380 A5 72     LDA 72                   -- get low byte of source address
 3382 18        CLC                      
-3383 69 04     ADC #04                  
-3385 85 72     STA 72                   
-3387 A0 03     LDY #03                  
-3389 B1 72     LDA (72),Y               
-338B 91 70     STA (70),Y               
-338D 88        DEY                      
-338E 10 F9     BPL 3389                 
-3390 4C 13 35  JMP 3513                 
-3393 20 00 11  JSR 1100                 
-3396 A5 71     LDA 71                   
+3383 69 04     ADC #04                  -- add 4 to get lower half of digit/life
+3385 85 72     STA 72                   -- restore revised low byte of address
+3387 A0 03     LDY #03                  -- init loop counter
+3389 B1 72     LDA (72),Y               -- get source
+338B 91 70     STA (70),Y               -- display it
+338D 88        DEY                      -- decrement loop counter
+338E 10 F9     BPL 3389                 -- loop around
+3390 4C 13 35  JMP 3513                 -- jump to move destination addresses 4 pixels to the right
+
+		-- get addresses into screen memory
+		-- on entry, x and y specify the game co-ordinates (0 to 63, 0 to 19)
+		-- adjusts the X and Y provided slightly to a position 1/4 tile above that specified
+		-- stores the result in 74 and 75
+
+3393 20 00 11  JSR 1100                 -- calculate destination address in screen memory for X and Y into 70 and 71
+3396 A5 71     LDA 71                   -- get high byte
 3398 38        SEC                      
-3399 E9 02     SBC #02                  
-339B C9 58     CMP #58                  
-339D B0 03     BCS 33A2                 
+3399 E9 02     SBC #02                  -- subtract 2 to get line above
+339B C9 58     CMP #58                  -- compare to start of screen memory
+339D B0 03     BCS 33A2                 -- branch if still in range
 339F 18        CLC                      
-33A0 69 28     ADC #28                  
+33A0 69 28     ADC #28                  -- add enough to wrap around to the far end of screen memory
 33A2 85 75     STA 75                   
-33A4 A5 70     LDA 70                   
+33A4 A5 70     LDA 70                   -- get low byte of destination
 33A6 18        CLC                      
-33A7 69 04     ADC #04                  
+33A7 69 04     ADC #04                  -- add 4
 33A9 85 74     STA 74                   
 33AB 60        RTS                      
 
-		-- redraw score?
+		-- redraw score
 
 33AC 8A        TXA                      
 33AD 48        PHA                      
 33AE 98        TYA                      
 33AF 48        PHA                      
-33B0 A2 2D     LDX #2D                  
-33B2 A0 01     LDY #01                  
-33B4 20 93 33  JSR 3393                 
+33B0 A2 2D     LDX #2D                  -- specifies a position 180 pixels in from the left
+33B2 A0 01     LDY #01                  -- specifies a position 8 pixels down from the top
+33B4 20 93 33  JSR 3393                 -- get screen addresses
+
 33B7 A9 00     LDA #00                  
-33B9 85 76     STA 76                   
-33BB A2 02     LDX #02                  
-33BD BD D5 0B  LDA 0BD5,X               
-33C0 48        PHA                      
+33B9 85 76     STA 76                   -- set any-digits-shown indicator to false 
+33BB A2 02     LDX #02                  -- init loop counter for 3 bytes of score
+
+33BD BD D5 0B  LDA 0BD5,X               -- get byte of score
+33C0 48        PHA                      -- push so can retrieve lower 4 bits later
 33C1 4A        LSR A                    
 33C2 4A        LSR A                    
 33C3 4A        LSR A                    
-33C4 4A        LSR A                    
-33C5 20 D9 33  JSR 33D9                 
-33C8 68        PLA                      
-33C9 20 D9 33  JSR 33D9                 
-33CC CA        DEX                      
-33CD 10 EE     BPL 33BD                 
+33C4 4A        LSR A                    -- move most significant nibble into lowest 4 bits
+33C5 20 D9 33  JSR 33D9                 -- draw digit or gap for most significant nibble
+33C8 68        PLA                      -- retrieve value
+33C9 20 D9 33  JSR 33D9                 -- draw digit or gap for least significant nibble
+33CC CA        DEX                      -- decrement loop counter
+33CD 10 EE     BPL 33BD                 -- loop around for next byte of score
+
 33CF A9 00     LDA #00                  
-33D1 20 6C 33  JSR 336C                 
+33D1 20 6C 33  JSR 336C                 -- draw a final 0
 33D4 68        PLA                      
 33D5 A8        TAY                      
 33D6 68        PLA                      
 33D7 AA        TAX                      
 33D8 60        RTS                      
 
-33D9 A4 76     LDY 76                   
-33DB D0 8F     BNE 336C                 
-33DD C9 00     CMP #00                  
-33DF F0 04     BEQ 33E5                 
-33E1 E6 76     INC 76                   
-33E3 D0 87     BNE 336C                 
+		-- draw digit or gap
+
+33D9 A4 76     LDY 76                   -- get any-digits-shown indicator
+33DB D0 8F     BNE 336C                 -- indicator set so draw digit
+33DD C9 00     CMP #00                  -- is the digit a zero
+33DF F0 04     BEQ 33E5                 -- if it is, then jump to draw a blank
+33E1 E6 76     INC 76                   -- set the indicator
+33E3 D0 87     BNE 336C                 -- always jump to draw digit
+
 33E5 A9 0B     LDA #0B                  
-33E7 D0 83     BNE 336C                 
+33E7 D0 83     BNE 336C                 -- draw a blank gap
 
 		-- redraw energy bar
+		-- on entry, 0C0E specifies the energy the player has remaining
+		--			 0C00 specifies if the player is alive (5 if so)
 
 33E9 8A        TXA                      
 33EA 48        PHA                      
 33EB 98        TYA                      
 33EC 48        PHA                      
-33ED A2 04     LDX #04                  
-33EF A0 01     LDY #01                  
-33F1 20 93 33  JSR 3393                 
-33F4 A5 74     LDA 74                   
+33ED A2 04     LDX #04                  -- energy bar starts 16 pixels from the left edge
+33EF A0 01     LDY #01                  -- specifies a y position 8 pixels down
+33F1 20 93 33  JSR 3393                 -- sets 70/71 and 74/75 to the screen memory address of the left hand edge of the energy bar
+33F4 A5 74     LDA 74                   -- get the low byte of the destination address
 33F6 18        CLC                      
-33F7 69 02     ADC #02                  
-33F9 85 74     STA 74                   
-33FB A9 F0     LDA #F0                  
-33FD 85 88     STA 88                   
+33F7 69 02     ADC #02                  -- adjust y co-ordinate down 2
+33F9 85 74     STA 74                   -- so 74/75 now point to 16,6 and 70/71 point to 16,8
+33FB A9 F0     LDA #F0                  -- specifies 4 green pixels
+33FD 85 88     STA 88                   -- 88 is used to store the colour
 33FF AD 0E 0C  LDA 0C0E                 -- get player energy
 3402 C9 04     CMP #04                  
 3404 B0 1E     BCS 3424                 -- branch if energy greater or equal to 4
@@ -6470,11 +6494,11 @@ definitions (initial frequency, initial volume, data change control, volume adju
 3414 69 01     ADC #01                  -- add 1 to energy amount
 3416 0A        ASL A                    -- double it
 3417 0A        ASL A                    -- double it again
-3418 85 77     STA 77                   
-341A A9 0F     LDA #0F                  
-341C 85 88     STA 88                   
-341E A9 00     LDA #00                  
-3420 85 76     STA 76                   
+3418 85 77     STA 77                   -- store the number of sets of 4 pixels to draw
+341A A9 0F     LDA #0F                  -- specify 4 red pixels
+341C 85 88     STA 88                   -- store
+341E A9 00     LDA #00                  -- no remainer
+3420 85 76     STA 76                   -- store the remainder pixels to draw
 3422 F0 0F     BEQ 3433                 
 
 		-- draw for when energy green (4 or above)
@@ -6483,145 +6507,185 @@ definitions (initial frequency, initial volume, data change control, volume adju
 3427 4A        LSR A                    -- divide by 2
 3428 4A        LSR A                    -- divide by 2
 3429 48        PHA                      
-342A 29 03     AND #03                  
-342C 85 76     STA 76                   
+342A 29 03     AND #03                  -- get remaining pixels
+342C 85 76     STA 76                   -- store remainder
 342E 68        PLA                      
 342F 4A        LSR A                    
 3430 4A        LSR A                    
-3431 85 77     STA 77                   
+3431 85 77     STA 77                   -- store the number of sets of 4 pixels to draw
 
-3433 A2 10     LDX #10                  
-3435 A5 77     LDA 77                   
-3437 F0 0F     BEQ 3448                 
-3439 A5 88     LDA 88                   
-343B 20 70 34  JSR 3470                 
-343E 20 13 35  JSR 3513                 
-3441 C6 77     DEC 77                   
-3443 CA        DEX                      
-3444 D0 EF     BNE 3435                 
-3446 F0 23     BEQ 346B                 
-3448 A5 76     LDA 76                   
-344A F0 14     BEQ 3460                 
-344C A8        TAY                      
-344D A9 0F     LDA #0F                  
-344F 4A        LSR A                    
-3450 88        DEY                      
-3451 D0 FC     BNE 344F                 
-3453 09 F0     ORA #F0                  
-3455 20 70 34  JSR 3470                 
-3458 20 13 35  JSR 3513                 
-345B CA        DEX                      
-345C D0 02     BNE 3460                 
-345E F0 0B     BEQ 346B                 
-3460 A9 FF     LDA #FF                  
-3462 20 70 34  JSR 3470                 
-3465 20 13 35  JSR 3513                 
-3468 CA        DEX                      
-3469 D0 F5     BNE 3460                 
-346B 68        PLA                      
+3433 A2 10     LDX #10                  -- init loop counter (bar is 16 x 4 pixels wide)
+
+3435 A5 77     LDA 77                   -- get the number of full 4 pixel sets remaining
+3437 F0 0F     BEQ 3448                 -- branch if none left
+3439 A5 88     LDA 88                   -- get colour to use
+343B 20 70 34  JSR 3470                 -- draw 4 pixels of the bar
+343E 20 13 35  JSR 3513                 -- move destination addresses 4 pixels to the right
+3441 C6 77     DEC 77                   -- decrement the number of full 4 pixels sets remaining
+3443 CA        DEX                      -- decrement the loop counter for the length of the energy bar
+3444 D0 EF     BNE 3435                 -- loop around if haven't fully drawn the bar
+3446 F0 23     BEQ 346B                 -- drawn everything, branch to cleanup and RTS
+
+3448 A5 76     LDA 76                   -- get the remainder energy
+344A F0 14     BEQ 3460                 -- branch if no remainder
+344C A8        TAY                      -- init loop counter with the remainder
+344D A9 0F     LDA #0F                  -- start with 00001111 which would end up as full blue
+344F 4A        LSR A                    -- shift a 1 away to turn a pixel green
+3450 88        DEY                      -- decrement loop counter
+3451 D0 FC     BNE 344F                 -- loop around
+3453 09 F0     ORA #F0                  -- make colour 1111xxx1 to turn each x into a blue, remaining 0 will be green
+3455 20 70 34  JSR 3470                 -- draw 4 pixels of the bar
+3458 20 13 35  JSR 3513                 -- move destination addresses 4 pixels to the right
+345B CA        DEX                      -- decrement the loop counter for the length of the energy bar
+345C D0 02     BNE 3460                 -- branch over if there's still more energy bar to draw
+345E F0 0B     BEQ 346B                 -- drawn everything
+
+3460 A9 FF     LDA #FF                  -- specifies a blue colour
+3462 20 70 34  JSR 3470                 -- draw 4 pixels of the bar
+3465 20 13 35  JSR 3513                 -- move destination addresses 4 pixels to the right
+3468 CA        DEX                      -- decrement the loop counter for the length of the energy bar
+3469 D0 F5     BNE 3460                 -- loop around if haven't fully drawn the bar
+
+346B 68        PLA                      -- cleanup and exit
 346C A8        TAY                      
 346D 68        PLA                      
 346E AA        TAX                      
 346F 60        RTS                      
-3470 A0 01     LDY #01                  
-3472 91 70     STA (70),Y               
-3474 91 74     STA (74),Y               
-3476 88        DEY                      
-3477 10 F9     BPL 3472                 
+
+3470 A0 01     LDY #01                  -- init loop counter
+3472 91 70     STA (70),Y               -- set lines 4 and 3 of the bar
+3474 91 74     STA (74),Y               -- set lines 2 and 1 of the bar
+3476 88        DEY                      -- decrement loop counter
+3477 10 F9     BPL 3472                 -- loop around
 3479 60        RTS                      
 
-347A A2 02     LDX #02                  
-347C A0 01     LDY #01                  
-347E A9 12     LDA #12                  
+		-- draw heads up display
+
+347A A2 02     LDX #02                  -- specifies a position 8 pixels in from the left
+347C A0 01     LDY #01                  -- specifies a position 8 pixels down from the top
+347E A9 12     LDA #12                  -- frame will be 12x4 pixels wide
 3480 85 76     STA 76                   
-3482 20 C8 34  JSR 34C8                 
-3485 A2 2A     LDX #2A                  
-3487 A0 01     LDY #01                  
-3489 A9 12     LDA #12                  
+3482 20 C8 34  JSR 34C8                 -- draw frame for the energy level
+
+3485 A2 2A     LDX #2A                  -- specifies a position 168 pixels in from the left
+3487 A0 01     LDY #01                  -- specifies a position 8 pixels down from the top
+3489 A9 12     LDA #12                  -- frame will be 12x4 pixels wide
 348B 85 76     STA 76                   
-348D 20 C8 34  JSR 34C8                 
-3490 20 AC 33  JSR 33AC                 
-3493 20 E9 33  JSR 33E9                 
-3496 A2 34     LDX #34                  
-3498 A0 01     LDY #01                  
-349A 20 93 33  JSR 3393                 
-349D AD C2 0B  LDA 0BC2                 
-34A0 85 76     STA 76                   
-34A2 A2 04     LDX #04                  
-34A4 A5 76     LDA 76                   
-34A6 C9 04     CMP #04                  
-34A8 B0 10     BCS 34BA                 
+348D 20 C8 34  JSR 34C8                 -- draw frame for score and lives
+
+3490 20 AC 33  JSR 33AC                 -- redraw score
+3493 20 E9 33  JSR 33E9                 -- redraw energy bar
+
+3496 A2 34     LDX #34                  -- specifies a position 280 pixels in from the left
+3498 A0 01     LDY #01                  -- specifies a position 8 pixels down from the top
+349A 20 93 33  JSR 3393                 -- get the screen addresses for that position
+349D AD C2 0B  LDA 0BC2                 -- get number of lives remaining
+34A0 85 76     STA 76                   -- store as indicator of what to draw
+
+34A2 A2 04     LDX #04                  -- init loop counter to draw 4 items
+
+34A4 A5 76     LDA 76                   -- get indicator
+34A6 C9 04     CMP #04                  -- if indication is 4 or more then lives will be drawn, otherwise a blank space
+34A8 B0 10     BCS 34BA                 -- branch to drawing lives
 34AA A9 0B     LDA #0B                  
-34AC 20 6C 33  JSR 336C                 
+34AC 20 6C 33  JSR 336C                 -- draw a blank space
 34AF A9 0B     LDA #0B                  
-34B1 20 6C 33  JSR 336C                 
-34B4 E6 76     INC 76                   
-34B6 CA        DEX                      
-34B7 D0 EB     BNE 34A4                 
+34B1 20 6C 33  JSR 336C                 -- draw a blank space
+34B4 E6 76     INC 76                   -- increment indicator (lives are right aligned)
+34B6 CA        DEX                      -- decrement loop counter
+34B7 D0 EB     BNE 34A4                 -- loop for next space to draw in
 34B9 60        RTS                      
+
 34BA A9 0A     LDA #0A                  
-34BC 20 6C 33  JSR 336C                 
+34BC 20 6C 33  JSR 336C                 -- draw left half of life
 34BF A9 0C     LDA #0C                  
-34C1 20 6C 33  JSR 336C                 
-34C4 CA        DEX                      
-34C5 D0 F3     BNE 34BA                 
+34C1 20 6C 33  JSR 336C                 -- draw right half of life
+34C4 CA        DEX                      -- decrement loop counter
+34C5 D0 F3     BNE 34BA                 -- loop for next space to draw in
 34C7 60        RTS                      
-34C8 20 93 33  JSR 3393                 
-34CB A5 74     LDA 74                   
+
+		-- draw frame for energy level or score
+		-- on entry, X and Y specify the game co-ordinates (0 to 63, 0 to 19)
+		--			 76 specifies the width of the frame
+
+34C8 20 93 33  JSR 3393                 -- get addresses into screen memory into 70/71 and 74/75
+34CB A5 74     LDA 74                   -- get the low byte of the address for the top part of the frame
 34CD 38        SEC                      
-34CE E9 01     SBC #01                  
-34D0 85 74     STA 74                   
-34D2 A0 04     LDY #04                  
-34D4 B1 70     LDA (70),Y               
-34D6 09 11     ORA #11                  
-34D8 91 70     STA (70),Y               
-34DA B1 74     LDA (74),Y               
-34DC 09 11     ORA #11                  
-34DE 91 74     STA (74),Y               
-34E0 88        DEY                      
-34E1 10 F1     BPL 34D4                 
-34E3 20 13 35  JSR 3513                 
-34E6 A0 04     LDY #04                  
-34E8 A9 00     LDA #00                  
-34EA 91 70     STA (70),Y               
-34EC 91 74     STA (74),Y               
-34EE 88        DEY                      
-34EF 10 F9     BPL 34EA                 
-34F1 C8        INY                      
-34F2 A9 FF     LDA #FF                  
-34F4 91 74     STA (74),Y               
-34F6 A0 04     LDY #04                  
-34F8 91 70     STA (70),Y               
-34FA 20 13 35  JSR 3513                 
-34FD C6 76     DEC 76                   
-34FF D0 E5     BNE 34E6                 
-3501 A0 04     LDY #04                  
-3503 B1 70     LDA (70),Y               
-3505 09 88     ORA #88                  
-3507 91 70     STA (70),Y               
-3509 B1 74     LDA (74),Y               
-350B 09 88     ORA #88                  
-350D 91 74     STA (74),Y               
-350F 88        DEY                      
-3510 10 F1     BPL 3503                 
+34CE E9 01     SBC #01                  -- subtract 1 to move up a pixel
+34D0 85 74     STA 74                   -- store new co-ordinate
+
+		-- draw left side of frame
+
+34D2 A0 04     LDY #04                  -- init loop counter for 5x2 lines
+
+34D4 B1 70     LDA (70),Y               -- get current contents of screen memory for bottom of frame
+34D6 09 11     ORA #11                  -- update to set right hand pixel blue
+34D8 91 70     STA (70),Y               -- store updated screen memory
+
+34DA B1 74     LDA (74),Y               -- get current contents of screen memory for top of frame
+34DC 09 11     ORA #11                  -- update to set right hand pixel blue
+34DE 91 74     STA (74),Y               -- store updated screen memory
+
+34E0 88        DEY                      -- decrement loop counter
+34E1 10 F1     BPL 34D4                 -- loop for next line
+
+34E3 20 13 35  JSR 3513                 -- move destination addresses 4 pixels to the right 
+
+		-- draw top and bottom lines of frame
+
+34E6 A0 04     LDY #04                  -- init loop counter for 5x2 lines
+34E8 A9 00     LDA #00                  -- prepare 4 black pixels
+
+34EA 91 70     STA (70),Y               -- set screen memory for bottom of frame
+34EC 91 74     STA (74),Y               -- set screen memory for top of frame
+34EE 88        DEY                      -- decrement loop counter
+34EF 10 F9     BPL 34EA                 -- loop for next line
+
+34F1 C8        INY                      -- set Y = 0
+34F2 A9 FF     LDA #FF                  -- prepare 4 blue pixels
+34F4 91 74     STA (74),Y               -- set blue line at top of frame
+34F6 A0 04     LDY #04                  -- 4 lines down from 70/71
+34F8 91 70     STA (70),Y               -- set blue line of bottom of frame
+34FA 20 13 35  JSR 3513                 -- move destination addresses 4 pixels to the right
+34FD C6 76     DEC 76                   -- decrement counter for width of frame
+34FF D0 E5     BNE 34E6                 -- loop around for next section of frame
+
+		-- draw right hand side of frame
+
+3501 A0 04     LDY #04                  -- init loop counter for 5x2 lines
+
+3503 B1 70     LDA (70),Y               -- get current contents of screen memory for bottom of frame
+3505 09 88     ORA #88                  -- update to set left hand pixel blue
+3507 91 70     STA (70),Y               -- store updated screen memory
+
+3509 B1 74     LDA (74),Y               -- get current contents of screen memory for top of frame
+350B 09 88     ORA #88                  -- update to set left hand pixel blue
+350D 91 74     STA (74),Y               -- store updated screen memory
+
+350F 88        DEY                      -- decrement loop counter
+3510 10 F1     BPL 3503                 -- loop for next line
 3512 60        RTS                      
-3513 A5 70     LDA 70                   
+
+		-- update 70/71 and 74/75 to a position 4 pixels to the right
+
+3513 A5 70     LDA 70                   -- get low byte
 3515 18        CLC                      
-3516 69 08     ADC #08                  
+3516 69 08     ADC #08                  -- moves 4 pixels right
 3518 85 70     STA 70                   
 351A 90 08     BCC 3524                 
-351C E6 71     INC 71                   
+351C E6 71     INC 71                   -- on carry, must increment the high byte
 351E 10 04     BPL 3524                 
-3520 A9 58     LDA #58                  
+3520 A9 58     LDA #58                  -- on carry, reset back to start of screen memory
 3522 85 71     STA 71                   
-3524 A5 74     LDA 74                   
+
+3524 A5 74     LDA 74                   -- get low byte
 3526 18        CLC                      
-3527 69 08     ADC #08                  
+3527 69 08     ADC #08                  -- moves 4 pixels right
 3529 85 74     STA 74                   
 352B 90 08     BCC 3535                 
-352D E6 75     INC 75                   
+352D E6 75     INC 75                   -- on carry, must increment the high byte
 352F 10 04     BPL 3535                 
-3531 A9 58     LDA #58                  
+3531 A9 58     LDA #58                  -- on carry, reset back to start of screen memory
 3533 85 75     STA 75                   
 3535 60        RTS                      
 
@@ -6727,52 +6791,60 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 35EB 8A        TXA                      
 35EC 48        PHA                      
-35ED A9 80     LDA #80                  
-35EF AE E0 18  LDX 18E0                 
-35F2 20 F4 FF  JSR FFF4                 -- osbyte &80: read adc channel 
-35F5 84 70     STY 70                   
-35F7 AE E0 18  LDX 18E0                 
-35FA CA        DEX                      
-35FB 20 F4 FF  JSR FFF4                 -- osbyte &80: read adc channel 
-35FE 84 71     STY 71                   
+35ED A9 80     LDA #80                  -- osbyte &80: read adc channel 
+35EF AE E0 18  LDX 18E0                 -- get ADC channel number
+35F2 20 F4 FF  JSR FFF4                 -- call osbyte
+35F5 84 70     STY 70                   -- store high byte read from channel for up/down motion
+35F7 AE E0 18  LDX 18E0                 -- get ADC channel number
+35FA CA        DEX                      -- decrement channel number
+35FB 20 F4 FF  JSR FFF4                 -- call osbyte
+35FE 84 71     STY 71                   -- store high byte read from channel for left/right motion
 3600 98        TYA                      
-3601 20 57 36  JSR 3657                 
-3604 85 73     STA 73                   
+3601 20 57 36  JSR 3657                 -- normalise value
+3604 85 73     STA 73                   -- 73 will store left/right value
 3606 A5 70     LDA 70                   
-3608 20 57 36  JSR 3657                 
+3608 20 57 36  JSR 3657                 -- normalise value
 360B C9 3C     CMP #3C                  
 360D 90 15     BCC 3624                 
 360F C5 73     CMP 73                   
-3611 B0 1D     BCS 3630                 
-3613 AD D0 0B  LDA 0BD0                 
-3616 85 8C     STA 8C                   
-3618 A5 71     LDA 71                   
+3611 B0 1D     BCS 3630                 -- jump to set up/down 
+
+3613 AD D0 0B  LDA 0BD0                 -- get key number for left
+3616 85 8C     STA 8C                   -- record left direction required
+3618 A5 71     LDA 71                   -- get left/right value (low = right)
 361A 30 22     BMI 363E                 
-361C AD D1 0B  LDA 0BD1                 
-361F 85 8C     STA 8C                   
-3621 4C 3E 36  JMP 363E                 
+361C AD D1 0B  LDA 0BD1                 -- get key number for right
+361F 85 8C     STA 8C                   -- record right direction required
+3621 4C 3E 36  JMP 363E                 -- jump to check for fire
+
 3624 A5 73     LDA 73                   
 3626 C9 3C     CMP #3C                  
 3628 B0 E9     BCS 3613                 
+
 362A A9 00     LDA #00                  
-362C 85 8C     STA 8C                   
-362E F0 0E     BEQ 363E                 
-3630 AD D2 0B  LDA 0BD2                 
+362C 85 8C     STA 8C                   -- clear direction status
+362E F0 0E     BEQ 363E                 -- always jump to check for fire
+
+3630 AD D2 0B  LDA 0BD2                 -- get key number for up
 3633 85 8C     STA 8C                   
-3635 A5 70     LDA 70                   
+3635 A5 70     LDA 70                   -- get up/down value (low = down)
 3637 30 05     BMI 363E                 
-3639 AD D3 0B  LDA 0BD3                 
+3639 AD D3 0B  LDA 0BD3                 -- get key number for down
 363C 85 8C     STA 8C                   
+
+		-- check if player wants to fire
+
 363E A9 00     LDA #00                  
-3640 85 8D     STA 8D                   
-3642 A9 80     LDA #80                  
-3644 A2 00     LDX #00                  
-3646 20 F4 FF  JSR FFF4                 
+3640 85 8D     STA 8D                   -- clear fire key status
+
+3642 A9 80     LDA #80                  -- osbyte &80
+3644 A2 00     LDX #00                  -- action 0 is to return fire button status in X
+3646 20 F4 FF  JSR FFF4                 -- call osbyte
 3649 8A        TXA                      
-364A 2D E1 18  AND 18E1                 
-364D F0 05     BEQ 3654                 
-364F AD D4 0B  LDA 0BD4                 
-3652 85 8D     STA 8D                   
+364A 2D E1 18  AND 18E1                 -- mask for fire button bit
+364D F0 05     BEQ 3654                 -- branch over if bit not set
+364F AD D4 0B  LDA 0BD4                 -- get key number for fire
+3652 85 8D     STA 8D                   -- record fire button is pressed
 3654 68        PLA                      
 3655 AA        TAX                      
 3656 60        RTS                      
@@ -7066,20 +7138,20 @@ definitions (initial frequency, initial volume, data change control, volume adju
 3861 A5 EC     LDA EC                   -- get last key pressed
 3863 C9 E2     CMP #E2                  
 3865 F0 14     BEQ 387B                 -- space pressed, so branch
-3867 A2 00     LDX #00                  
-3869 A9 80     LDA #80                  
-386B 20 F4 FF  JSR FFF4                 -- osbyte &80 - read adc channel 
+3867 A2 00     LDX #00                  -- osbyte &80 action 0 gets fire button status into X
+3869 A9 80     LDA #80                  -- osbyte &80 - read adc channel 
+386B 20 F4 FF  JSR FFF4                 -- call osbyte
 386E 8A        TXA                      
 386F F0 E8     BEQ 3859                 -- nothing pressed? then loop
-3871 8D E1 18  STA 18E1                 
-3874 0A        ASL A                    
-3875 8D E0 18  STA 18E0                 
+3871 8D E1 18  STA 18E1                 -- store which fire button pressed 
+3874 0A        ASL A                    -- double the value
+3875 8D E0 18  STA 18E0                 -- store
 3878 CE CF 0B  DEC 0BCF                 -- set joystick input
 387B 4C 8D 36  JMP 368D                 -- jump to initialise game
 
 		-- clear screen memory
 
-387E A9 58     LDA #58                  
+387E A9 58     LDA #58                  -- screen memory starts at &5800
 3880 85 71     STA 71                   
 3882 A9 00     LDA #00                  
 3884 85 70     STA 70                   
@@ -7088,7 +7160,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 3889 C8        INY                      
 388A D0 FB     BNE 3887                 
 388C E6 71     INC 71                   
-388E 10 F7     BPL 3887                 
+388E 10 F7     BPL 3887                 -- loop around until &7FFF
 3890 60        RTS                      
 
 		-- has block crushed anything?
@@ -7120,15 +7192,16 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 		-- start room numbers per level
 
-38BB 00
-38BC 34
-38BD 08
-38BE 1C
-38BF 1C
-38C0 6B
-38C1 47
-38C2 73
-38C3 00
+38BB 00									-- level 1
+38BC 34									-- level 2
+38BD 08									-- level 3
+38BE 1C									-- level 4 (bottom)
+38BF 1C									-- level 4 (top)
+38C0 6B									-- level 5
+38C1 47									-- level 6
+38C2 73									-- level 7
+
+38C3 00									-- unused
 
 		-- show high scores
 
@@ -7401,6 +7474,25 @@ definitions (initial frequency, initial volume, data change control, volume adju
 
 		-- sprite definitions
 
+Each 16x16 sprite takes 64 bytes to define (4 pixels per byte) stored in this way:
+
+00	10	20	30
+01	11	21	31
+02	12	22	32
+03	13	23	33
+04	14	24	34
+05	15	25	35
+06	16	26	36
+07	17	27	37
+08	18	28	38
+09	19	29	39
+0A	1A	2A	3A
+0B	1B	2B	3B
+0C	1C	2C	3C
+0D	1D	2D	3D
+0E	1E	2E	3E
+0F	1F	2F	3F
+
 4100 - 413F								-- 8 wall mask rounded bottom left
 4140 - 417F								-- 9 wall mask rounded top right
 4180 - 41BF								-- A wall mask rounded top left
@@ -7486,8 +7578,10 @@ definitions (initial frequency, initial volume, data change control, volume adju
 5240 - 527F								-- 4D horizontal monster shot
 5280 - 52BF								-- 4E vertical monster shot
 52C0 - 52FF								-- 4F grave
-5300 - 533F								-- 50 digits & life 1/2
-5340 - 537F								-- 51 digits & life 2/2
+5300 - 537F								-- 50 & 51 digits & life
+										-- each digit is 8 bytes long, and is located at offset n*8
+										-- the life icon is shown by combining 8 bytes at offset 10 with 8 bytes at offset 12
+										-- an empty gap can be shown by using offset 11
 5380 - 53BF								-- 52 egg 1/2
 53C0 - 53FF								-- 53 egg 2/2
 5400 - 543F								-- 54 bang 1/4
