@@ -33,12 +33,24 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public static readonly PropertyDef<bool> MonsterScoresWhenKilled = new PropertyDef<bool>(nameof(MonsterScoresWhenKilled), false);
 
+        /// <summary>
+        /// Indicates whether the object instantly kills the player when touched
+        /// </summary>
         public static readonly PropertyDef<bool> DeadlyToTouch = new PropertyDef<bool>(nameof(DeadlyToTouch), false);
 
+        /// <summary>
+        /// Defines how an object reduces the player's energy
+        /// </summary>
         public static readonly PropertyDef<Func<Player, int>> InjuriousToPlayer = new PropertyDef<Func<Player, int>>(nameof(InjuriousToPlayer), player => 0);
 
+        /// <summary>
+        /// Defines how an object increases the player's energy
+        /// </summary>
         public static readonly PropertyDef<Func<Player, int>> CurativeToPlayer = new PropertyDef<Func<Player, int>>(nameof(CurativeToPlayer), player => 0);
 
+        /// <summary>
+        /// Defines an object's movement strategy
+        /// </summary>
         public static readonly PropertyDef<IMovementChecker> MovementChecker = new PropertyDef<IMovementChecker>(nameof(MovementChecker), new MovementChecker());
         }
     }
