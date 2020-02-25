@@ -2,5 +2,6 @@
     {
     class WorldCompleted
         {
+        // no members
         }
     }

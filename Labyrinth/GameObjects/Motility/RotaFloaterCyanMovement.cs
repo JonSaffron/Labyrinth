@@ -9,16 +9,16 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
             
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
             var result = 
                 ShouldMakeAnAggressiveMove(this.Monster) 
                     ? GetIntendedDirection(this.Monster) 
                     : base.GetDesiredDirection();
-            return base.GetConfirmedSafeDirection(result);
+            return base.GetConfirmedDirection(result);
             }
 
-        private SelectedDirection GetIntendedDirection(Monster monster)
+        private PossibleDirection GetIntendedDirection(Monster monster)
             {
             TilePos tp = monster.TilePosition;
             TilePos playerPosition = GlobalServices.GameState.Player.TilePosition;
@@ -29,16 +29,16 @@ namespace Labyrinth.GameObjects.Motility
             if (orientation == Orientation.Horizontal)
                 {
                 if (yDiff > 0)
-                    return SelectedDirection.UnsafeDirection(Direction.Up);
+                    return PossibleDirection.Up;
                 if (yDiff < 0)
-                    return SelectedDirection.UnsafeDirection(Direction.Down);
+                    return PossibleDirection.Down;
                 }
             else if (orientation == Orientation.Vertical)
                 {
                 if (xDiff > 0)
-                    return SelectedDirection.UnsafeDirection(Direction.Left);
+                    return PossibleDirection.Left;
                 if (xDiff < 0)
-                    return SelectedDirection.UnsafeDirection(Direction.Right);
+                    return PossibleDirection.Right;
                 }
 
             return MonsterMovement.RandomDirection();
@@ -46,7 +46,7 @@ namespace Labyrinth.GameObjects.Motility
 
         private static bool ShouldMakeAnAggressiveMove(Monster monster)
             {
-            var result = GlobalServices.Randomness.Next(7) == 0 && MonsterMovement.IsPlayerNearby(monster);
+            var result = GlobalServices.Randomness.Next(7) == 0 && monster.IsPlayerNearby();
             return result;
             }
         }

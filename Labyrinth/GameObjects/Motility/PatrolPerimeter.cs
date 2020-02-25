@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
@@ -29,16 +30,16 @@ namespace Labyrinth.GameObjects.Motility
             this._state = new AttachedState(this);
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
-            Direction result = this._state.GetDirection();
+            ConfirmedDirection result = this._state.GetDirection();
             this._lastDirection = result;
             return result;
             }
 
         private interface IPatrolState
             {
-            Direction GetDirection();
+            ConfirmedDirection GetDirection();
             }
 
         private class AttachedState : IPatrolState
@@ -50,7 +51,7 @@ namespace Labyrinth.GameObjects.Motility
                 this._parent = patrolPerimeter;
                 }
 
-            public Direction GetDirection()
+            public ConfirmedDirection GetDirection()
                 { 
                 using (var directions = GetPreferredDirections(this._parent._lastDirection, this._parent.CurrentAttachmentToWall).GetEnumerator())
                     {
@@ -66,17 +67,17 @@ namespace Labyrinth.GameObjects.Motility
                             newDirection = directions.Current;
                             if (this._parent.Monster.CanMoveInDirection(newDirection))
                                 {
-                                return newDirection;
+                                return new ConfirmedDirection(newDirection);
                                 }
                             }
                         // can't go in any direction
-                        return Direction.None;
+                        return ConfirmedDirection.None;
                         }
 
                     // monster could go in any direction as it's not next to any wall
                     // - turn the corner to follow the wall and hopefully we'll re-attach next move 
                     this._parent._state = new TurningCornerState(this._parent);
-                    return newDirection;
+                    return new ConfirmedDirection(newDirection);
                     } 
                 }
             }
@@ -90,7 +91,7 @@ namespace Labyrinth.GameObjects.Motility
                 this._parent = patrolPerimeter;
                 }
 
-            public Direction GetDirection()
+            public ConfirmedDirection GetDirection()
                 {
                 using (var directions = GetPreferredDirections(this._parent._lastDirection, this._parent.CurrentAttachmentToWall).GetEnumerator())
                     {
@@ -104,13 +105,13 @@ namespace Labyrinth.GameObjects.Motility
                         newDirection = directions.Current;
                         if (this._parent.Monster.CanMoveInDirection(newDirection))
                             {
-                            return newDirection;
+                            return new ConfirmedDirection(newDirection);
                             }
                         this._parent._state = new AttachedState(this._parent);
                         }
 
                     // can't go in any direction
-                    return Direction.None;
+                    return ConfirmedDirection.None;
                     }
                 }
             }
@@ -124,11 +125,11 @@ namespace Labyrinth.GameObjects.Motility
                 this._parent = patrolPerimeter;
                 }
 
-            public Direction GetDirection()
+            public ConfirmedDirection GetDirection()
                 {
                 if (this._parent.Monster.CanMoveInDirection(this._parent._lastDirection))
                     {
-                    return this._parent._lastDirection;
+                    return new ConfirmedDirection(this._parent._lastDirection);
                     }
 
                 // Aha. We have bumped into something so we need to re-attach.
@@ -143,13 +144,13 @@ namespace Labyrinth.GameObjects.Motility
                         var newDirection = directions.Current;
                         if (this._parent.Monster.CanMoveInDirection(newDirection))
                             {
-                            return newDirection;
+                            return new ConfirmedDirection(newDirection);
                             }
                         }
                     }
 
                 // can't go in any direction
-                return Direction.None;
+                return ConfirmedDirection.None;
                 }
             }
 

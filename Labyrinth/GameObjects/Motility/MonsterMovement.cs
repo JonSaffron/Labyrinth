@@ -8,10 +8,10 @@ namespace Labyrinth.GameObjects.Motility
         {
         private static readonly Direction[] Directions = { Direction.Left, Direction.Right, Direction.Up, Direction.Down };
         
-        public static SelectedDirection RandomDirection()
+        public static PossibleDirection RandomDirection()
             {
             int d = GlobalServices.Randomness.Next(256) & 3;
-            return SelectedDirection.UnsafeDirection(Directions[d]);
+            return new PossibleDirection(Directions[d]);
             }
 
         public static bool IsPlayerInWeaponSights(this Monster m)
@@ -59,61 +59,70 @@ namespace Labyrinth.GameObjects.Motility
         /// <param name="intendedDirection">The direction the monster hopes to move in</param>
         /// <param name="feasibleDirection">The direction the monster can move in, or Direction.None if it's unable to move</param>
         /// <returns>True if the monster can move in the intendedDirection, or False otherwise</returns>
-        public static bool ConfirmDirectionToMoveIn(this Monster m, Direction intendedDirection, out Direction feasibleDirection)
+        public static bool ConfirmDirectionToMoveIn(this Monster m, IDirectionChosen intendedDirection, out ConfirmedDirection feasibleDirection)
             {
-            if (intendedDirection == Direction.None)
-                throw new ArgumentOutOfRangeException(nameof(intendedDirection), "Cannot specify Direction.None.");
-
-            if (m.CanMoveInDirection(intendedDirection))
+            if (intendedDirection.Direction == Direction.None)
                 {
-                feasibleDirection = intendedDirection;
+                feasibleDirection = ConfirmedDirection.None;
                 return true;
                 }
 
-            var directionToTry = intendedDirection;
+            if (intendedDirection is ConfirmedDirection confirmedDirection)
+                {
+                feasibleDirection = confirmedDirection;
+                return true;
+                }
+
+            if (m.CanMoveInDirection(intendedDirection.Direction))
+                {
+                feasibleDirection = intendedDirection.Confirm();
+                return true;
+                }
+
+            var directionToTry = new PossibleDirection(intendedDirection.Direction);
             for (int i = 0; i < 3; i++)
                 {
                 directionToTry = GetNextDirection(directionToTry);
-                if (m.CanMoveInDirection(directionToTry))
+                if (m.CanMoveInDirection(directionToTry.Direction))
                     {
-                    feasibleDirection = directionToTry;
+                    feasibleDirection = directionToTry.Confirm();
                     return false;
                     }
                 }
 
-            feasibleDirection = Direction.None;
+            feasibleDirection = ConfirmedDirection.None;
             return false;
             }
 
-        private static Direction GetNextDirection(Direction d)
+        private static PossibleDirection GetNextDirection(PossibleDirection d)
             {
-            switch (d)
+            switch (d.Direction)
                 {
                 case Direction.Left:
-                    return Direction.Right;
+                    return PossibleDirection.Right;
                 case Direction.Right:
-                    return Direction.Up;
+                    return PossibleDirection.Up;
                 case Direction.Up:
-                    return Direction.Down;
+                    return PossibleDirection.Down;
                 case Direction.Down:
-                    return Direction.Left;
+                    return PossibleDirection.Left;
                 default:
                     throw new InvalidOperationException();
                 }
             }
 
-        public static SelectedDirection AlterDirectionByVeeringAway(Direction d)
+        public static PossibleDirection AlterDirectionByVeeringAway(Direction d)
             {
             switch (d)
                 {
                 case Direction.Left:
-                    return SelectedDirection.UnsafeDirection(Direction.Up);
+                    return PossibleDirection.Up;
                 case Direction.Right:
-                    return SelectedDirection.UnsafeDirection(Direction.Down);
+                    return PossibleDirection.Down;
                 case Direction.Up:
-                    return SelectedDirection.UnsafeDirection(Direction.Left);
+                    return PossibleDirection.Left;
                 case Direction.Down:
-                    return SelectedDirection.UnsafeDirection(Direction.Right);
+                    return PossibleDirection.Right;
                 default:
                     throw new InvalidOperationException();
                 }
@@ -124,41 +133,51 @@ namespace Labyrinth.GameObjects.Motility
         /// </summary>
         /// <param name="m">The monster to determine the movement for</param>
         /// <returns>The direction that brings the monster closer to the player</returns>
-        /// <remarks>This will never return Direction.None</remarks>
-        public static SelectedDirection DetermineDirectionTowardsPlayer(this Monster m)
-            {
-            TilePos playerPos = GlobalServices.GameState.Player.TilePosition;
-            int diffX = m.TilePosition.X - playerPos.X; 
-            Direction result;
-            if (diffX != 0)
-                {
-                result = diffX > 0 ? Direction.Left : Direction.Right;
-
-                if (m.CanMoveInDirection(result))
-                    return SelectedDirection.SafeDirection(result);
-                }
-
-            int diffY = m.TilePosition.Y - playerPos.Y;
-            result = diffY > 0 ? Direction.Up : Direction.Down;
-            return SelectedDirection.UnsafeDirection(result);
-            }
-
-        public static SelectedDirection DetermineDirectionAwayFromPlayer(this Monster m)
+        /// <remarks>
+        /// For left/right movement, the direction of travel is confirmed as safe.
+        /// For up/down movement, the direction of travel is not necessarily safe.
+        /// This will never return Direction.None
+        /// </remarks>
+        public static IDirectionChosen DetermineDirectionTowardsPlayer(this Monster m)
             {
             TilePos playerPos = GlobalServices.GameState.Player.TilePosition;
             int diffX = m.TilePosition.X - playerPos.X;
-            Direction result;
             if (diffX != 0)
                 {
-                result = diffX > 0 ? Direction.Right : Direction.Left;
+                var result = diffX > 0 ? PossibleDirection.Left : PossibleDirection.Right;
 
-                if (m.CanMoveInDirection(result))
-                    return SelectedDirection.SafeDirection(result);
+                if (m.CanMoveInDirection(result.Direction))
+                    return result.Confirm();
                 }
 
             int diffY = m.TilePosition.Y - playerPos.Y;
-            result = diffY > 0 ? Direction.Down : Direction.Up;
-            return SelectedDirection.UnsafeDirection(result);
+            return diffY > 0 ? PossibleDirection.Up : PossibleDirection.Down;
+            }
+
+        /// <summary>
+        /// This works in the same way to the original code. Movement to the right or left will be made in preference to up/down.
+        /// </summary>
+        /// <param name="m">The monster to determine the movement for</param>
+        /// <returns>The direction that brings the monster away from the player</returns>
+        /// <remarks>
+        /// For left/right movement, the direction of travel is confirmed as safe.
+        /// For up/down movement, the direction of travel is not necessarily safe.
+        /// This will never return Direction.None
+        /// </remarks>
+        public static IDirectionChosen DetermineDirectionAwayFromPlayer(this Monster m)
+            {
+            TilePos playerPos = GlobalServices.GameState.Player.TilePosition;
+            int diffX = m.TilePosition.X - playerPos.X;
+            if (diffX != 0)
+                {
+                var result = diffX > 0 ? PossibleDirection.Right : PossibleDirection.Left;
+
+                if (m.CanMoveInDirection(result.Direction))
+                    return result.Confirm();
+                }
+
+            int diffY = m.TilePosition.Y - playerPos.Y;
+            return diffY > 0 ? PossibleDirection.Down : PossibleDirection.Up;
             }
         }
     }

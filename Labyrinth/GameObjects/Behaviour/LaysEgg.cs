@@ -34,38 +34,6 @@ namespace Labyrinth.GameObjects.Behaviour
                 GlobalServices.GameState.AddMonster(md);
                 }
             }
-/*
-        public static MonsterDef FromExistingMonster([NotNull] Monster monster)
-            {
-            if (monster == null)
-                throw new ArgumentNullException();
-
-            var result = new MonsterDef
-                {
-                Breed = monster.Breed,
-                Position = monster.TilePosition.ToPosition(),
-                Energy = monster.OriginalEnergy,
-                Mobility = monster.Mobility,
-                InitialDirection = Direction.None,
-                ChangeRooms = monster.ChangeRooms,
-                IsEgg = false,
-                LaysMushrooms = monster.Behaviours.Has<LaysMushroom>(),
-                LaysEggs = monster.Behaviours.Has<LaysEgg>(),
-                SplitsOnHit = monster.Behaviours.Has<SpawnsUponDeath>(),
-                ShootsAtPlayer = monster.Behaviours.Has<ShootsAtPlayer>(),
-                ShootsOnceProvoked = monster.Behaviours.Has<StartsShootingWhenHurt>(),
-                ShotsBounceOff = monster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection,
-                IsActive = monster.IsActive
-                };
-
-            if (result.Mobility == MonsterMobility.Patrolling)
-                {
-                throw new InvalidOperationException("Cannot clone a monster which is patrolling.");
-                }
-
-            return result;
-            }
-*/
 
         private bool ShouldAttemptToLayEgg()
             {

@@ -122,10 +122,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataStructures\DirectionChosen.cs" />
     <Compile Include="DataStructures\GameStartParameters.cs" />
     <Compile Include="DataStructures\Grid.cs" />
     <Compile Include="DataStructures\PlayerControl.cs" />
-    <Compile Include="DataStructures\SelectedDirection.cs" />
     <Compile Include="DataStructures\SimpleList.cs" />
     <Compile Include="GameObjectEventArgs.cs" />
     <Compile Include="GameObjects\BoundaryCurrentRoom.cs" />

@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
@@ -10,14 +11,14 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
             var result = 
                 ShouldMakeAnAggressiveMove(this.Monster) 
                     ? this.Monster.DetermineDirectionTowardsPlayer() 
                     : MonsterMovement.RandomDirection();
             
-            return base.GetConfirmedSafeDirection(result);
+            return base.GetConfirmedDirection(result);
             }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

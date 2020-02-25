@@ -1,7 +1,9 @@
-﻿namespace Labyrinth
+﻿using Labyrinth.DataStructures;
+
+namespace Labyrinth
     {
     public interface IMonsterMotion
         {
-        Direction GetDirection();
+        ConfirmedDirection GetDirection();
         }
     }

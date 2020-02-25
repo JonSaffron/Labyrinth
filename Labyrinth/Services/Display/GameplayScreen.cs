@@ -202,7 +202,7 @@ namespace Labyrinth.Services.Display
             {
             // Load the WorldToLoad.
             var world = new World(this._gameStartParameters.WorldLoader, worldData);
-            //GlobalServices.GameState.AddPotion(GlobalServices.GameState.Player.TilePosition.GetPositionAfterMoving(Direction.Left, 4).ToPosition());
+            GlobalServices.GameState.AddPotion(GlobalServices.GameState.Player.TilePosition.GetPositionAfterMoving(Direction.Right, 4).ToPosition());
             world.ResetWorldForStartingNewLife();
             return world;
             }

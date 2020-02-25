@@ -13,39 +13,15 @@ namespace Labyrinth.GameObjects.Motility
             this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
-        public abstract Direction GetDirection();
+        public abstract ConfirmedDirection GetDirection();
 
-        protected Direction GetConfirmedSafeDirection(SelectedDirection selectedDirection)
+        protected ConfirmedDirection GetConfirmedDirection(IDirectionChosen selectedDirection)
             {
-            if (selectedDirection.IsConfirmedSafe || selectedDirection.Direction == Direction.None)
-                return selectedDirection.Direction;
+            if (selectedDirection is ConfirmedDirection || selectedDirection.Direction == Direction.None)
+                return selectedDirection.Confirm();
             
-            this.Monster.ConfirmDirectionToMoveIn(selectedDirection.Direction, out Direction feasibleDirection);
+            this.Monster.ConfirmDirectionToMoveIn(selectedDirection, out ConfirmedDirection feasibleDirection);
             return feasibleDirection;
             }
-
-/*        protected virtual Direction DetermineDirection()
-            {
-            return Direction.None;
-            }
-
-        public virtual bool SetDirectionAndDestination()
-            {
-            Direction direction = DetermineDirection();
-            if (direction != Direction.None)
-                {
-                this.Monster.ConfirmDirectionToMoveIn(direction, out Direction feasibleDirection);
-                direction = feasibleDirection;
-                }
-
-            if (direction == Direction.None)
-                {
-                this.Monster.StandStill();
-                return false;
-                }
-
-            this.Monster.Move(direction);
-            return true;
-            }*/
         }
     }

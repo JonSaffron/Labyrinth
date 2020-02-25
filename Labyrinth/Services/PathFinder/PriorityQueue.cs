@@ -72,7 +72,7 @@ namespace Labyrinth.Services.PathFinder
             this._data.RemoveAt(lastIndex);
 
             lastIndex -= 1; // last index (after removal)
-            int parentIndex = 0; // parent index. start at front of pq
+            int parentIndex = 0; // parent index. start at front of priority queue
             while (true)
                 {
                 int leftChildOfParentIndex = parentIndex * 2 + 1; // left child index of parent
@@ -80,7 +80,7 @@ namespace Labyrinth.Services.PathFinder
                     break;  // no children so done
 
                 int rightChildOfParentIndex = leftChildOfParentIndex + 1;     // right child
-                if (rightChildOfParentIndex <= lastIndex && this._data[rightChildOfParentIndex].Key.CompareTo(this._data[leftChildOfParentIndex].Key) < 0) // if there is a rc (ci + 1), and it is smaller than left child, use the rc instead
+                if (rightChildOfParentIndex <= lastIndex && this._data[rightChildOfParentIndex].Key.CompareTo(this._data[leftChildOfParentIndex].Key) < 0) // if there is a right child (ci + 1), and it is smaller than left child, use the right child instead
                     leftChildOfParentIndex = rightChildOfParentIndex;
 
                 if (this._data[parentIndex].Key.CompareTo(this._data[leftChildOfParentIndex].Key) <= 0) 
@@ -135,7 +135,7 @@ namespace Labyrinth.Services.PathFinder
         /// <summary>
         /// Checks whether the queue is correctly constructed
         /// </summary>
-        /// <returns>True is the queue's binary heap is consistent, otherwise false.</returns>
+        /// <returns>True if the queue's binary heap is consistent, otherwise false.</returns>
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public bool IsConsistent()
             {
@@ -150,7 +150,7 @@ namespace Labyrinth.Services.PathFinder
                 int rightChildIndex = 2 * parentIndex + 2; // right child index
 
                 if (leftChildIndex <= lastIndex && this._data[parentIndex].Key.CompareTo(this._data[leftChildIndex].Key) > 0) 
-                    return false; // if lc exists and it's greater than parent then bad.
+                    return false; // if left child exists and it's greater than parent then bad.
 
                 if (rightChildIndex <= lastIndex && this._data[parentIndex].Key.CompareTo(this._data[rightChildIndex].Key) > 0) 
                     return false; // check the right child too.

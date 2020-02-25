@@ -17,15 +17,15 @@ namespace Labyrinth.GameObjects.Motility
             this.CurrentDirection = initialDirection;
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
-            SelectedDirection desiredDirection = GetDesiredDirection();
-            var result = GetConfirmedSafeDirection(desiredDirection);
+            IDirectionChosen desiredDirection = GetDesiredDirection();
+            var result = GetConfirmedDirection(desiredDirection);
             this.CurrentDirection = result;
             return result;
             }
 
-        protected SelectedDirection GetDesiredDirection()
+        protected IDirectionChosen GetDesiredDirection()
             {
             if (this.CurrentDirection == Direction.None)
                 {
@@ -43,10 +43,10 @@ namespace Labyrinth.GameObjects.Motility
                 }
 
             if (this.Monster.CanMoveInDirection(this.CurrentDirection))
-                return SelectedDirection.SafeDirection(this.CurrentDirection);
+                return new ConfirmedDirection(this.CurrentDirection);
 
             var reversed = this.CurrentDirection.Reversed();
-            return SelectedDirection.UnsafeDirection(reversed);
+            return new PossibleDirection(reversed);
             }
 
         private bool ShouldMonsterFollowPlayerIntoAnotherRoom()

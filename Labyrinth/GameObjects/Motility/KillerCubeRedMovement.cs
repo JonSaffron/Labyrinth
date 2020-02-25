@@ -11,39 +11,41 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
             var direction = ShouldMakeAnAggressiveMove() ? GetIntendedDirection() : base.GetDesiredDirection();
-            var result = base.GetConfirmedSafeDirection(direction);
+            var result = base.GetConfirmedDirection(direction);
             return result;
             }
 
-        private SelectedDirection GetIntendedDirection()
+        private PossibleDirection GetIntendedDirection()
             {
             TilePos tp = this.Monster.TilePosition;
                 
-            SelectedDirection newDirection;
+            PossibleDirection newDirection;
             TilePos playerPosition = GlobalServices.GameState.Player.TilePosition;
             int yDiff = tp.Y - playerPosition.Y;    // +ve and the player is above, -ve and the player is below
             int xDiff = tp.X - playerPosition.X;    // +ve and the player is to the left, -ve and the player is to the right
                 
             // if on the same row or column as the player then will be at risk of being shot
             if ((xDiff == 0 || yDiff == 0) && ShouldMakeMoveToAvoidTrouble())
+                {
                 newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
+                }
             else if ((this.CurrentDirection == Direction.Left && xDiff <= -5) || (this.CurrentDirection == Direction.Right && xDiff >= 5))
                 {
-                newDirection = SelectedDirection.UnsafeDirection(yDiff > 0 ? Direction.Up : Direction.Down);
+                newDirection = yDiff > 0 ? PossibleDirection.Up : PossibleDirection.Down;
                 }
             else if ((this.CurrentDirection == Direction.Up && yDiff <= -5) || (this.CurrentDirection == Direction.Down && yDiff >= 5))
                 {
-                newDirection = SelectedDirection.UnsafeDirection(xDiff > 0 ? Direction.Left : Direction.Right);
+                newDirection = xDiff > 0 ? PossibleDirection.Left : PossibleDirection.Right;
                 }
             else if (GlobalServices.Randomness.Next(16) == 0)
                 {
                 newDirection = GetRandomPerpendicularDirection(this.CurrentDirection);
                 }
             else
-                newDirection = SelectedDirection.UnsafeDirection(this.CurrentDirection);
+                newDirection = new PossibleDirection(this.CurrentDirection);
                 
             return newDirection;
             }
@@ -53,7 +55,7 @@ namespace Labyrinth.GameObjects.Motility
             return GlobalServices.Randomness.Next(8) == 0; 
             }
 
-        private static SelectedDirection GetRandomPerpendicularDirection(Direction currentDirection)
+        private static PossibleDirection GetRandomPerpendicularDirection(Direction currentDirection)
             {
             if (currentDirection == Direction.None)
                 return MonsterMovement.RandomDirection();
@@ -63,9 +65,9 @@ namespace Labyrinth.GameObjects.Motility
             switch (orientation)
                 {
                 case Orientation.Horizontal:
-                    return SelectedDirection.UnsafeDirection(whichWay ? Direction.Up : Direction.Down);
+                    return whichWay ? PossibleDirection.Up : PossibleDirection.Down;
                 case Orientation.Vertical:
-                    return SelectedDirection.UnsafeDirection(whichWay ? Direction.Left : Direction.Right);
+                    return whichWay ? PossibleDirection.Left : PossibleDirection.Right;
                 }
             throw new InvalidOperationException();
             }

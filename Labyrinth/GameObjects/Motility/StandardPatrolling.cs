@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
@@ -15,21 +16,21 @@ namespace Labyrinth.GameObjects.Motility
             this._currentDirection = initialDirection;
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
-            var result = GetDesiredDirection();
+            var result = GetConfirmedDirection();
             this._currentDirection = result;
             return result;
             }
 
-        private Direction GetDesiredDirection()
+        private ConfirmedDirection GetConfirmedDirection()
             {
             if (this.Monster.CanMoveInDirection(this._currentDirection))
-                return this._currentDirection;
+                return new ConfirmedDirection(this._currentDirection);
             var reversed = this._currentDirection.Reversed();
             if (this.Monster.CanMoveInDirection(reversed))
-                return reversed;
-            return Direction.None;
+                return new ConfirmedDirection(reversed);
+            return ConfirmedDirection.None;
             }
         }
     }

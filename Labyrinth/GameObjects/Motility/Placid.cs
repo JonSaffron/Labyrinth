@@ -10,13 +10,13 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
-            SelectedDirection direction = GetDesiredDirection();
-            return base.GetConfirmedSafeDirection(direction);
+            IDirectionChosen direction = GetDesiredDirection();
+            return base.GetConfirmedDirection(direction);
             }
 
-        private SelectedDirection GetDesiredDirection()
+        private IDirectionChosen GetDesiredDirection()
             {
             if (this.Monster.ChangeRooms == ChangeRooms.FollowsPlayer 
                 && !this.Monster.IsPlayerInSameRoom() 

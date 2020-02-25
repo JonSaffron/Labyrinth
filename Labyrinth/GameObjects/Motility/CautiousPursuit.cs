@@ -11,13 +11,12 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
             var method = IsScaredOfPlayer(this.Monster) 
-                ? (Func<Monster, SelectedDirection>) MoveAwayFromPlayer 
-                                           : MoveTowardsPlayer;
+                ? (Func<Monster, IDirectionChosen>) MoveAwayFromPlayer : MoveTowardsPlayer;
             var selectedDirection = method(this.Monster);
-            return GetConfirmedSafeDirection(selectedDirection);
+            return GetConfirmedDirection(selectedDirection);
             }
 
         private static bool IsScaredOfPlayer(Monster m)
@@ -27,16 +26,16 @@ namespace Labyrinth.GameObjects.Motility
             return result;
             }
 
-        public static SelectedDirection MoveTowardsPlayer(Monster monster)
+        public static IDirectionChosen MoveTowardsPlayer(Monster monster)
             {
             bool shouldMoveRandomly = GlobalServices.Randomness.Test(7);
-            SelectedDirection result = shouldMoveRandomly
+            IDirectionChosen result = shouldMoveRandomly
                 ? MonsterMovement.RandomDirection() 
                 : monster.DetermineDirectionTowardsPlayer();
             return result;
             }
 
-        private static SelectedDirection MoveAwayFromPlayer(Monster monster)
+        private static IDirectionChosen MoveAwayFromPlayer(Monster monster)
             {
             var awayFromPlayer = monster.DetermineDirectionAwayFromPlayer();
             bool shouldDodgeWhilstFleeing = GlobalServices.Randomness.Test(3);

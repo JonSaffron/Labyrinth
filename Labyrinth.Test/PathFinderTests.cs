@@ -16,7 +16,7 @@ namespace Labyrinth.Test
         private SearchParameters _searchParameters;
 
         [SetUp]
-        public void Initialize()
+        public void Initialise()
             {
             //  □ □ □ □ □ □ □
             //  □ □ □ □ □ □ □
@@ -31,10 +31,12 @@ namespace Labyrinth.Test
                 for (int x = 0; x < this._map.GetLength(0); x++)
                     _map[x, y] = true;
 
-            this._searchParameters = new SearchParameters();
-            this._searchParameters.StartLocation = new TilePos(1, 2);
-            this._searchParameters.EndLocation = new TilePos(5, 2);
-            this._searchParameters.CanBeOccupied = CanOccupyPositionOnMap;
+            this._searchParameters = new SearchParameters
+                {
+                StartLocation = new TilePos(1, 2),
+                EndLocation = new TilePos(5, 2),
+                CanBeOccupied = CanOccupyPositionOnMap
+                };
             }
 
         private bool CanOccupyPositionOnMap(TilePos tp)

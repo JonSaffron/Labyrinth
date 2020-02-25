@@ -44,7 +44,6 @@ namespace Labyrinth.DataStructures
                 }
             }
 
-
         public void Add(T item) 
             {
             if (this.Length == this._items.Length)
@@ -77,7 +76,8 @@ namespace Labyrinth.DataStructures
             this.Length--;
             }
 
-        private void EnsureCapacity(int min) {
+        private void EnsureCapacity(int min) 
+            {
             const int maxArrayLength = 0X7FEFFFFF;
 
             if (_items.Length < min) {

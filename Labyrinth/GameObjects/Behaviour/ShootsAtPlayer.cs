@@ -33,7 +33,7 @@ namespace Labyrinth.GameObjects.Behaviour
                 this.IsInSameRoom()
                 && !this.Random.Test(0x03) // 3 in 4 chance is deliberate
                 && this.Player.IsAlive()
-                && MonsterMovement.IsPlayerInWeaponSights(this.Monster);
+                && this.Monster.IsPlayerInWeaponSights();
             return result;
             }
         }

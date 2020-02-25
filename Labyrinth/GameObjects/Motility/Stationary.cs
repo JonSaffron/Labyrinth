@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
@@ -8,9 +9,9 @@ namespace Labyrinth.GameObjects.Motility
             {
             }
 
-        public override Direction GetDirection()
+        public override ConfirmedDirection GetDirection()
             {
-            return Direction.None;
+            return ConfirmedDirection.None;
             }
         }
     }
