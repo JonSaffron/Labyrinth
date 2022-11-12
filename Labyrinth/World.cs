@@ -419,6 +419,7 @@ namespace Labyrinth
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
                 (sender, args) => this._worldReturnType = WorldReturnType.FinishedWorld);
 
+            // TODO: also need to prevent player energy going down
             GlobalServices.PlayerInput.Enabled = false;
 
             GlobalServices.Game.Components.Add(new FlashEffectTimer(this));

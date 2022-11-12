@@ -1,9 +1,22 @@
+Texture2D SpriteTexture;
 sampler s0;
 bool flashOn;
 
-float4 PixelShaderFunction(float2 coords: TEXCOORD0) : COLOR0
+sampler2D SpriteTextureSampler = sampler_state
+{
+	Texture = <SpriteTexture>;
+};
+
+struct VertexShaderOutput
+{
+	float4 Position : SV_POSITION;
+	float4 Color : COLOR0;
+	float2 TextureCoordinates : TEXCOORD0;
+};
+
+float4 PixelShaderFunction(VertexShaderOutput input) : COLOR
 	{
-	float4 colour = tex2D(s0, coords);
+	float4 colour = tex2D(s0, input.TextureCoordinates);
 	
 	if (colour.a > 0)
 		{
@@ -29,6 +42,6 @@ technique Technique1
 	{
 	pass Pass1
 		{
-		PixelShader = compile ps_2_0 PixelShaderFunction();
+		PixelShader = compile ps_4_0_level_9_1 PixelShaderFunction();
 		}
 	}
