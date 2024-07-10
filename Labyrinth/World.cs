@@ -28,7 +28,13 @@ namespace Labyrinth
         private Effect _endOfWorldEffect;
         private readonly WorldWindow _worldWindow;
         private bool _applyEndOfWorldEffect;
-        private WorldReturnType _worldReturnType = WorldReturnType.Normal;
+        private WorldReturnType _worldReturnTypeBacking = WorldReturnType.Normal;
+
+        private WorldReturnType WorldReturnType
+            {
+            get => this._worldReturnTypeBacking;
+            set => this._worldReturnTypeBacking = value;
+            }
 
         public World([NotNull] IWorldLoader worldLoader, [NotNull] string world)
             {
@@ -130,7 +136,7 @@ namespace Labyrinth
             MoveNearbyMonstersToASafeDistance();
 
             GlobalServices.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
-            this._worldReturnType = WorldReturnType.Normal;
+            this.WorldReturnType = WorldReturnType.Normal;
             GlobalServices.PlayerInput.Enabled = true;
             }
 
@@ -200,7 +206,7 @@ namespace Labyrinth
             
             UpdateGameItems(gameTime);
             
-            return this._worldReturnType;
+            return this.WorldReturnType;
             }
 
         private void UpdateGameItems(GameTime gameTime)
@@ -406,7 +412,7 @@ namespace Labyrinth
         private void LostLife(LifeLost lifeLost)
             {
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, 
-                (sender, args) => this._worldReturnType = WorldReturnType.LostLife);
+                (sender, args) => this.WorldReturnType = WorldReturnType.LostLife);
             }
 
         private void WorldCompleted(WorldCompleted worldCompleted)
@@ -417,7 +423,7 @@ namespace Labyrinth
                 }
 
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
-                (sender, args) => this._worldReturnType = WorldReturnType.FinishedWorld);
+                (sender, args) => this.WorldReturnType = WorldReturnType.FinishedWorld);
 
             // TODO: also need to prevent player energy going down
             GlobalServices.PlayerInput.Enabled = false;

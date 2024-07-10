@@ -21,6 +21,7 @@ namespace Labyrinth.Services.Display
         private readonly GameInput _gameInput;
         private World _world;
         private int _livesRemaining;
+        private bool _normalPlay = true;
 
         /// <summary>
         /// Constructor.
@@ -87,21 +88,29 @@ namespace Labyrinth.Services.Display
                 {
                 // ReSharper disable once PossibleNullReferenceException
                 WorldReturnType worldReturnType = this._world.Update(gameTime);
-                switch (worldReturnType)
+                if (worldReturnType == WorldReturnType.Normal)
                     {
-                    case WorldReturnType.FinishedWorld:
-                        //this._world = null;
-                        //this._livesRemaining++;
-                        // todo this isn't the ideal place for this
-                        VolumeControl.Instance.SaveState();
-                        this.ScreenManager.Game.Exit();
-                        break;
-            
-                    case WorldReturnType.LostLife:
-                        var screenWipe = new ScreenWipe();
-                        screenWipe.Wiped += LostLife;
-                        ScreenManager.AddScreen(screenWipe, this.ControllingPlayer);
-                        break;
+                    this._normalPlay = true;
+                    }
+                else if (this._normalPlay)
+                    {
+                    this._normalPlay = false;
+                    switch (worldReturnType)
+                        {
+                        case WorldReturnType.FinishedWorld:
+                            //this._world = null;
+                            //this._livesRemaining++;
+                            // todo this isn't the ideal place for this
+                            VolumeControl.Instance.SaveState();
+                            this.ScreenManager.Game.Exit();
+                            break;
+
+                        case WorldReturnType.LostLife:
+                            var screenWipe = new ScreenWipe();
+                            screenWipe.Wiped += LostLife;
+                            ScreenManager.AddScreen(screenWipe, this.ControllingPlayer);
+                            break;
+                        }
                     }
                 }
 

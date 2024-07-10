@@ -39,7 +39,9 @@ namespace Labyrinth
             if (this._timeRemaining.Ticks <= 0)
                 {
                 this._callBack(this, new EventArgs());
+                this.Enabled = false;
                 this.Dispose();
+                // ToDo ensure this object gets removed from GameComponents collection
                 }
             }
 
