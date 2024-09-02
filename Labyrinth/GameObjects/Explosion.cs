@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this._animationPlayer = new LinearAnimation(this, "Sprites/Props/LongBang", 8);
             this._isExtant = true;
             this.Originator = originator;
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Bang);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.Bang);
             }
 
         public override bool IsExtant => base.IsExtant && this._isExtant;

@@ -1,76 +1,181 @@
-﻿using JetBrains.Annotations;
+﻿using System;
 using Labyrinth.Services.Sound;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
-    static class GlobalServices
+    internal static class GlobalServices
         {
-        private static ISoundPlayer _soundPlayer;
+        private static ISoundPlayer? _soundPlayer;
         private static readonly ISoundPlayer NullSoundPlayer = new NullSoundPlayer();
 
         public static ISoundPlayer SoundPlayer => _soundPlayer ?? NullSoundPlayer;
 
         public static void SetSoundPlayer(ISoundPlayer soundPlayer)
             {
-            _soundPlayer = soundPlayer;
+            _soundPlayer = soundPlayer ?? throw new ArgumentNullException(nameof(soundPlayer));
             }
 
-        public static ISpriteLibrary SpriteLibrary { get; private set; }
+        //
+
+        private static ISpriteLibrary? _spriteLibrary;
+
+        public static ISpriteLibrary SpriteLibrary
+            {
+            get
+                {
+                if (_spriteLibrary == null)
+                    throw new InvalidOperationException("SpriteLibrary has not been set.");
+                return _spriteLibrary;
+                }
+            }
 
         public static void SetSpriteLibrary(ISpriteLibrary spriteLibrary)
             {
-            SpriteLibrary = spriteLibrary;
+            _spriteLibrary = spriteLibrary ?? throw new ArgumentNullException(nameof(spriteLibrary));
             }
 
-        public static GameState GameState { get; private set; }
+        //
 
-        public static void SetGameState(GameState gameState)
+        public static GameState GameState
             {
-            GameState = gameState;
+            get
+                {
+                if (_world == null)
+                    throw new InvalidOperationException("World has not been set.");
+                return _world.GameState;
+                }
             }
 
-        public static Game Game { get; private set; }
+        //
+
+        private static Game? _game;
+
+        public static Game Game
+            {
+            get
+                {
+                if (_game == null)
+                    throw new InvalidOperationException("Game has not been set.");
+                return _game;
+                }
+            }
 
         public static void SetGame(Game game)
             {
-            Game = game;
+            _game = game ?? throw new ArgumentNullException(nameof(game));
             }
 
-        public static World World { get; private set; }
+        //
+
+        private static World? _world;
+
+        public static World World
+            {
+            get
+                {
+                if (_world == null)
+                    throw new InvalidOperationException("World has not been set.");
+                return _world;
+                }
+            }
         
         public static void SetWorld(World world)
             {
-            World = world;
+            _world = world ?? throw new ArgumentNullException(nameof(world));
             }
 
-        public static IPlayerInput PlayerInput { get; private set; }
+        public static void ClearWorld()
+            {
+            _world = null;
+            }
+
+        //
+
+        private static IPlayerInput? _playerInput;
+
+        public static IPlayerInput PlayerInput
+            {
+            get
+                {
+                if (_playerInput == null)
+                    throw new InvalidOperationException("PlayerInput has not been set.");
+                return _playerInput;
+                }
+            }
 
         public static void SetPlayerInput(IPlayerInput playerInput)
             {
-            PlayerInput = playerInput;
+            _playerInput = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
             }
 
-        public static ICentrePointProvider CentrePointProvider { [CanBeNull] get; private set; }
+        //
+
+        private static ICentrePointProvider? _centrePointProvider;
+        private static readonly ICentrePointProvider NullCentrePointProvider = new NullCentrePointProvider();
+        
+        public static ICentrePointProvider CentrePointProvider => _centrePointProvider ?? NullCentrePointProvider;
 
         public static void SetCentrePointProvider(ICentrePointProvider centrePointProvider)
             {
-            CentrePointProvider = centrePointProvider;
+            _centrePointProvider = centrePointProvider ?? throw new ArgumentNullException(nameof(centrePointProvider));
             }
 
-        public static IRandomness Randomness { get; private set; }
+        //
+
+        private static IRandomness? _randomness;
+
+        public static IRandomness Randomness
+            {
+            get
+                {
+                if (_randomness == null)
+                    throw new InvalidOperationException("Randomness has not been set.");
+                return _randomness;
+                }
+            }
 
         public static void SetRandomness(IRandomness randomness)
             {
-            Randomness = randomness;
+            _randomness = randomness ?? throw new ArgumentNullException(nameof(randomness));
+            }
+
+        //
+
+        private static IBoundMovementFactory? _boundMovementFactory;
+        
+        public static IBoundMovementFactory BoundMovementFactory
+            {
+            get
+                {
+                if (_boundMovementFactory == null)
+                    throw new InvalidOperationException("BoundMovementFactory has not been set.");
+                return _boundMovementFactory;
+                }
             }
 
         public static void SetBoundMovementFactory(IBoundMovementFactory boundMovementFactory)
             {
-            BoundMovementFactory = boundMovementFactory;
+            _boundMovementFactory = boundMovementFactory ?? throw new ArgumentNullException(nameof(boundMovementFactory));
             }
 
-        public static IBoundMovementFactory BoundMovementFactory { get; private set; }
+        //
 
+        private static IScoreKeeper? _scoreKeeper;
+
+        public static IScoreKeeper ScoreKeeper
+            {
+            get
+                {
+                if (_scoreKeeper == null)
+                    throw new InvalidOperationException("ScoreKeeper has not been set.");
+                return _scoreKeeper;
+                }
+            }
+
+        public static void SetScoreKeeper(IScoreKeeper scoreKeeper)
+            {
+            _scoreKeeper = scoreKeeper ?? throw new ArgumentNullException(nameof(scoreKeeper));
+            }
         }
     }

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
-using Labyrinth.Services.Display;
-using Labyrinth.Services.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -23,17 +20,16 @@ namespace Labyrinth.Test
             this.Components.Add(new SuppressDrawComponent(this));
             }
 
-        public void LoadLevel(string worldData)
+        public void LoadWorld(string worldData)
             {
-            var gameStartParameters = new GameStartParameters
-                {
-                WorldToLoad = worldData, 
-                WorldLoader = new WorldLoaderForTest()
-                };
+            var worldLoader = new WorldLoaderForTest(worldData);
+            var boundMovementFactory = new BoundMovementFactory(worldLoader.WorldSize);
+            GlobalServices.SetBoundMovementFactory(boundMovementFactory);
 
-            var gamePlayScreen = new GameplayScreen(gameStartParameters, new InputState());
-            this._world = gamePlayScreen.LoadWorld(worldData);
-            GlobalServices.SetWorld(this._world);
+            this._world = new World(worldLoader);
+            GlobalServices.SetWorld(_world);
+
+            _world.ResetWorldForStartingNewLife();
             }
 
         protected override void Update(GameTime gameTime)
@@ -61,62 +57,58 @@ namespace Labyrinth.Test
 
         private static bool IsAnythingMoving()
             {
-            foreach (var item in GlobalServices.GameState.GetSurvivingInteractiveItems())
+            foreach (var item in GlobalServices.GameState.GetSurvivingGameObjects())
                 {
                 if (item is IStandardShot)
                     return true;
                 if (item is Bang)
                     return true;
-                if (item.CurrentMovement.IsMoving)
+                if (item is IMovingItem { CurrentMovement.IsMoving: true })
                     return true;
                 }
             return false;
             }
         }
+
+    public class GraphicsDeviceServiceMock : IGraphicsDeviceService
+        {
+        private Form _hiddenForm;
+
+        public GraphicsDeviceServiceMock()
+            {
+            this._hiddenForm = new Form()
+                {
+                Visible = false,
+                ShowInTaskbar = false
+                };
+
+            var parameters = new PresentationParameters()
+                {
+                BackBufferWidth = 1280,
+                BackBufferHeight = 720,
+                DeviceWindowHandle = this._hiddenForm.Handle,
+                PresentationInterval = PresentInterval.Immediate,
+                IsFullScreen = false
+                };
+
+            this.GraphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.Reach, parameters);
+            }
+
+        public GraphicsDevice GraphicsDevice { get; private set; }
+
+        public event EventHandler<EventArgs> DeviceCreated;
+        public event EventHandler<EventArgs> DeviceDisposing;
+        public event EventHandler<EventArgs> DeviceReset;
+        public event EventHandler<EventArgs> DeviceResetting;
+
+        public void Release()
+            {            
+            this.GraphicsDevice.Dispose();
+            this.GraphicsDevice = null;
+
+            this._hiddenForm.Close();            
+            this._hiddenForm.Dispose();
+            this._hiddenForm = null;
+            }
+        } 
     }
-
-public class GraphicsDeviceServiceMock : IGraphicsDeviceService
-    {
-    GraphicsDevice _GraphicsDevice;
-    Form HiddenForm;
-
-    public GraphicsDeviceServiceMock()
-        {
-        HiddenForm = new Form()
-            {
-            Visible = false,
-            ShowInTaskbar = false
-            };
-
-        var Parameters = new PresentationParameters()
-            {
-            BackBufferWidth = 1280,
-            BackBufferHeight = 720,
-            DeviceWindowHandle = HiddenForm.Handle,
-            PresentationInterval = PresentInterval.Immediate,
-            IsFullScreen = false
-            };
-
-        _GraphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.Reach, Parameters);
-        }
-
-    public GraphicsDevice GraphicsDevice
-        {
-        get { return _GraphicsDevice; }
-        }
-
-    public event EventHandler<EventArgs> DeviceCreated;
-    public event EventHandler<EventArgs> DeviceDisposing;
-    public event EventHandler<EventArgs> DeviceReset;
-    public event EventHandler<EventArgs> DeviceResetting;
-
-    public void Release()
-        {            
-        _GraphicsDevice.Dispose();
-        _GraphicsDevice = null;
-
-        HiddenForm.Close();            
-        HiddenForm.Dispose();
-        HiddenForm = null;
-        }
-    } 

@@ -7,13 +7,18 @@
     <TieredCompilation>false</TieredCompilation>
     <UseWindowsForms>true</UseWindowsForms>
     <LangVersion>8.0</LangVersion>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Game.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Game.ico">
+      <LogicalName>Game.ico</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="GameObjects\Monsters\**" />
     <EmbeddedResource Remove="GameObjects\Monsters\**" />
@@ -21,10 +26,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ComponentRegistration.cs" />
+    <Compile Remove="Enumeration.cs" />
     <Compile Remove="GameObjects\BoulderForTesting.cs" />
     <Compile Remove="GameObjects\MovementOfAnother.cs" />
     <Compile Remove="Interfaces\IAnimationPlayer.cs" />
     <Compile Remove="Interfaces\IAnimationState.cs" />
+    <Compile Remove="Interfaces\IMonsterMovement.cs" />
+    <Compile Remove="Interfaces\IServiceSetup.cs" />
     <Compile Remove="MonsterMovementFactory.cs" />
     <Compile Remove="Services\Display\Animation.cs" />
     <Compile Remove="Services\Display\AnimationPlayer.cs" />

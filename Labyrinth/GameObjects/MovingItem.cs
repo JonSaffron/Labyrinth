@@ -15,6 +15,8 @@ namespace Labyrinth.GameObjects
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Insubstantial);
             }
 
+        public IBoundMovement? MovementBoundary { get; protected set; } 
+
         /// <summary>
         /// Returns or sets the current movement by this object
         /// </summary>
@@ -98,7 +100,7 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Makes this object stationary
         /// </summary>
-        public void StandStill()
+        private void StandStill()
             {
             this.CurrentMovement = Movement.Still;
             }
@@ -173,7 +175,5 @@ namespace Labyrinth.GameObjects
                 }
             return hasArrivedAtDestination;
             }
-
-        public IBoundMovement MovementBoundary { get; protected set; }
         }
     }

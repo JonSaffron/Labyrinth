@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.GameObjects.Motility;
 using Labyrinth.Services.Display;
@@ -14,18 +13,18 @@ namespace Labyrinth.GameObjects
         {
         private MonsterMobility _mobility;
         public readonly Dictionary<MonsterMobility, Type> MovementMethods = new Dictionary<MonsterMobility, Type>();
-        [CanBeNull] protected IMonsterMotion DetermineDirection;
-        protected IDynamicAnimation AnimationPlayer;
+        protected IMonsterMotion? DetermineDirection;
+        protected IDynamicAnimation? AnimationPlayer;
 
-        public IBoundMovement SightBoundary { get; private set; }
+        public IBoundMovement? SightBoundary { get; private set; }
 
         public readonly MonsterDef Definition;
 
-        private IEnumerator<bool> _movementIterator;
+        private IEnumerator<bool>? _movementIterator;
         protected double RemainingTime;
         private ChangeRooms _changeRooms;
 
-        [CanBeNull] public IMonsterWeapon Weapon { get; set; }
+        public IMonsterWeapon? Weapon { get; set; }
 
         public Monster(MonsterDef definition, string textureName, int baseMovesDuringAnimation) : this(definition)
             {
@@ -46,7 +45,7 @@ namespace Labyrinth.GameObjects
             if (!this.IsActive)
                 {
                 this.IsActive = true;
-                SetMonsterMotion(true);
+                SetMonsterMotion(isInitialActivation: true);
                 }
             }
 
@@ -101,7 +100,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public override bool Update(GameTime gameTime)
             {
-            this.AnimationPlayer.Update(gameTime);
+            this.AnimationPlayer?.Update(gameTime);
 
             // move the monster
             this.RemainingTime = gameTime.ElapsedGameTime.TotalSeconds;
@@ -144,7 +143,7 @@ namespace Labyrinth.GameObjects
 
                         timeLeftStationary -= this.RemainingTime;
                         this.RemainingTime = 0;
-                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
+                        this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticMonster);
                         yield return hasMovedSinceLastCall;
                         hasMovedSinceLastCall = false;
                         }
@@ -158,13 +157,13 @@ namespace Labyrinth.GameObjects
                         if (this.TryToCompleteMoveToTarget(ref this.RemainingTime))
                             break;
 
-                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.MovingMonster);
+                        this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.MovingMonster);
                         yield return true; // we have moved
                         }
                     }
 
                 this.Behaviours.Perform<IMovementBehaviour>();
-                if (this.RemainingTime <= Double.Epsilon * 2)
+                if (this.RemainingTime <= double.Epsilon * 2)
                     {
                     yield return hasMovedSinceLastCall;
                     hasMovedSinceLastCall = false;
@@ -203,10 +202,9 @@ namespace Labyrinth.GameObjects
 
         public decimal SpeedAdjustmentFactor { get; set; } = 1m;
 
-        [NotNull]
         public BehaviourCollection Behaviours { get; }
 
-        public override IRenderAnimation RenderAnimation => this.AnimationPlayer;
+        public override IRenderAnimation? RenderAnimation => this.AnimationPlayer;
 
         public ChangeRooms ChangeRooms
             {
@@ -233,7 +231,7 @@ namespace Labyrinth.GameObjects
             {
             if (!type.GetInterfaces().Contains(typeof(IMonsterMotion)))
                 {
-                throw new InvalidOperationException("Type " + type.Name + " does not implement IMonsterMotion.");
+                throw new InvalidOperationException($"Type {type.Name} does not implement IMonsterMotion.");
                 }
 
             var constructorArgTypes = new List<Type> {typeof(Monster)};
@@ -246,7 +244,7 @@ namespace Labyrinth.GameObjects
 
             var constructorInfo = type.GetConstructor(constructorArgTypes.ToArray());
             if (constructorInfo == null)
-                throw new InvalidOperationException("Failed to get matching constructor information for " + type.Name + " class.");
+                throw new InvalidOperationException($"Failed to get matching constructor information for {type.Name} class.");
 
             var movementImplementation = (IMonsterMotion) constructorInfo.Invoke(constructorArguments.ToArray());
             return movementImplementation;

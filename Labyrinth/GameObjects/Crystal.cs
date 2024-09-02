@@ -17,7 +17,7 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             this._animationPlayer = new LoopedAnimation(this, "Sprites/Crystal/Crystal", 8);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Intangible);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticItem);
             }
 
         public override bool IsExtant

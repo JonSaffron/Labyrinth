@@ -1,14 +1,13 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects
     {
-    class BoundaryCurrentRoom : IBoundMovement
+    internal class BoundaryCurrentRoom : IBoundMovement
         {
         private readonly IMovingItem _gameObject;
 
-        public BoundaryCurrentRoom([NotNull] IMovingItem gameObject)
+        public BoundaryCurrentRoom(IMovingItem gameObject)
             {
             this._gameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             }

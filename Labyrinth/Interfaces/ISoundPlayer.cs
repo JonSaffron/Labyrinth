@@ -10,12 +10,14 @@ namespace Labyrinth
         /// </summary>
         /// <param name="gameSound">Indicates which sound to play</param>
         void Play(GameSound gameSound);
+        
         /// <summary>
         /// Play a sound and trigger a callback upon its completion
         /// </summary>
         /// <param name="gameSound">Indicates which sound to play</param>
         /// <param name="callback">The method to call when the sound finishes playing</param>
         void PlayWithCallback(GameSound gameSound, EventHandler callback);
+        
         /// <summary>
         /// Play a sound that relates to a particular game object
         /// </summary>
@@ -23,6 +25,7 @@ namespace Labyrinth
         /// <param name="gameObject">The game object the sound relates to</param>
         /// <param name="centrePointProvider">The object that provides the co-ordinates of the centre of the screen view</param>
         void PlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider);
+
         /// <summary>
         /// Play a sound that relates to a particular game object and trigger a callback upon its completion
         /// </summary>

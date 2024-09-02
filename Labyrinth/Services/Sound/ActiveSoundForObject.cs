@@ -1,16 +1,19 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
     {
+    /// <summary>
+    /// An object for playing one sound once which is connected to a GameObject
+    /// </summary>
+    /// <remarks>Multiple ActiveSound and ActiveSoundForObject instances can reference the same SoundEffectInstance</remarks>
     public class ActiveSoundForObject : ActiveSound
         {
         private readonly IGameObject _gameObject;
         private readonly ICentrePointProvider _centrePointProvider;
 
-        public ActiveSoundForObject([NotNull] ISoundEffectInstance soundEffectInstance, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider) : base(soundEffectInstance)
+        public ActiveSoundForObject(ISoundEffectInstance soundEffectInstance, IGameObject gameObject, ICentrePointProvider centrePointProvider) : base(soundEffectInstance)
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
@@ -48,8 +51,7 @@ namespace Labyrinth.Services.Sound
 
         private void UpdateVolumeAndPanning()
             {
-            var centrePoint = this._centrePointProvider.CentrePoint;
-            var differenceInPosition = _gameObject.Position - centrePoint;
+            var differenceInPosition = this._centrePointProvider.GetDistanceFromCentreOfScreen(_gameObject.Position);
 
             var adjustedDistanceApart = (differenceInPosition * new Vector2(1, 1.6f)).Length();
             var relativeCloseness = (768.0f - adjustedDistanceApart) / 768.0f;
@@ -64,7 +66,7 @@ namespace Labyrinth.Services.Sound
         public override string ToString()
             {
             var result = $"{this.SoundEffectInstance.InstanceName} {this.SoundEffectInstance.State} for {this._gameObject.GetType().Name} vol={this.SoundEffectInstance.Volume} pan={this.SoundEffectInstance.Pan}";
-            if (this.SoundEffectInstance.RestartPlayWhenStopped)
+            if (this.SoundEffectInstance.IsSetToRestart)
                 result += " to be restarted";
             return result;
             }

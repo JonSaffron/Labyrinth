@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using GalaSoft.MvvmLight.Messaging;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Display;
 using Labyrinth.Services.Messages;
@@ -12,7 +11,7 @@ using Microsoft.Xna.Framework;
  *  Start moving in the direction faced. Cache the direction.
  * If at grid point and key is still pressed
  *  Keep moving in cached direction
- * If moving:
+ * If moving then:
  *  If key released and haven't reached the next stop point then keep moving in cached direction
  *  If key released and have reached the next stop point then stop moving
  *  If new key pressed change direction being faced. Cache the direction.
@@ -30,8 +29,8 @@ namespace Labyrinth.GameObjects
         public TimeSpan WhenCanMoveInDirectionFaced { get; private set; }
         private readonly TimeSpan _delayBeforeMovingInDirectionFaced = TimeSpan.FromMilliseconds(75);
         
-        [NotNull] private readonly IPlayerWeapon _weapon1;
-        [NotNull] private readonly IPlayerWeapon _weapon2;
+        private readonly IPlayerWeapon _weapon1;
+        private readonly IPlayerWeapon _weapon2;
 
         // Animations
         private readonly PlayerAnimation _playerAnimation;
@@ -45,7 +44,7 @@ namespace Labyrinth.GameObjects
         private int _countBeforeDecrementingEnergy;
 
         // for movement
-        private IEnumerator<bool> _movementIterator;
+        private IEnumerator<bool>? _movementIterator;
         private double _remainingTime;
 
         // this is set on every update and can be compared against WhenCanMoveInDirectionFaced
@@ -67,7 +66,7 @@ namespace Labyrinth.GameObjects
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
 
             this.Properties.Set(GameObjectProperties.Capability, ObjectCapability.CanPushOrCauseBounceBack);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Player);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.Player);
             }
 
         /// <summary>
@@ -167,21 +166,29 @@ namespace Labyrinth.GameObjects
             bool hasMovedSinceLastCall = false;
             while (true)
                 {
-                if (this.SetDirectionAndDestination())
+                bool hasNewMovementStarted = this.CheckInputForPlayer();
+                if (hasNewMovementStarted)
                     {
                     hasMovedSinceLastCall = true;
+
                     while (true)
                         {
-                        if (this.TryToCompleteMoveToTarget(ref this._remainingTime))
+                        bool hasMoveFinished = this.TryToCompleteMoveToTarget(ref this._remainingTime);
+                        if (hasMoveFinished)
                             {
                             break;
                             }
 
-                        yield return true;
+                        yield return true;  // indicate that the player object is currently moving
                         }
 
-                    if (HasPlayerEnteredNewWorldArea())
+                    // movement has now finished
+                    if (HasPlayerEnteredNewWorldArea(out int worldAreaId))
+                        {
                         GlobalServices.SoundPlayer.Play(GameSound.PlayerEntersNewLevel);
+                        var msg = new WorldStatus($"Level {worldAreaId}");
+                        Messenger.Default.Send(msg);
+                        }
                     }
                 else
                     {
@@ -195,7 +202,10 @@ namespace Labyrinth.GameObjects
         public override void Move(Direction direction, MovementSpeed movementSpeed)
             {
             if (movementSpeed == MovementSpeed.BounceBack && this.CurrentMovement.IsMoving)
+                {
                 this._playerAnimation.ResetAnimation();
+                }
+
             base.Move(direction, movementSpeed);
             }
 
@@ -223,12 +233,13 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Updates the player's velocity and position based on input
         /// </summary>
-        private bool SetDirectionAndDestination()
+        /// <returns>True if the player starts moving</returns>
+        private bool CheckInputForPlayer()
             {
             IPlayerInput playerInput = GlobalServices.PlayerInput;
             var playerControl = playerInput.Update();
 
-            var result = SetDirection(playerControl.Direction);            
+            var result = ChangeDirectionFacedOrStartMove(playerControl.Direction);            
 
             this._weapon1.Fire(this, playerControl.FireState1, this.CurrentDirectionFaced);
             this._weapon2.Fire(this, playerControl.FireState2, this.CurrentDirectionFaced);
@@ -236,7 +247,12 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private bool SetDirection(Direction requestedDirection)
+        /// <summary>
+        /// May update in which direction the player is facing, or may start moving in the indicated direction
+        /// </summary>
+        /// <param name="requestedDirection">The requested direction to face or move</param>
+        /// <returns>True if the player starts moving</returns>
+        private bool ChangeDirectionFacedOrStartMove(Direction requestedDirection)
             {
             if (requestedDirection == Direction.None)
                 return false;
@@ -258,10 +274,10 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private bool HasPlayerEnteredNewWorldArea()
+        private bool HasPlayerEnteredNewWorldArea(out int currentWorldAreaId)
             {
-            int worldAreaId = GlobalServices.World.GetWorldAreaIdForTilePos(this.TilePosition);
-            bool result = this._worldAreaIdsVisited.Add(worldAreaId);
+            currentWorldAreaId = GlobalServices.World.GetWorldAreaIdForTilePos(this.TilePosition);
+            bool result = this._worldAreaIdsVisited.Add(currentWorldAreaId);
             return result;
             }
 

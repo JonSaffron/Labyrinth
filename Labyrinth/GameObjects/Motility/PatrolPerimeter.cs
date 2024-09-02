@@ -6,7 +6,7 @@ using Labyrinth.DataStructures;
 namespace Labyrinth.GameObjects.Motility
     {
     [UsedImplicitly]
-    class PatrolPerimeter : MonsterMotionBase
+    internal class PatrolPerimeter : MonsterMotionBase
         {
         private Direction _lastDirection;
 
@@ -19,10 +19,11 @@ namespace Labyrinth.GameObjects.Motility
         private static readonly Direction[] FollowWallOnLeft = { Direction.Left, Direction.Down, Direction.Right, Direction.Up };
         private static readonly Direction[] FollowWallOnRight = { Direction.Left, Direction.Up, Direction.Right, Direction.Down };
 
-        [NotNull] private IPatrolState _state;
+        private IPatrolState _state;
 
-        public PatrolPerimeter([NotNull] Monster monster, Direction initialDirection) : base(monster)
+        public PatrolPerimeter(Monster monster, Direction initialDirection) : base(monster)
             {
+            if (monster == null) throw new ArgumentNullException(nameof(monster));
             if (initialDirection == Direction.None)
                 throw new ArgumentOutOfRangeException(nameof(initialDirection), "May not be None");
             this._lastDirection = initialDirection;
@@ -52,33 +53,31 @@ namespace Labyrinth.GameObjects.Motility
                 }
 
             public ConfirmedDirection GetDirection()
-                { 
-                using (var directions = GetPreferredDirections(this._parent._lastDirection, this._parent.CurrentAttachmentToWall).GetEnumerator())
+                {
+                using var directions = GetPreferredDirections(this._parent._lastDirection, this._parent.CurrentAttachmentToWall).GetEnumerator();
+                directions.MoveNext();
+                var newDirection = directions.Current;
+
+                var canGoInNewDirection = this._parent.Monster.CanMoveInDirection(newDirection);
+                if (!canGoInNewDirection)
                     {
-                    directions.MoveNext();
-                    var newDirection = directions.Current;
-
-                    var canGoInNewDirection = this._parent.Monster.CanMoveInDirection(newDirection);
-                    if (!canGoInNewDirection)
+                    // so there's definitely one or more walls. Just need to get the first direction we can go in.
+                    while (directions.MoveNext())
                         {
-                        // so there's definitely one or more walls. Just need to get the first direction we can go in.
-                        while (directions.MoveNext())
+                        newDirection = directions.Current;
+                        if (this._parent.Monster.CanMoveInDirection(newDirection))
                             {
-                            newDirection = directions.Current;
-                            if (this._parent.Monster.CanMoveInDirection(newDirection))
-                                {
-                                return new ConfirmedDirection(newDirection);
-                                }
+                            return new ConfirmedDirection(newDirection);
                             }
-                        // can't go in any direction
-                        return ConfirmedDirection.None;
                         }
+                    // can't go in any direction
+                    return ConfirmedDirection.None;
+                    }
 
-                    // monster could go in any direction as it's not next to any wall
-                    // - turn the corner to follow the wall and hopefully we'll re-attach next move 
-                    this._parent._state = new TurningCornerState(this._parent);
-                    return new ConfirmedDirection(newDirection);
-                    } 
+                // monster could go in any direction as it's not next to any wall
+                // - turn the corner to follow the wall, and hopefully we'll re-attach next move 
+                this._parent._state = new TurningCornerState(this._parent);
+                return new ConfirmedDirection(newDirection);
                 }
             }
 
@@ -93,26 +92,24 @@ namespace Labyrinth.GameObjects.Motility
 
             public ConfirmedDirection GetDirection()
                 {
-                using (var directions = GetPreferredDirections(this._parent._lastDirection, this._parent.CurrentAttachmentToWall).GetEnumerator())
+                using var directions = GetPreferredDirections(this._parent._lastDirection, this._parent.CurrentAttachmentToWall).GetEnumerator();
+                directions.MoveNext();
+                var newDirection = directions.Current;
+
+                var hasWallVanished = this._parent.Monster.CanMoveInDirection(newDirection);
+                this._parent._state = hasWallVanished ? (IPatrolState) new DetachedState(this._parent) : new AttachedState(this._parent);
+                while (directions.MoveNext())
                     {
-                    directions.MoveNext();
-                    var newDirection = directions.Current;
-
-                    var hasWallVanished = this._parent.Monster.CanMoveInDirection(newDirection);
-                    this._parent._state = hasWallVanished ? (IPatrolState) new DetachedState(this._parent) : new AttachedState(this._parent);
-                    while (directions.MoveNext())
+                    newDirection = directions.Current;
+                    if (this._parent.Monster.CanMoveInDirection(newDirection))
                         {
-                        newDirection = directions.Current;
-                        if (this._parent.Monster.CanMoveInDirection(newDirection))
-                            {
-                            return new ConfirmedDirection(newDirection);
-                            }
-                        this._parent._state = new AttachedState(this._parent);
+                        return new ConfirmedDirection(newDirection);
                         }
-
-                    // can't go in any direction
-                    return ConfirmedDirection.None;
+                    this._parent._state = new AttachedState(this._parent);
                     }
+
+                // can't go in any direction
+                return ConfirmedDirection.None;
                 }
             }
 
@@ -132,20 +129,18 @@ namespace Labyrinth.GameObjects.Motility
                     return new ConfirmedDirection(this._parent._lastDirection);
                     }
 
-                // Aha. We have bumped into something so we need to re-attach.
+                // Aha. We have bumped into something, so we need to re-attach.
                 // Upon attaching, we need to reverse the rotation that the monster uses to plan its next move
                 this._parent.SwitchDirection();
                 this._parent._state = new AttachedState(this._parent);
 
-                using (var directions = GetPreferredDirections(this._parent._lastDirection.Reversed(), this._parent.CurrentAttachmentToWall).GetEnumerator())
+                using var directions = GetPreferredDirections(this._parent._lastDirection.Reversed(), this._parent.CurrentAttachmentToWall).GetEnumerator();
+                while (directions.MoveNext())
                     {
-                    while (directions.MoveNext())
+                    var newDirection = directions.Current;
+                    if (this._parent.Monster.CanMoveInDirection(newDirection))
                         {
-                        var newDirection = directions.Current;
-                        if (this._parent.Monster.CanMoveInDirection(newDirection))
-                            {
-                            return new ConfirmedDirection(newDirection);
-                            }
+                        return new ConfirmedDirection(newDirection);
                         }
                     }
 
@@ -193,9 +188,10 @@ namespace Labyrinth.GameObjects.Motility
         // ReSharper disable once MemberCanBePrivate.Global - potentially useful 
         public AttachmentToWall CurrentAttachmentToWall { get; private set; }
 
-        // ReSharper disable once UnusedMember.Global - potentially useful
+        // ReSharper disable once UnusedMember.Global - potentially useful diagnostics
         public bool IsAttached => this._state is AttachedState;
 
+        // ReSharper disable once UnusedMember.Global - potentially useful diagnostics
         public bool IsTurningCorner => this._state is TurningCornerState;
 
         public bool IsDetached => this._state is DetachedState;

@@ -1,15 +1,23 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.GameObjects.Motility;
 
 namespace Labyrinth.GameObjects.Behaviour
     {
     public abstract class BaseBehaviour : IBehaviour
         {
-        protected readonly Player Player = GlobalServices.GameState.Player;
+        protected Player Player => GlobalServices.GameState.Player;
         protected readonly IRandomness Random = GlobalServices.Randomness;
 
-        protected Monster Monster { get; private set; }
+        private Monster? _monster;
+        protected Monster Monster 
+            {
+            get
+                {
+                if (this._monster == null)
+                    throw new InvalidOperationException("Monster property has not been set");
+                return this._monster;
+                }
+            }
 
         protected BaseBehaviour()
             {
@@ -17,23 +25,23 @@ namespace Labyrinth.GameObjects.Behaviour
             }
 
         // ReSharper disable once UnusedMember.Global - used by reflection
-        protected BaseBehaviour([NotNull] Monster monster)
+        protected BaseBehaviour(Monster monster)
             {
-            this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
+            this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
 
-        public virtual void Init([NotNull] Monster monster)
+        public void Init(Monster monster)
             {
             // ReSharper disable once JoinNullCheckWithUsage
             if (monster == null)
                 {
                 throw new ArgumentNullException(nameof(monster));
                 }
-            if (this.Monster != null)
+            if (this._monster != null)
                 {
                 throw new InvalidOperationException("Init already called.");
                 }
-            this.Monster = monster;
+            this._monster = monster;
             OnInit();
             }
 

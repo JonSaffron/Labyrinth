@@ -7,9 +7,17 @@ namespace Labyrinth
         private static readonly Vector2 CentreOfRoom = Constants.RoomSizeInPixels / 2.0f;
         private const float CurrentVelocity = 750f;
 
+        /// <summary>
+        /// Returns the game co-ordinate of the top-left corner of the window on the world
+        /// </summary>
         public Vector2 WindowPosition { get; private set; }
 
-        public Vector2 CentrePoint => this.WindowPosition + CentreOfRoom;
+        public Vector2 GetDistanceFromCentreOfScreen(Vector2 gameObjectPosition)
+            {
+            var centrePoint = this.WindowPosition + CentreOfRoom;
+            var result = gameObjectPosition - centrePoint;
+            return result;
+            }
 
         public void ResetPosition(Vector2 newPosition)
             {

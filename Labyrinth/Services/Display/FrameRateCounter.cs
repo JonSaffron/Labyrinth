@@ -8,8 +8,8 @@ namespace Labyrinth.Services.Display
     public class FrameRateCounter : DrawableGameComponent
         {
         private readonly ContentManager _content;
-        private SpriteBatch _spriteBatch;
-        private SpriteFont _spriteFont;
+        private SpriteBatch? _spriteBatch;
+        private SpriteFont? _spriteFont;
 
         private int _frameRate;
         private int _frameCounter;
@@ -24,6 +24,26 @@ namespace Labyrinth.Services.Display
             {
             this._spriteBatch = new SpriteBatch(GraphicsDevice);
             this._spriteFont = this._content.Load<SpriteFont>("Display/FpsFont");
+            }
+
+        private SpriteBatch SpriteBatch
+            {
+            get
+                {
+                if (this._spriteBatch == null)
+                    throw new InvalidOperationException("SpriteBatch has not been instantiated");
+                return this._spriteBatch;
+                }
+            }
+
+        private SpriteFont SpriteFont
+            {
+            get
+                {
+                if (this._spriteFont == null)
+                    throw new InvalidOperationException("Content for SpriteFont property has not been loaded");
+                return this._spriteFont;
+                }
             }
 
         protected override void UnloadContent()
@@ -49,12 +69,12 @@ namespace Labyrinth.Services.Display
 
             string fps = $"fps: {this._frameRate}";
 
-            this._spriteBatch.Begin();
+            this.SpriteBatch.Begin();
 
-            this._spriteBatch.DrawString(this._spriteFont, fps, new Vector2(33, 33), Color.Black);
-            this._spriteBatch.DrawString(this._spriteFont, fps, new Vector2(32, 32), Color.White);
+            this.SpriteBatch.DrawString(this.SpriteFont, fps, new Vector2(33, 33), Color.Black);
+            this.SpriteBatch.DrawString(this.SpriteFont, fps, new Vector2(32, 32), Color.White);
             
-            this._spriteBatch.End();
+            this.SpriteBatch.End();
             }
         }
     }

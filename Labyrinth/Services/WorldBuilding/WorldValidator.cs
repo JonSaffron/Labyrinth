@@ -8,43 +8,37 @@ namespace Labyrinth.Services.WorldBuilding
     {
     internal class WorldValidator
         {
-        private readonly List<string> _validationErrors;
-
-        public WorldValidator()
-            {
-            this._validationErrors = new List<string>();
-            }
-
         public void Validate(string xml, string pathToXsd)
             {
-            this._validationErrors.Clear();
+            var validationErrors = new List<string>();
 
             using (Stream schema = File.OpenRead(pathToXsd))
                 {
                 using (var sr = new StringReader(xml))
                     {
-                    var readerSettings = GetSettings(schema);
-                    var vr = XmlReader.Create(sr, readerSettings);
-                    
-                    while (vr.Read())
+                    using (var schemaReader = new XmlTextReader(schema))
                         {
+                        var readerSettings = GetSettings(schemaReader, ValidationCallBack);
+                        var vr = XmlReader.Create(sr, readerSettings);
+
+                        while (vr.Read())
+                            {
+                            }
                         }
                     }
                 }
 
-            if (this._validationErrors.Count == 0)
+            if (validationErrors.Count == 0)
                 return;
 
-            var strings = new string[this._validationErrors.Count];
-            this._validationErrors.CopyTo(strings, 0);
-            var message = String.Join("\r\n", strings);
-            throw new FormatException("Xml data is invalid:\r\n" + message);
+            var message = string.Join("\r\n", validationErrors);
+            throw new FormatException($"Xml data is invalid:\r\n{message}");
+
+            void ValidationCallBack(object? sender, ValidationEventArgs args) => validationErrors.Add(args.Message);
             }
 
-        private XmlReaderSettings GetSettings(Stream schema)
+        private static XmlReaderSettings GetSettings(XmlReader schemaReader, ValidationEventHandler validationCallBack)
             {
-            XmlReader schemaReader = new XmlTextReader(schema);
-
             var readerSettings = new XmlReaderSettings
                                         {
                                             CheckCharacters = true,
@@ -56,14 +50,9 @@ namespace Labyrinth.Services.WorldBuilding
                                         };
             readerSettings.ValidationFlags |= XmlSchemaValidationFlags.ProcessInlineSchema;
             readerSettings.Schemas.Add(null, schemaReader);
-            readerSettings.ValidationEventHandler += ValidationCallBack;
-
+            readerSettings.ValidationEventHandler += validationCallBack;
+            
             return readerSettings;
-            }
-
-        private void ValidationCallBack(object sender, ValidationEventArgs e)
-            {
-            _validationErrors.Add(e.Message);
             }
         }
     }

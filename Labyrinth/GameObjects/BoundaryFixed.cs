@@ -2,7 +2,7 @@
 
 namespace Labyrinth.GameObjects
     {
-    class BoundaryFixed : IBoundMovement
+    internal class BoundaryFixed : IBoundMovement
         {
         private readonly TileRect _boundary;
 

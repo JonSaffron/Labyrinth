@@ -10,7 +10,7 @@ namespace Labyrinth.GameObjects
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
             }
 
-        public override IRenderAnimation RenderAnimation => null;
+        public override IRenderAnimation? RenderAnimation => null;
 
         public override bool IsExtant => true;
         }

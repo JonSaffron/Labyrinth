@@ -3,13 +3,14 @@
 namespace Labyrinth.Services.Sound
     {
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    class SoundInfoAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Field)]
+    internal class SoundInfoAttribute : Attribute
         {
         public readonly int CacheSize;
         public readonly bool RequiresGameObject;
-        public readonly string ResourceName;
+        public readonly string? ResourceName;
 
-        public SoundInfoAttribute(int cacheSize = 1, bool requiresGameObject = false, string resourceName = null) 
+        public SoundInfoAttribute(int cacheSize = 1, bool requiresGameObject = false, string? resourceName = null)
             { 
             this.CacheSize = cacheSize;
             this.RequiresGameObject = requiresGameObject;

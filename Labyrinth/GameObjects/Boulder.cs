@@ -16,7 +16,7 @@ namespace Labyrinth.GameObjects
             {
             this._animationPlayer = new StaticAnimation(this, TextureName);
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Boulder);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.Boulder);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Moveable);
             }
         

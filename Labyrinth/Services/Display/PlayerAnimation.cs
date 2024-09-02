@@ -1,12 +1,11 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
     {
-    class PlayerAnimation: IRenderAnimation
+    internal class PlayerAnimation: IRenderAnimation
         {
         private readonly Player _player;
         private const double AnimationLength = 2 * Constants.GameClockResolution;
@@ -14,7 +13,7 @@ namespace Labyrinth.Services.Display
 
         private double TimeWithinAnimation { get; set; }
 
-        public PlayerAnimation([NotNull] Player player)
+        public PlayerAnimation(Player player)
             {
             this._player = player ?? throw new ArgumentNullException(nameof(player));
             }

@@ -1,10 +1,10 @@
 ﻿using System;
-using JetBrains.Annotations;
+using System.Diagnostics.Contracts;
 using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth.Services
     {
-    class StandardRandom : IRandomness
+    internal class StandardRandom : IRandomness
         {
         private readonly Random _random;
 
@@ -18,21 +18,21 @@ namespace Labyrinth.Services
             this._random = new Random(seed);
             }
 
-        [MustUseReturnValue]
+        [Pure]
         public bool Test(byte mask)
             {
             var result = (this._random.Next(256) & mask) == 0;
             return result;
             }
 
-        [MustUseReturnValue]
+        [Pure]
         public int Next(int maxValue)
             {
             var result = this._random.Next(maxValue);
             return result;
             }
 
-        [MustUseReturnValue]
+        [Pure]
         public int DiceRoll(DiceRoll diceRoll)
             {
             if (diceRoll == WorldBuilding.DiceRoll.None) 

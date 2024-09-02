@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth.ClockEvents
@@ -9,7 +8,7 @@ namespace Labyrinth.ClockEvents
         private readonly World _world;
         private int _levelUnlocked;
 
-        public UnlockLevel([NotNull] World world)
+        public UnlockLevel(World world)
             {
             this._world = world ?? throw new ArgumentNullException(nameof(world));
             }

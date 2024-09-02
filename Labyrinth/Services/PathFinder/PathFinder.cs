@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Labyrinth.DataStructures;
 
@@ -21,14 +22,18 @@ namespace Labyrinth.Services.PathFinder
         /// <param name="searchParameters">An instance of a SearchParameters object that defines the search to perform</param>
         public PathFinder(SearchParameters searchParameters)
             {
+            if (searchParameters == null)
+                throw new ArgumentNullException(nameof(searchParameters));
+            if (searchParameters.CanBeOccupied == null)
+                throw new ArgumentException("SearchParameters.CanBeOccupied must be set.");
             this._searchParameters = searchParameters;
             }
 
         /// <summary>
         /// Attempts to find a path from the start location to the end location based on the supplied SearchParameters
         /// </summary>
-        /// <returns>A List of Points representing the path. If no path was found, the returned list is empty.</returns>
-        public bool TryFindPath(out IList<TilePos> result)
+        /// <returns>True if a path can be found and a list of positions representing the path. If no path was found, false is returned and a null list.</returns>
+        public bool TryFindPath([NotNullWhen(returnValue: true)] out IList<TilePos>? result)
             {
             // The start node is the first entry in the 'open' list
             this._openNodes.Enqueue(0, new Path<TilePos>(this._searchParameters.StartLocation));
@@ -58,12 +63,16 @@ namespace Labyrinth.Services.PathFinder
                     if (pathYetToVisit != null)
                         {
                         if (newPath.Cost >= pathYetToVisit.Cost)
+                            // don't add the newPath as it's no better than one we've already found
                             continue;
+
+                        // mark the path we've already queued as not worth investigating
                         pathYetToVisit.IsViable = false;
                         }
 
                     var pathAlreadyVisited = this._closedNodes.FirstOrDefault(item => item.LastStep == newPath.LastStep);
                     if (pathAlreadyVisited != null && newPath.Cost >= pathAlreadyVisited.Cost)
+                        // don't add the newPath as it's no better than one we've already found
                         continue;
 
                     var estimatedCostToGoal = newPath.Cost + GetEstimatedTraversalCost(newPath.LastStep);
@@ -71,7 +80,7 @@ namespace Labyrinth.Services.PathFinder
                     }
                 }
 
-            // The method returns false if this path leads to be a dead end
+            // The method returns false if it's not possible to get to the target point
             result = null;
             return false;
             }
@@ -88,7 +97,7 @@ namespace Labyrinth.Services.PathFinder
             foreach (var location in nextLocations)
                 {
                 // Ignore non-walkable nodes
-                if (!this._searchParameters.CanBeOccupied(location))
+                if (!this._searchParameters.CanBeOccupied!(location))
                     continue;
 
                 yield return location;

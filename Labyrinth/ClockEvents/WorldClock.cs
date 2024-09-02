@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.ClockEvents
     {
-    class WorldClock
+    internal class WorldClock
         {
         private int _worldClock;
         private double _time;
@@ -27,13 +26,10 @@ namespace Labyrinth.ClockEvents
         private void Tick()
             {
             this._worldClock++;
-            foreach (var item in this._clockEvents)
-                {
-                item.Update(this._worldClock);
-                }
+            this._clockEvents.ForEach(item => item.Update(this._worldClock));
             }
 
-        public void AddEventHandler([NotNull] IClockEvent clockEvent)
+        public void AddEventHandler(IClockEvent clockEvent)
             {
             if (clockEvent == null) throw new ArgumentNullException(nameof(clockEvent));
             this._clockEvents.Add(clockEvent);

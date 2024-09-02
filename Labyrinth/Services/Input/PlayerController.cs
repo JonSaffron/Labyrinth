@@ -7,10 +7,10 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.Input
     {
-    class PlayerController : GameComponent, IPlayerInput
+    internal class PlayerController : GameComponent, IPlayerInput
         {
         private readonly Queue<TimedInstruction> _instructions = new Queue<TimedInstruction>(); 
-        private Instruction _currentInstruction;
+        private Instruction? _currentInstruction;
 
         private TimeSpan _totalGameTime;
 
@@ -18,7 +18,7 @@ namespace Labyrinth.Services.Input
             {
             }
 
-        public void Enqueue([NotNull] IEnumerable<TimedInstruction> instructions)
+        public void Enqueue(IEnumerable<TimedInstruction> instructions)
             {
             if (instructions == null) throw new ArgumentNullException(nameof(instructions));
             foreach (var item in instructions)
@@ -88,11 +88,11 @@ namespace Labyrinth.Services.Input
                     }
                 }
                 
-            var fireStatus1 = this._currentInstruction.FireStatus1;
+            var fireStatus1 = ci.FireStatus1;
             if (fireStatus1 == FiringState.Pulse)
                 ci.FireStatus1 = FiringState.None;
 
-            var fireStatus2 = this._currentInstruction.FireStatus2;
+            var fireStatus2 = ci.FireStatus2;
             if (fireStatus2 == FiringState.Pulse)
                 ci.FireStatus2 = FiringState.None;
 
@@ -119,6 +119,7 @@ namespace Labyrinth.Services.Input
                 this.Instruction = instruction;
                 }
 
+            [PublicAPI]
             public static TimedInstruction InitialState()
                 {
                 var result = new TimedInstruction(TimeSpan.Zero, Instruction.DoNothingInstruction());
@@ -127,7 +128,7 @@ namespace Labyrinth.Services.Input
 
             public override string ToString()
                 {
-                var result = string.Format("At {0}, {1}", this.TakesEffectFrom, this.Instruction);
+                var result = $"At {this.TakesEffectFrom}, {this.Instruction}";
                 return result;
                 }
             }
@@ -149,7 +150,7 @@ namespace Labyrinth.Services.Input
                 return new Instruction(direction, MoveType.TurnToFace, FiringState.Pulse, FiringState.None);
                 }
 
-            public Instruction(Direction direction, MoveType moveType, FiringState fireStatus1, FiringState fireStatus2)
+            private Instruction(Direction direction, MoveType moveType, FiringState fireStatus1, FiringState fireStatus2)
                 {
                 this.Direction = direction;
                 this.MoveType = moveType;

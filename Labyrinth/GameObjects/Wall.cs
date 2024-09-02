@@ -11,7 +11,7 @@ namespace Labyrinth.GameObjects
             {
             this._animationPlayer = new StaticAnimation(this, textureName);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Impervious);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Wall);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.Wall);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Impassable);
             }
 

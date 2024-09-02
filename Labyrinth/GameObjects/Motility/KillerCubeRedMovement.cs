@@ -5,9 +5,9 @@ using Labyrinth.DataStructures;
 namespace Labyrinth.GameObjects.Motility
     {
     [UsedImplicitly]
-    class KillerCubeRedMovement : StandardRolling
+    internal class KillerCubeRedMovement : StandardRolling
         {
-        public KillerCubeRedMovement([NotNull] Monster monster) : base(monster)
+        public KillerCubeRedMovement(Monster monster) : base(monster)
             {
             }
 

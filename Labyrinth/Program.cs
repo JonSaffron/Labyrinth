@@ -14,7 +14,7 @@ namespace Labyrinth
             int result;
             try
                 {
-                var game = new Game1();
+                var game = new LabyrinthGame();
                 game.Run();
                 result = 0;
                 }

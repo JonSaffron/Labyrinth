@@ -1,73 +1,91 @@
 using System;
-using JetBrains.Annotations;
+using System.Linq;
+using GalaSoft.MvvmLight.Messaging;
 using Labyrinth.DataStructures;
+using Labyrinth.GameObjects;
+using Labyrinth.Services.Display;
 using Labyrinth.Services.Input;
+using Labyrinth.Services.Messages;
 using Labyrinth.Services.Sound;
+using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
-namespace Labyrinth.Services.Display
+namespace Labyrinth.Screens
     {
     /// <summary>
     /// This screen implements the actual game. 
     /// </summary>
-    class GameplayScreen : GameScreen
+    internal class GameplayScreen : GameScreen
         {
-        private readonly GameStartParameters _gameStartParameters;
+        private readonly WorldStartParameters _worldStartParameters;
         private readonly ContentManager _content;
-        private bool _isGamePaused;
-        [NotNull] private readonly IScoreKeeper _scoreKeeper;
         private readonly IHeadsUpDisplay _headsUpDisplay = new HeadsUpDisplay();
         private readonly GameInput _gameInput;
-        private World _world;
+        private World? _world;
         private int _livesRemaining;
         private bool _normalPlay = true;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public GameplayScreen([NotNull] GameStartParameters gameStartParameters, InputState inputState)
+        public GameplayScreen(WorldStartParameters worldStartParameters, InputState inputState)
             {
-            this._gameStartParameters = gameStartParameters ?? throw new ArgumentNullException(nameof(gameStartParameters));
-            this.TransitionOnTime = TimeSpan.FromSeconds(1.5);
-            this.TransitionOffTime = TimeSpan.FromSeconds(0.5);
-            this._scoreKeeper = new ScoreKeeper.ScoreKeeper();
-            this._gameInput = new GameInput(inputState);
-            this._livesRemaining = this._gameStartParameters.CountOfLives - 1;
-            this._content = new ContentManager(GlobalServices.Game.Services, GlobalServices.Game.Content.RootDirectory);
+            _worldStartParameters = worldStartParameters ?? throw new ArgumentNullException(nameof(worldStartParameters));
+            TransitionOnTime = TimeSpan.FromSeconds(1.5);
+            TransitionOffTime = TimeSpan.FromSeconds(0.5);
+            _gameInput = new GameInput(inputState);
+            _livesRemaining = worldStartParameters.CountOfLives - 1;
+            GlobalServices.ScoreKeeper.Reset();
+            _content = new ContentManager(GlobalServices.Game.Services, GlobalServices.Game.Content.RootDirectory);
             VolumeControl.Instance.LoadState();
             }
 
         /// <summary>
-        /// Load graphics content for the game.
+        /// Loads the world - this could take some time
         /// </summary>
-        public override void LoadContent()
+        public override void Activate(bool instancePreserved = false)
             {
-            this._headsUpDisplay.LoadContent(this._content);
-            this._world = LoadWorld(this._gameStartParameters.WorldToLoad);
-            this._world.LoadContent(this._content);
-            GlobalServices.SetWorld(this._world);
+            _headsUpDisplay.LoadContent(_content);
+
+            var worldLoader = new WorldLoader(_worldStartParameters.WorldToLoad);
+            var boundMovementFactory = new BoundMovementFactory(worldLoader.WorldSize);
+            GlobalServices.SetBoundMovementFactory(boundMovementFactory);
+
+            GlobalServices.ClearWorld();
+            _world = new World(worldLoader);
+            //GlobalServices.GameState.AddPotion(GlobalServices.GameState.Player.TilePosition.GetPositionAfterMoving(Direction.Right, 4).ToPosition());
+            GlobalServices.SetWorld(_world);
+
+            _world.LoadContent(_content);
+            _world.ResetWorldForStartingNewLife();
+
+            var msg = new WorldStatus(worldLoader.WorldName);
+            Messenger.Default.Send(msg);
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
             // it should not try to catch up.
             ScreenManager.Game.ResetElapsedTime();
 
-            this.ScreenManager.Game.Deactivated += GameOnDeactivated;
+            ScreenManager.Game.Deactivated += GameOnDeactivated;
             }
 
-        private void GameOnDeactivated(object sender, EventArgs e)
+        private void GameOnDeactivated(object? sender, EventArgs e)
             {
-            this._isGamePaused = true;
+            if (this.ScreenState == ScreenState.Active && this.ScreenManager.Screens.Count() == 1)
+                {
+                ScreenManager.AddScreen(new PauseMenuScreen(), ControllingPlayer);
+                }
             }
 
         /// <summary>
         /// Unload graphics content used by the game.
         /// </summary>
-        public override void UnloadContent()
+        public override void Unload()
             {
-            this._content.Unload();
-            this.ScreenManager.Game.Deactivated -= GameOnDeactivated;
+            _content.Unload();
+            ScreenManager.Game.Deactivated -= GameOnDeactivated;
             }
 
         /// <summary>
@@ -79,36 +97,41 @@ namespace Labyrinth.Services.Display
             {
             base.Update(gameTime, doesScreenHaveFocus, coveredByOtherScreen);
 
-            if (this._isGamePaused || !this.IsActive)
+            if (_world == null)
+                {
+                return;
+                }
+
+            if (!IsActive)
                 gameTime = new GameTime();
 
             GlobalServices.SoundPlayer.ActiveSoundService.Update();
 
-            if (!this._isGamePaused && gameTime.ElapsedGameTime != TimeSpan.Zero)
+            if (gameTime.ElapsedGameTime != TimeSpan.Zero)
                 {
                 // ReSharper disable once PossibleNullReferenceException
-                WorldReturnType worldReturnType = this._world.Update(gameTime);
-                if (worldReturnType == WorldReturnType.Normal)
+                WorldState worldState = _world.Update(gameTime);
+                if (worldState == WorldState.Normal)
                     {
-                    this._normalPlay = true;
+                    _normalPlay = true;
                     }
-                else if (this._normalPlay)
+                else if (_normalPlay)
                     {
-                    this._normalPlay = false;
-                    switch (worldReturnType)
+                    _normalPlay = false;
+                    switch (worldState)
                         {
-                        case WorldReturnType.FinishedWorld:
+                        case WorldState.FinishedWorld:
                             //this._world = null;
                             //this._livesRemaining++;
                             // todo this isn't the ideal place for this
                             VolumeControl.Instance.SaveState();
-                            this.ScreenManager.Game.Exit();
+                            LoadingScreen.Load(this.ScreenManager, false, null, new BackgroundScreen(), new GameOverScreen("World Completed"));
                             break;
 
-                        case WorldReturnType.LostLife:
+                        case WorldState.LostLife:
                             var screenWipe = new ScreenWipe();
                             screenWipe.Wiped += LostLife;
-                            ScreenManager.AddScreen(screenWipe, this.ControllingPlayer);
+                            ScreenManager.AddScreen(screenWipe, ControllingPlayer);
                             break;
                         }
                     }
@@ -124,54 +147,56 @@ namespace Labyrinth.Services.Display
         private void LostLife(object source, EventArgs eventArgs)
             {
             GlobalServices.SoundPlayer.ActiveSoundService.Clear();
-            this.ScreenManager.RemoveScreen((GameScreen) source);
-            if (this._livesRemaining == 0)
+            ScreenManager.RemoveScreen((GameScreen)source);
+            if (_livesRemaining == 0)
                 {
                 // todo this isn't the ideal place for this
                 VolumeControl.Instance.SaveState();
-                this.ScreenManager.Game.Exit();
+                LoadingScreen.Load(this.ScreenManager, false, null, new BackgroundScreen(), new GameOverScreen("Game Over"));
                 return;
                 }
-            this._livesRemaining--;
-            this._world.ResetWorldAfterLosingLife();
-            this.ScreenState = ScreenState.TransitionOn;
-            this.TransitionPosition = 1f;
+            _livesRemaining--;
+            _world!.ResetWorldAfterLosingLife();
+            ScreenState = ScreenState.TransitionOn;
+            TransitionPosition = 1f;
             }
 
         /// <summary>
-        /// Lets the game respond to player input. Unlike the Update method,
+        /// Responds to player input. Unlike the Update method,
         /// this will only be called when the gameplay screen is active.
         /// </summary>
         public override void HandleInput(/*InputState input*/)
             {
-            var gameInput = this._gameInput;
+            var gameInput = _gameInput;
             gameInput.Update();
 
             if (gameInput.HasGameExitBeenTriggered)
                 {
                 //LoadingScreen.Load(ScreenManager, false, ControllingPlayer, new BackgroundScreen(), new MainMenuScreen());
-                this.ScreenManager.Game.Exit();
+                ScreenManager.Game.Exit();
                 }
 
             if (gameInput.HasPauseBeenTriggered)
-                this._isGamePaused = !this._isGamePaused;
+                {
+                ScreenManager.AddScreen(new PauseMenuScreen(), ControllingPlayer);
+                }
 
             if (gameInput.HasToggleFullScreenBeenTriggered)
-                this.ScreenManager.ToggleFullScreen();
+                ScreenManager.ToggleFullScreen();
 
             if (gameInput.HasIncreaseZoomBeenTriggered)
-                this.ScreenManager.IncreaseZoom();
+                ScreenManager.IncreaseZoom();
 
             if (gameInput.HasDecreaseZoomBeenTriggered)
-                this.ScreenManager.DecreaseZoom();
-                    
+                ScreenManager.DecreaseZoom();
+
             int changeToEnabled = (gameInput.HasSoundOnBeenTriggered ? 1 : 0) + (gameInput.HasSoundOffBeenTriggered ? -1 : 0);
             if (changeToEnabled < 0)
                 VolumeControl.Instance.Mute();
             else if (changeToEnabled > 0)
                 VolumeControl.Instance.Unmute();
 
-            int changeToVolume = (gameInput.HasSoundIncreaseBeenTriggered ? 1 : 0) + (gameInput.HasSoundDecreaseBeenTriggered  ? -1 : 0);
+            int changeToVolume = (gameInput.HasSoundIncreaseBeenTriggered ? 1 : 0) + (gameInput.HasSoundDecreaseBeenTriggered ? -1 : 0);
             if (changeToVolume < 0)
                 VolumeControl.Instance.TurnDownTheVolume();
             else if (changeToVolume > 0)
@@ -179,7 +204,7 @@ namespace Labyrinth.Services.Display
 
             if (gameInput.HasMoveToNextLevelBeenTriggered)
                 {
-                this._world?.MoveUpALevel();
+                _world?.MoveUpALevel();
                 }
             }
 
@@ -190,30 +215,18 @@ namespace Labyrinth.Services.Display
             {
             ISpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
-            if (this._isGamePaused)
+            if (!this.IsActive)
                 gameTime = new GameTime();
 
-            // Draw the sprite.
-            if (this._world != null)
-                {
-                this._world.Draw(gameTime, spriteBatch);
-                this._headsUpDisplay.DrawStatus(spriteBatch, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, this._scoreKeeper.CurrentScore, this._livesRemaining, this._isGamePaused, gameTime.IsRunningSlowly);
-                }
+            // Draw the screen
+            _world?.Draw(spriteBatch);
+            _headsUpDisplay.DrawStatus(spriteBatch, gameTime, GlobalServices.GameState.Player.IsExtant, GlobalServices.GameState.Player.Energy, GlobalServices.ScoreKeeper.CurrentScore, this._livesRemaining);
 
             // If the game is transitioning on or off, fade it out to black.
-            if (this.TransitionPosition > 0f)
+            if (TransitionPosition > 0f)
                 {
-                this.ScreenManager.FadeBackBufferToBlack(1f - this.TransitionAlpha);
+                ScreenManager.FadeBackBufferToBlack(1f - TransitionAlpha);
                 }
-            }
-
-        public World LoadWorld(string worldData)
-            {
-            // Load the WorldToLoad.
-            var world = new World(this._gameStartParameters.WorldLoader, worldData);
-            //GlobalServices.GameState.AddPotion(GlobalServices.GameState.Player.TilePosition.GetPositionAfterMoving(Direction.Right, 4).ToPosition());
-            world.ResetWorldForStartingNewLife();
-            return world;
             }
         }
     }

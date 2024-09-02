@@ -19,22 +19,22 @@
         /// <summary>
         /// A possible movement Left
         /// </summary>
-        public static PossibleDirection Left = new PossibleDirection(Direction.Left);
+        public static readonly PossibleDirection Left = new PossibleDirection(Direction.Left);
 
         /// <summary>
         /// A possible movement right
         /// </summary>
-        public static PossibleDirection Right = new PossibleDirection(Direction.Right);
+        public static readonly PossibleDirection Right = new PossibleDirection(Direction.Right);
 
         /// <summary>
         /// A possible movement up
         /// </summary>
-        public static PossibleDirection Up = new PossibleDirection(Direction.Up);
+        public static readonly PossibleDirection Up = new PossibleDirection(Direction.Up);
 
         /// <summary>
         /// A possible movement down
         /// </summary>
-        public static PossibleDirection Down = new PossibleDirection(Direction.Down);
+        public static readonly PossibleDirection Down = new PossibleDirection(Direction.Down);
 
         /// <summary>
         /// Constructs a possible movement in the specified direction
@@ -78,7 +78,7 @@
         /// <summary>
         /// Implicit conversion to Direction
         /// </summary>
-        /// <param name="direction"></param>
+        /// <param name="direction">The confirmed direction of travel</param>
         public static implicit operator Direction(ConfirmedDirection direction) => direction.Direction;
         }
 
@@ -90,7 +90,7 @@
         /// <summary>
         /// Creates a confirmed direction from the specified 
         /// </summary>
-        /// <param name="directionChosen"></param>
+        /// <param name="directionChosen">Specifies the direction chosen to travel in</param>
         /// <returns>A confirmed direction of travel</returns>
         public static ConfirmedDirection Confirm(this IDirectionChosen directionChosen)
             {

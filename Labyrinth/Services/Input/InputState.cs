@@ -97,6 +97,31 @@ namespace Labyrinth.Services.Input
             }
 
         /// <summary>
+        /// Helper for checking if a button was pressed during this update.
+        /// The controllingPlayer parameter specifies which player to read input for.
+        /// If this is null, it will accept input from any player. When a button press
+        /// is detected, the output playerIndex reports which player pressed it.
+        /// </summary>
+        public bool IsButtonPressed(Buttons button, PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
+            {
+            if (controllingPlayer.HasValue)
+                {
+                // Read input from the specified player.
+                playerIndex = controllingPlayer.Value;
+
+                int i = (int)playerIndex;
+
+                return CurrentGamePadStates[i].IsButtonDown(button);
+                }
+
+            // Accept input from any player.
+            return (IsButtonPressed(button, PlayerIndex.One, out playerIndex) ||
+                    IsButtonPressed(button, PlayerIndex.Two, out playerIndex) ||
+                    IsButtonPressed(button, PlayerIndex.Three, out playerIndex) ||
+                    IsButtonPressed(button, PlayerIndex.Four, out playerIndex));
+            }
+
+        /// <summary>
         /// Helper for checking if a button was newly pressed during this update.
         /// The controllingPlayer parameter specifies which player to read input for.
         /// If this is null, it will accept input from any player. When a button press

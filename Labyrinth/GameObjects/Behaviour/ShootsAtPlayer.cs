@@ -1,14 +1,16 @@
-﻿using Labyrinth.GameObjects.Motility;
+﻿using JetBrains.Annotations;
+using Labyrinth.GameObjects.Motility;
 
 namespace Labyrinth.GameObjects.Behaviour
     {
-    class ShootsAtPlayer : BaseBehaviour, IMovementBehaviour
+    internal class ShootsAtPlayer : BaseBehaviour, IMovementBehaviour
         {
         public ShootsAtPlayer()
             {
-
+            // nothing to do
             }
 
+        [UsedImplicitly]
         public ShootsAtPlayer(Monster monster) : base(monster)
             {
             OnInit();

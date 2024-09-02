@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth.DataStructures
     {
     public class Grid
         {
-        private readonly List<IGameObject>[,] _gameObjects;
+        private readonly List<IGameObject>?[,] _gameObjects;
         private static readonly IEnumerable<IGameObject> EmptyItemList = Enumerable.Empty<StaticItem>();
         private readonly TilePos _worldSize;
 
@@ -18,7 +17,7 @@ namespace Labyrinth.DataStructures
             this._worldSize = worldSize;
             }
 
-        public void Add([NotNull] IGameObject gameObject)
+        public void Add(IGameObject gameObject)
             {
             if (gameObject == null) 
                 throw new ArgumentNullException(nameof(gameObject));
@@ -26,21 +25,18 @@ namespace Labyrinth.DataStructures
                 throw new ArgumentException("Cannot Add a non-extant object to the GameObjectCollection.");
             
             TilePos tp = gameObject.TilePosition;
-            ref List<IGameObject> listOfStaticItem = ref this._gameObjects[tp.X, tp.Y];
-            if (listOfStaticItem == null)
-                {
-                listOfStaticItem = new List<IGameObject>();
-                }
+            ref List<IGameObject>? listOfStaticItem = ref this._gameObjects[tp.X, tp.Y];
+            listOfStaticItem ??= new List<IGameObject>();
             listOfStaticItem.Add(gameObject);
             }
 
-        public void Remove([NotNull] IGameObject gameObject)
+        public void Remove(IGameObject gameObject)
             {
             if (gameObject == null) 
                 throw new ArgumentNullException(nameof(gameObject));
 
             TilePos tp = gameObject.TilePosition;
-            List<IGameObject> listOfStaticItem = this._gameObjects[tp.X, tp.Y];
+            List<IGameObject>? listOfStaticItem = this._gameObjects[tp.X, tp.Y];
             if (listOfStaticItem == null || listOfStaticItem.Count == 0)
                 throw new InvalidOperationException("The gameObjects collection where the gameObject was expected to be was null.");
             if (!listOfStaticItem.Remove(gameObject))

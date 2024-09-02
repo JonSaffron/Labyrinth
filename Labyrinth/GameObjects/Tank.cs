@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects.Motility;
 using Labyrinth.Services.Display;
@@ -73,7 +72,7 @@ namespace Labyrinth.GameObjects
 
                         timeLeftStationary -= this.RemainingTime;
                         this.RemainingTime = 0;
-                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
+                        this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticMonster);
                         yield return hasMovedSinceLastCall;
                         hasMovedSinceLastCall = false;
                         }
@@ -92,7 +91,7 @@ namespace Labyrinth.GameObjects
                         if (this.TryToCompleteRotationToTarget(ref this.RemainingTime, targetRotation, directionOfTravel))
                             break;
 
-                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
+                        this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticMonster);
                         yield return hasMovedSinceLastCall;
                         hasMovedSinceLastCall = false;
                         }
@@ -111,7 +110,7 @@ namespace Labyrinth.GameObjects
                         if (this.TryToCompleteMoveToTarget(ref this.RemainingTime))
                             break;
 
-                        this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.MovingMonster);
+                        this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.MovingMonster);
                         yield return true; // we have moved
                         }
                     }
@@ -181,7 +180,7 @@ namespace Labyrinth.GameObjects
             private decimal _currentRotationRelativeToHull;
             private decimal _desiredRotation;
 
-            public Turret([NotNull] Tank tank)
+            public Turret(Tank tank)
                 {
                 this._tank = tank ?? throw new ArgumentNullException(nameof(tank));
                 }

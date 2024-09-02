@@ -17,7 +17,7 @@ namespace Labyrinth.Services.PathFinder
         /// </summary>
         public T LastStep { get; }
 
-        private readonly Path<T> _previousSteps;
+        private readonly Path<T>? _previousSteps;
 
         /// <summary>
         /// The actual cost of this path
@@ -34,7 +34,7 @@ namespace Labyrinth.Services.PathFinder
             // nothing to do
             }
 
-        private Path(T lastStep, Path<T> previousSteps, int cost)
+        private Path(T lastStep, Path<T>? previousSteps, int cost)
             {
             this.LastStep = lastStep;
             this._previousSteps = previousSteps;
@@ -50,7 +50,7 @@ namespace Labyrinth.Services.PathFinder
 
         public IEnumerator<T> GetEnumerator()
             {
-            for (Path<T> p = this; p != null; p = p._previousSteps)
+            for (Path<T>? p = this; p != null; p = p._previousSteps)
                 yield return p.LastStep;
             }
 
@@ -59,9 +59,10 @@ namespace Labyrinth.Services.PathFinder
             return this.GetEnumerator();
             }
 
-        public int CompareTo(Path<T> other)
+        public int CompareTo(Path<T>? other)
             {
-            var result = other.Cost - this.Cost;
+            int otherCost = other?.Cost ?? 0;
+            var result = otherCost - this.Cost;
             return result;
             }
 
@@ -75,7 +76,7 @@ namespace Labyrinth.Services.PathFinder
                 steps = p.LastStep + steps;
                 }
             var result = this.IsViable ? "Viable" : "Not viable";
-            result += " path " + i + " steps, cost=" + this.Cost + " " + steps;
+            result += $" path {i} steps, cost={this.Cost} {steps}";
             return result;
             }
         }

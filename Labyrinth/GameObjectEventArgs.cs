@@ -1,11 +1,10 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace Labyrinth
     {
     public class GameObjectEventArgs : EventArgs
         {
-        public GameObjectEventArgs([NotNull] IGameObject gameObject)
+        public GameObjectEventArgs(IGameObject gameObject)
             {
             this.GameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             }

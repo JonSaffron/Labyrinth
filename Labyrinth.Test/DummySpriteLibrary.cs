@@ -29,7 +29,7 @@ namespace Labyrinth.Test
                 }
             mutex.ReleaseMutex();
 
-            var result = new Texture2D(this._graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            var result = new Texture2D(this._graphicsDevice, Constants.TileRectangle.Width, Constants.TileRectangle.Height, false, SurfaceFormat.Color);
             return result;
             }
         }

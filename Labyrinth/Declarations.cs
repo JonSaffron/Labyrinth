@@ -110,7 +110,7 @@ namespace Labyrinth
     public enum PushStatus
         {
         /// <summary>
-        /// The push succeeds and the the pushed object moves in forward direction
+        /// The push succeeds and the pushed object moves in forward direction
         /// </summary>
         Yes,
 
@@ -153,10 +153,26 @@ namespace Labyrinth
         [UsedImplicitly] Acorn = 6
         }
 
-    public enum WorldReturnType
+    public enum WorldState
         {
+        /// <summary>
+        /// World is starting up, gameplay hasn't begun as yet
+        /// </summary>
+        Loading,
+
+        /// <summary>
+        /// Normal gameplay
+        /// </summary>
         Normal,
+
+        /// <summary>
+        /// Normal gameplay is not happening because the player has lost a life
+        /// </summary>
         LostLife,
+
+        /// <summary>
+        /// Normal gameplay is not happening because the player has completed the world
+        /// </summary>
         FinishedWorld
         }
 
@@ -170,6 +186,7 @@ namespace Labyrinth
         /// <summary>
         /// Moving without reference to the player's position
         /// </summary>
+        [UsedImplicitly]
         Placid,
 
         /// <summary>
@@ -185,6 +202,7 @@ namespace Labyrinth
         /// <summary>
         /// Evaluates risk of battle with Player and attacks or retreats appropriately
         /// </summary>
+        [UsedImplicitly]
         Cautious
         }
 
@@ -276,17 +294,17 @@ namespace Labyrinth
         [SoundInfo(3, true)]                MonsterShattersIntoNewLife,         // position of bang
         [SoundInfo]                         PlayerStartsNewLife,                // single instance
         [SoundInfo(3, true)]                StaticObjectShotAndInjured,         // position of object
-        [SoundInfo(1, true)]                ForceFieldShutsDown,                // position of forcefield
+        [SoundInfo(1, true)]                ForceFieldShutsDown,                // position of ForceField
         [SoundInfo(3, true)]                MineLaid,                           // position of mine
         [SoundInfo(3, true)]                MineArmed                           // position of mine
         }
 
     /// <summary>
-    /// Lower number items will be drawn first.
+    /// Lower number items will be drawn first so that higher number items may cover them up
     /// </summary>
     public enum SpriteDrawOrder
         {
-        Floor = 0,
+        [UsedImplicitly] Floor = 0,
         Wall = 1,
         StaticItem = 2,
         ForceField = 3,
@@ -303,6 +321,7 @@ namespace Labyrinth
         /// <summary>
         /// The population of fruit is performed once when the world is created
         /// </summary>
+        [UsedImplicitly]
         InitialPopulationOnly,
 
         /// <summary>

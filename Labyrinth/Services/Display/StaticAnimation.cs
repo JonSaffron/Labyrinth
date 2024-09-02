@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Labyrinth.Services.Display
     {
     /// <summary>
-    /// Renders a gameobject with a manually selected image
+    /// Renders a GameObject with a manually selected image
     /// </summary>
-    /// <remarks>Only suitable for a animation which is the same size as a tile</remarks>
+    /// <remarks>Only suitable for an animation which is the same size as a tile</remarks>
     public class StaticAnimation : IRenderAnimation
         {
         private readonly IGameObject _gameObject;
@@ -22,11 +22,13 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// What rotation to apply when drawing the sprite
         /// </summary>
+        [PublicAPI]
         public float Rotation { get; set; }
 
         /// <summary>
-        /// What effect to apply when drawing the sprite
+        /// What effects to apply when drawing the sprite
         /// </summary>
+        [PublicAPI]
         public SpriteEffects SpriteEffect { get; set; }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace Labyrinth.Services.Display
                 }
             }
 
-        public StaticAnimation([NotNull] IGameObject gameObject, [NotNull] string textureName)
+        public StaticAnimation(IGameObject gameObject, string textureName)
             {
             this._gameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             this._textureName = textureName ?? throw new ArgumentNullException(nameof(textureName));

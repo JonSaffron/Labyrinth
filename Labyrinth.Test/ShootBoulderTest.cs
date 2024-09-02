@@ -21,7 +21,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("# b p");
+            g.LoadWorld("# b p");
 
             g.RunTest();
 
@@ -42,7 +42,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("# bp ");
+            g.LoadWorld("# bp ");
 
             g.RunTest();
 
@@ -63,7 +63,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("#bp ");
+            g.LoadWorld("#bp ");
 
             g.RunTest();
 
@@ -85,7 +85,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("#b p ");
+            g.LoadWorld("#b p ");
 
             g.RunTest();
 
@@ -106,7 +106,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("# bbp ");
+            g.LoadWorld("# bbp ");
 
             g.RunTest();
 

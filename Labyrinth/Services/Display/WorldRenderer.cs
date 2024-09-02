@@ -1,12 +1,11 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.PathFinder;
 using Labyrinth.Services.WorldBuilding;
 using Microsoft.Xna.Framework;
 
-// todo drawing is quicker if the same texture is used multiple times rather than swapping between different textures - or use a portion of a bigger texture
+// todo: drawing is quicker if the same texture is used multiple times rather than swapping between different textures - or use a portion of a bigger texture
 // with spritebatch in immediate mode we could turn on GraphicsDevice.RenderState.DepthBufferEnable and specify a layerDepth during Draw and then output in texture order
 // http://www.shawnhargreaves.com/blog/spritebatch-and-spritesortmode.html
 // http://www.shawnhargreaves.com/blog/spritebatch-sorting-part-2.html
@@ -14,13 +13,13 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.Display
     {
-    class WorldRenderer
+    internal class WorldRenderer
         {
         private readonly TileRect _viewOfWorld;
-        [NotNull] private readonly ISpriteBatch _spriteBatch;
-        [NotNull] private readonly ISpriteLibrary _spriteLibrary;
+        private readonly ISpriteBatch _spriteBatch;
+        private readonly ISpriteLibrary _spriteLibrary;
 
-        public WorldRenderer(TileRect viewOfWorld, [NotNull] ISpriteBatch spriteBatch, [NotNull] ISpriteLibrary spriteLibrary)
+        public WorldRenderer(TileRect viewOfWorld, ISpriteBatch spriteBatch, ISpriteLibrary spriteLibrary)
             {
             this._viewOfWorld = viewOfWorld;
             this._spriteBatch = spriteBatch ?? throw new ArgumentNullException(nameof(spriteBatch));
@@ -45,8 +44,6 @@ namespace Labyrinth.Services.Display
                     int x = this._viewOfWorld.TopLeft.X + i;
 
                     string textureName = tiles[x, y].TextureName;
-                    if (textureName == null)
-                        continue;
 
                     var pathToTexture = textureName.Contains("/") ? textureName : "Tiles/" + textureName;
                     drawParameters.Texture = this._spriteLibrary.GetSprite(pathToTexture);
@@ -57,24 +54,22 @@ namespace Labyrinth.Services.Display
             }
 
         /// <summary>
-        /// Draws all the gameobjects within the current view
+        /// Draws all the GameObjects within the current view
         /// </summary>
-        /// <param name="gameTime"></param>
-        public void RenderWorld(GameTime gameTime)
+        public void RenderWorld()
             {
             var itemsToDraw = GlobalServices.GameState.AllItemsInRectangle(this._viewOfWorld);
             var drawQueue = new PriorityQueue<int, IGameObject>(100);
             foreach (var item in itemsToDraw)
                 {
-                int drawOrder = item.Properties.Get(GameObjectProperties.DrawOrder);
+                int drawOrder = (int) item.Properties.Get(GameObjectProperties.DrawOrder);
                 drawQueue.Enqueue(drawOrder, item);
                 }
-            //Trace.WriteLine("Drawing " + drawQueue.Count + " sprites.");
+
             while (!drawQueue.IsEmpty)
                 {
                 var item = drawQueue.Dequeue();
-                if (!(item is MovingItem))
-                    item.Update(gameTime);
+
                 var renderAnimation = item.RenderAnimation;
 
                 renderAnimation?.Draw(this._spriteBatch, this._spriteLibrary);

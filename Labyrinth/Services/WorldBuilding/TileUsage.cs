@@ -1,6 +1,6 @@
 ﻿namespace Labyrinth.Services.WorldBuilding
     {
-    readonly struct TileUsage
+    internal readonly struct TileUsage
         {
         public readonly TileTypeByMap TileTypeByMap;
         private readonly char _symbol;

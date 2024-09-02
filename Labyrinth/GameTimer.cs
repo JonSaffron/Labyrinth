@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth
@@ -18,7 +17,7 @@ namespace Labyrinth
             return gt;
             }
 
-        private GameTimer(Game game, TimeSpan timeToElapse, [NotNull] EventHandler callBack, bool isEnabled = true) : base(game)
+        private GameTimer(Game game, TimeSpan timeToElapse, EventHandler callBack, bool isEnabled = true) : base(game)
             {
             if (timeToElapse.Ticks < 0)
                 throw new ArgumentOutOfRangeException(nameof(timeToElapse));
@@ -38,7 +37,7 @@ namespace Labyrinth
             this._timeRemaining -= gameTime.ElapsedGameTime;
             if (this._timeRemaining.Ticks <= 0)
                 {
-                this._callBack(this, new EventArgs());
+                this._callBack(this, EventArgs.Empty);
                 this.Enabled = false;
                 this.Dispose();
                 // ToDo ensure this object gets removed from GameComponents collection

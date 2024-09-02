@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Input;
 
 namespace Labyrinth.Services.Input
@@ -19,7 +18,7 @@ namespace Labyrinth.Services.Input
 
         private readonly InputState _inputState;
 
-        public GameInput([NotNull] InputState inputState)
+        public GameInput(InputState inputState)
             {
             this._inputState = inputState ?? throw new ArgumentNullException(nameof(inputState));
             }

@@ -3,10 +3,9 @@
 namespace Labyrinth.GameObjects.Behaviour
     {
     /// <summary>
-    /// Gets the monster moving if it gets hurt
+    /// Gets the monster to start moving when it encounters the player
     /// </summary>
-    /// <remarks>Not a behaviour of the original game, but seems like a sensible thing to have</remarks>
-    class ActivateWhenMeetsPlayer : BaseBehaviour, IMovementBehaviour
+    internal class ActivateWhenMeetsPlayer : BaseBehaviour, IMovementBehaviour
         {
         public override void Perform()
             {

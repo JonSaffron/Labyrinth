@@ -8,6 +8,7 @@ namespace Labyrinth.Test
         private SoundState _state = SoundState.Stopped;
         private float _pan;
         private float _volume;
+        private bool _restart;
 
         public DummySoundEffectInstance()
             {
@@ -23,16 +24,24 @@ namespace Labyrinth.Test
         public void Play()
             {
             this._state = SoundState.Playing;
+            this._restart = false;
             }
 
         public void Stop()
             {
             this._state = SoundState.Stopped;
+            this._restart = false;
+            }
+
+        public void Restart()
+            {
+            this._state = SoundState.Stopped;
+            this._restart = true;
             }
 
         public string InstanceName { get; set; }
 
-        public bool RestartPlayWhenStopped { get; set; }
+        public bool IsSetToRestart => this._restart;
 
         public SoundState State
             {

@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
+using Labyrinth.Screens;
 using Labyrinth.Services.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -9,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Labyrinth.Services.Display
-    {
+{
     /// <summary>
     /// The screen manager is a component which manages one or more GameScreen
     /// instances. It maintains a stack of screens, calls their Update and Draw
@@ -21,7 +22,9 @@ namespace Labyrinth.Services.Display
         private readonly List<GameScreen> _screens = new List<GameScreen>();
         private readonly GraphicsDeviceManager _gdm;
 
-        private Texture2D _blankTexture;
+        private ISpriteBatch? _spriteBatch;
+        private SpriteFont? _spriteFont;
+        private Texture2D? _blankTexture;
         
         private bool _isInitialised;
 
@@ -29,13 +32,39 @@ namespace Labyrinth.Services.Display
         /// A default SpriteBatch shared by all the screens. This saves
         /// each screen having to bother creating their own local instance.
         /// </summary>
-        public ISpriteBatch SpriteBatch { get; private set; }
+        public ISpriteBatch SpriteBatch
+            {
+            get
+                {
+                if (this._spriteBatch == null)
+                    throw new InvalidOperationException("SpriteBatch has not been instantiated");
+                return this._spriteBatch;
+                }
+            }
 
         /// <summary>
         /// A default font shared by all the screens. This saves
         /// each screen having to bother loading their own local copy.
         /// </summary>
-        public SpriteFont Font { get; private set; }
+        public SpriteFont Font
+            {
+            get
+                {
+                if (this._spriteFont == null)
+                    throw new InvalidOperationException("Content for Font property has not been loaded");
+                return this._spriteFont;
+                }
+            }
+
+        public Texture2D BlankTexture
+            {
+            get
+                {
+                if (this._blankTexture == null)
+                    throw new InvalidOperationException("BlankTexture has not been created");
+                return this._blankTexture;
+                }
+            }
 
         /// <summary>
         /// If true, the manager prints out a list of all the screens
@@ -54,14 +83,15 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// Constructs a new screen manager component.
         /// </summary>
-        public ScreenManager([NotNull] Game game) : base(game)
+        public ScreenManager(Game game) : base(game)
             {
+            if (game == null) throw new ArgumentNullException(nameof(game));
             // we must set EnabledGestures before we can query for them, but
             // we don't assume the game wants to read them.
             TouchPanel.EnabledGestures = GestureType.None;
             this._gdm = new GraphicsDeviceManager(game);
             this._zoomWhilstWindowed = GetInitialZoom();
-            SetBackBufferSize(true);
+            SetBackBufferSize(isInitialSize: true);
             var playerInput = new PlayerInput(this.InputState);
             GlobalServices.SetPlayerInput(playerInput);
             }
@@ -96,7 +126,7 @@ namespace Labyrinth.Services.Display
         private static float GetInitialZoom()
             {
             var zoomLevels = GetPossibleZoomLevels().ToArray();
-            var result = zoomLevels.Length > 1 ? zoomLevels[zoomLevels.Length - 2] : zoomLevels[0];
+            var result = zoomLevels.Length > 1 ? zoomLevels[^2] : zoomLevels[0];
             return result;
             }
 
@@ -112,7 +142,7 @@ namespace Labyrinth.Services.Display
             if (!DoesScaleFactorFitScreen(nextZoomLevel))
                 return;
             this._zoomWhilstWindowed = nextZoomLevel;
-            SetBackBufferSize(false);
+            SetBackBufferSize(isInitialSize: false);
             }
 
         public void DecreaseZoom()
@@ -125,7 +155,7 @@ namespace Labyrinth.Services.Display
                 return;
             float previousZoomLevel = lesserZoomLevels.Max();
             this._zoomWhilstWindowed = previousZoomLevel;
-            SetBackBufferSize(false);
+            SetBackBufferSize(isInitialSize: false);
             }
 
         private void SetBackBufferSize(bool isInitialSize)
@@ -135,7 +165,7 @@ namespace Labyrinth.Services.Display
             if (!isInitialSize)
                 {
                 this._gdm.ApplyChanges();
-                this.SpriteBatch = GetSpriteBatch();
+                this._spriteBatch = GetSpriteBatch();
                 }
             }
 
@@ -157,15 +187,15 @@ namespace Labyrinth.Services.Display
             // Load content belonging to the screen manager.
             ContentManager content = Game.Content;
 
-            this.SpriteBatch = GetSpriteBatch();
-            this.Font = content.Load<SpriteFont>("Display/MenuFont");
+            this._spriteBatch = GetSpriteBatch();
+            this._spriteFont = content.Load<SpriteFont>("Display/MenuFont");
             this._blankTexture = new Texture2D(this.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             this._blankTexture.SetData(new[] { Color.White });
 
             // Tell each of the screens to load their content.
             foreach (GameScreen screen in _screens)
                 {
-                screen.LoadContent();
+                screen.Activate();
                 }
 
             GlobalServices.SoundPlayer.SoundLibrary.LoadContent(content);
@@ -179,7 +209,7 @@ namespace Labyrinth.Services.Display
             // Tell each of the screens to unload their content.
             foreach (GameScreen screen in _screens)
                 {
-                screen.UnloadContent();
+                screen.Unload();
                 }
             this.SpriteBatch.Dispose();
             }
@@ -189,7 +219,7 @@ namespace Labyrinth.Services.Display
         /// </summary>
         public override void Update(GameTime gameTime)
             {
-            // Read the keyboard and gamepad.
+            // Read the keyboard and GamePad.
             this.InputState.Update();
 
             // Make a copy of the master screen list, to avoid confusion if
@@ -231,7 +261,7 @@ namespace Labyrinth.Services.Display
                 TraceScreens();
             }
 
-        private string _lastListOfScreens;
+        private string? _lastListOfScreens;
 
         /// <summary>
         /// Prints a list of all the screens, for debugging.
@@ -274,7 +304,7 @@ namespace Labyrinth.Services.Display
             // If we have a graphics device, tell the screen to load content.
             if (this._isInitialised)
                 {
-                screen.LoadContent();
+                screen.Activate();
                 }
 
             this._screens.Add(screen);
@@ -294,7 +324,7 @@ namespace Labyrinth.Services.Display
             // If we have a graphics device, tell the screen to unload content.
             if (this._isInitialised)
                 {
-                screen.UnloadContent();
+                screen.Unload();
                 }
 
             this._screens.Remove(screen);
@@ -303,7 +333,7 @@ namespace Labyrinth.Services.Display
             // to respond to gestures that screen is interested in.
             if (this._screens.Count > 0)
                 {
-                TouchPanel.EnabledGestures = _screens[_screens.Count - 1].EnabledGestures;
+                TouchPanel.EnabledGestures = _screens[^1].EnabledGestures;
                 }
             }
 
@@ -327,19 +357,21 @@ namespace Labyrinth.Services.Display
             SpriteBatch.End();
             }
 
+        public bool IsFullScreen => this._gdm.IsFullScreen;
+
         public void ToggleFullScreen()
             {
-            if (!this._gdm.IsFullScreen)
+            if (!this.IsFullScreen)
                 {
                 this._gdm.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
                 this._gdm.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
                 }
             else
                 {
-                SetBackBufferSize(true);
+                SetBackBufferSize(isInitialSize: true);
                 }
             this._gdm.ToggleFullScreen();
-            this.SpriteBatch = GetSpriteBatch();
+            this._spriteBatch = GetSpriteBatch();
             }
 
         private ISpriteBatch GetSpriteBatch()

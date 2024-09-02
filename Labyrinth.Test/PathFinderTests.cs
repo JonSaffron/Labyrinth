@@ -299,6 +299,7 @@ namespace Labyrinth.Test
             Assert.IsFalse(path1.IsViable);
             Assert.IsTrue(path1.ToString().StartsWith("Not viable path 4 steps, cost=6"));
             var enumerator = ((IEnumerable) path1).GetEnumerator();
+            var disposable = enumerator as IDisposable;
             var s = string.Empty;
             while (enumerator.MoveNext())
                 {
@@ -306,6 +307,7 @@ namespace Labyrinth.Test
                 s += (char) enumerator.Current;
                 }
             Assert.IsTrue("DCBA" == s);
+            disposable?.Dispose();
 
             Assert.Positive(path1.CompareTo(path1.AddStep('E', 4)));
             Assert.Negative(path1.AddStep('E', 4).CompareTo(path1));

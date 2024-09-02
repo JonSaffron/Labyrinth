@@ -4,12 +4,12 @@ using Labyrinth.DataStructures;
 namespace Labyrinth.GameObjects.Motility
     {
     [UsedImplicitly]
-    class FullPursuit : MonsterMotionBase
+    internal class FullPursuit : MonsterMotionBase
         {
         // Determine which direction gets closer to player
         // Horizontal movement is preferred, but if the move isn't possible or the monster is already
         // on the same column as the player then vertical movement will be tried.
-        public FullPursuit([NotNull] Monster monster) : base(monster)
+        public FullPursuit(Monster monster) : base(monster)
             {
             }
 

@@ -17,7 +17,7 @@ namespace Labyrinth.GameObjects
         private readonly Dictionary<Direction, Rectangle> _boundingRectangles;
         private readonly StaticAnimation _animationPlayer;
 
-        private IEnumerator<bool> _movementIterator;
+        private IEnumerator<bool>? _movementIterator;
         private double _remainingTime;
 
         public StandardShot(Vector2 position, Direction direction, int energy, IGameObject originator) : base(position)
@@ -38,7 +38,7 @@ namespace Labyrinth.GameObjects
             this.MovementBoundary = GlobalServices.BoundMovementFactory.GetWorldBoundary();
 
             this.Properties.Set(GameObjectProperties.Capability, ObjectCapability.CanPushOthers);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Shot);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.Shot);
             }
 
         private Dictionary<Direction, Rectangle> GetBoundingRectangles()

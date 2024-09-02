@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,7 +8,7 @@ namespace Labyrinth.Services.Display
         {
         private readonly Game _game;
 
-        public SpriteLibrary([NotNull] Game game)
+        public SpriteLibrary(Game game)
             {
             this._game = game ?? throw new ArgumentNullException(nameof(game));
             }

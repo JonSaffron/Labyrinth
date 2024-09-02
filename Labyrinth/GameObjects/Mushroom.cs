@@ -12,7 +12,7 @@ namespace Labyrinth.GameObjects
             {
             this._animationPlayer = new StaticAnimation(this, "Sprites/Props/Mushroom");
             this.Energy = 40;
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticItem);
             }
         
         public override IRenderAnimation RenderAnimation => this._animationPlayer;

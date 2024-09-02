@@ -19,11 +19,11 @@ namespace Labyrinth.GameObjects
             this._animationPlayer = new LoopedAnimation(this, "Sprites/Monsters/Egg", 6);
             var timeSpan = TimeSpan.FromSeconds(timeToHatch * Constants.GameClockResolution);
             this._hatchingTimer = GameTimer.AddGameTimer(timeSpan, EggIsHatching, false);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticMonster);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticMonster);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
             }
 
-        private void EggIsHatching(object sender, EventArgs args)
+        private void EggIsHatching(object? sender, EventArgs args)
             {
             if (this.IsExtant)
                 {
@@ -32,12 +32,12 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        private void HatchingSoundFinished(object sender, EventArgs args)
+        private void HatchingSoundFinished(object? sender, EventArgs args)
             {
             HatchEgg();
             }
 
-        public Monster HatchEgg()
+        public Monster? HatchEgg()
             {
             if (!this.IsExtant)
                 {

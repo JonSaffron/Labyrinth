@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Microsoft.Xna.Framework.Input;
 
@@ -15,7 +14,7 @@ namespace Labyrinth.Services.Input
 
         public bool Enabled { get; set; }
 
-        public PlayerInput([NotNull] InputState inputState)
+        public PlayerInput(InputState inputState)
             {
             this._inputState = inputState ?? throw new ArgumentNullException(nameof(inputState));
             }

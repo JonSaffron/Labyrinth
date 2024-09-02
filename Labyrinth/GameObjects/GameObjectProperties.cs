@@ -10,7 +10,7 @@ namespace Labyrinth.GameObjects
         /// </summary>
         /// <remarks>Objects with a low DrawOrder are drawn before those with a higher DrawOrder.
         /// Objects with the same DrawOrder may be drawn in any order.</remarks>
-        public static readonly PropertyDef<int> DrawOrder = new PropertyDef<int>(nameof(DrawOrder), 0);
+        public static readonly PropertyDef<SpriteDrawOrder> DrawOrder = new PropertyDef<SpriteDrawOrder>(nameof(DrawOrder), 0);
 
         /// <summary>
         /// An indication of how solid the object is
@@ -38,15 +38,17 @@ namespace Labyrinth.GameObjects
         /// </summary>
         public static readonly PropertyDef<bool> DeadlyToTouch = new PropertyDef<bool>(nameof(DeadlyToTouch), false);
 
-        /// <summary>
-        /// Defines how an object reduces the player's energy
-        /// </summary>
-        public static readonly PropertyDef<Func<Player, int>> InjuriousToPlayer = new PropertyDef<Func<Player, int>>(nameof(InjuriousToPlayer), player => 0);
+        // todo
+        //// <summary>
+        //// Defines how an object reduces the player's energy
+        //// </summary>
+        //public static readonly PropertyDef<Func<Player, int>> InjuriousToPlayer = new PropertyDef<Func<Player, int>>(nameof(InjuriousToPlayer), player => 0);
 
-        /// <summary>
-        /// Defines how an object increases the player's energy
-        /// </summary>
-        public static readonly PropertyDef<Func<Player, int>> CurativeToPlayer = new PropertyDef<Func<Player, int>>(nameof(CurativeToPlayer), player => 0);
+        // todo
+        //// <summary>
+        //// Defines how an object increases the player's energy
+        //// </summary>
+        //public static readonly PropertyDef<Func<Player, int>> CurativeToPlayer = new PropertyDef<Func<Player, int>>(nameof(CurativeToPlayer), player => 0);
 
         /// <summary>
         /// Defines an object's movement strategy

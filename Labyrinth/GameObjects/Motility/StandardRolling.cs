@@ -3,16 +3,16 @@ using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
-    class StandardRolling : MonsterMotionBase
+    [UsedImplicitly]
+    internal class StandardRolling : MonsterMotionBase
         {
         protected Direction CurrentDirection { get; private set; }
 
-        [UsedImplicitly]
-        public StandardRolling([NotNull] Monster monster) : base(monster)
+        public StandardRolling(Monster monster) : base(monster)
             {
             }
 
-        public StandardRolling([NotNull] Monster monster, Direction initialDirection) : base(monster)
+        public StandardRolling(Monster monster, Direction initialDirection) : base(monster)
             {
             this.CurrentDirection = initialDirection;
             }

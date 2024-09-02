@@ -13,7 +13,10 @@ namespace Labyrinth.Services.Sound
             if (activeSound == null)
                 throw new ArgumentNullException(nameof(activeSound));
 
-            // slightly odd looking, but this means that if a SoundEffectInstance is added both as an ActiveSound and as an ActiveSoundForObject then the code copes
+            // slightly odd looking, but this means that:
+            // - if a SoundEffectInstance is already present it will be replaced with the new instance.
+            //   this means that the sound panning and volume will track the new item and not the old
+            // - if a SoundEffectInstance is added both as an ActiveSound and as an ActiveSoundForObject then the code copes
             this._activeSounds.Remove(activeSound);
             this._activeSounds.Add(activeSound);
             activeSound.Play();
@@ -67,7 +70,7 @@ namespace Labyrinth.Services.Sound
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private class ActiveSoundComparer : IEqualityComparer<IActiveSound>
             {
-            public bool Equals(IActiveSound x, IActiveSound y)
+            public bool Equals(IActiveSound? x, IActiveSound? y)
                 {
                 if (x == null && y == null)
                     return true;

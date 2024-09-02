@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Labyrinth.DataStructures;
 
@@ -28,7 +29,7 @@ namespace Labyrinth.Services.PathFinder
         /// Attempts to find a path from the start location to the end location based on the supplied SearchParameters
         /// </summary>
         /// <returns>A List of Points representing the path. If no path was found, the returned list is empty.</returns>
-        public bool TryFindPath(out IList<TilePos> result)
+        public bool TryFindPath([NotNullWhen(returnValue: true)] out IList<TilePos>? result)
             {
             // The start node is the first entry in the 'open' list
             this._openNodes.Enqueue(0, new Path<TilePos>(this._repelParameters.StartLocation));
@@ -59,7 +60,7 @@ namespace Labyrinth.Services.PathFinder
                     if (pathYetToVisit != null)
                         {
                         if (newPath.Cost >= pathYetToVisit.Cost)
-                            // don't add the newpath as it's no better than one we've already found
+                            // don't add the newPath as it's no better than one we've already found
                             continue;
 
                         // mark the path we've already queued as not worth investigating
@@ -68,7 +69,7 @@ namespace Labyrinth.Services.PathFinder
 
                     var pathsAlreadyVisitedThatEndUpInTheSamePlace = this._closedNodes.Where(item => item.LastStep == newPath.LastStep);
                     if (pathsAlreadyVisitedThatEndUpInTheSamePlace.Any(p => p.Cost <= newPath.Cost))
-                        // don't add the newpath as it's no better than one we've already found
+                        // don't add the newPath as it's no better than one we've already found
                         continue;
 
                     var estimatedCostToGoal = -(ManhattanDistance(this._repelParameters.RepelLocation, nextNode)) + GetTieBreaker(nextNode);
@@ -76,7 +77,7 @@ namespace Labyrinth.Services.PathFinder
                     }
                 }
 
-            // The method returns false if no path can be found
+            // The method returns false if no path can be found away from the object specified
             result = null;
             return false;
             }
@@ -93,7 +94,7 @@ namespace Labyrinth.Services.PathFinder
             foreach (var location in nextLocations)
                 {
                 // Ignore non-walkable nodes
-                if (!this._repelParameters.CanBeOccupied(location))
+                if (!this._repelParameters.CanBeOccupied!(location))
                     continue;
 
                 yield return location;
@@ -118,7 +119,7 @@ namespace Labyrinth.Services.PathFinder
             }
 
         /// <summary>
-        /// Gets the estimated distance between a specifed point and the goal
+        /// Gets the estimated distance between a specified point and the goal
         /// </summary>
         private static int ManhattanDistance(TilePos tp1, TilePos tp2)
             {
@@ -138,7 +139,7 @@ namespace Labyrinth.Services.PathFinder
             var start = this._repelParameters.StartLocation;
             var goal = this._repelParameters.RepelLocation;
 
-            // add tie-breaker. This makes the heurisitic non-applicable but should improve the routes taken
+            // add tie-breaker. This makes the heuristic non-applicable but should improve the routes taken
             int dx1 = start.X - goal.X;
             int dy1 = start.Y - goal.Y;
             int dx2 = current.X - goal.X;

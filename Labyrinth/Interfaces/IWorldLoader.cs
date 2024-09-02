@@ -6,8 +6,7 @@ namespace Labyrinth
     {
     public interface IWorldLoader
         {
-        void LoadWorld(string levelName);
-
+        string WorldName { get; }
         TilePos WorldSize { get; }
         Tile[,] FloorTiles { get; }
         bool RestartInSameRoom { get; }

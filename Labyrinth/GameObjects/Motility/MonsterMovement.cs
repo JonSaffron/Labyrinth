@@ -32,6 +32,9 @@ namespace Labyrinth.GameObjects.Motility
             Player p = GlobalServices.GameState.Player;
             if (!p.IsAlive())
                 return false;
+            if (monster.SightBoundary == null)
+                throw new InvalidOperationException("SightBoundary has not been set for monster");
+
             var playerTilePos = p.TilePosition;
             if (!monster.SightBoundary.IsPositionWithinBoundary(playerTilePos))
                 return false;

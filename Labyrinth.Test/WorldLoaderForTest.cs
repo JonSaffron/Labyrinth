@@ -9,12 +9,14 @@ namespace Labyrinth.Test
     {
     class WorldLoaderForTest : IWorldLoader
         {
-        private string _layout;
+        private readonly string _layout;
 
-        public void LoadWorld(string worldLayout)
+        public WorldLoaderForTest(string worldLayout)
             {
             this._layout = worldLayout;
             }
+
+        public string WorldName => "UnitTest";
 
         private int Height 
             {
@@ -45,7 +47,7 @@ namespace Labyrinth.Test
                 var result = new Tile[this.Width, this.Height];
                 for (int x = 0; x < this.Width; x++)
                 for (int y = 0; y < this.Height; y++)
-                    result[x, y] = new Tile(null, 0);
+                    result[x, y] = new Tile(" ", 0);
                 return result;
                 }
             }

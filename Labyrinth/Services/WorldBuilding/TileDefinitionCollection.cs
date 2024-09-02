@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    class TileDefinitionCollection : IHasArea
+    internal class TileDefinitionCollection : IHasArea
         {
         public Rectangle Area { get; set; }
         private readonly Dictionary<char, TileDefinition> _definitions = new Dictionary<char, TileDefinition>();
 
-        public void Add([NotNull] TileDefinition td)
+        private void Add(TileDefinition td)
             {
             if (td == null) throw new ArgumentNullException(nameof(td));
             this._definitions.Add(td.Symbol, td);
@@ -38,32 +37,32 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public static TileDefinitionCollection FromXml(XmlNodeList tiledefs)
+        public static TileDefinitionCollection FromXml(XmlNodeList tileDefinitions)
             {
             var result = new TileDefinitionCollection();
-            foreach (XmlElement tiledef in tiledefs)
+            foreach (XmlElement tileDef in tileDefinitions)
                 {
-                string symbol = tiledef.GetAttribute("Symbol");
-                switch (tiledef.Name)
+                string symbol = tileDef.GetAttribute("Symbol");
+                switch (tileDef.Name)
                     {
                     case "Wall":
                         {
-                        string texture = tiledef.GetAttribute("Tile");
+                        string texture = tileDef.GetAttribute("Tile");
                         var td = new TileWallDefinition(symbol, texture);
                         result.Add(td);
                         break;
                         }
                     case "Floor":
                         {
-                        string texture = tiledef.GetAttribute("Tile");
-                        bool.TryParse(tiledef.GetAttribute("IsDefault"), out var isDefault);
+                        string texture = tileDef.GetAttribute("Tile");
+                        bool.TryParse(tileDef.GetAttribute("IsDefault"), out var isDefault);
                         var td = new TileFloorDefinition(symbol, texture, isDefault);
                         result.Add(td);
                         break;
                         }
                     case "Object":
                         {
-                        string description = tiledef.GetAttribute("Description");
+                        string description = tileDef.GetAttribute("Description");
                         var td = new TileObjectDefinition(symbol, description);
                         result.Add(td);
                         break;

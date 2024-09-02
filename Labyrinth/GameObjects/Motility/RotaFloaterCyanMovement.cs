@@ -3,9 +3,10 @@ using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
-    class RotaFloaterCyanMovement : StandardRolling
+    [UsedImplicitly]
+    internal class RotaFloaterCyanMovement : StandardRolling
         {
-        public RotaFloaterCyanMovement([NotNull] Monster monster) : base(monster)
+        public RotaFloaterCyanMovement(Monster monster) : base(monster)
             {
             }
             

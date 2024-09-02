@@ -4,9 +4,9 @@ using Labyrinth.DataStructures;
 namespace Labyrinth.GameObjects.Motility
     {
     [UsedImplicitly]
-    class Placid : MonsterMotionBase
+    internal class Placid : MonsterMotionBase
         {
-        public Placid([NotNull] Monster monster) : base(monster)
+        public Placid(Monster monster) : base(monster)
             {
             }
 

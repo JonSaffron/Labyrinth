@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 
 namespace Labyrinth.Services.WorldBuilding
     {
@@ -8,7 +9,10 @@ namespace Labyrinth.Services.WorldBuilding
         public int NumberOfDice { get; }
         public int NumberOfSides { get; }
 
-        public static DiceRoll None = new DiceRoll();
+        private static readonly DiceRoll NoRoll = new DiceRoll();
+#pragma warning disable CA2211
+        public static DiceRoll None = NoRoll;
+#pragma warning restore CA2211
 
         public DiceRoll(int numberOfDice, int numberOfSides)
             {
@@ -38,11 +42,13 @@ namespace Labyrinth.Services.WorldBuilding
             this.NumberOfSides = numberOfSides;
             }
 
+        [PublicAPI]
         public int MinValue => this.NumberOfDice;
 
+        [PublicAPI]
         public int MaxValue => this.NumberOfDice * this.NumberOfSides;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             {
             return obj is DiceRoll roll && this.Equals(roll);
             }

@@ -1,14 +1,13 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
-    abstract class MonsterMotionBase : IMonsterMotion
+    internal abstract class MonsterMotionBase : IMonsterMotion
         {
         protected readonly Monster Monster;
 
-        protected MonsterMotionBase([NotNull] Monster monster)
+        protected MonsterMotionBase(Monster monster)
             {
             this.Monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }

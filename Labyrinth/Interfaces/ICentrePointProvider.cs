@@ -4,6 +4,6 @@ namespace Labyrinth
     {
     public interface ICentrePointProvider
         {
-        Vector2 CentrePoint { get; }
+        Vector2 GetDistanceFromCentreOfScreen(Vector2 gameObjectPosition);
         }
     }

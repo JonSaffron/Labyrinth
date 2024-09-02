@@ -11,25 +11,36 @@ namespace Labyrinth
     public class GameState
         {
         private readonly IGameObjectCollection _gameObjectCollection;
+        private Player? _player;
 
-        public Player Player { get; private set; }
+        public Player Player
+            {
+            get
+                {
+                if (this._player == null)
+                    throw new InvalidOperationException("Player property has not been set.");
+                return this._player;
+                }
 
-        public event EventHandler<GameObjectEventArgs> GameObjectRemoved;
+            private set => this._player = value ?? throw new ArgumentNullException(nameof(value));
+            }
+
+        public event EventHandler<GameObjectEventArgs>? GameObjectRemoved;
 
         public GameState(IGameObjectCollection gameObjectCollection)
             {
             this._gameObjectCollection = gameObjectCollection ?? throw new ArgumentNullException(nameof(gameObjectCollection));
             }
 
-         /// <summary>
+        /// <summary>
         /// Returns a list of all extant game objects that could interact with other game objects
         /// </summary>
         /// <returns>A lazy enumeration of all the matching game objects</returns>
-        public IEnumerable<IMovingItem> GetSurvivingInteractiveItems()
+        public IEnumerable<IGameObject> GetSurvivingGameObjects()
             {
-            List<IMovingItem> itemsToRemove = null;
+            List<IGameObject> itemsToRemove = new List<IGameObject>();
 
-            foreach (var item in this._gameObjectCollection.InteractiveGameItems)
+            foreach (var item in this._gameObjectCollection.AllGameObjects)
                 {
                 if (item.IsExtant)
                     {
@@ -40,13 +51,10 @@ namespace Labyrinth
                 if (item is Player) 
                     continue;
 
-                if (itemsToRemove == null)
-                    itemsToRemove = new List<IMovingItem> {item};
-                else
-                    itemsToRemove.Add(item);
+                itemsToRemove.Add(item);
                 }
 
-            if (itemsToRemove == null)
+            if (itemsToRemove.Count == 0)
                 yield break;
 
             foreach (var item in itemsToRemove)
@@ -98,12 +106,8 @@ namespace Labyrinth
                     {
                     int x = tr.TopLeft.X + i;
 
-                    var listOfItems = this.GetItemsOnTile(new TilePos(x, y));
-                    if (listOfItems == null)
-                        continue;
-
-                    var copyOfList = listOfItems.ToArray();
-                    foreach (var item in copyOfList)
+                    var listOfItems = this.GetItemsOnTile(new TilePos(x, y)).ToArray();
+                    foreach (var item in listOfItems)
                         yield return item;
                     }
                 }
@@ -172,7 +176,6 @@ namespace Labyrinth
         /// Place short bang at a shot's position and remove the shot
         /// </summary>
         /// <param name="s">An instance of a shot to convert</param>
-        // todo review this. I still don't like it.
         public Bang ConvertShotToBang(IMunition s)
             {
             var result = AddBang(s.Position, BangType.Short);
@@ -208,6 +211,7 @@ namespace Labyrinth
             return b;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public Bang AddBang(Vector2 p, BangType bangType, GameSound gameSound)
             {
             var b = AddBang(p, bangType);
@@ -215,6 +219,7 @@ namespace Labyrinth
             return b;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public Grave AddGrave(TilePos tp)
             {
             var g = new Grave(tp.ToPosition());
@@ -228,6 +233,7 @@ namespace Labyrinth
             this._gameObjectCollection.Add(m);
             }
         
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public Crystal AddCrystal(Vector2 position, int id, int score, int energy)
             {
             var crystal = new Crystal(position, id, score, energy);
@@ -256,6 +262,7 @@ namespace Labyrinth
             return result;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public StandardShot AddStandardShot(Vector2 startPos, Direction direction, int energy, IGameObject originator)
             {
             var shot = new StandardShot(startPos, direction, energy, originator);
@@ -263,9 +270,11 @@ namespace Labyrinth
             return shot;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public Player AddPlayer(Vector2 position, int energy, int initialWorldAreaId)
             {
-            if (this.Player != null)
+            // use the backing field for this test
+            if (this._player != null)
                 throw new InvalidOperationException("Cannot add more than one Player.");
             var result = new Player(position, energy, initialWorldAreaId);
             this._gameObjectCollection.Add(result);
@@ -273,6 +282,7 @@ namespace Labyrinth
             return result;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public Wall AddWall(Vector2 position, string textureName)
             {
             var result = new Wall(position, textureName);
@@ -280,6 +290,7 @@ namespace Labyrinth
             return result;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public Boulder AddBoulder(Vector2 position)
             {
             var result = new Boulder(position);
@@ -287,6 +298,7 @@ namespace Labyrinth
             return result;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public ForceField AddForceField(Vector2 position, int crystalRequired)
             {
             var result = new ForceField(position, crystalRequired);
@@ -294,6 +306,7 @@ namespace Labyrinth
             return result;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public CrumblyWall AddCrumblyWall(Vector2 position, string textureName, int energy)
             {
             var result = new CrumblyWall(position, textureName, energy);
@@ -308,6 +321,7 @@ namespace Labyrinth
             return result;
             }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public TileReservation AddTileReservation(Vector2 position)
             {
             var result = new TileReservation(position);
@@ -315,6 +329,7 @@ namespace Labyrinth
             return result;
             }
 
+        // ReSharper disable once UnusedMember.Global
         public Potion AddPotion(Vector2 position)
             {
             var result = new Potion(position);

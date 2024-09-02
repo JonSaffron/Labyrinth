@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<World Name="TestWorld" Height="20" Width="32" RestartInSameRoom="true" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
+<World Name="Test World" Height="20" Width="32" RestartInSameRoom="true" xmlns="http://JonSaffron/Labyrinth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://JonSaffron/Labyrinth WorldSchema.xsd">
   <Layout>
     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
     OS       #     OOr             O

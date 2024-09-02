@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace Labyrinth.Services.Messages
     {
@@ -7,7 +6,7 @@ namespace Labyrinth.Services.Messages
         {
         public readonly string Message;
 
-        public WorldLoaderProgress([NotNull] string message)
+        public WorldLoaderProgress(string message)
             {
             this.Message = message ?? throw new ArgumentNullException(nameof(message));
             }

@@ -5,9 +5,9 @@ using Labyrinth.DataStructures;
 namespace Labyrinth.GameObjects.Motility
     {
     [UsedImplicitly]
-    class CautiousPursuit : MonsterMotionBase
+    internal class CautiousPursuit : MonsterMotionBase
         {
-        public CautiousPursuit([NotNull] Monster monster) : base(monster)
+        public CautiousPursuit(Monster monster) : base(monster)
             {
             }
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.ClockEvents;
 using Labyrinth.Services.WorldBuilding;
@@ -20,53 +19,49 @@ namespace Labyrinth
     public class World
         {
         private readonly TilePos _worldSize;
-        [NotNull] private Tile[,] _tiles;
+        private Tile[,] _tiles;
         private readonly bool _restartInSameRoom;
-        [NotNull] private readonly Dictionary<int, PlayerStartState> _playerStartStates;
-        [NotNull] private readonly Player _player;
-        [NotNull] private readonly WorldClock _worldClock;
-        private Effect _endOfWorldEffect;
+        private readonly Dictionary<int, PlayerStartState> _playerStartStates;
+        private readonly Player _player;
+        private readonly WorldClock _worldClock;
         private readonly WorldWindow _worldWindow;
         private bool _applyEndOfWorldEffect;
-        private WorldReturnType _worldReturnTypeBacking = WorldReturnType.Normal;
+        private Effect? _endOfWorldEffect;
+        private WorldState _worldState = WorldState.Loading;
 
-        private WorldReturnType WorldReturnType
-            {
-            get => this._worldReturnTypeBacking;
-            set => this._worldReturnTypeBacking = value;
-            }
+        public readonly GameState GameState;
 
-        public World([NotNull] IWorldLoader worldLoader, [NotNull] string world)
+        public World(IWorldLoader worldLoader)
             {
-            worldLoader.LoadWorld(world);
+            if (worldLoader == null) 
+                throw new ArgumentNullException(nameof(worldLoader));
+
             this._worldSize = worldLoader.WorldSize;
             this._tiles = worldLoader.FloorTiles;
             this._restartInSameRoom = worldLoader.RestartInSameRoom;
             this._playerStartStates = worldLoader.PlayerStartStates;
 
-            var boundMovementFactory = new BoundMovementFactory(this._worldSize);
-            GlobalServices.SetBoundMovementFactory(boundMovementFactory);
-
             var gameObjectCollection = new GameObjectCollection(worldLoader.WorldSize);
-            var gameState = new GameState(gameObjectCollection);
-            GlobalServices.SetGameState(gameState);
-            worldLoader.AddGameObjects(gameState);
-            this._player = gameState.Player;
+            this.GameState = new GameState(gameObjectCollection);
+            worldLoader.AddGameObjects(this.GameState);
+            ValidateGameState(this.GameState);
+            this._player = GameState.Player;
 
             this._worldClock = new WorldClock();
             if (worldLoader.UnlockLevels)
+                {
                 this._worldClock.AddEventHandler(new UnlockLevel(this));
+                }
+
             foreach (var dist in worldLoader.FruitDistributions.Where(item => item.PopulationMethod.WillReplenish()))
                 {
-                var replenishFruit = new ReplenishFruit(dist);
+                var replenishFruit = new ReplenishFruit(dist, this.GameState);
                 this._worldClock.AddEventHandler(replenishFruit);
                 }
 
             this._worldWindow = new WorldWindow();
             GlobalServices.SetCentrePointProvider(this._worldWindow);
-
-            ValidateGameState(gameState);
-
+            
             Messenger.Default.Register<WorldCompleted>(this, WorldCompleted);
             Messenger.Default.Register<LifeLost>(this, LostLife);
             }
@@ -92,7 +87,7 @@ namespace Labyrinth
                     var tp = new TilePos(x, y);
                     var items = gameState.GetItemsOnTile(tp).ToList();
                     if (!tcv.IsListOfObjectsValid(items, out string reason))
-                        issues.Add(tp + ": " + reason);
+                        issues.Add($"{tp}: {reason}");
                     }
                 }
 
@@ -136,7 +131,7 @@ namespace Labyrinth
             MoveNearbyMonstersToASafeDistance();
 
             GlobalServices.SoundPlayer.Play(GameSound.PlayerStartsNewLife);
-            this.WorldReturnType = WorldReturnType.Normal;
+            this._worldState = WorldState.Normal;
             GlobalServices.PlayerInput.Enabled = true;
             }
 
@@ -165,7 +160,9 @@ namespace Labyrinth
                     {
                     monster = egg.HatchEgg();
                     }
-                if (monster != null && !monster.IsStationary)
+
+                // look at any non-stationary monsters including those that aren't active
+                if (monster != null && monster.Mobility != MonsterMobility.Stationary)
                     {
                     searchParameters.StartLocation = monster.TilePosition;
 
@@ -190,39 +187,40 @@ namespace Labyrinth
                 };
             var repeller = new RepelObject(repelParameters);
             var result = repeller.TryFindPath(out var path);
-            if (result && path.Any())
+            if (result && path!.Any())
                 {
-                monster.ResetPosition(path.Last().ToPosition());
+                monster.ResetPosition(path!.Last().ToPosition());
                 }
             }
 
         /// <summary>
         /// Updates the world in accordance to how much time has passed
         /// </summary>
-        public WorldReturnType Update(GameTime gameTime)
+        public WorldState Update(GameTime gameTime)
             {
             this._worldWindow.RecalculateWindow(gameTime);
             this._worldClock.Update(gameTime);
             
             UpdateGameItems(gameTime);
             
-            return this.WorldReturnType;
+            return this._worldState;
             }
 
         private void UpdateGameItems(GameTime gameTime)
             {
-            //const float minimumDistance = (Constants.TileLength * 2;
+            //const float minimumDistance = Constants.TileLength * 2;
 
             //int countOfGameItemsThatMoved = 0;
             //int countOfGameItems = 0;
             //int countOfInteractions = 0;
-            foreach (var currentItem in GlobalServices.GameState.GetSurvivingInteractiveItems())
+            foreach (IGameObject currentItem in GlobalServices.GameState.GetSurvivingGameObjects())
                 {
                 //countOfGameItems++;
 
-                if (!currentItem.Update(gameTime))
+                var movingItem = currentItem as IMovingItem;
+                if (!currentItem.Update(gameTime) || movingItem == null)
                     continue;
-                GlobalServices.GameState.UpdatePosition(currentItem);
+                GlobalServices.GameState.UpdatePosition(movingItem);
                 //countOfGameItemsThatMoved++;
 
                 Rectangle? bounds = null;
@@ -234,17 +232,13 @@ namespace Labyrinth
 
                     //if (Math.Abs(Vector2.DistanceSquared(currentItem.Position, si.Position)) <= minimumDistance)
                         {
-                        if (bounds == null)
-                            {
-                            //Trace.WriteLine(string.Format("checking {0} and {1}", currentItem, si));
-                            bounds = currentItem.BoundingRectangle;
-                            }
+                        bounds ??= currentItem.BoundingRectangle;
                         if (bounds.Value.Intersects(si.BoundingRectangle))
                             {
                             //countOfInteractions++;
                             //Trace.WriteLine(string.Format("interacting {0} and {1}", currentItem, si));
-                            var interaction = BuildInteraction(currentItem, si);
-                            interaction?.Collide();
+                            var interaction = BuildInteraction(movingItem, si);
+                            interaction.Collide();
                             }
                         }
                     }
@@ -297,7 +291,7 @@ namespace Labyrinth
         /// <summary>
         /// Draw everything in the WorldToLoad from background to foreground.
         /// </summary>
-        public void Draw(GameTime gameTime, [NotNull] ISpriteBatch spriteBatch)
+        public void Draw(ISpriteBatch spriteBatch)
             {
             var windowPosition = this._worldWindow.WindowPosition;
             spriteBatch.WindowPosition = this._worldWindow.WindowPosition;
@@ -306,7 +300,7 @@ namespace Labyrinth
             spriteBatch.Begin(this._applyEndOfWorldEffect ? this._endOfWorldEffect : null);
             WorldRenderer worldRenderer = new WorldRenderer(tileRectangle, spriteBatch, GlobalServices.SpriteLibrary);
             worldRenderer.RenderFloorTiles(ref this._tiles);
-            worldRenderer.RenderWorld(gameTime);
+            worldRenderer.RenderWorld();
             spriteBatch.End();
             }
 
@@ -330,7 +324,7 @@ namespace Labyrinth
                 return;
 
             int currentWorldAreaId = this.GetWorldAreaIdForTilePos(this._player.TilePosition);
-            var newState = this._playerStartStates.Values.Where(item => item.Id > currentWorldAreaId).OrderBy(item => item.Id).FirstOrDefault();
+            var newState = this._playerStartStates.Values.Where(item => item.Id > currentWorldAreaId).MinBy(item => item.Id);
             if (newState == null)
                 return;
 
@@ -412,9 +406,13 @@ namespace Labyrinth
         private void LostLife(LifeLost lifeLost)
             {
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerDies, 
-                (sender, args) => this.WorldReturnType = WorldReturnType.LostLife);
+                (sender, args) => this._worldState = WorldState.LostLife);
             }
 
+        /// <summary>
+        /// This gets called as soon as the player collects the final crystal, but the world status will only change once the end world sound has finished playing
+        /// </summary>
+        /// <param name="worldCompleted">The WorldCompleted message</param>
         private void WorldCompleted(WorldCompleted worldCompleted)
             {
             foreach (IMonster monster in GlobalServices.GameState.DistinctItemsOfType<IMonster>())
@@ -423,7 +421,7 @@ namespace Labyrinth
                 }
 
             GlobalServices.SoundPlayer.PlayWithCallback(GameSound.PlayerFinishesWorld,
-                (sender, args) => this.WorldReturnType = WorldReturnType.FinishedWorld);
+                (sender, args) => this._worldState = WorldState.FinishedWorld);
 
             // TODO: also need to prevent player energy going down
             GlobalServices.PlayerInput.Enabled = false;
@@ -438,7 +436,7 @@ namespace Labyrinth
             private const double SecondsToShowEachColour = 0.080d;
             private readonly World _world;
 
-            public FlashEffectTimer([NotNull] World world) : base(GlobalServices.Game)
+            public FlashEffectTimer(World world) : base(GlobalServices.Game)
                 {
                 this._world = world ?? throw new ArgumentNullException(nameof(world));
                 this._world._applyEndOfWorldEffect = true;
@@ -446,6 +444,10 @@ namespace Labyrinth
 
             public override void Update(GameTime gameTime)
                 {
+                var effect = this._world._endOfWorldEffect;
+                if (effect == null)
+                    throw new InvalidOperationException("EndOfWorldEffect resource has not been loaded.");
+
                 this._timeElapsed += gameTime.ElapsedGameTime.TotalSeconds;
                 while (this._timeElapsed >= SecondsToShowEachColour)
                     {
@@ -453,7 +455,7 @@ namespace Labyrinth
                     this._flashState = !this._flashState;
                     }
 
-                this._world._endOfWorldEffect.Parameters["flashOn"].SetValue(this._flashState);
+                effect.Parameters["flashOn"].SetValue(this._flashState);
                 }
             }
         }

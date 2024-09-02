@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Microsoft.Xna.Framework;
@@ -128,7 +127,7 @@ namespace Labyrinth.Services.WorldBuilding
             this._gameState.AddCrumblyWall(position, "Tiles/" + textureName, energy);
             }
 
-        public void AddMonstersFromRandomDistributions([NotNull] IEnumerable<RandomMonsterDistribution> randomMonsterDistributions)
+        public void AddMonstersFromRandomDistributions(IEnumerable<RandomMonsterDistribution> randomMonsterDistributions)
             {
             if (randomMonsterDistributions == null) throw new ArgumentNullException(nameof(randomMonsterDistributions));
             var rnd = GlobalServices.Randomness;
@@ -144,7 +143,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public void AddFruitFromRandomDistributions([NotNull] IEnumerable<RandomFruitDistribution> randomFruitDistributions)
+        public void AddFruitFromRandomDistributions(IEnumerable<RandomFruitDistribution> randomFruitDistributions)
             {
             if (randomFruitDistributions == null) throw new ArgumentNullException(nameof(randomFruitDistributions));
             foreach (var dist in randomFruitDistributions)

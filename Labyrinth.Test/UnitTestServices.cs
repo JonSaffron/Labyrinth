@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth.Test
     {
-    class UnitTestServices : IServiceSetup
+    class UnitTestServices 
         {
         public PlayerController PlayerController;
 

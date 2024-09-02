@@ -37,7 +37,7 @@ namespace Labyrinth.Test
             gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(true);
             gameObject.Setup(objectToTheSide => objectToTheSide.Position).Returns(new Vector2(10, 10));
             var centrePointProvider = new Mock<ICentrePointProvider>();
-            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            centrePointProvider.Setup(cp => cp.GetDistanceFromCentreOfScreen(It.IsAny<Vector2>())).Returns((Vector2 v) => new Vector2(500, 500) - v);
             var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
 
             ass.Add(activeSound);
@@ -45,7 +45,7 @@ namespace Labyrinth.Test
             Assert.AreEqual(1, ass.Count);
             var item = ass[0];
             Assert.AreEqual(SoundState.Playing, item.SoundEffectInstance.State);
-            Assert.AreNotEqual(1, item.SoundEffectInstance.Volume);
+            Assert.AreNotEqual(1f, item.SoundEffectInstance.Volume);
             Assert.AreNotEqual(0, item.SoundEffectInstance.Pan);
             }
 
@@ -56,7 +56,7 @@ namespace Labyrinth.Test
             var gameObject = new Mock<IGameObject>();
             gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(false);
             var centrePointProvider = new Mock<ICentrePointProvider>();
-            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            centrePointProvider.Setup(cp => cp.GetDistanceFromCentreOfScreen(It.IsAny<Vector2>())).Returns(Vector2.Zero);
             Assert.Throws<ArgumentException>(() => new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object));
             }
 
@@ -88,7 +88,7 @@ namespace Labyrinth.Test
             Assert.AreEqual(1, ass.Count);
             // ReSharper disable once RedundantAssignment
             activeSound = (ActiveSound) ass[0];
-            Assert.IsTrue(sei.RestartPlayWhenStopped);
+            Assert.IsTrue(sei.IsSetToRestart);
             }
 
         [Test]
@@ -100,7 +100,7 @@ namespace Labyrinth.Test
             gameObject.Setup(aliveGameObject => aliveGameObject.IsExtant).Returns(true);
             gameObject.Setup(objectToTheSide => objectToTheSide.Position).Returns(new Vector2(10, 10));
             var centrePointProvider = new Mock<ICentrePointProvider>();
-            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            centrePointProvider.Setup(cp => cp.GetDistanceFromCentreOfScreen(It.IsAny<Vector2>())).Returns(Vector2.Zero);
             var activeSoundWithObject = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
             var activeSoundWithoutObject = new ActiveSound(sei);
             
@@ -109,9 +109,10 @@ namespace Labyrinth.Test
 
             Assert.AreEqual(1, ass.Count);
             activeSoundWithoutObject = (ActiveSound) ass[0];
-            Assert.IsTrue(sei.RestartPlayWhenStopped);
+            Assert.IsTrue(sei.IsSetToRestart);
             ass.Update();
-            Assert.IsFalse(sei.RestartPlayWhenStopped);
+            Assert.IsFalse(sei.IsSetToRestart);
+            Assert.AreEqual(SoundState.Playing, sei.State);
             Assert.AreEqual(1, activeSoundWithoutObject.SoundEffectInstance.Volume);
             Assert.AreEqual(0, activeSoundWithoutObject.SoundEffectInstance.Pan);
             }
@@ -160,7 +161,7 @@ namespace Labyrinth.Test
             var gameObject = new Mock<IGameObject>();
             gameObject.Setup(deadGameObject => deadGameObject.IsExtant).Returns(true);
             var centrePointProvider = new Mock<ICentrePointProvider>();
-            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            centrePointProvider.Setup(cp => cp.GetDistanceFromCentreOfScreen(It.IsAny<Vector2>())).Returns(Vector2.Zero);
             var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
 
             ass.Add(activeSound);
@@ -183,7 +184,7 @@ namespace Labyrinth.Test
                 .Returns(new Vector2(-10, 0))
                 .Returns(new Vector2(10, 0));
             var centrePointProvider = new Mock<ICentrePointProvider>();
-            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            centrePointProvider.Setup(cp => cp.GetDistanceFromCentreOfScreen(It.IsAny<Vector2>())).Returns((Vector2 v) => new Vector2(0, 0) - v);
             var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
 
             ass.Add(activeSound);
@@ -205,7 +206,7 @@ namespace Labyrinth.Test
                 .Returns(Vector2.Zero)
                 .Returns(new Vector2(100, 0));
             var centrePointProvider = new Mock<ICentrePointProvider>();
-            centrePointProvider.Setup(cp => cp.CentrePoint).Returns(Vector2.Zero);
+            centrePointProvider.Setup(cp => cp.GetDistanceFromCentreOfScreen(It.IsAny<Vector2>())).Returns((Vector2 v) => new Vector2(0, 0) - v);
             var activeSound = new ActiveSoundForObject(sei, gameObject.Object, centrePointProvider.Object);
 
             ass.Add(activeSound);

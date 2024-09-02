@@ -7,7 +7,7 @@ namespace Labyrinth
         {
         Movement CurrentMovement { get; }
         Vector2 OriginalPosition { get; set; }
-        IBoundMovement MovementBoundary { get; } 
+        IBoundMovement? MovementBoundary { get; } 
 
         void Move(Direction direction, MovementSpeed movementSpeed);
         void PushOrBounce(IMovingItem moveableObject, Direction direction);

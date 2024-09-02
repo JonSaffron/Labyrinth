@@ -19,6 +19,7 @@ namespace Labyrinth.Test
             {
             var r = new StandardRandom();
             Assert.IsTrue(r.Test(0));
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
             Assert.DoesNotThrow(() => r.Test(0b1));
             Assert.DoesNotThrow(() => r.Test(0b11));
             Assert.DoesNotThrow(() => r.Test(0b111));
@@ -27,6 +28,7 @@ namespace Labyrinth.Test
             Assert.DoesNotThrow(() => r.Test(0b11_1111));
             Assert.DoesNotThrow(() => r.Test(0b111_1111));
             Assert.DoesNotThrow(() => r.Test(0b1111_1111));
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
 
             for (int i = 0; i <= 1000; i++)
                 {
@@ -83,6 +85,7 @@ namespace Labyrinth.Test
             {
             var r = new StandardRandom();
 
+            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
             Assert.Throws<ArgumentOutOfRangeException>(() => r.DiceRoll(new DiceRoll()));
             for (int i = 1; i <= 10; i++)
                 {

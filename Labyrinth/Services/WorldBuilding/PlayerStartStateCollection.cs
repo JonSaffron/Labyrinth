@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Labyrinth.DataStructures;
-using JetBrains.Annotations;
 
 namespace Labyrinth.Services.WorldBuilding
     {
-    class PlayerStartStateCollection
+    internal class PlayerStartStateCollection
         {
         public readonly Dictionary<int, PlayerStartState> StartStates = new Dictionary<int, PlayerStartState>();
 
-        public void Add([NotNull] PlayerStartState pss)
+        public void Add(PlayerStartState pss)
             {
             if (pss == null) throw new ArgumentNullException(nameof(pss));
             this.StartStates.Add(pss.Id, pss);
@@ -18,7 +18,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         public IList<PlayerStartState> Values => this.StartStates.Values.ToList();
 
-        public bool TryGetStartState(TilePos tp, out PlayerStartState pss)
+        public bool TryGetStartState(TilePos tp, [NotNullWhen(returnValue: true)] out PlayerStartState? pss)
             {
             pss = this.StartStates.Values.SingleOrDefault(item => item.Area.ContainsTile(tp));
             return pss != null;

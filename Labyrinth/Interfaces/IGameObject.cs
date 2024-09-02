@@ -57,6 +57,9 @@ namespace Labyrinth
 
         bool Update(GameTime gameTime);
 
-        IRenderAnimation RenderAnimation { get; }
+        /// <summary>
+        /// 
+        /// </summary>
+        IRenderAnimation? RenderAnimation { get; }
         }
     }

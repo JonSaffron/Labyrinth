@@ -2,7 +2,7 @@
 
 namespace Labyrinth
     {
-    static class Constants
+    internal static class Constants
         {
         /// <summary>
         /// Length of tile in pixels

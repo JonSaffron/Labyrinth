@@ -8,7 +8,7 @@ namespace Labyrinth.Services.Display
     /// <summary>
     /// Controls playback of an Animation that loops repeatedly
     /// </summary>
-    /// <remarks>Only suitable for a animation which is the same size as a tile</remarks>
+    /// <remarks>Only suitable for an animation which is the same size as a tile</remarks>
     public class LoopedAnimation : IDynamicAnimation
         {
         private readonly IGameObject _gameObject;
@@ -26,11 +26,13 @@ namespace Labyrinth.Services.Display
         /// <summary>
         /// What rotation to apply when drawing the sprite
         /// </summary>
+        [PublicAPI]
         public float Rotation { get; set; }
 
         /// <summary>
-        /// What effect to apply when drawing the sprite
+        /// What effects to apply when drawing the sprite
         /// </summary>
+        [PublicAPI]
         public SpriteEffects SpriteEffect { get; set; }
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace Labyrinth.Services.Display
         /// </summary>
         private double _time;
 
-        public LoopedAnimation([NotNull] IGameObject gameObject, [NotNull] string textureName, int baseMovesDuringAnimation)
+        public LoopedAnimation(IGameObject gameObject, string textureName, int baseMovesDuringAnimation)
             {
             this._gameObject = gameObject ?? throw new ArgumentNullException(nameof(gameObject));
             this._textureName = textureName ?? throw new ArgumentNullException(nameof(textureName));

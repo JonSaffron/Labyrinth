@@ -1,7 +1,7 @@
 ﻿namespace Labyrinth.Services.ScoreKeeper
     {
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    class NullScoreKeeper : IScoreKeeper
+    internal class NullScoreKeeper : IScoreKeeper
         {
         public void Reset()
             {

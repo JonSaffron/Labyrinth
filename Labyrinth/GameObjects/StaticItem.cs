@@ -43,14 +43,17 @@ namespace Labyrinth.GameObjects
         /// <summary>
         /// Updates the position and/or animation of this object each tick of the game
         /// </summary>
-        /// <param name="gameTime">The amount of gametime that has passed since the last time Update was called</param>
+        /// <param name="gameTime">The amount of GameTime that has passed since the last time Update was called</param>
         /// <returns>True if the position of the object changes, otherwise false if the object is stationary</returns>
         public virtual bool Update(GameTime gameTime)
             {
             return false;
             }
 
-        public abstract IRenderAnimation RenderAnimation { get; }
+        /// <summary>
+        /// Returns an object that animates the GameObject. Can be null if the object is not visible, or does not have a physical presence.
+        /// </summary>
+        public abstract IRenderAnimation? RenderAnimation { get; }
 
         /// <summary>
         /// Gets or sets how much energy the object has
@@ -91,11 +94,11 @@ namespace Labyrinth.GameObjects
             if (this.IsExtant)
                 UponInjury();
             else
-                UponDeath(false);
+                UponDeath(wasDeathInstant: false);
             }
 
         /// <summary>
-        /// Reduce the object's energy to zero
+        /// Instantly reduce the object's energy to zero
         /// </summary>
         public virtual void InstantlyExpire()
             {
@@ -103,14 +106,21 @@ namespace Labyrinth.GameObjects
                 return;
             
             this.Energy = 0;
-            UponDeath(true);
+            UponDeath(wasDeathInstant: true);
             }
 
+        /// <summary>
+        /// Override this method to implement any behaviour that needs to happen when this object is injured
+        /// </summary>
         protected virtual void UponInjury()
             {
             // override as necessary
             }
 
+        /// <summary>
+        /// Override this method to implement any behaviour that needs to happen when the object no longer has any energy remaining
+        /// </summary>
+        /// <param name="wasDeathInstant">When set to true it indicates that the object was outright destroyed, otherwise it was an injury that did for it</param>
         protected virtual void UponDeath(bool wasDeathInstant)
             {
             // override as necessary

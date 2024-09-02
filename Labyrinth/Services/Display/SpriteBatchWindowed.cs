@@ -18,7 +18,7 @@ namespace Labyrinth.Services.Display
             this.SpriteBatch.Draw(texture, destination, sourceRectangle, colour, rotation, origin, this.Zoom, effects, 0);
             }
         
-        protected override void DrawTexture(Texture2D texture, Rectangle absoluteArea, Color colour)
+        protected override void DrawTextureOverRegionInGameCoordinates(Texture2D texture, Rectangle absoluteArea, Color colour)
             {
             var x = (int)(absoluteArea.X * this.Zoom);
             var y = (int)(absoluteArea.Y * this.Zoom);

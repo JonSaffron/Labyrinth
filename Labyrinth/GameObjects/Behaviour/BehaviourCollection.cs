@@ -9,7 +9,7 @@ namespace Labyrinth.GameObjects.Behaviour
         {
         private readonly Monster _monster;
 
-        public BehaviourCollection([NotNull] Monster monster)
+        public BehaviourCollection(Monster monster)
             {
             this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }
@@ -21,6 +21,7 @@ namespace Labyrinth.GameObjects.Behaviour
                 action.Perform();
             }
 
+        [PublicAPI]
         public bool Has<T>() where T : IBehaviour
             {
             bool result = this.Items.OfType<T>().Any();
@@ -33,13 +34,13 @@ namespace Labyrinth.GameObjects.Behaviour
                 return;
             bool hasSpecificInterface = typeof(T).FindInterfaces(TypeFilter, null).Any();
             if (!hasSpecificInterface)
-                throw new InvalidOperationException("Behaviour " + typeof(T).Name + " does not have a specific behaviour (movement, injury, death)");
+                throw new InvalidOperationException($"Behaviour {typeof(T).Name} does not have a specific behaviour (movement, injury, death)");
             var newBehaviour = new T();
             newBehaviour.Init(this._monster);
             base.Add(newBehaviour);
             }
 
-        private bool TypeFilter(Type m, object filterCriteria)
+        private static bool TypeFilter(Type m, object? filterCriteria)
             {
             return m == typeof(IInjuryBehaviour) || m == typeof(IMovementBehaviour) || m == typeof(IDeathBehaviour);
             }
@@ -49,7 +50,10 @@ namespace Labyrinth.GameObjects.Behaviour
             for (int i = this.Items.Count - 1; i >= 0; i--)
                 {
                 if (this.Items[i] is T)
+                    {
                     this.Items.RemoveAt(i);
+                    break;
+                    }
                 }
             }
 

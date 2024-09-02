@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace Labyrinth
     {
@@ -6,6 +7,6 @@ namespace Labyrinth
         {
         void LoadContent(ContentManager contentManager);
         void Reset();
-        void DrawStatus(ISpriteBatch spriteBatch, bool isPlayerExtant, int playerEnergy, decimal score, int livesLeft, bool isPaused, bool isRunningSlowly);
+        void DrawStatus(ISpriteBatch spriteBatch, GameTime gameTime, bool isPlayerExtant, int playerEnergy, decimal score, int livesLeft);
         }
     }

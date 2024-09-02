@@ -53,7 +53,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("p ");
+            g.LoadWorld("p ");
             var p = GlobalServices.GameState.Player;
 
             g.RunTest();
@@ -75,7 +75,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("pg");
+            g.LoadWorld("pg");
 
             g.RunTest();
             
@@ -98,7 +98,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("p ");
+            g.LoadWorld("p ");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
             g.RunTest();
@@ -125,7 +125,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("pg");
+            g.LoadWorld("pg");
             GlobalServices.GameState.AddGrave(new TilePos(0, 0));
 
             g.RunTest();

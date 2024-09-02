@@ -1,13 +1,12 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace Labyrinth.Services.Messages
     {
-    class CrystalTaken
+    internal class CrystalTaken
         {
         public readonly IValuable Crystal;
 
-        public CrystalTaken([NotNull] IValuable crystal)
+        public CrystalTaken(IValuable crystal)
             {
             this.Crystal = crystal ?? throw new ArgumentNullException(nameof(crystal));
             }

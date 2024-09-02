@@ -11,7 +11,7 @@ namespace Labyrinth.GameObjects
             {
             this.Energy = 255;
             this._animationPlayer = new StaticAnimation(this, "Sprites/Props/Grave");
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticItem);
             }
 
         public override IRenderAnimation RenderAnimation => this._animationPlayer;

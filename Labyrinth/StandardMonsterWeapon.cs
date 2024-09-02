@@ -1,15 +1,14 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
-    class StandardMonsterWeapon : IMonsterWeapon
+    internal class StandardMonsterWeapon : IMonsterWeapon
         {
         private readonly Monster _monster;
 
-        public StandardMonsterWeapon([NotNull] Monster monster)
+        public StandardMonsterWeapon(Monster monster)
             {
             this._monster = monster ?? throw new ArgumentNullException(nameof(monster));
             }

@@ -48,10 +48,10 @@ namespace Labyrinth.Services.PathFinder
                 {
                 int parentIndex = (childIndex - 1) / 2; // parent index
                 if (this._data[childIndex].Key.CompareTo(this._data[parentIndex].Key) >= 0) 
-                    break; // child item is larger than (or equal) parent so we're done
-                KeyValuePair<P, T> tmp = this._data[childIndex]; 
-                this._data[childIndex] = this._data[parentIndex]; 
-                this._data[parentIndex] = tmp;
+                    break; // child item is larger than (or equal) to the parent which means we're done
+
+                // swap parent and child data items
+                (this._data[childIndex], this._data[parentIndex]) = (this._data[parentIndex], this._data[childIndex]);
                 childIndex = parentIndex;
                 }
             }
@@ -84,11 +84,10 @@ namespace Labyrinth.Services.PathFinder
                     leftChildOfParentIndex = rightChildOfParentIndex;
 
                 if (this._data[parentIndex].Key.CompareTo(this._data[leftChildOfParentIndex].Key) <= 0) 
-                    break; // parent is smaller than (or equal to) smallest child so done
+                    break; // parent is smaller than (or equal to) the smallest child so done
 
-                KeyValuePair<P, T> tmp = this._data[parentIndex]; 
-                this._data[parentIndex] = this._data[leftChildOfParentIndex]; 
-                this._data[leftChildOfParentIndex] = tmp; // swap parent and child
+                // swap parent and child
+                (this._data[parentIndex], this._data[leftChildOfParentIndex]) = (this._data[leftChildOfParentIndex], this._data[parentIndex]);
                 parentIndex = leftChildOfParentIndex;
                 }
             return frontItem.Value;
@@ -150,7 +149,7 @@ namespace Labyrinth.Services.PathFinder
                 int rightChildIndex = 2 * parentIndex + 2; // right child index
 
                 if (leftChildIndex <= lastIndex && this._data[parentIndex].Key.CompareTo(this._data[leftChildIndex].Key) > 0) 
-                    return false; // if left child exists and it's greater than parent then bad.
+                    return false; // if left child exists, and it's greater than parent, then bad.
 
                 if (rightChildIndex <= lastIndex && this._data[parentIndex].Key.CompareTo(this._data[rightChildIndex].Key) > 0) 
                     return false; // check the right child too.

@@ -1,14 +1,17 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
     {
+    /// <summary>
+    /// An object for playing a one sound once which is not connected to a GameObject but is simply an ambience
+    /// </summary>
+    /// <remarks>Multiple ActiveSound and ActiveSoundForObject instances can reference the same SoundEffectInstance</remarks>
     public class ActiveSound : IActiveSound
         {
         public ISoundEffectInstance SoundEffectInstance { get; }
 
-        public ActiveSound([NotNull] ISoundEffectInstance soundEffectInstance)
+        public ActiveSound(ISoundEffectInstance soundEffectInstance)
             {
             this.SoundEffectInstance = soundEffectInstance ?? throw new ArgumentNullException(nameof(soundEffectInstance));
             }
@@ -17,7 +20,7 @@ namespace Labyrinth.Services.Sound
             {
             get
                 {
-                var result = this.SoundEffectInstance.State == SoundState.Stopped && !this.SoundEffectInstance.RestartPlayWhenStopped;
+                var result = this.SoundEffectInstance is { State: SoundState.Stopped, IsSetToRestart: false };
                 return result;
                 }
             }
@@ -33,8 +36,7 @@ namespace Labyrinth.Services.Sound
             {
             if (this.SoundEffectInstance.State == SoundState.Playing)
                 {
-                this.SoundEffectInstance.Stop();
-                this.SoundEffectInstance.RestartPlayWhenStopped = true;
+                this.SoundEffectInstance.Restart();
                 return;
                 }
 
@@ -44,22 +46,20 @@ namespace Labyrinth.Services.Sound
         public void Stop()
             {
             this.SoundEffectInstance.Stop();
-            this.SoundEffectInstance.RestartPlayWhenStopped = false;
             }
 
         public virtual void Update()
             {
-            if (this.SoundEffectInstance.RestartPlayWhenStopped && this.SoundEffectInstance.State == SoundState.Stopped)
+            if (this.SoundEffectInstance is { IsSetToRestart: true, State: SoundState.Stopped })
                 {
                 InternalPlay();
-                this.SoundEffectInstance.RestartPlayWhenStopped = false;
                 }
             }
 
         public override string ToString()
             {
             var result = $"{this.SoundEffectInstance.InstanceName} {this.SoundEffectInstance.State}";
-            if (this.SoundEffectInstance.RestartPlayWhenStopped)
+            if (this.SoundEffectInstance.IsSetToRestart)
                 result += " to be restarted";
             return result;
             }

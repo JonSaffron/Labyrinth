@@ -21,7 +21,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("# bp#");
+            g.LoadWorld("# bp#");
 
             g.RunTest();
 
@@ -47,7 +47,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("#bp #");
+            g.LoadWorld("#bp #");
 
             g.RunTest();
 
@@ -71,7 +71,7 @@ namespace Labyrinth.Test
             {
             var g = new GameForUnitTests();
 
-            g.LoadLevel("#bp#");
+            g.LoadWorld("#bp#");
             var p = GlobalServices.GameState.Player;
 
             Assert.IsFalse(p.CanMoveInDirection(Direction.Left));
@@ -95,7 +95,7 @@ namespace Labyrinth.Test
 
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("#bpb #");
+            g.LoadWorld("#bpb #");
 
             g.RunTest();
 
@@ -124,7 +124,7 @@ namespace Labyrinth.Test
             {
             var g = new GameForUnitTests();
 
-            g.LoadLevel("#bpb#");
+            g.LoadWorld("#bpb#");
             var p = GlobalServices.GameState.Player;
 
             Assert.IsFalse(p.CanMoveInDirection(Direction.Left));
@@ -147,7 +147,7 @@ namespace Labyrinth.Test
                 };
             g.UnitTestServices.PlayerController.Enqueue(instructions);
 
-            g.LoadLevel("# bbp #");
+            g.LoadWorld("# bbp #");
 
             g.RunTest();
 

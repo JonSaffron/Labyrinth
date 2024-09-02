@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace Labyrinth.Services.WorldBuilding
     {
@@ -7,9 +6,9 @@ namespace Labyrinth.Services.WorldBuilding
         {
         public readonly char Symbol;
 
-        protected TileDefinition([NotNull] string symbol)
+        protected TileDefinition(string symbol)
             {
-            if (string.IsNullOrEmpty(symbol) || symbol.Length != 1)
+            if (!(symbol is { Length: 1 }))
                 throw new InvalidOperationException();
             this.Symbol = symbol[0];
             }
@@ -19,7 +18,7 @@ namespace Labyrinth.Services.WorldBuilding
         {
         public readonly string TextureName;
 
-        public TileWallDefinition([NotNull] string symbol, [NotNull] string textureName) : base(symbol)
+        public TileWallDefinition(string symbol, string textureName) : base(symbol)
             {
             this.TextureName = textureName ?? throw new ArgumentNullException(nameof(textureName));
             }
@@ -30,7 +29,7 @@ namespace Labyrinth.Services.WorldBuilding
         public readonly string TextureName;
         public readonly bool IsDefault;
 
-        public TileFloorDefinition([NotNull] string symbol, [NotNull] string textureName, bool isDefault) : base(symbol)
+        public TileFloorDefinition(string symbol, string textureName, bool isDefault) : base(symbol)
             {
             this.TextureName = textureName ?? throw new ArgumentNullException(nameof(textureName));
             this.IsDefault = isDefault;
@@ -41,7 +40,7 @@ namespace Labyrinth.Services.WorldBuilding
         {
         public readonly string Description;
 
-        public TileObjectDefinition([NotNull] string symbol, [NotNull] string description) : base(symbol)
+        public TileObjectDefinition(string symbol, string description) : base(symbol)
             {
             this.Description = description ?? throw new ArgumentNullException(nameof(description));
             }

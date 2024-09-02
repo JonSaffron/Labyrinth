@@ -364,7 +364,7 @@ namespace Labyrinth.Test
         [Test]
         public void TestConstructor()
             {
-            Assert.Throws<ArgumentNullException>(() => new RepelObject(null));
+            Assert.Throws<ArgumentNullException>(() => new RepelObject(null!));
             Assert.Throws<ArgumentException>(() => new RepelObject(new RepelParameters()));
             }
 

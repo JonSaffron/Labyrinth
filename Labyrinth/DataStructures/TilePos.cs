@@ -66,13 +66,13 @@ namespace Labyrinth.DataStructures
         /// </summary>
         /// <param name="obj">The TilePos structure to compare against</param>
         /// <returns>True if the co-ordinates are the same in both TilePos structures, false otherwise</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             {
-            if (!(obj is TilePos))
+            if (!(obj is TilePos tp))
                 {
                 return false;
                 }
-            var tp = (TilePos)obj;
+
             return tp == this;
             }
 

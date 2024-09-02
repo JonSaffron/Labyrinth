@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Display;
 using Microsoft.Xna.Framework;
@@ -8,14 +7,14 @@ namespace Labyrinth.GameObjects
     {
     public class Mine : MovingItem
         {
-        [NotNull] private MineState _mineState;
+        private MineState _mineState;
         private TimeSpan _countdown;
 
         public Mine(Vector2 position) : base(position)
             {
             this.Energy = 240;
             this._mineState = new InactiveState(this);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticItem);
             this.Properties.Set(GameObjectProperties.Solidity, ObjectSolidity.Stationary);
             }
 
@@ -39,7 +38,7 @@ namespace Labyrinth.GameObjects
                 }
             }
 
-        public override IRenderAnimation RenderAnimation => this._mineState.RenderAnimation;
+        public override IRenderAnimation? RenderAnimation => this._mineState.RenderAnimation;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,7 +57,7 @@ namespace Labyrinth.GameObjects
             public abstract void SteppedOnBy(IMovingItem movingItem);
             public abstract bool Update(GameTime gameTime);
             public abstract bool IsExtant();
-            public abstract IRenderAnimation RenderAnimation { get; }
+            public abstract IRenderAnimation? RenderAnimation { get; }
             }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +233,7 @@ namespace Labyrinth.GameObjects
                 return false;
                 }
 
-            public override IRenderAnimation RenderAnimation => null;
+            public override IRenderAnimation? RenderAnimation => null;
 
             public override bool IsExtant()
                 {

@@ -31,3 +31,23 @@ https://stackoverflow.com/questions/13541615/how-to-remove-files-that-are-listed
 
 SN76489 sound chip
 http://www.smspower.org/Development/SN76489
+
+GameStateManagement
+https://github.com/SimonDarksideJ/GameStateManagementSample
+
+GameSaver
+https://github.com/SupSuper/MonoGame-SaveManager
+
+Font
+https://www.dafont.com/vtc-belias-blade.font?text=Labyrinth&psize=l&back=theme
+
+-------------
+
+MonoGame content Editor
+-----------------------
+Run the Developer Command Prompt
+Change to the content directory
+Run:  dotnet mgcb-editor LabyrinthContent.mgcb
+
+The .config/dotnet-tools.json has to list the monogame tools
+It might be necessary to run dotnet tool restore to ensure they can be run

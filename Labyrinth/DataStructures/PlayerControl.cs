@@ -6,7 +6,7 @@
         public readonly FiringState FireState1;
         public readonly FiringState FireState2;
 
-        public static PlayerControl NoAction = new PlayerControl(Direction.None, FiringState.None, FiringState.None);
+        public static readonly PlayerControl NoAction = new PlayerControl(Direction.None, FiringState.None, FiringState.None);
 
         public PlayerControl(Direction direction, FiringState fireState1, FiringState fireState2)
             {

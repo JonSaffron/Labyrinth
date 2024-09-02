@@ -1,6 +1,5 @@
 ﻿using System;
 using GalaSoft.MvvmLight.Messaging;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.Messages;
@@ -8,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace Labyrinth
     {
-    class InteractionWithMovingItems : IInteraction
+    internal class InteractionWithMovingItems : IInteraction
         {
         /// <summary>
         /// This game object will have just moved its position (or at least returned true from its update method)
@@ -20,7 +19,7 @@ namespace Labyrinth
         /// </summary>
         private readonly IMovingItem _secondaryItem;
 
-        public InteractionWithMovingItems([NotNull] IMovingItem primaryItem, [NotNull] IMovingItem secondaryItem)
+        public InteractionWithMovingItems(IMovingItem primaryItem, IMovingItem secondaryItem)
             {
             this._primaryItem = primaryItem ?? throw new ArgumentNullException(nameof(primaryItem));
             this._secondaryItem = secondaryItem ?? throw new ArgumentNullException(nameof(secondaryItem));
@@ -53,14 +52,9 @@ namespace Labyrinth
                 {
                 PlayerAndMonsterCollide(player, monster);
                 }
-            else
+            else if (this._primaryItem is IMonster monster2 && this._secondaryItem is Player player2)
                 {
-                player = this._secondaryItem as Player;
-                monster = this._primaryItem as IMonster;
-                if (player != null && monster != null)
-                    {
-                    PlayerAndMonsterCollide(player, monster);
-                    }
+                PlayerAndMonsterCollide(player2, monster2);
                 }
 
             // this deals with the situation where the player or a shot will move the boulder
@@ -71,7 +65,7 @@ namespace Labyrinth
                     return;
                 }
 
-            // this deals with the situation where the boulder might crush a monster, even a deathcube which wouldn't be moving
+            // this deals with the situation where the boulder might crush a monster, even a DeathCube which wouldn't be moving
             if (this._primaryItem.Properties.Get(GameObjectProperties.Solidity) == ObjectSolidity.Moveable)
                 {
                 var actionTaken = CrushObject(this._primaryItem, this._secondaryItem);
@@ -97,7 +91,7 @@ namespace Labyrinth
         /// <param name="moveableObject">An item such as the boulder</param>
         /// <param name="movingObject">An item that is capable of moving another item such as the player or a shot</param>
         /// <returns>True if a push or bounce occurs, false otherwise</returns>
-        private static bool PushOrBounceObject([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
+        private static bool PushOrBounceObject(IMovingItem moveableObject, IMovingItem movingObject)
             {
             var result = ShouldStartPushOrBounce(moveableObject, movingObject);
             if (result)
@@ -109,7 +103,7 @@ namespace Labyrinth
             return result;            
             }
 
-        private static bool ShouldStartPushOrBounce([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
+        private static bool ShouldStartPushOrBounce(IMovingItem moveableObject, IMovingItem movingObject)
             {
             bool isMoveableObjectAlreadyInMotion = moveableObject.CurrentMovement.IsMoving;
             bool isMovingObjectMotionless = !movingObject.CurrentMovement.IsMoving;
@@ -132,7 +126,7 @@ namespace Labyrinth
         /// <param name="moveableObject">An item such as the boulder</param>
         /// <param name="movingObject">Any item that moves, such as the player or a monster</param>
         /// <returns>True if the movingObject is crushed, false otherwise</returns>
-        private static bool CrushObject([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
+        private static bool CrushObject(IMovingItem moveableObject, IMovingItem movingObject)
             {
             if (!IsCrushingPossible(moveableObject, movingObject)) 
                 return false;
@@ -160,8 +154,8 @@ namespace Labyrinth
         /// </summary>
         /// <param name="moveableObject">An item such as the boulder</param>
         /// <param name="movingObject">Any item that moves, such as the player or a monster</param>
-        /// <returns></returns>
-        private static bool IsCrushingPossible([NotNull] IMovingItem moveableObject, [NotNull] IMovingItem movingObject)
+        /// <returns>True if the <see cref="moveableObject"/> can crush the <see cref="movingObject"/></returns>
+        private static bool IsCrushingPossible(IMovingItem moveableObject, IMovingItem movingObject)
             {
             if (!moveableObject.CurrentMovement.IsMoving)
                 return false;
@@ -222,10 +216,10 @@ namespace Labyrinth
 
         private static bool ShotHitsPlayerOrMonster(StandardShot shot, IMovingItem playerOrMonster)
             {
-            IMonster monster = playerOrMonster as IMonster;
+            IMonster? monster = playerOrMonster as IMonster;
             if (playerOrMonster.Properties.Get(GameObjectProperties.EffectOfShot) == EffectOfShot.Reflection)
                 {
-                // A rebounded shot cannot hurt a monster that shots rebound off but it doesn't rebound again
+                // A rebounded shot cannot hurt a monster that shots rebound off, but it doesn't rebound again
                 if (!shot.HasRebounded)
                     shot.Reverse();
                 return false;
@@ -257,7 +251,9 @@ namespace Labyrinth
         private static bool ShotHitsShot(StandardShot standardShot1, StandardShot standardShot2)
             {
             // this is the same logic the original game uses
-            var isAtLeastOneShotFromMonsterWhichHasNotRebounded = (standardShot1.Originator is IMonster && !standardShot1.HasRebounded) || (standardShot2.Originator is IMonster && !standardShot2.HasRebounded);
+            var isAtLeastOneShotFromMonsterWhichHasNotRebounded = 
+                (standardShot1.Originator is IMonster && !standardShot1.HasRebounded) || 
+                (standardShot2.Originator is IMonster && !standardShot2.HasRebounded);
             if (!isAtLeastOneShotFromMonsterWhichHasNotRebounded)
                 {
                 return false;
@@ -270,7 +266,7 @@ namespace Labyrinth
                 }
             
             int minEnergy = Math.Min(standardShot2.Energy, standardShot1.Energy);
-            Bang bang = null;
+            Bang? bang = null;
             standardShot2.ReduceEnergy(minEnergy);
             if (!standardShot2.IsExtant)
                 bang = GlobalServices.GameState.ConvertShotToBang(standardShot2);

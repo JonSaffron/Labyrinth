@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using GalaSoft.MvvmLight.Messaging;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.Services.Messages;
 
@@ -14,23 +13,23 @@ namespace Labyrinth.Services.WorldBuilding
     {
     public class WorldLoader : IWorldLoader
         {
-        private XmlElement _xmlRoot;
-        private XmlNamespaceManager _xnm;
+        private readonly XmlElement _xmlRoot;
+        private readonly XmlNamespaceManager _xnm;
 
-        [NotNull] private readonly PlayerStartStateCollection _playerStartStates = new PlayerStartStateCollection();
-        [NotNull] private readonly List<TileDefinitionCollection> _tileDefinitionCollections = new List<TileDefinitionCollection>();
-        [NotNull] private readonly List<RandomMonsterDistribution> _randomMonsterDistributions = new List<RandomMonsterDistribution>();
-        [NotNull] private readonly List<RandomFruitDistribution> _randomFruitDistributions = new List<RandomFruitDistribution>();
+        private readonly PlayerStartStateCollection _playerStartStates = new PlayerStartStateCollection();
+        private readonly List<TileDefinitionCollection> _tileDefinitionCollections = new List<TileDefinitionCollection>();
+        private readonly List<RandomMonsterDistribution> _randomMonsterDistributions = new List<RandomMonsterDistribution>();
+        private readonly List<RandomFruitDistribution> _randomFruitDistributions = new List<RandomFruitDistribution>();
 
-        public TilePos WorldSize { get; private set; }
+        private bool _isLoaded;
 
-        public void LoadWorld(string levelName)
+        public WorldLoader(string worldToLoad)
             {
             OnProgress("Loading and validating world design");
 
             string worldDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Worlds");
 
-            string pathToWorld = $"{worldDirectory}/{levelName}.xml";
+            string pathToWorld = $"{worldDirectory}/{worldToLoad}";
             if (!File.Exists(pathToWorld))
                 throw new ArgumentOutOfRangeException(pathToWorld);
 
@@ -38,27 +37,51 @@ namespace Labyrinth.Services.WorldBuilding
             xmlDoc.Load(pathToWorld);
 
             var validator = new WorldValidator();
-            var pathToXsd = worldDirectory + "/WorldSchema.xsd";
+            var pathToXsd = $"{worldDirectory}/WorldSchema.xsd";
             validator.Validate(xmlDoc.OuterXml, pathToXsd);
 
-            this._xmlRoot = xmlDoc.DocumentElement;
+            this._xmlRoot = xmlDoc.DocumentElement!;
             if (this._xmlRoot == null)
                 throw new InvalidOperationException("Empty xml document.");
             this._xnm = new XmlNamespaceManager(xmlDoc.NameTable);
             this._xnm.AddNamespace("ns", "http://JonSaffron/Labyrinth");
+            }
 
-            int width = int.Parse(this._xmlRoot.GetAttribute("Width"));
-            int height = int.Parse(this._xmlRoot.GetAttribute("Height"));
-            this.WorldSize = new TilePos(width, height);
+        private void EnsureLoaded()
+            {
+            if (this._isLoaded) 
+                return;
 
             LoadAreas();
             ValidateAreas();
+            this._isLoaded = true;
+            }
+
+        public string WorldName
+            {
+            get
+                {
+                var result = this._xmlRoot.GetAttribute("Name");
+                return result;
+                }
+            }
+
+        public TilePos WorldSize
+            {
+            get
+                {
+                int width = int.Parse(this._xmlRoot.GetAttribute("Width"));
+                int height = int.Parse(this._xmlRoot.GetAttribute("Height"));
+                var result = new TilePos(width, height);
+                return result;
+                }
             }
 
         public Tile[,] FloorTiles
             {
             get
                 {
+                EnsureLoaded();
                 var result = GetFloorLayout(this._playerStartStates);
                 return result;
                 }
@@ -88,21 +111,36 @@ namespace Labyrinth.Services.WorldBuilding
                 }
             }
 
-        public Dictionary<int, PlayerStartState> PlayerStartStates => this._playerStartStates.StartStates;
+        public Dictionary<int, PlayerStartState> PlayerStartStates
+            {
+            get
+                {
+                EnsureLoaded();
+                return this._playerStartStates.StartStates;
+                }
+            }
 
-        public List<RandomFruitDistribution> FruitDistributions => this._randomFruitDistributions;
+        public List<RandomFruitDistribution> FruitDistributions
+            {
+            get
+                {
+                EnsureLoaded();
+                return this._randomFruitDistributions;
+                }
+            }
 
         public void AddGameObjects(GameState gameState)
             {
             OnProgress("Adding game objects");
 
+            EnsureLoaded();
             var layout = GetLayout();
 
             var pgo = new ProcessGameObjects(gameState);
             pgo.AddWalls(this._tileDefinitionCollections, layout);
             pgo.AddPlayerAndStartPositions(this._playerStartStates.StartStates.Values);
 
-            var objects = this._xmlRoot.SelectNodes(@"ns:Objects/ns:*", this._xnm);
+            var objects = this._xmlRoot.SelectNodes("ns:Objects/ns:*", this._xnm);
             if (objects != null)
                 {
                 var objectList = objects.Cast<XmlElement>();
@@ -119,7 +157,7 @@ namespace Labyrinth.Services.WorldBuilding
 
         private string[] GetLayout()
             {
-            var layoutDef = (XmlElement)this._xmlRoot.SelectSingleNode("ns:Layout", this._xnm);
+            var layoutDef = (XmlElement?) this._xmlRoot.SelectSingleNode("ns:Layout", this._xnm);
             if (layoutDef == null)
                 throw new InvalidOperationException("No Layout element found.");
             var layout = layoutDef.InnerText;
@@ -135,20 +173,20 @@ namespace Labyrinth.Services.WorldBuilding
             if (areas == null)
                 throw new InvalidOperationException();
 
-            XmlNodeList areaList = areas.SelectNodes("ns:Area", this._xnm);
+            XmlNodeList? areaList = areas.SelectNodes("ns:Area", this._xnm);
             if (areaList == null)
                 throw new InvalidOperationException();
 
             this._playerStartStates.Clear();
             this._tileDefinitionCollections.Clear();
-            this._randomMonsterDistributions.Clear();
             this._randomFruitDistributions.Clear();
+            this._randomMonsterDistributions.Clear();
 
             foreach (XmlElement area in areaList)
                 {
                 var areaRect = RectangleExtensions.GetRectangleFromDefinition(area);
 
-                var startPos = (XmlElement) area.SelectSingleNode("ns:PlayerStartState", this._xnm);
+                var startPos = (XmlElement?) area.SelectSingleNode("ns:PlayerStartState", this._xnm);
                 if (startPos != null)
                     {
                     var pss = PlayerStartState.FromXml(startPos);
@@ -164,7 +202,7 @@ namespace Labyrinth.Services.WorldBuilding
                     this._tileDefinitionCollections.Add(td);
                     }
 
-                var fruitPopulation = (XmlElement) area.SelectSingleNode("ns:FruitDefinitions", this._xnm);
+                var fruitPopulation = (XmlElement?) area.SelectSingleNode("ns:FruitDefinitions", this._xnm);
                 if (fruitPopulation != null && fruitPopulation.ChildNodes.Count != 0)
                     {
                     var fd = RandomFruitDistribution.FromXml(fruitPopulation);
@@ -172,7 +210,7 @@ namespace Labyrinth.Services.WorldBuilding
                     this._randomFruitDistributions.Add(fd);
                     }
 
-                var randomMonsterDistribution = (XmlElement) area.SelectSingleNode("ns:RandomMonsterDistribution", this._xnm);
+                var randomMonsterDistribution = (XmlElement?) area.SelectSingleNode("ns:RandomMonsterDistribution", this._xnm);
                 if (randomMonsterDistribution != null)
                     {
                     var md = RandomMonsterDistribution.FromXml(randomMonsterDistribution, this._xnm);
@@ -223,7 +261,7 @@ namespace Labyrinth.Services.WorldBuilding
                 }
 
             if (this._playerStartStates.StartStates.Values.Count(wa => wa.IsInitialArea) != 1)
-                throw new InvalidOperationException("One and only one world player start state should be marked as the initial area.");
+                throw new InvalidOperationException("One and only one player start state in the world should be marked as the initial area.");
             }
 
         private Tile[,] GetFloorLayout(PlayerStartStateCollection playerStartStateCollection)
@@ -245,9 +283,9 @@ namespace Labyrinth.Services.WorldBuilding
                             ? definition.TextureName
                             : defaultFloorName;
 
-                    if (!playerStartStateCollection.TryGetStartState(tp, out PlayerStartState pss))
-                        throw new InvalidOperationException();
-                    result[tp.X, tp.Y] = new Tile(textureName, pss.Id);
+                    if (!playerStartStateCollection.TryGetStartState(tp, out PlayerStartState? pss))
+                        throw new InvalidOperationException($"Could not determine which world area the TilePos {tp} is in");
+                    result[tp.X, tp.Y] = new Tile(textureName, worldAreaId: pss.Id);
                     }
                 }
             return result;
@@ -284,13 +322,12 @@ namespace Labyrinth.Services.WorldBuilding
                     TileUsage t = tileUsage[x, y];
                     if (t.TileTypeByMap == TileTypeByMap.Object && !hasItems)
                         {
-                        issues.Add(tp + ": Map had tile marked as occupied by an object '" + t.Description + "', but nothing is there.");
+                        issues.Add($"{tp}: Map had tile marked as occupied by an object '{t.Description}', but nothing is there.");
                         }
                     else if (t.TileTypeByMap == TileTypeByMap.Floor && hasItems)
                         {
                         var items = gameState.GetItemsOnTile(tp).ToList();
-                        issues.Add(tp + ": Map had tile marked as unoccupied, but contains " + items.Count +
-                                   " item(s): " + string.Join(", ", items.Select(item => item.GetType().Name)) + ".");
+                        issues.Add($"{tp}: Map had tile marked as unoccupied, but contains {items.Count} item(s): {string.Join(", ", items.Select(item => item.GetType().Name))}.");
                         }
                     }
                 }
@@ -337,7 +374,7 @@ namespace Labyrinth.Services.WorldBuilding
             return result;
             }
 
-        private void OnProgress(string message)
+        private static void OnProgress(string message)
             {
             var msg = new WorldLoaderProgress(message);
             Messenger.Default.Send(msg);

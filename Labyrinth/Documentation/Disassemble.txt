@@ -6991,7 +6991,7 @@ definitions (initial frequency, initial volume, data change control, volume adju
 375B EE C2 0B  INC 0BC2                 -- extra life won
 375E A9 00     LDA #00                  
 3760 8D C6 0B  STA 0BC6                 -- reset player room number to 0
-3763 8D 7F 0E  STA 0E7F                 -- reset block room number to 0
+3763 8D 7F 0E  STA 0E7F                 -- reset boulder room number to 0
 3766 A9 FF     LDA #FF                  
 3768 8D 0E 0C  STA 0C0E                 -- maximum energy for player
 376B 8D CD 0B  STA 0BCD                 -- set highest level achieved

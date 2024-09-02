@@ -24,7 +24,7 @@ namespace Labyrinth.GameObjects
                 }
             
             this._isExtant = true;
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.Bang);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.Bang);
             }
 
         public override bool IsExtant => this._isExtant;

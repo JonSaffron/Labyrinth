@@ -1,11 +1,10 @@
-﻿using JetBrains.Annotations;
-using Labyrinth.DataStructures;
+﻿using Labyrinth.DataStructures;
 
 namespace Labyrinth.GameObjects.Motility
     {
-    class Stationary : MonsterMotionBase
+    internal class Stationary : MonsterMotionBase
         {
-        public Stationary([NotNull] Monster monster) : base(monster)
+        public Stationary(Monster monster) : base(monster)
             {
             }
 

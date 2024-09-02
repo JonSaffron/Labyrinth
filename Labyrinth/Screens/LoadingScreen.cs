@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
+using Labyrinth.Services.Display;
 using Labyrinth.Services.Messages;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Labyrinth.Services.Display
+namespace Labyrinth.Screens
     {
     /// <summary>
     /// The loading screen coordinates transitions between the menu system and the
@@ -21,23 +23,25 @@ namespace Labyrinth.Services.Display
     ///   next screen, which may take a long time to load its data. The loading
     ///   screen will be the only thing displayed while this load is taking place.
     /// </summary>
-    class LoadingScreen : GameScreen
+    internal class LoadingScreen : GameScreen
         {
         private readonly bool _loadingIsSlow;
         private bool _otherScreensAreGone;
 
-        private readonly GameScreen[] _screensToLoad;
+        private readonly List<GameScreen> _screensToLoad;
 
-        private string _loadingMessage;
+        private string? _loadingMessage;
 
         /// <summary>
         /// The constructor is private: loading screens should
         /// be activated via the static Load method instead.
         /// </summary>
-        private LoadingScreen(bool loadingIsSlow, GameScreen[] screensToLoad)
+        private LoadingScreen(bool loadingIsSlow, IEnumerable<GameScreen> screensToLoad)
             {
-            this._loadingIsSlow = loadingIsSlow;
-            this._screensToLoad = screensToLoad;
+            _loadingIsSlow = loadingIsSlow;
+            _screensToLoad = screensToLoad.WhereNotNull().ToList();
+            if (_screensToLoad.Count == 0)
+                throw new ArgumentException("Nothing specified to load", nameof(screensToLoad));
 
             // we don't serialize loading screens. if the user exits while the
             // game is at a loading screen, the game will resume at the screen
@@ -51,10 +55,10 @@ namespace Labyrinth.Services.Display
 
         private void UpdateLoadingScreenMessage(WorldLoaderProgress msg)
             {
-            this._loadingMessage = msg.Message;
-            this.ScreenManager.GraphicsDevice.Clear(Color.Black);
-            this.Draw(new GameTime());
-            this.ScreenManager.GraphicsDevice.Present();
+            _loadingMessage = msg.Message;
+            ScreenManager.GraphicsDevice.Clear(Color.Black);
+            Draw(new GameTime());
+            ScreenManager.GraphicsDevice.Present();
             }
 
         /// <summary>
@@ -62,9 +66,14 @@ namespace Labyrinth.Services.Display
         /// </summary>
         public static void Load(ScreenManager screenManager, bool loadingIsSlow, PlayerIndex? controllingPlayer, params GameScreen[] screensToLoad)
             {
+            if (screenManager == null)
+                throw new ArgumentNullException(nameof(screenManager));
+
             // Tell all the current screens to transition off.
             foreach (GameScreen screen in screenManager.Screens)
+                {
                 screen.ExitScreen();
+                }
 
             // Create and activate the loading screen.
             LoadingScreen loadingScreen = new LoadingScreen(loadingIsSlow, screensToLoad);
@@ -81,16 +90,13 @@ namespace Labyrinth.Services.Display
 
             // If all the previous screens have finished transitioning
             // off, it is time to actually perform the load.
-            if (this._otherScreensAreGone)
+            if (_otherScreensAreGone)
                 {
                 ScreenManager.RemoveScreen(this);
 
                 foreach (GameScreen screen in _screensToLoad)
                     {
-                    if (screen != null)
-                        {
-                        ScreenManager.AddScreen(screen, ControllingPlayer);
-                        }
+                    ScreenManager.AddScreen(screen, ControllingPlayer);
                     }
 
                 // Once the load has finished, we use ResetElapsedTime to tell
@@ -99,9 +105,9 @@ namespace Labyrinth.Services.Display
                 ScreenManager.Game.ResetElapsedTime();
 
                 Messenger.Default.Unregister<WorldLoaderProgress>(this);
+                }
             }
-        }
-        
+
         /// <summary>
         /// Draws the loading screen.
         /// </summary>
@@ -114,7 +120,7 @@ namespace Labyrinth.Services.Display
             // have actually drawn a frame without them before we perform the load.
             if (ScreenState == ScreenState.Active && ScreenManager.Screens.Count() == 1)
                 {
-                this._otherScreensAreGone = true;
+                _otherScreensAreGone = true;
                 }
 
             // The gameplay screen takes a while to load, so we display a loading
@@ -123,9 +129,9 @@ namespace Labyrinth.Services.Display
             // second while returning from the game to the menus. This parameter
             // tells us how long the loading is going to take, so we know whether
             // to bother drawing the message.
-            if (this._loadingIsSlow)
+            if (_loadingIsSlow)
                 {
-                ISpriteBatch spriteBatch = this.ScreenManager.SpriteBatch;
+                ISpriteBatch spriteBatch = ScreenManager.SpriteBatch;
                 SpriteFont font = ScreenManager.Font;
 
                 const string message = "Loading...";
@@ -138,8 +144,8 @@ namespace Labyrinth.Services.Display
                 spriteBatch.Begin();
                 spriteBatch.DrawCentredString(font, message, y, color);
 
-                if (this._loadingMessage != null)
-                    spriteBatch.DrawCentredString(font, this._loadingMessage, y + 75, color);
+                if (_loadingMessage != null)
+                    spriteBatch.DrawCentredString(font, _loadingMessage, y + 75, color);
 
                 spriteBatch.End();
                 }

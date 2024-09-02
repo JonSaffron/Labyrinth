@@ -2,21 +2,22 @@
 
 namespace Labyrinth.Services.Sound
     {
-    class SoundEffectInstanceCache : InstanceCache<ISoundEffectInstance>
+    internal class SoundEffectInstanceCache : InstanceCache<ISoundEffectInstance>
         {
-        public TimeSpan SoundDuration { get; }
         private readonly GameSound _gameSound;
+        private readonly Func<Microsoft.Xna.Framework.Audio.SoundEffectInstance> _createSoundEffectInstance;
 
-        public SoundEffectInstanceCache(int countOfEntries, TimeSpan soundDuration, GameSound gameSound, Func<ISoundEffectInstance> createNewInstance): base(countOfEntries, createNewInstance)
+        public SoundEffectInstanceCache(int countOfEntries, GameSound gameSound, Func<Microsoft.Xna.Framework.Audio.SoundEffectInstance> createSoundEffectInstance): base(countOfEntries)
             {
-            this.SoundDuration = soundDuration;
             this._gameSound = gameSound;
+            this._createSoundEffectInstance = createSoundEffectInstance;
             }
 
         protected override ISoundEffectInstance CreateNewInstance()
             {
-            var result = base.CreateNewInstance();
-            result.InstanceName = $"{this._gameSound}{this.Position}";
+            var instanceName = $"{this._gameSound}{this.Position}";
+            var soundEffectInstance = this._createSoundEffectInstance();
+            var result = new SoundEffectInstance(soundEffectInstance, instanceName);
             return result;
             }
 

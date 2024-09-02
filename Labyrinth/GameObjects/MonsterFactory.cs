@@ -4,14 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects.Behaviour;
 using Labyrinth.Services.WorldBuilding;
 
 namespace Labyrinth.GameObjects
     {
-    class MonsterFactory
+    internal class MonsterFactory
         {
         private static readonly Dictionary<string, Breed> Breeds = BuildBreedDefinitions();
         private static readonly MovementCheckerForMonsters MovementCheckerForMonsters = new MovementCheckerForMonsters();
@@ -89,7 +88,7 @@ namespace Labyrinth.GameObjects
 
             if (result.Mobility != MonsterMobility.Stationary && result.MovementBoundary == null)
                 {
-                throw new InvalidOperationException("Monster of type " + monsterDef.Breed + " at " + monsterDef.Position + " has no movement boundary. Presumably ChangeRooms has not been set.");
+                throw new InvalidOperationException($"Monster of type {monsterDef.Breed} at {monsterDef.Position} has no movement boundary. Presumably ChangeRooms has not been set.");
                 }
 
             result.SetMonsterMotion(true);
@@ -109,9 +108,10 @@ namespace Labyrinth.GameObjects
             return result;
             }
 
-        private static Monster BuildMonsterFromBreed([NotNull] Breed breedInfo, MonsterDef monsterDef)
+        private static Monster BuildMonsterFromBreed(Breed breedInfo, MonsterDef monsterDef)
             {
-            var pathToTexture = "Sprites/Monsters/" + breedInfo.Texture;
+            if (breedInfo == null) throw new ArgumentNullException(nameof(breedInfo));
+            var pathToTexture = $"Sprites/Monsters/{breedInfo.Texture}";
             if (breedInfo.Name == "Tank")
                 return new Tank(monsterDef);
             var result = new Monster(monsterDef, pathToTexture, breedInfo.BaseMovesDuringAnimation);
@@ -123,11 +123,11 @@ namespace Labyrinth.GameObjects
             var inherentBehaviours = breedInfo.InherentBehaviours;
             foreach (var behaviourName in inherentBehaviours)
                 {
-                string typeName = "Labyrinth.GameObjects.Behaviour." + behaviourName;
-                Type behaviourType = Type.GetType(typeName);
+                string typeName = $"Labyrinth.GameObjects.Behaviour.{behaviourName}";
+                Type? behaviourType = Type.GetType(typeName);
                 if (behaviourType == null || !behaviourType.GetInterfaces().Contains(typeof(IBehaviour)))
                     {
-                    throw new InvalidOperationException("Could not find behaviour Type " + behaviourName);
+                    throw new InvalidOperationException($"Could not find behaviour Type {behaviourName}");
                     }
                 var constructorInfo = behaviourType.GetConstructor(new[] {typeof (Monster)});
                 if (constructorInfo == null)
@@ -154,7 +154,7 @@ namespace Labyrinth.GameObjects
             foreach (var move in breedInfo.BreedMovement.Moves)
                 {
                 string typeName = "Labyrinth.GameObjects.Motility." + move.Value;
-                Type movementType = Type.GetType(typeName);
+                Type? movementType = Type.GetType(typeName);
                 if (movementType == null || !movementType.GetInterfaces().Contains(typeof(IMonsterMotion)))
                     {
                     throw new InvalidOperationException("Could not find movement Type " + move.Value);
@@ -180,7 +180,7 @@ namespace Labyrinth.GameObjects
             {
             string worldDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/StandingData");
 
-            string pathToWorld = worldDirectory + "/Monsters.xml";
+            string pathToWorld = $"{worldDirectory}/Monsters.xml";
             if (!File.Exists(pathToWorld))
                 throw new ArgumentOutOfRangeException(pathToWorld);
 
@@ -201,13 +201,13 @@ namespace Labyrinth.GameObjects
             foreach (XmlElement breedElement in xmlRoot.SelectNodesEx("ns:Breed", xnm))
                 {
                 var breed = new Breed
-                    {
-                    Name = breedElement.GetAttribute(nameof(Breed.Name)),
-                    Texture = breedElement.GetAttribute(nameof(Breed.Texture)),
-                    BaseMovesDuringAnimation = int.Parse(breedElement.GetAttribute(nameof(Breed.BaseMovesDuringAnimation)))
-                    };
+                    (
+                    name: breedElement.GetAttribute(nameof(Breed.Name)),
+                    texture: breedElement.GetAttribute(nameof(Breed.Texture)),
+                    baseMovesDuringAnimation: int.Parse(breedElement.GetAttribute(nameof(Breed.BaseMovesDuringAnimation)))
+                    );
 
-                XmlElement inherentBehaviours = (XmlElement) breedElement.SelectSingleNode("ns:InherentBehaviours", xnm);
+                XmlElement? inherentBehaviours = (XmlElement?) breedElement.SelectSingleNode("ns:InherentBehaviours", xnm);
                 if (inherentBehaviours != null)
                     {
                     foreach (XmlElement behaviour in inherentBehaviours.ChildNodes)
@@ -216,7 +216,7 @@ namespace Labyrinth.GameObjects
                         }
                     }
 
-                XmlElement inherentProperties = (XmlElement) breedElement.SelectSingleNode("ns:InherentProperties", xnm);
+                XmlElement? inherentProperties = (XmlElement?) breedElement.SelectSingleNode("ns:InherentProperties", xnm);
                 if (inherentProperties != null)
                     {
                     foreach (XmlElement property in inherentProperties.ChildNodes)
@@ -226,7 +226,7 @@ namespace Labyrinth.GameObjects
                         }
                     }
 
-                XmlElement movement = (XmlElement) breedElement.SelectSingleNode("ns:Movement", xnm);
+                XmlElement? movement = (XmlElement?) breedElement.SelectSingleNode("ns:Movement", xnm);
                 if (movement != null)
                     {
                     var defaultMobility = movement.GetAttribute("Default");
@@ -268,7 +268,9 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException("Failed to get property definition for " + propertyName);
                 }
 
-            object propertyDef = fieldInfo.GetValue(null);
+            object? propertyDef = fieldInfo.GetValue(null);
+            if (propertyDef == null)
+                throw new InvalidOperationException($"Could not get value of property {propertyName}.");
             Type propertyType = propertyDef.GetType().GetGenericArguments()[0];
             object value;
             if (propertyType.IsEnum)
@@ -284,7 +286,7 @@ namespace Labyrinth.GameObjects
                 throw new InvalidOperationException($"Property definition {propertyName} has type {propertyType.FullName} which isn't supported.");
                 }
 
-            MethodInfo methodInfo = typeof(PropertyBag).GetMethod("Set")?.MakeGenericMethod(propertyType);
+            MethodInfo? methodInfo = typeof(PropertyBag).GetMethod("Set")?.MakeGenericMethod(propertyType);
             if (methodInfo == null)
                 {
                 throw new InvalidOperationException("Failed to get generic PropertyBag method definition");
@@ -295,12 +297,19 @@ namespace Labyrinth.GameObjects
 
         private class Breed
             {
-            public string Name;
-            public string Texture;
-            public int BaseMovesDuringAnimation;
+            public readonly string Name;
+            public readonly string Texture;
+            public readonly int BaseMovesDuringAnimation;
             public readonly HashSet<string> InherentBehaviours = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             public readonly Dictionary<string, string> InherentProperties = new Dictionary<string, string>();
             public readonly BreedMovement BreedMovement = new BreedMovement();
+
+            public Breed(string name, string texture, int baseMovesDuringAnimation)
+                {
+                this.Name = name;
+                this.Texture = texture;
+                this.BaseMovesDuringAnimation = baseMovesDuringAnimation;
+                }
             }
 
         private class BreedMovement

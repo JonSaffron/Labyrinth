@@ -21,7 +21,7 @@ namespace Labyrinth.Services.PathFinder
         /// <summary>
         /// Sets or returns a delegate that takes a co-ordinate and returns true when that location is walkable and false otherwise
         /// </summary>
-        public Func<TilePos, bool> CanBeOccupied { get; set; }
+        public Func<TilePos, bool>? CanBeOccupied { get; set; }
 
         /// <summary>
         /// Sets or returns the maximum length of the path that can be traveled

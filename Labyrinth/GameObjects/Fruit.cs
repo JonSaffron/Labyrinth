@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this.Energy = energy;
             string textureName = $"Sprites/Fruit/{this.FruitType:G}";
             this._animationPlayer = new StaticAnimation(this, textureName);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.StaticItem);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.StaticItem);
             }
 
         public override bool IsExtant

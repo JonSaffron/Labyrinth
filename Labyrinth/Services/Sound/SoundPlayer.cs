@@ -1,8 +1,10 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace Labyrinth.Services.Sound
     {
+    /// <summary>
+    /// Initiates the playing of a single sound
+    /// </summary>
     public class SoundPlayer : ISoundPlayer
         {
         public SoundLibrary SoundLibrary { get; }
@@ -19,7 +21,7 @@ namespace Labyrinth.Services.Sound
             InternalPlay(gameSound);
             }
 
-        public void PlayWithCallback(GameSound gameSound, [NotNull] EventHandler callback)
+        public void PlayWithCallback(GameSound gameSound, EventHandler callback)
             {
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
@@ -28,7 +30,7 @@ namespace Labyrinth.Services.Sound
             AddCallback(gameSound, callback);
             }
 
-        public void PlayForObject(GameSound gameSound, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider)
+        public void PlayForObject(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider)
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
@@ -38,7 +40,7 @@ namespace Labyrinth.Services.Sound
             InternalPlayForObject(gameSound, gameObject, centrePointProvider);
             }
 
-        public void PlayForObjectWithCallback(GameSound gameSound, [NotNull] IGameObject gameObject, [NotNull] ICentrePointProvider centrePointProvider, [NotNull] EventHandler callback)
+        public void PlayForObjectWithCallback(GameSound gameSound, IGameObject gameObject, ICentrePointProvider centrePointProvider, EventHandler callback)
             {
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
@@ -55,7 +57,7 @@ namespace Labyrinth.Services.Sound
             {
 #if DEBUG
             if (DoesSoundRequirePosition(gameSound))
-                throw new ArgumentOutOfRangeException("GameSound " + gameSound + " needs to be associated with a GameObject.");
+                throw new ArgumentOutOfRangeException($"GameSound {gameSound} needs to be associated with a GameObject.");
 #endif
 
             ISoundEffectInstance soundEffect = this.SoundLibrary[gameSound];
@@ -67,7 +69,7 @@ namespace Labyrinth.Services.Sound
             {
 #if DEBUG
             if (!DoesSoundRequirePosition(gameSound))
-                throw new ArgumentOutOfRangeException("GameSound " + gameSound + " should not be associated with a GameObject.");
+                throw new ArgumentOutOfRangeException($"GameSound {gameSound} should not be associated with a GameObject.");
 #endif
 
             ISoundEffectInstance soundEffect = this.SoundLibrary[gameSound];

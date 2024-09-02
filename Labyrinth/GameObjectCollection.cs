@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Labyrinth.DataStructures;
+using Labyrinth.GameObjects;
 
 namespace Labyrinth
     {
@@ -10,7 +11,7 @@ namespace Labyrinth
     public class GameObjectCollection : IGameObjectCollection
         {
         private readonly Grid _grid;
-        private readonly SimpleList<IMovingItem> _interactiveGameItems; 
+        private readonly SimpleList<IGameObject> _allGameObjects;
 
         /// <inheritdoc />
         public int CountOfShots { get; private set; }
@@ -21,7 +22,7 @@ namespace Labyrinth
         public GameObjectCollection(TilePos worldSize)
             {
             this._grid = new Grid(worldSize);
-            this._interactiveGameItems = new SimpleList<IMovingItem>(100);
+            this._allGameObjects = new SimpleList<IGameObject>(400);
             }
 
         /// <inheritdoc />
@@ -33,11 +34,11 @@ namespace Labyrinth
                 throw new ArgumentException("Cannot Add a non-extant object to the GameObjectCollection.");
 
             this._grid.Add(gameObject);
+            this._allGameObjects.Add(gameObject);
             if (!(gameObject is IMovingItem mi)) 
                 return;
 
             mi.OriginalPosition = mi.Position;
-            this._interactiveGameItems.Add(mi);
             if (mi is IStandardShot)
                 this.CountOfShots++;
             }
@@ -48,28 +49,26 @@ namespace Labyrinth
             if (gameObject == null)
                 throw new ArgumentNullException(nameof(gameObject));
 
-            if (gameObject is IMovingItem movingItem)
-                {
-                var indexOfItem = this._interactiveGameItems.IndexOf(movingItem);
-                if (indexOfItem == -1)
-                    throw new ArgumentOutOfRangeException(nameof(gameObject));
-                
-                this._interactiveGameItems.RemoveAt(indexOfItem);
-                }
+            if (gameObject is Player)
+                throw new ArgumentOutOfRangeException(nameof(gameObject), "Cannot remove Player object from collection.");
+
+            this._grid.Remove(gameObject);
+            var indexOfItem = this._allGameObjects.IndexOf(gameObject);
+            if (indexOfItem == -1)
+                throw new ArgumentOutOfRangeException(nameof(gameObject));
+            this._allGameObjects.RemoveAt(indexOfItem);
 
             if (gameObject is IStandardShot)
                 this.CountOfShots--;
-
-            this._grid.Remove(gameObject);
             }
 
         /// <inheritdoc />
-        public IEnumerable<IMovingItem> InteractiveGameItems
+        public IEnumerable<IGameObject> AllGameObjects
             {
             get
                 {
-                var result = new IMovingItem[this._interactiveGameItems.Length];
-                this._interactiveGameItems.CopyTo(result);
+                var result = new IGameObject[this._allGameObjects.Length];
+                this._allGameObjects.CopyTo(result);
                 return result;
                 }
             }

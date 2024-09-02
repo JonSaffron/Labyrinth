@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.IO.IsolatedStorage;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Labyrinth.Services.Sound
@@ -16,80 +15,55 @@ namespace Labyrinth.Services.Sound
 
         private VolumeControl()
             {
+            // only one instance allowed
             }
 
         public void LoadState()
             {
-            using (var storage = IsolatedStorageFile.GetUserStoreForDomain())
-                {
-                if (storage.FileExists(SerialiseFileName))
-                    {
-                    using (IsolatedStorageFileStream stream = storage.OpenFile(SerialiseFileName, FileMode.Open, FileAccess.Read))
-                        {
-                        using (TextReader reader = new StreamReader(stream))
-                            {
-                            // "8 muted"
-                            string line = reader.ReadLine();
-                            if (line != null)
-                                {
-                                string[] parts = line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-                                if (parts.Length > 0)
-                                    {
-                                    if (int.TryParse(parts[0], out var volume))
-                                        {
-                                        if (volume >= 0 && volume <= TopVolume)
-                                            {
-                                            this._currentVolume = volume;
-                                            SetVolume();
-                                            }
-                                        }
-                                    }
+            // format looks like "8 muted"
+            string line = PersistentStorage.ReadSettings(SerialiseFileName) ?? string.Empty;
 
-                                if (parts.Length > 1)
-                                    {
-                                    if (string.Equals(parts[1], Muted))
-                                        {
-                                        Mute();
-                                        }
-                                    }
-                                }
-                            }
-                        }
+            string[] parts = line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            var queue = new Queue<string>(parts);
+            if (queue.TryDequeue(out var volumeString))
+                {
+                if (int.TryParse(volumeString, out var volume) && volume >= 0 && volume <= TopVolume)
+                    {
+                    this._currentVolume = volume;
                     }
+                }
+
+            if (queue.TryDequeue(out var isMuted) && string.Equals(isMuted, Muted, StringComparison.OrdinalIgnoreCase))
+                {
+                Mute();
+                }
+            else
+                {
+                Unmute();
                 }
             }
 
         public void SaveState()
             {
-            using (var storage = IsolatedStorageFile.GetUserStoreForDomain())
-                {
-                using (IsolatedStorageFileStream stream = storage.CreateFile(SerialiseFileName))
-                    {
-                    using (TextWriter writer = new StreamWriter(stream))
-                        {
-                        string line = $"{this._currentVolume}{(this.IsMuted ? " " + Muted : string.Empty)}";
-                        writer.WriteLine(line);
-                        }
-                    }
-                }
+            string line = $"{this._currentVolume}{(this.IsMuted ? " " + Muted : string.Empty)}";
+            PersistentStorage.WriteSettings(SerialiseFileName, line);
             }
 
         public void Mute()
             {
-            SoundEffect.MasterVolume = 0;
+            SetMasterVolume(0);
             }
 
         public void Unmute()
             {
-            SetVolume();
+            SetMasterVolume(this._currentVolume);
             }
 
         public bool IsMuted
             {
             get
                 {
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                var result = (SoundEffect.MasterVolume == 0);
+                var result = (SoundEffect.MasterVolume == 0f);
                 return result;
                 }
             }
@@ -97,7 +71,7 @@ namespace Labyrinth.Services.Sound
         public void TurnUpTheVolume()
             {
             this._currentVolume = IsMuted ? 1 : Math.Min(this._currentVolume + 1, TopVolume);
-            SetVolume();
+            SetMasterVolume(this._currentVolume);
             }
 
         public void TurnDownTheVolume()
@@ -105,12 +79,14 @@ namespace Labyrinth.Services.Sound
             if (IsMuted)
                 return;
             this._currentVolume = Math.Max(0, this._currentVolume - 1);
-            SetVolume();
+            SetMasterVolume(this._currentVolume);
             }
 
-        private void SetVolume()
+        private static void SetMasterVolume(int volumeLevel)
             {
-            float volume = 1.0f / TopVolume * this._currentVolume;
+            if (volumeLevel < 0 || volumeLevel > TopVolume)
+                throw new ArgumentOutOfRangeException(nameof(volumeLevel));
+            float volume = 1.0f / TopVolume * volumeLevel;
             SoundEffect.MasterVolume = volume;
             }
 

@@ -5,7 +5,7 @@ using Labyrinth.GameObjects;
 
 namespace Labyrinth.Services.ScoreKeeper
     {
-    class ScoreKeeper : IScoreKeeper, IDisposable
+    internal class ScoreKeeper : IScoreKeeper, IDisposable
         {
         private decimal _score;
 

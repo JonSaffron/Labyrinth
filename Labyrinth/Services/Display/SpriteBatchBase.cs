@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Labyrinth.Services.Display
@@ -6,12 +7,14 @@ namespace Labyrinth.Services.Display
     public abstract class SpriteBatchBase : ISpriteBatch
         {
         private readonly Texture2D _pointTexture;
-        protected float Zoom;
-        protected int ScreenCentreWidth;
+        public float Zoom { get; protected set; }
+        public int ScreenCentreWidth { get; protected set; }
 
         protected SpriteBatch SpriteBatch { get; }
         
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the offset for the view on the world for relative positioning
+        /// </summary>
         public Vector2 WindowPosition { get; set; }
 
         protected SpriteBatchBase(GraphicsDevice graphicsDevice)
@@ -22,7 +25,7 @@ namespace Labyrinth.Services.Display
             }
 
         /// <inheritdoc />
-        public void Begin(Effect effect = null)
+        public void Begin(Effect? effect = null)
             {
             this.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, effect);
             }
@@ -39,6 +42,7 @@ namespace Labyrinth.Services.Display
             if (!this.SpriteBatch.IsDisposed)
                 {
                 this.SpriteBatch.Dispose();
+                GC.SuppressFinalize(this);
                 }
             }
 
@@ -60,13 +64,24 @@ namespace Labyrinth.Services.Display
         /// <inheritdoc />
         public virtual void DrawRectangle(Rectangle destinationRectangle, Color colour)
             {
-            this.DrawTexture(this._pointTexture, destinationRectangle, colour);
+            this.DrawTextureOverRegionInGameCoordinates(this._pointTexture, destinationRectangle, colour);
             }
 
-        protected abstract void DrawTexture(Texture2D texture, Rectangle absoluteArea, Color colour);
+        protected abstract void DrawTextureOverRegionInGameCoordinates(Texture2D texture, Rectangle absoluteArea, Color colour);
+
+        public void DrawTextureOverRegion(Texture2D texture, Rectangle absoluteArea, Color colour)
+            {
+            this.SpriteBatch.Draw(texture, absoluteArea, colour);
+            }
 
         /// <inheritdoc />
-        public void DrawCentredString(SpriteFont font, string text, int y, Color colour)
+        public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color colour, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
+            {
+            this.SpriteBatch.DrawString(spriteFont, text, position, colour, rotation, origin, scale * this.Zoom, effects, layerDepth);
+            }
+
+        /// <inheritdoc />
+        public void DrawCentredString(SpriteFont font, string text, float y, Color colour)
             {
             float textWidth = font.MeasureString(text).X;
             Vector2 pos = new Vector2(this.ScreenCentreWidth, y);

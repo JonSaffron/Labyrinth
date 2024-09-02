@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 
 namespace Labyrinth
@@ -10,13 +9,13 @@ namespace Labyrinth
         /// Adds a single item to the collection
         /// </summary>
         /// <param name="gameObject">Specifies the item to add</param>
-        void Add([NotNull] IGameObject gameObject);
+        void Add(IGameObject gameObject);
 
         /// <summary>
         /// Removes a single item from the collection
         /// </summary>
         /// <param name="gameObject">Specified the item to remove</param>
-        void Remove([NotNull] IGameObject gameObject);
+        void Remove(IGameObject gameObject);
 
         /// <summary>
         /// Allows the collection to update its knowledge of where the specified game object is located
@@ -28,7 +27,7 @@ namespace Labyrinth
         /// Returns a list of all the moving items in the world
         /// </summary>
         /// <remarks>Used for the update loop</remarks>
-        IEnumerable<IMovingItem> InteractiveGameItems { get; }
+        IEnumerable<IGameObject> AllGameObjects { get; }
 
         /// <summary>
         /// Returns a list of all the items at the specified position

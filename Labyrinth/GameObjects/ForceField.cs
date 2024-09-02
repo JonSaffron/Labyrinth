@@ -15,7 +15,7 @@ namespace Labyrinth.GameObjects
             this._crystalRequired = crystalRequired;
             this._animationPlayer = new LoopedAnimation(this, "Sprites/Props/ForceField", 6);
             this.Properties.Set(GameObjectProperties.EffectOfShot, EffectOfShot.Reflection);
-            this.Properties.Set(GameObjectProperties.DrawOrder, (int) SpriteDrawOrder.ForceField);
+            this.Properties.Set(GameObjectProperties.DrawOrder, SpriteDrawOrder.ForceField);
             this.Properties.Set(GameObjectProperties.DeadlyToTouch, true);
             }
 

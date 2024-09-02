@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using Labyrinth.DataStructures;
 using Labyrinth.GameObjects;
 using Labyrinth.Services.WorldBuilding;
@@ -12,12 +11,14 @@ namespace Labyrinth.ClockEvents
     public class ReplenishFruit : IClockEvent
         {
         private readonly RandomFruitDistribution _fruitDistList;
+        private readonly GameState _gameState;
         private readonly Dictionary<FruitType, bool[]> _population;
         private readonly Dictionary<Fruit, int> _reverseLookup;
 
-        public ReplenishFruit([NotNull] RandomFruitDistribution fruitDistList)
+        public ReplenishFruit(RandomFruitDistribution fruitDistList, GameState gameState)
             {
             this._fruitDistList = fruitDistList ?? throw new ArgumentNullException(nameof(fruitDistList));
+            this._gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
             this._population = new Dictionary<FruitType, bool[]>();
             var totalFruitCount = 0;
             foreach (var fd in fruitDistList.Definitions)
@@ -26,7 +27,7 @@ namespace Labyrinth.ClockEvents
                 totalFruitCount += fd.Quantity;
                 }
             this._reverseLookup = new Dictionary<Fruit, int>(totalFruitCount);
-            GlobalServices.GameState.GameObjectRemoved += OnRemoveFruit;
+            gameState.GameObjectRemoved += OnRemoveFruit;
             }
 
         public void Update(int ticks)
@@ -43,8 +44,6 @@ namespace Labyrinth.ClockEvents
 
         private void AddFruit(int slotNumber, Rectangle area, FruitType fruitType, int energy)
             {
-            var gameState = GlobalServices.GameState;
-
             if (!this._population.TryGetValue(fruitType, out var population))
                 throw new InvalidOperationException("Population dictionary does not contain an entry for " + fruitType);
 
@@ -54,13 +53,13 @@ namespace Labyrinth.ClockEvents
 
             var rnd = GlobalServices.Randomness;
             var tp = new TilePos(area.X + rnd.Next(area.Width), area.Y + rnd.Next(area.Height));
-            if (gameState.GetItemsOnTile(tp).Any())
+            if (this._gameState.GetItemsOnTile(tp).Any())
                 return;
 
             // Don't put a new fruit near to the player.
             // This differs from the original game's methodology which would not place it in the same room as the player or the previous room that the player had visited.
-            if (Math.Abs(tp.X - gameState.Player.TilePosition.X) < Constants.RoomSizeInTiles.X
-                && Math.Abs(tp.Y - gameState.Player.TilePosition.Y) < Constants.RoomSizeInTiles.Y)
+            if (Math.Abs(tp.X - this._gameState.Player.TilePosition.X) < Constants.RoomSizeInTiles.X
+                && Math.Abs(tp.Y - this._gameState.Player.TilePosition.Y) < Constants.RoomSizeInTiles.Y)
                 {
                 return;
                 }
@@ -70,7 +69,7 @@ namespace Labyrinth.ClockEvents
             this._reverseLookup.Add(fruit, slotNumber);
             }
 
-        private void OnRemoveFruit(object sender, GameObjectEventArgs args)
+        private void OnRemoveFruit(object? sender, GameObjectEventArgs args)
             {
             if (!(args.GameObject is Fruit fruit))
                 return;

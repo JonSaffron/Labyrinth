@@ -5,9 +5,9 @@ using Labyrinth.DataStructures;
 namespace Labyrinth.GameObjects.Motility
     {
     [UsedImplicitly]
-    class SemiAggressive : MonsterMotionBase
+    internal class SemiAggressive : MonsterMotionBase
         {
-        public SemiAggressive([NotNull] Monster monster) : base(monster)
+        public SemiAggressive(Monster monster) : base(monster)
             {
             }
 

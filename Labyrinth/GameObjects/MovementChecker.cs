@@ -26,7 +26,7 @@ namespace Labyrinth.GameObjects
             {
             if (objectToCheck.MovementBoundary == null)
                 {
-                throw new InvalidOperationException("MovementBoundary is not set for " + objectToCheck + ".");
+                throw new InvalidOperationException($"MovementBoundary is not set for {objectToCheck}.");
                 }
                 
             TilePos proposedDestination = objectToCheck.TilePosition.GetPositionAfterOneMove(direction);
